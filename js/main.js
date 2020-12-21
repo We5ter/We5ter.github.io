@@ -5220,6 +5220,12 @@ default = c
 										vendor: "Apple",                                                                                            vendor: "Apple",
 										target: "safari"
 										},{
+										color: "color-4",
+										desc: "iOS 14.0 Special Acknowledgment",
+										url: "https://support.apple.com/en-us/HT211850",   
+										vendor: "Apple",                                                                                            vendor: "Apple",
+										target: "iOS"
+										},{
 										color: "color-2",
 										desc: "Safari13.0.1 Special Acknowledgment",
 										url: "https://support.apple.com/en-us/HT210605",   
