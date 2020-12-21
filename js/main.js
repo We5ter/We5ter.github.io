@@ -5213,7 +5213,13 @@ default = c
 					}, [e(s.
 				default, {
 						attrs: {
-							sections: [{
+									sections: [{
+										color: "color-1",
+										desc: "CVE-2020-9942 Address bar spoofing on macOS safari",
+										url: "https://support.apple.com/zh-cn/HT211931",   
+										vendor: "Apple",                                                                                            vendor: "Apple",
+										target: "safari"
+										},{
 										color: "color-2",
 										desc: "Safari13.0.1 Special Acknowledgment",
 										url: "https://support.apple.com/en-us/HT210605",   
