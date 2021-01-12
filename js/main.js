@@ -5275,19 +5275,19 @@ default = c
 										target: "iMessage"
 										}, {
 											color: "color-3",
-											desc: "CVE-2020-**031 Incorrect security UI in share",
+											desc: "CVE-20**-160** Incorrect security UI in share",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
 										}, {
 											color: "color-5",
-											desc: "CVE-2020-**032 Incorrect security UI in Tab preview",
+											desc: "CVE-20**-160** Incorrect security UI in Tab preview",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
 										}, {
 											color: "color-9",
-											desc: "CVE-2020-*536 Incorrect security UI in PWAs",
+											desc: "CVE-20**-653* Incorrect security UI in PWAs",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
