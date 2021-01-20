@@ -5305,7 +5305,7 @@ default = c
 											target: "chrome"
 										}, {
 										color: "color-3",
-										desc: "CVE-2019-13743 User-Interface logic flaw in browser navigation module",
+										desc: "CVE-2019-13743 Incorrect security UI in Navigation",
 										url: "https://chromereleases.googleblog.com",
 										vendor: "Google",
 										target: "chrome"
