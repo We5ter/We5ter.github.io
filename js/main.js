@@ -4815,7 +4815,7 @@ default = s
 								title: "Safari Adventure: A Dive into Apple Browser Internals(Lang: en_US)",
 								url: "http://www.powerofcommunity.net/poc2019/Zhiyang.pdf"
 							}, {
-								conf: "Blackhat Asia 2021[Singapore Vitual Event]",
+								conf: "BH Asia 2021[Vitual Event]",
 								title: "A New Era of One-Click Attacks: How to Break Install-Less Apps(Lang: en_US)",
 								url: "https://www.blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259"
 							}]
