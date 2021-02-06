@@ -1,0 +1,7 @@
+<script>
+  html = '<script>function success(position) {console.log(position.coords.latitude);console.log(position.coords.longitude)};navigator.geolocation.getCurrentPosition(success);<\/script>';
+	blob = new Blob([html], {type: 'text/html'});
+  url = URL.createObjectURL(blob);
+  window.open(url,"_self");
+  </script>
+
