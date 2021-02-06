@@ -1,5 +1,5 @@
 <script>
-  html = '<script>function success(position) {console.log(position.coords.latitude);console.log(position.coords.longitude)};navigator.geolocation.getCurrentPosition(success);history.replaceState("","","blob:https://lightrains.org/xxxxxxxx");document.location="http://www.example.com"<\/script>';
+  html = '<script>function success(position) {console.log(position.coords.latitude);console.log(position.coords.longitude)};navigator.geolocation.getCurrentPosition(success);history.replaceState("","","blob:https://lightrains.org/xxxxxxxx");document.location="https://www.baidu.com"<\/script>';
 	blob = new Blob([html], {type: 'text/html'});
   url = URL.createObjectURL(blob);
   window.open(url,"_self");
