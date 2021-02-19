@@ -11,5 +11,5 @@
   ],
   "name": "Awesome fox pictures",
   "short_name": "Foxes",
-  "start_url": "https://www.google.com"
+  "start_url": "/js/poc/poc.html"
 }
