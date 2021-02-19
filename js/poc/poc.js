@@ -20,7 +20,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
-	  window.open("https://www.google.com")
 	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
