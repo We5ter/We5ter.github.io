@@ -22,6 +22,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     addBtn.style.display = 'none';
 	  setTimeout(function(){
     // Show the prompt
+   location="about:blank"
     deferredPrompt.prompt();
     // Wait for the user to respond to the prompt
     deferredPrompt.userChoice.then((choiceResult) => {
