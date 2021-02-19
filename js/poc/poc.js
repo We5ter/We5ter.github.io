@@ -16,11 +16,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
   // Update UI to notify the user they can add to home screen
   addBtn.style.display = 'block';
 
-  //addBtn.addEventListener('click', () => {
-	document.addEventListener("visibilitychange", () => {
+  addBtn.addEventListener('click', () => {
+	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
-     if (document.visibilityState != 'visible') {
     addBtn.style.display = 'none';
+	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
     // Wait for the user to respond to the prompt
@@ -31,7 +31,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
         console.log('User dismissed the A2HS prompt');
       }
       deferredPrompt = null;
-    }
     });
+	  },2000);
   });
 });
