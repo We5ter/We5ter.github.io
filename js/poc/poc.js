@@ -19,6 +19,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   //addBtn.addEventListener('click', () => {
 	document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
+     if (document.visibilityState != 'visible') {
     addBtn.style.display = 'none';
     // Show the prompt
     deferredPrompt.prompt();
@@ -30,6 +31,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
         console.log('User dismissed the A2HS prompt');
       }
       deferredPrompt = null;
+    }
     });
   });
 });
