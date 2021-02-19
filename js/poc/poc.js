@@ -17,10 +17,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
   addBtn.style.display = 'block';
 
   addBtn.addEventListener('click', () => {
-	  html = document.getElementsByTagName('html')[0].innerHTML+'<script src="https://lightrains.org/js/poc/poc.js"></script>';
-	blob = new Blob([html], {type: 'text/html'});
-    url = URL.createObjectURL(blob); 
-    window.open(url,"_self");
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
