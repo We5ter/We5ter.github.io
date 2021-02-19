@@ -23,7 +23,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt.prompt();
     // Wait for the user to respond to the prompt
     deferredPrompt.userChoice.then((choiceResult) => {
-      location="https://www.google.com:2333";
+      html = 'xxx';
+	    blob = new Blob([html], {type: 'text/html'});
+      url = URL.createObjectURL(blob); 
+      window.open(url,"_self");
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the A2HS prompt');
       } else {
