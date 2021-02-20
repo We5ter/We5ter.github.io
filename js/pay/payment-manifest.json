@@ -1,0 +1,4 @@
+{
+  "default_applications": ["https://bobpay.xyz/pay/manifest.json"],
+  "supported_origins": [*]
+}
