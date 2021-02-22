@@ -2,11 +2,11 @@
   <head>
     <title>demo</title>
     <link rel="manifest" href="../pay/manifest.json">
-    <script>
-  /**
- * Initializes the payment request object.
- * @return {PaymentRequest} The payment request object.
- */
+  </head>
+  <body>
+<button onclick="onBuyClicked()">Buy</button>
+  </body>
+   <script>
 function buildPaymentRequest() {
   if (!window.PaymentRequest) {
     return null;
@@ -98,9 +98,5 @@ function onBuyClicked() { // eslint-disable-line no-unused-vars
   }
 }
 </script>
-  </head>
-  <body>
-<button onclick="onBuyClicked()">Buy</button>
-  </body>
 </html>
 
