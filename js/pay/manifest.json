@@ -3,7 +3,7 @@
   "short_name": "BobPay",
   "icons": [{
   	"src": "tree.png",
-  	"sizes": "48x48",
+  	"sizes": "200x200",
   	"type": "image/png"
   }],
   "serviceworker": {
