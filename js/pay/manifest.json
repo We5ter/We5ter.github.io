@@ -11,6 +11,7 @@
     "use_cache": false
   },
   "prefer_related_applications": true,
+  "start_url": "index.html",
   "related_applications": [{
       "platform": "play",
       "id": "com.bobpay",
