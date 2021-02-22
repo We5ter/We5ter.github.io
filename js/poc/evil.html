@@ -48,11 +48,11 @@ function buildPaymentRequest() {
       request.canMakePayment().then(function(result) {
         info(result ? 'Can make payment' : 'Cannot make payment');
       }).catch(function(err) {
-        error(err);
+        console.log(err);
       });
     }
   } catch (e) {
-    error('Developer mistake: \'' + e.message + '\'');
+    console.log('Developer mistake: \'' + e.message + '\'');
   }
 
   return request;
