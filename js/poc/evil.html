@@ -46,7 +46,7 @@ function buildPaymentRequest() {
     request = new PaymentRequest(supportedInstruments, details);
     if (request.canMakePayment) {
       request.canMakePayment().then(function(result) {
-        info(result ? 'Can make payment' : 'Cannot make payment');
+        console.log(result ? 'Can make payment' : 'Cannot make payment');
       }).catch(function(err) {
         console.log(err);
       });
