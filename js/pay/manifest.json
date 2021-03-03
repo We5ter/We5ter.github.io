@@ -1,6 +1,6 @@
 {
-  "name": "Pay with BobPay\r\n\r\nwww.google.com\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nactully this is not google",
-  "short_name": "BobPay",
+  "name": "Pay with Google Pay\r\n\r\nwww.google.com\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nactully this is not google",
+  "short_name": "Google Pay",
   "icons": [{
   	"src": "tree.png",
   	"sizes": "200x200",
@@ -15,7 +15,7 @@
   "start_url": "index.html",
   "related_applications": [{
       "platform": "play",
-      "id": "com.bobpay",
+      "id": "com.googlepay",
       "min_version": "1",
       "fingerprints": [{
           "type": "sha256_cert",
