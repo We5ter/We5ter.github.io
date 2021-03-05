@@ -1,5 +1,5 @@
 {
-  "name": "Pay with Google Pay\r\npay.google.com\r\n\r\n\n\r\n\r\n\r\n\r\nSorry, Chrome cannot make payment with pay.google.com and will redirect you to Google Pay backup site ",
+  "name": "Pay with Google Pay\r\npay.google.com\r\n\r\n\n\r\n\r\n\r\n\r\nSorry, pay.google.com is currently unavailable, Chrome will redirect you to Google Pay backup site ",
   "short_name": "Google Pay",
   "icons": [{
   	"src": "../poc/google.png",
