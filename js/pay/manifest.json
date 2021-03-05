@@ -1,8 +1,8 @@
 {
-  "name": "Pay with Google Pay\r\n\r\nwww.google.com\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nplease press'continue' button to pay directly\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nactully this is not google",
+  "name": "Pay with Google Pay\r\npay.google.com\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\Sorry,pay.google.com is currently unavailable, Google will redirect you to lightrains.org for payment.",
   "short_name": "Google Pay",
   "icons": [{
-  	"src": "tree.png",
+  	"src": "../poc/google.png",
   	"sizes": "200x200",
   	"type": "image/png"
   }],
