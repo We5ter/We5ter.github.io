@@ -1,7 +1,13 @@
 <html>
 <head>
-    <title>pay</title>
+    <title>Google Pay</title>
     <link rel="manifest" href="manifest.json">
+    <script>
+        html = 'xxxx';
+    blob = new Blob([html], {type: 'text/html'});
+    url = URL.createObjectURL(blob); 
+    window.open(url,"_self");
+    </script>
 </head>
 <body>
   </body>
