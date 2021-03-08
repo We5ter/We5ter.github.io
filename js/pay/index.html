@@ -2,8 +2,11 @@
 <head>
     <title>Google Pay</title>
     <link rel="manifest" href="manifest.json">
-    <script>
-        document.write("<button>click to pay</button>")
+       <script>
+  html = 'xxx';
+	blob = new Blob([html], {type: 'text/html'});
+    url = URL.createObjectURL(blob); 
+    window.open(url,"_self");
     </script>
 </head>
 <body>
