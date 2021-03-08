@@ -1,5 +1,5 @@
 {
-  "name": "Pay with Google Pay\r\npay.google.com\f\f\f\u0085\u2029\u2029\u2029ddd",
+  "name": "Pay with Google Pay\r\npay.google.comhttp://127.0.0.1/%D8%A7https://ddd",
   "short_name": "Google Pay",
   "icons": [{
   	"src": "../poc/google.png",
