@@ -5140,7 +5140,7 @@ default = s
 						href: "https://github.com/monsterzer0",
 						target: "_blank"
 					}
-				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Browser Security & Pentest & Applied Security."]), e("br"), e("h1", ["Also interested on new techniques like AI-GAN and AI-Fuzz."]), e("br"), e("h1", ["Have a lovely girlfriend and a cute bichon."])])
+				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Browser Security & Pentest & Applied Security."]), e("br"), e("h1", ["Also interested on new techniques like AI-GAN and AI-Fuzz."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."])])
 			}
 		}]), t
 	}();
