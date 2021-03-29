@@ -1,5 +1,5 @@
 {
-  "name": "Pay with Google Pay\r\npay.google.comhttp://127.0.0.1/%D8%A7https://ddd",
+  "name": "Pay with Google Pay\r\n\r\npay.google.com\r\n\r\nsorry, we currently cannot acess pay.google.com, will redirect you to ",
   "short_name": "Google Pay",
   "icons": [{
   	"src": "../poc/google.png",
