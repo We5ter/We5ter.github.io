@@ -12,7 +12,7 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     name: 'Rouslan Solomakhin',
   };
   const instrument = {
-    displayName: 'Troy\r\n\r\n\r\nddddd',
+    displayName: 'Troy\r\n\r\n\r\n\t\t\t\t\t\u0085\u0085\u0085\u0085\u0085\u2028\u2028\u2028\u2028\u2028\u2028\u2028\t\r\n\r\n\r\n\r\nddddd',
     icon: 'https://rsolomakhin.github.io/pr/spc/troy.png',
   };
   const pubKeyCredParams = [{
