@@ -5322,11 +5322,17 @@ default = c
 										vendor: "Microsoft",
 										target: "outlook.com"
 										}, {
+										color: "color-4",
+										desc: "Theft of arbitrary files",
+										url: "https://security.opera.com/hall-of-fame/",
+										vendor: "Opera",
+										target: "Opera Browser"
+										}, {
 										color: "color-3",
-										desc: "Account takeover and Privilege Escalation",
+										desc: "Hackerone",
 										url: "https://hackerone.com/wester0x01",
-										vendor: "Paypal",
-										target: "paypal.com"
+										vendor: "-",
+										target: "-"
 										}, {
 										color: "color-1",
 										desc: "Extension Page html injection lead to XSS on chrome and firefox browser",
@@ -5339,18 +5345,6 @@ default = c
 										url: "https://zhuanlan.zhihu.com/p/51768716",
 										vendor: "Typora",
 										target: "windows editor"
-										}, {
-										color: "color-9",
-										desc: "URL can be replaceState by blob URL in iOS brave",
-										url: "https://hackerone.com/reports/215044",
-										vendor: "Brave",
-										target: "browser"
-										}, {
-										color: "color-1",
-										desc: "UI spoofing & address bar spoofing",
-										url: "https://hackerone.com/wester0x01",
-										vendor: "Brave",
-										target: "browser"
 										}, {
 										color: "color-3",
 										desc: "CVE-2017-8104 Directory traversal in smilie module",
