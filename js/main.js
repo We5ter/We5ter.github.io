@@ -5326,13 +5326,7 @@ default = c
 										desc: "Theft of arbitrary files",
 										url: "https://security.opera.com/hall-of-fame/",
 										vendor: "Opera",
-										target: "Opera Browser"
-										}, {
-										color: "color-3",
-										desc: "Hackerone",
-										url: "https://hackerone.com/wester0x01",
-										vendor: "-",
-										target: "-"
+										target: "opera browser"
 										}, {
 										color: "color-1",
 										desc: "Extension Page html injection lead to XSS on chrome and firefox browser",
