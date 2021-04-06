@@ -8,7 +8,7 @@ const textEncoder = new TextEncoder();
  */
 async function createPaymentCredential(windowLocalStorageIdentifier) {
   const rp = {
-    id: 'rsolomakhin.github.io',
+    id: 'lightrains.org',
     name: 'Rouslan Solomakhin',
   };
   const instrument = {
