@@ -4977,8 +4977,8 @@ default = s
 								url: "https://github.com/We5ter"
 							}, {
 								color: "color-4",
-								title: "知乎",
-								url: "https://www.zhihu.com/people/zhiyangzeng"
+								title: "Hackerone",
+								url: "https://hackerone.com/wester0x01"
 							}, {
 								color: "color-8",
 								title: "Email",
