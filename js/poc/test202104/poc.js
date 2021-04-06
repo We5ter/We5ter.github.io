@@ -38,11 +38,11 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
         windowLocalStorageIdentifier,
         btoa(String.fromCharCode(...new Uint8Array(
             publicKeyCredential.rawId))));
-    info(windowLocalStorageIdentifier + ': Credential ' +
+    console.log(windowLocalStorageIdentifier + ': Credential ' +
          window.localStorage.getItem(windowLocalStorageIdentifier) +
          ' enrolled.');
   } catch (err) {
-    error(err);
+    console.log(err);
   }
 }
 
@@ -85,7 +85,7 @@ async function buildPaymentRequest(windowLocalStorageIdentifier) {
 
     request = new PaymentRequest(supportedInstruments, details);
   } catch (err) {
-    error(err);
+    console.log(err);
   }
 
   return request;
@@ -96,7 +96,7 @@ async function buildPaymentRequest(windowLocalStorageIdentifier) {
  */
 async function onBuyClicked(windowLocalStorageIdentifier) {
   if (!window.PaymentRequest) {
-    error('PaymentRequest API is not supported.');
+    console.log('PaymentRequest API is not supported.');
     return;
   }
 
@@ -107,15 +107,15 @@ async function onBuyClicked(windowLocalStorageIdentifier) {
   try {
     const instrumentResponse = await request.show();
     await instrumentResponse.complete('success')
-    info(windowLocalStorageIdentifier + ': ' + JSON.stringify(instrumentResponse, undefined, 2));
+    console.log(windowLocalStorageIdentifier + ': ' + JSON.stringify(instrumentResponse, undefined, 2));
   } catch (err) {
-    error(err);
+    console.log(err);
   }
 }
 
 async function checkCanMakePayment(windowLocalStorageIdentifier) {
   if (!window.PaymentRequest) {
-    error('PaymentRequest API is not supported.');
+    console.log('PaymentRequest API is not supported.');
     return;
   }
   try {
@@ -123,8 +123,8 @@ async function checkCanMakePayment(windowLocalStorageIdentifier) {
     if (!request)
       return;
     const result = await request.canMakePayment();
-    info(windowLocalStorageIdentifier + ': ' + (result ? 'Can make payment.' : 'Cannot make payment'));
+    console.log(windowLocalStorageIdentifier + ': ' + (result ? 'Can make payment.' : 'Cannot make payment'));
   } catch (err) {
-    error(err);
+    console.log(err);
   }
 }
