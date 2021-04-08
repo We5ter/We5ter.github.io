@@ -29,12 +29,11 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     rp,
     instrument,
     challenge: textEncoder.encode('Transaction approval challenge'),
-    pubKeyCredParams,
+    //pubKeyCredParams,
     authenticatorSelection,
   };
   try {
-    //const publicKeyCredential = await navigator.credentials.create({payment});
-    const publicKeyCredential = await navigator.credentials.create({'password':true});
+    const publicKeyCredential = await navigator.credentials.create({payment});
     console.log(publicKeyCredential);
     window.localStorage.setItem(
         windowLocalStorageIdentifier,
