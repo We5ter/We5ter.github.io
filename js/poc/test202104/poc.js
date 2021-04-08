@@ -16,8 +16,8 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     icon: 'https://rsolomakhin.github.io/pr/spc/troy.png',
   };
   const pubKeyCredParams = [{
-    type: 'public-key',
-    alg: cose_alg_ECDSA_w_SHA256,  // ECDSA, not supported on Windows.
+    type: 'password',
+    alg: -7,  // ECDSA, not supported on Windows.
   }];
   const authenticatorSelection = {
     userVerification: 'required',
