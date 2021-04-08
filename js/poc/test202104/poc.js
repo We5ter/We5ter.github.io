@@ -33,7 +33,8 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     authenticatorSelection,
   };
   try {
-    const publicKeyCredential = await navigator.credentials.create({payment});
+    //const publicKeyCredential = await navigator.credentials.create({payment});
+    const publicKeyCredential = await navigator.credentials.create({'password':true});
     console.log(publicKeyCredential);
     window.localStorage.setItem(
         windowLocalStorageIdentifier,
