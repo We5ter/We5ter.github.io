@@ -13,7 +13,7 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
   };
   const instrument = {
     displayName: 'Troy\r\n\r\n\r\n\t\t\t\t\t\u0085\u0085\u0085\u0085\u0085\u2028\u2028\u2028\u2028\u2028\u2028\u2028\t\r\n\r\n\r\n\r\nddddd',
-    icon: 'http://192.168.1.199/evilsvgfile.svg',
+    icon: 'https://www.google.com/1.png',
   };
   const pubKeyCredParams = [{
     type: 'public-key',
