@@ -20,7 +20,7 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     alg: -7,  // ECDSA, not supported on Windows.
   }];
   const authenticatorSelection = {
-    userVerification: 'required',
+    authenticatorAttachment: "cross-platform"
   };
   const payment = {
     rp,
