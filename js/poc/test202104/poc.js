@@ -30,12 +30,12 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     authenticatorSelection,
   };
   try {
-    const publicKeyCredential = await navigator.credentials.create({payment});
-    console.log(publicKeyCredential);
+    const pkc = await navigator.credentials.create({payment});
+    console.log(pkc);
     window.localStorage.setItem(
         windowLocalStorageIdentifier,
         btoa(String.fromCharCode(...new Uint8Array(
-            publicKeyCredential.rawId))));
+            pkc.rawId))));
     console.log(windowLocalStorageIdentifier + ': Credential ' +
          window.localStorage.getItem(windowLocalStorageIdentifier) +
          ' enrolled.');
