@@ -1,4 +1,5 @@
 <button id="butOpenFile">xxx</button>
+<textarea id="textArea"></textarea>
 <script>
     let fileHandle;
     butOpenFile = document.getElementById("butOpenFile");
@@ -6,5 +7,10 @@
   // Destructure the one-element array.
   [fileHandle] = await window.showOpenFilePicker();
   // Do something with the file handle.
+  const file = await fileHandle.getFile();
+const contents = await file.text();
+textArea = document.getElementById("textArea");
+textArea.value = contents;
+
 });
 </script>
