@@ -1,16 +1,15 @@
-<button id="butOpenFile">xxx</button>
-<textarea id="textArea"></textarea>
+<button id="butDirectory">click me</button>
 <script>
-    let fileHandle;
-    butOpenFile = document.getElementById("butOpenFile");
-    butOpenFile.addEventListener('click', async () => {
-  // Destructure the one-element array.
-  [fileHandle] = await window.showOpenFilePicker();
-  // Do something with the file handle.
-  const file = await fileHandle.getFile();
-const contents = await file.text();
-textArea = document.getElementById("textArea");
-textArea.value = contents;
-
+  const butDir = document.getElementById('butDirectory');
+butDir.addEventListener('click', async () => {
+  const dirHandle = await window.showDirectoryPicker();
+  for await (const entry of dirHandle.values()) {
+    console.log(entry.kind, entry.name);
+  }
 });
+    const newDirectoryHandle = await existingDirectoryHandle.getDirectoryHandle('My Documents', {
+  create: true,
+});
+// In this new directory, create a file named "My Notes.txt".
+const newFileHandle = await newDirectoryHandle.getFileHandle('My Notes.txt', { create: true });
 </script>
