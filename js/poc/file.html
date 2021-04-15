@@ -1,4 +1,4 @@
-<button id="butDirectory" onclick="poc">click me</button>
+<button id="butDirectory" onclick="javascript:poc()">click me</button>
 <script>
   function poc(){
   const dir_ref =  window.showDirectoryPicker();
@@ -9,8 +9,8 @@ if (!dir_ref) {
 
 // No special API to create copies, but still possible to do so by using
 // available read and write APIs.
-const new_file = await dir_ref.getFile('zzy.txt', {create: true});
-const new_file_writer = await new_file.createWritable();
+const new_file =  dir_ref.getFile('zzy.txt', {create: true});
+const new_file_writer =  new_file.createWritable();
 await new_file_writer.write("xxxxx");
 await new_file_writer.close();
   }
