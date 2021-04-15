@@ -1,0 +1,10 @@
+<button id="butOpenFile">xxx</button>
+<script>
+    let fileHandle;
+    butOpenFile = document.getElementById("butOpenFile");
+    butOpenFile.addEventListener('click', async () => {
+  // Destructure the one-element array.
+  [fileHandle] = await window.showOpenFilePicker();
+  // Do something with the file handle.
+});
+</script>
