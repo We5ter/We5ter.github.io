@@ -11,7 +11,7 @@ if (!dir_ref) {
 // available read and write APIs.
 const new_file =  dir_ref.getFile('zzy.txt', {create: true});
 const new_file_writer =  new_file.createWritable();
-await new_file_writer.write("xxxxx");
-await new_file_writer.close();
+new_file_writer.write("xxxxx");
+new_file_writer.close();
   }
 </script>
