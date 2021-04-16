@@ -1,17 +1,17 @@
 <button id="butDirectory" onclick="javascript:poc()">click me</button>
 <script>
   function poc(){
-  const dir_ref =  window.showDirectoryPicker();
-if (!dir_ref) {
-    // User cancelled, or otherwise failed to open a directory.
-    return;
-}
-
-// No special API to create copies, but still possible to do so by using
-// available read and write APIs.
-const new_file =  dir_ref.getFileHandle('zzy.txt', {create: true});
-const new_file_writer =  new_file.createWritable();
-new_file_writer.write("xxxxx");
-new_file_writer.close();
+  const options = {
+    types: [
+      {
+        description: 'Text Files',
+        accept: {
+          'text/plain': ['.txt'],
+        },
+      },
+    ],
+  };
+  const handle =  window.showSaveFilePicker(options);
+  return handle;
   }
 </script>
