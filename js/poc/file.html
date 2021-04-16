@@ -9,7 +9,7 @@ if (!dir_ref) {
 
 // No special API to create copies, but still possible to do so by using
 // available read and write APIs.
-const new_file =  dir_ref.getFile('zzy.txt', {create: true});
+const new_file =  dir_ref.getFileHandle('zzy.txt', {create: true});
 const new_file_writer =  new_file.createWritable();
 new_file_writer.write("xxxxx");
 new_file_writer.close();
