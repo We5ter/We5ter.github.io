@@ -1,5 +1,4 @@
 {
-  "background_color": "purple",
   "description": "Shows random fox pictures. Hey, at least it isn't cats.",
   "display": "fullscreen",
   "icons": [
@@ -12,15 +11,11 @@
 "name": "Trust me! this is an google app\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\nwww.google.com\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\ntest",
   "short_name": "Google Account",
   "start_url": "/js/poc/google.html",
-  "url_handlers": [
-        {
-            "origin": "apple.com"
-        },
-        {
-            "origin": "google.com"
-        },
-        {
-            "origin": "*.twitter.com"
-        }
-    ]
+  "background_color": "#f5f5f5;font-size:100px",
+  "theme_color": "#29434d",
+  "protocol_handlers": [
+    {
+      "protocol": "web+testing",
+      "url": "https://lightrains.org/?testing=%s"
+    }
 }
