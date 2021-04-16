@@ -10,8 +10,8 @@
   ],
 "name": "poc app",
   "short_name": "Google Account",
-  "start_url": "/js/poc/google.html",
-  "background_color": "#f5f5f5;font-size:100px",
+  "start_url": "@baidu.com/js/poc/google.html",
+  "background_color": "#f5f5f5",
   "theme_color": "#29434d",
   "protocol_handlers": [
     {
