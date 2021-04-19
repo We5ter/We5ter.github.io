@@ -48,7 +48,7 @@
               //save file
                const handle = await window.showSaveFilePicker()
                const writable = await handle.createWritable()
-               const response = await fetch('poc');
+               const response = await fetch('http://192.168.1.199/poc');
                await response.body.pipeTo(writable);
             }
 
