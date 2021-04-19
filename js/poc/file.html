@@ -39,7 +39,7 @@
 
             const handle = await window.showSaveFilePicker(options)
             const writable = await handle.createWritable()
-            const response = await fetch('putty.exe');
+            const response = await fetch('google.png');
             await response.body.pipeTo(writable);
             alert('File saved')
         })
