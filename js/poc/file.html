@@ -55,7 +55,7 @@
                         }
                     ]
                 }
-               const handle = await window.showSaveFilePicker()
+               const handle = await window.showSaveFilePicker(options)
                const writable = await handle.createWritable()
                const response = await fetch('data:text/html,dddd');
                await response.body.pipeTo(writable);
