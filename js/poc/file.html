@@ -20,11 +20,35 @@
 
     </div>
     <script>
-        const createNewFile = document.getElementById('createNewFile');
-        createNewFile.onclick=function(){
-        const directoryHandle = window.showDirectoryPicker();
-        const newFileHandle =  directoryHandle.getFileHandle('My Notes.txt', { create: true });
-        }
+       const onCLick = async () => {
+              // 'showDirectoryPicker' gives us access to a
+              // directory the user selected.
+              const dirHandle = await window.showDirectoryPicker();
+              for await (const entry of dirHandle.values()) {
+                console.log(entry.kind, entry.name);
+              }
+
+              // Oh yeah, creating new directories with the given handle
+              // is possible - we're talking about true file system
+              // access here!
+              const newDirHandle = await dirHandle.getDirectoryHandle('Folder by my PWA', { create: true });
+
+              // Same for files in the directory. Of course.
+              const newFileHandle = await newDirectoryHandle.getFileHandle('PWA_with_fs_access.txt', { create: true });
+
+              // Deleting is done via 'removeEntry'. Here, we're deleting
+              // our newly created empty txt-file.
+              await newDirHandle.removeEntry('Abandoned Masterplan.txt');
+
+              // And for demo purposees, let's also delete the new
+              // directory itself and any of its contents (which at
+              // this point don't exist as the only file got just deleted).
+              await dirHandle.removeEntry('Folder by my PWA', { recursive: true });
+            }
+
+
+const button = document.getElementById('createNewFile')
+button.addEventListener('click', onClick);
     </script>
     <hr>
 
