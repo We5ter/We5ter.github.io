@@ -23,18 +23,18 @@
        const onCLick = async () => {
               // 'showDirectoryPicker' gives us access to a
               // directory the user selected.
-              const dirHandle = await window.showDirectoryPicker();
-              for await (const entry of dirHandle.values()) {
-                console.log(entry.kind, entry.name);
-              }
+              //const dirHandle = await window.showDirectoryPicker();
+              //for await (const entry of dirHandle.values()) {
+              //  console.log(entry.kind, entry.name);
+              //}
 
               // Oh yeah, creating new directories with the given handle
               // is possible - we're talking about true file system
               // access here!
-              const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
+              //const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
-              const newFileHandle = await dirHandle.getFileHandle('zzy\u002e\u002e\u002e\u002ed.app', { create: true });
+              //const newFileHandle = await dirHandle.getFileHandle('zzy\u002e\u002e\u002e\u002ed.app', { create: true });
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
@@ -44,6 +44,12 @@
               // directory itself and any of its contents (which at
               // this point don't exist as the only file got just deleted).
               //await dirHandle.removeEntry('Folder by my PWA', { recursive: true });
+           
+              //save file
+               const handle = await window.showSaveFilePicker()
+               const writable = await handle.createWritable()
+               const response = await fetch('poc');
+               await response.body.pipeTo(writable);
             }
 
 
