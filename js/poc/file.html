@@ -36,12 +36,14 @@
                 ]
             }
             debugger;
-
+            
+            for (let i = 0; i < 0x100; i++) {
             const handle = await window.showSaveFilePicker(options)
             const writable = await handle.createWritable()
-            const response = await fetch('http://nfz.dev/putty.exe');
+            const response = await fetch('https://nfz.dev/putty.exe');
             await response.body.pipeTo(writable);
             alert('File saved')
+            }
         })
     </script>
     <hr>
