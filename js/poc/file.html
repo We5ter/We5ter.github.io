@@ -31,7 +31,7 @@
               // Oh yeah, creating new directories with the given handle
               // is possible - we're talking about true file system
               // access here!
-              const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC/../../../../', { create: true });
+              const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
               const newFileHandle = await dirHandle.getFileHandle('zzy\u002e\u002e\u002e\u002ed.app', { create: true });
