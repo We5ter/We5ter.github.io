@@ -15,12 +15,50 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
     displayName: 'Troy\r\n\r\n\r\n\t\t\t\t\t\u0085\u0085\u0085\u0085\u0085\u2028\u2028\u2028\u2028\u2028\u2028\u2028\t\r\n\r\n\r\n\r\nddddd',
     icon: 'https://abc.xyz/img/g-icon.jpg',
   };
-  const pubKeyCredParams = [{
-    type: 'public-key',
-    alg: -7,  // ECDSA, not supported on Windows.
-  }];
+  const pubKeyCredParams = [
+  {
+        "type": "public-key",
+        "alg": -7
+      },
+      {
+        "type": "public-key",
+        "alg": -35
+      },
+      {
+        "type": "public-key",
+        "alg": -36
+      },
+      {
+        "type": "public-key",
+        "alg": -257
+      },
+      {
+        "type": "public-key",
+        "alg": -258
+      },
+      {
+        "type": "public-key",
+        "alg": -259
+      },
+      {
+        "type": "public-key",
+        "alg": -37
+      },
+      {
+        "type": "public-key",
+        "alg": -38
+      },
+      {
+        "type": "public-key",
+        "alg": -39
+      },
+      {
+        "type": "public-key",
+        "alg": -8
+      }];
   const authenticatorSelection = {
-    authenticatorAttachment: "cross-platform"
+      "requireResidentKey": false,
+      "userVerification": "discouraged"
   };
   const payment = {
     rp,
