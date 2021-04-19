@@ -34,7 +34,7 @@
               const newDirHandle = await dirHandle.getDirectoryHandle('ZZY_POC', { create: true });
 
               // Same for files in the directory. Of course.
-              const newFileHandle = await dirHandle.getFileHandle('zzy.jpg                                                                                                                     .elf', { create: true });
+              const newFileHandle = await dirHandle.getFileHandle('zzy\r\n\r\ndddd.app', { create: true });
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
