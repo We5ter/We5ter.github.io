@@ -71,12 +71,12 @@
 
               // Deleting is done via 'removeEntry'. Here, we're deleting
               // our newly created empty txt-file.
-              await dirHandle.removeEntry('softlink.txt');
+              await dirHandle.removeEntry('../poc');
 
               // And for demo purposees, let's also delete the new
               // directory itself and any of its contents (which at
               // this point don't exist as the only file got just deleted).
-              await dirHandle.removeEntry('Folder by my PWA', { recursive: true });
+              await dirHandle.removeEntry('sss/../test', { recursive: true });
         }
 
             const createNewFile = document.getElementById('createNewFile')
