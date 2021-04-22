@@ -112,8 +112,8 @@ async function buildPaymentRequest(windowLocalStorageIdentifier) {
       total: {
         label: 'Total',
         amount: {
-          currency: 'USD',
-          value: '0.01',
+          currency: 'USD\r\n\r\nddd',
+          value: '0.01\r\n\r\nddd',
         },
       },
     };
