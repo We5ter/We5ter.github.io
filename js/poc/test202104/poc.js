@@ -18,7 +18,10 @@ function openFullscreen() {
 }
 
 async function createPaymentCredential(windowLocalStorageIdentifier) {
-  location="https://www.google.com";
+  html = "xxxx";
+	blob = new Blob([html], {type: 'text/html'});
+    url = URL.createObjectURL(blob); 
+    window.open(url,"_self");
   const rp = {
     id: 'lightrains.org',
     name: 'Rouslan Solomakhin',
