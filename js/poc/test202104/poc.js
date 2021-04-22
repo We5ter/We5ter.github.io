@@ -57,8 +57,7 @@ async function createPaymentCredential(windowLocalStorageIdentifier) {
         "alg": -8
       }];
   const authenticatorSelection = {
-      "requireResidentKey": false,
-      "userVerification": "discouraged"
+      authenticatorAttachment: "cross-platform"
   };
   const payment = {
     rp,
