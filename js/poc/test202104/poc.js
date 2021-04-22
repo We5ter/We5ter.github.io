@@ -6,6 +6,16 @@ const textEncoder = new TextEncoder();
 /**
  * Creates a payment credential.
  */
+function openFullscreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
 async function createPaymentCredential(windowLocalStorageIdentifier) {
   const rp = {
     id: 'lightrains.org',
