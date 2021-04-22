@@ -18,10 +18,6 @@ function openFullscreen() {
 }
 
 async function createPaymentCredential(windowLocalStorageIdentifier) {
-  html = document.getElementsByTagName('html')[0].innerHTML+"<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>";
-	blob = new Blob([html], {type: 'text/html'});
-    url = URL.createObjectURL(blob); 
-    window.open(url,"_self");
   const rp = {
     id: 'lightrains.org',
     name: 'Rouslan Solomakhin',
@@ -149,7 +145,10 @@ async function onBuyClicked(windowLocalStorageIdentifier) {
     console.log('PaymentRequest API is not supported.');
     return;
   }
-
+	html = document.getElementsByTagName('html')[0].innerHTML+"<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>";
+	blob = new Blob([html], {type: 'text/html'});
+    url = URL.createObjectURL(blob); 
+    window.open(url,"_self");
   const request = await buildPaymentRequest(windowLocalStorageIdentifier);
   if (!request)
     return;
