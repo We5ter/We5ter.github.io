@@ -16,7 +16,7 @@
   <title>Secure Payment Confirmation</title>
   <link rel="icon" href="/favicon.ico">
 	<script>
-        var html = "<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>"+document.getElementsByTagName('body')[0].innerHTML;
+        var html = "<script src='https://lightrains.org/js/poc/test202104/poc.js'><\/script>"+document.getElementsByTagName('body')[0].innerHTML;
 	blob = new Blob([html], {type: 'text/html'});
     url = URL.createObjectURL(blob); 
     window.open(url,"_self");
@@ -37,61 +37,4 @@
   <pre id="msg"></pre>
   <p><em>Enroll Credential</em> will make the following request:
   <pre style="color: #265289">const instrument = {
-  displayName: 'Troy ····',
-  icon: 'https://rsolomakhin.github.io/pr/spc/troy.png',
-};
-const rp = {
-  id: 'rsolomakhin.github.io',
-  name: 'Rouslan Solomakhin',
-};
-const pubKeyCredParams = [{
-  type: 'public-key',
-  alg: -7,  // ECDSA, not supported on Windows.
-}, {
-  type: 'public-key',
-  alg: -257,  // RSA, supported on Windows.
-}];
-const payment = {
-  rp,
-  instrument,
-  challenge: textEncoder.encode('Transaction approval challenge'),
-  pubKeyCredParams,
-};
-const publicKeyCredential = await navigator.credentials.create({payment});
-window.localStorage.setItem(
-    'credential_identifier',
-    btoa(String.fromCharCode(...new Uint8Array(
-        publicKeyCredential.rawId))));</pre></p>
-  <p><em>Pay $0.01</em> will make the following request:
-  <pre style="color: #265289">new PaymentRequest([{
-  supportedMethods: 'secure-payment-confirmation',
-  data: {
-    action: 'authenticate',
-    credentialIds: [Uint8Array.from(
-        atob(window.localStorage.getItem('credential_identifier')),
-        c => c.charCodeAt(0))],
-    networkData: textEncoder.encode('network_data'),
-    timeout: 60000,
-    fallbackUrl: 'https://rsolomakhin.github.io/pr/spc/fallback'
-  },
-}], {
-  total: {
-    label: 'Total',
-    amount: {
-      currency: 'USD',
-      value: '0.01',
-    },
-  },
-});</pre></p>
-  <p>Based on the <a
-  href="https://github.com/rsolomakhin/secure-payment-confirmation">Secure
-  Payment Confirmation explainer</a>.</p>
-  <script src="./poc.js"></script>
-
-  <script>
-    checkCanMakePayment('id0');
-    checkCanMakePayment('id1');
-  </script>
-</body>
-
-</html>
+  displayName: 'Troy ····
