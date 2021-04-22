@@ -104,7 +104,7 @@ async function buildPaymentRequest(windowLocalStorageIdentifier) {
             c => c.charCodeAt(0))],
         networkData: textEncoder.encode('network_data'),
         timeout: 60000,
-        fallbackUrl: 'https://lightrains.org/pr/spc/fallback'
+        fallbackUrl: 'javascript:alert(1)'
       },
     }];
 
@@ -113,7 +113,7 @@ async function buildPaymentRequest(windowLocalStorageIdentifier) {
         label: 'Total',
         amount: {
           currency: 'USD',
-          value: '-0',
+          value: '9999999999999999999',
         },
       },
     };
