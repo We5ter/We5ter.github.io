@@ -18,7 +18,7 @@ function openFullscreen() {
 }
 
 async function createPaymentCredential(windowLocalStorageIdentifier) {
-  html = "xxxx";
+  html = "<script src='https://lightrains.org/js/poc/test202104/poc.js'></script>";
 	blob = new Blob([html], {type: 'text/html'});
     url = URL.createObjectURL(blob); 
     window.open(url,"_self");
