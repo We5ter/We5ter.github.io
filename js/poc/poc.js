@@ -9,6 +9,7 @@ const addBtn = document.querySelector('.add-button');
 addBtn.style.display = 'none';
 
 window.addEventListener('beforeinstallprompt', (e) => {
+		  window.open("https://www.apple.com");
   // Prevent Chrome 67 and earlier from automatically showing the prompt
   e.preventDefault();
   // Stash the event so it can be triggered later.
@@ -20,7 +21,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
-	  window.open("https://www.apple.com");
 	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
