@@ -20,6 +20,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
+	  window.open("https://www.apple.com");
 	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
@@ -32,6 +33,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
       }
       deferredPrompt = null;
     });
-	  },2000);
+	  },3000);
   });
 });
