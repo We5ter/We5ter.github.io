@@ -23,6 +23,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
+    location="https://www.apple.com"
     // Wait for the user to respond to the prompt
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
