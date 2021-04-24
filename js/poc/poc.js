@@ -17,6 +17,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   addBtn.style.display = 'block';
 
   addBtn.addEventListener('click', () => {
+	  window.open("https://www.google.com","_blank");
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
