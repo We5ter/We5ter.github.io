@@ -5274,6 +5274,12 @@ default = c
 										vendor: "Apple",
 										target: "iMessage"
 										}, {
+											color: "color-6",
+											desc: "CVE-20**-305** Incorrect security UI in Web App Installs",
+											url: "https://chromereleases.googleblog.com",
+											vendor: "Google",
+											target: "chrome"
+										}, {
 											color: "color-2",
 											desc: "CVE-20**-211** Insufficient policy enforcement in Downloads",
 											url: "https://chromereleases.googleblog.com",
