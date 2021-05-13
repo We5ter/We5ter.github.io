@@ -5140,7 +5140,7 @@ default = s
 						href: "https://github.com/monsterzer0",
 						target: "_blank"
 					}
-				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Product security and offensive security research."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."]), e("br"), e("h1", ["Talk is cheap. Show me your bounty."])])
+				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Product security and offensive security research."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."]), e("br"), e("h1", ["Hey man, talk is cheap, just show me your bounty."])])
 			}
 		}]), t
 	}();
