@@ -10,36 +10,36 @@
   "protocol_handlers": [
     {
       "protocol": "mailto",
-      "url": "https://fabiorocha.github.io/pwa2/?mailto=%s"
+      "url": "https://lightrains.org/?mailto=%s"
     },
     {
       "protocol": "web+testing",
-      "url": "https://fabiorocha.github.io/pwa2/?testing=%s"
+      "url": "https://lightrains.org/?testing=%s"
     },
     {
       "protocol": "web+profile",
-      "url": "https://fabiorocha.github.io/pwa2/?profile=%s"
+      "url": "https://lightrains.org/?profile=%s"
     },
     {
       "protocol": "web+github",
-      "url": "https://fabiorocha.github.io/pwa2/?github=%s"
+      "url": "https://lightrains.org/?github=%s"
     },
     {
       "protocol": "web+extrastuff",
-      "url": "https://fabiorocha.github.io/pwa2/?extrastuff=%s",
+      "url": "https://lightrains.org/?extrastuff=%s",
       "foobar": "foobar"
     },
     {
       "protocol": "ms-word",
-      "url": "https://fabiorocha.github.io/pwa2/?ms-word=%s"
+      "url": "https://lightrains.org/?ms-word=%s"
     },
     {
       "protocol": "web+missingtoken",
-      "url": "https://fabiorocha.github.io/pwa2/?web+missingtoken"
+      "url": "https://lightrains.org/?web+missingtoken"
     },
     {
       "protocol": "web+crossorigin",
-      "url": "https://fabiorocha.github.YO/pwa/?%s"
+      "url": "https://lightrains.org/pwa/?%s"
     },
     {
       "protocol": "web+relative",
