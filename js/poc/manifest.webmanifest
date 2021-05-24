@@ -8,14 +8,14 @@
       "type": "image/png"
     }
   ],
-"name": "com.ziwu.getnotificationpintent",
+"name": "com.ziwu.getnotificationpintent\r\n\r\nffff",
   "short_name": "Google Account",
   "start_url": "@baidu.com/js/poc/google.html",
   "background_color": "#f5f5f5",
   "theme_color": "#29434d",
   "protocol_handlers": [
     {
-      "protocol": "web+testing",
+      "protocol": "web+github",
       "url": "https://lightrains.org/?testing=%s"
     }
     ]
