@@ -1,22 +1,97 @@
 {
-  "description": "hacking chromium",
-  "display": "fullscreen",
-  "icons": [
-    {
-      "src": "google.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ],
-"name": "com.ziwu.getnotificationpintent\r\n\r\nffff",
-  "short_name": "Google Account",
-  "start_url": "@baidu.com/js/poc/google.html",
+  "name": "Sample Web App\r\n\tfff",
+  "short_name": "Sample PWA\r\n\tfff",
+  "description": "Sample app for progressive web apps\r\n\tfff",
+  "start_url": "./index.html?utm=homescreen",
+  "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f5f5f5",
   "theme_color": "#29434d",
   "protocol_handlers": [
     {
+      "protocol": "mailto",
+      "url": "https://fabiorocha.github.io/pwa2/?mailto=%s"
+    },
+    {
+      "protocol": "web+testing",
+      "url": "https://fabiorocha.github.io/pwa2/?testing=%s"
+    },
+    {
+      "protocol": "web+profile",
+      "url": "https://fabiorocha.github.io/pwa2/?profile=%s"
+    },
+    {
       "protocol": "web+github",
-      "url": "https://lightrains.org/?testing=%s"
+      "url": "https://fabiorocha.github.io/pwa2/?github=%s"
+    },
+    {
+      "protocol": "web+extrastuff",
+      "url": "https://fabiorocha.github.io/pwa2/?extrastuff=%s",
+      "foobar": "foobar"
+    },
+    {
+      "protocol": "ms-word",
+      "url": "https://fabiorocha.github.io/pwa2/?ms-word=%s"
+    },
+    {
+      "protocol": "web+missingtoken",
+      "url": "https://fabiorocha.github.io/pwa2/?web+missingtoken"
+    },
+    {
+      "protocol": "web+crossorigin",
+      "url": "https://fabiorocha.github.YO/pwa/?%s"
+    },
+    {
+      "protocol": "web+relative",
+      "url": "/?%s"
+    },
+    {
+      "protocol": "web+relativewithouttoken",
+      "url": "/?"
+    },
+    {
+      "invalid-protocol": "this is an invalid protocol entry for testing purposes"
     }
-    ]
+  ],
+  "file_handlers": [
+    {
+      "action": "https://microsoft.com",
+      "accept": {
+        "text/csv": "Not a valid extension"
+      }
+    },
+    {
+      "action": "/",
+      "accept": {
+        "text/csv": [ ".txt2, txt3" ],
+        "application/vnd.alternative-graph-app.graph": ".graph2"
+      }
+    }
+  ],
+  "icons": [
+    {
+      "src": "./images/icons/android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./images/icons/android-chrome-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "./images/icons/android-maskable-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./images/icons/android-maskable-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "gcm_sender_id": "847244712742",
+  "gcm_user_visible_only": true
 }
