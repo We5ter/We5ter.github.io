@@ -5273,49 +5273,55 @@ default = c
 										url: "https://support.apple.com/zh-cn/HT208743",
 										vendor: "Apple",
 										target: "iMessage"
-										}, {
+										},{
+											color: "color-1",
+											desc: "CVE-20**-305** Incorrect security UI in Payments",
+											url: "https://chromereleases.googleblog.com",
+											vendor: "Google",
+											target: "chrome"
+										},{
 											color: "color-6",
 											desc: "CVE-20**-305** Incorrect security UI in Web App Installs",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 											color: "color-2",
 											desc: "CVE-20**-211** Insufficient policy enforcement in Downloads",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 											color: "color-7",
 											desc: "CVE-20**-211** Incorrect security UI in Page Info",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 											color: "color-3",
 											desc: "CVE-20**-160** Incorrect security UI in share",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 											color: "color-5",
 											desc: "CVE-20**-160** Incorrect security UI in Tab preview",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 											color: "color-9",
 											desc: "CVE-20**-653* Incorrect security UI in PWAs",
 											url: "https://chromereleases.googleblog.com",
 											vendor: "Google",
 											target: "chrome"
-										}, {
+										},{
 										color: "color-3",
 										desc: "CVE-2019-13743 Incorrect security UI in Navigation",
 										url: "https://chromereleases.googleblog.com",
 										vendor: "Google",
 										target: "chrome"
-										}, {
+										},{
 										color: "color-9",
 										desc: "CVE-2017-5085 Inappropriate javascript execution on WebUI pages",
 										url: "https://chromereleases.googleblog.com",
