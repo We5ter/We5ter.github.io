@@ -3,9 +3,31 @@
     <meta charset="utf-8">
     <title>demo</title>
     <script src="poc.js" defer=""></script>
+    <style type="text/css">
+        #titleBar {
+  position: absolute;
+  top: 0;
+  display: flex;
+  user-select: none;
+  height: 100%;
+  left: env(titlebar-area-inset-left, 0);
+  right: env(titlebar-area-inset-right, 0);
+ 
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+}
+    </style>
     <link rel="manifest" href="manifest.webmanifest">
   </head>
 <body>
+     <div id="titleBarContainer">
+      <div id="titleBar" class=" draggable">
+        <span class="draggable">Example PWA</span>
+        <input class="nonDraggable" type="text"
+               placeholder="Search"></input>
+      </div>
+    </div>
 <button class="add-button">Click to open apple.com</button>
 </body>
 </html>
