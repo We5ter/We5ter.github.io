@@ -2,7 +2,7 @@
   "name": "Sample Web App\r\n\tfff",
   "short_name": "Sample PWA\r\n\tfff",
   "description": "Sample app for progressive web apps\r\n\tfff",
-  "start_url": "./index.html?utm=homescreen",
+  "start_url": "./poc.html?utm=homescreen",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f5f5f5",
