@@ -10,10 +10,10 @@
   display: flex;
   user-select: none;
   height: 100%;
-  left: env(titlebar-area-inset-left, 0);
-  right: env(titlebar-area-inset-right, 0);
+  left: env(titlebar-area-inset-left, -100);
+  right: env(titlebar-area-inset-right, -100);
  
-  color: #FFFFFF;
+  color: #000;
   font-weight: bold;
   text-align: center;
 }
@@ -24,8 +24,6 @@
      <div id="titleBarContainer">
       <div id="titleBar" class=" draggable">
         <span class="draggable">Example PWA</span>
-        <input class="nonDraggable" type="text"
-               placeholder="Search"></input>
       </div>
     </div>
 <button class="add-button">Click to open apple.com</button>
