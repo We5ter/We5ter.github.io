@@ -4976,10 +4976,6 @@ default = s
 								title: "Github",
 								url: "https://github.com/We5ter"
 							}, {
-								color: "color-4",
-								title: "Hackerone",
-								url: "https://hackerone.com/wester0x01"
-							}, {
 								color: "color-8",
 								title: "Email",
 								url: "mailto:alert@lightrains.org"
