@@ -7,6 +7,9 @@
   "orientation": "portrait",
   "background_color": "#f5f5f5",
   "theme_color": "#29434d",
+  "display_override": [ 
+    "window-controls-overlay" 
+  ],
   "protocol_handlers": [
     {
       "protocol": "mailto",
