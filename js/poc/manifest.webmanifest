@@ -2,6 +2,19 @@
   "name": "Sample Web App\r\n\tfff",
   "short_name": "Sample PWA\r\n\tfff",
   "description": "Sample app for progressive web apps\r\n\tfff",
+  "categories": ["cats\r\nff", "memes\r\nfff"],
+  "screenshots": [
+    {
+      "src": "google.png",
+      "type": "image/jpeg",
+      "sizes": "728x409"
+    },
+    {
+      "src": "google.png",
+      "type": "image/jpeg",
+      "sizes": "551x541"
+    }
+  ],
   "start_url": "./poc.html?utm=homescreen",
   "display": "standalone",
   "orientation": "portrait",
