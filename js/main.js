@@ -5136,7 +5136,7 @@ default = s
 						href: "https://github.com/monsterzer0",
 						target: "_blank"
 					}
-				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Product security and offensive security research."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."]), e("br"), e("h1", ["A huge Marvel & DC fans, especially iron man and wonder woman."])])
+				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Product security and offensive security research."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."]), e("br"), e("h1", ["A huge Marvel & DC fan, especially iron man and wonder woman."])])
 			}
 		}]), t
 	}();
