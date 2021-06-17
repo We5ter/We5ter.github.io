@@ -5329,7 +5329,7 @@ default = c
 										target: "chrome"
 										}, {
 										color: "color-2",
-										desc: "Arbitrary command execution in meag android client via implicit pendingintent",
+										desc: "Arbitrary command execution in mega android client",
 										url: "https://mega.io",
 										vendor: "Mega",
 										target: "android client"
