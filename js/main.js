@@ -4983,6 +4983,10 @@ default = s
 								color: "color-3",
 								title: "Twitter",
 								url: "https://twitter.com/wester0x01"
+							},{
+								color: "color-1",
+								title: "Weibo",
+								url: "https://weibo.com/zzyme"
 							}],
 							columns: "1fr 1fr"
 						},
@@ -5323,6 +5327,12 @@ default = c
 										url: "https://chromereleases.googleblog.com",
 										vendor: "Google",
 										target: "chrome"
+										}, {
+										color: "color-2",
+										desc: "Arbitrary command execution in meag android client via implicit pendingintent",
+										url: "https://mega.io",
+										vendor: "Mega",
+										target: "android client"
 										}, {
 										color: "color-5",
 										desc: "Server side request forgery through web outlook",
