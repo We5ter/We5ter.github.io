@@ -1,4 +1,0 @@
-{
-  "default_applications": ["https://lightrains.org/js/pay/manifest.json"],
-  "supported_origins": ["*"]
-}
