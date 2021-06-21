@@ -1,31 +1,13 @@
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8">
-    <title>demo</title>
-    <script src="poc.js" defer=""></script>
-    <style type="text/css">
-        #titleBar {
-  position: absolute;
-  top: 0;
-  display: flex;
-  user-select: none;
-  height: 100%;
-  left: env(titlebar-area-inset-left, -100);
-  right: env(titlebar-area-inset-right, -100);
- 
-  color: #000;
-  font-weight: bold;
-  text-align: center;
-}
-    </style>
+    <title>A2HS demo</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="poc.js" defer></script>
     <link rel="manifest" href="manifest.webmanifest">
   </head>
-<body>
-     <div id="titleBarContainer">
-      <div id="titleBar" class=" draggable">
-        <span class="draggable">Example PWA</span>
-      </div>
-    </div>
-<button class="add-button">install</button>
-</body>
+  <body>
+    <button class="add-button">Add to home screen</button>
+  </body>
 </html>
