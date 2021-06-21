@@ -18,17 +18,16 @@
       "sizes": "128x128",
       },
     ],
-      "description":
-      "Compress and compare images with different codecs, right in your browser.",
+      "description": "Compress and compare images with different codecs, right in your browser.",
       "lang": "en",
       "categories": ["photo", "productivity", "utilities"],
       "screenshots": [
-      {
-      "src: "gogole.png",
-      "type": "image/png",
-      "sizes": "100x300",
-      }
-    ],
+         {
+          "src": "test.jpg",
+           "sizes": "320x640",
+           "type": "image/jpeg"
+         }
+      ],
       "share_target": {
       "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
       "method": "POST",
