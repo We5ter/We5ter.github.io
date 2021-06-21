@@ -20,7 +20,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
 	//document.addEventListener("visibilitychange", () => {
     // hide our user interface that shows our A2HS button
     addBtn.style.display = 'none';
-	  setTimeout(function(){
     // Show the prompt
     deferredPrompt.prompt();
     // Wait for the user to respond to the prompt
@@ -32,6 +31,5 @@ window.addEventListener('beforeinstallprompt', (e) => {
       }
       deferredPrompt = null;
     });
-	  },3000);
   });
 });
