@@ -1,20 +1,45 @@
 {
-  "name": "getInstalled",
-  "short_name": "getInst",
-  "icons": [{
-    "src": "google.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    }],
-  "scope": "/",
-  "start_url": "/poc.html",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#f5f5f5",
-  "theme_color": "#3f51b5",
-  "related_applications": [{
-    "platform": "play",
-    "id": "com.twitter.android",
-    "url": "https://twitter.com"
-  }]
-}
+    name: 'Squoosh',
+    short_name: 'Squoosh',
+    start_url: '/?utm_medium=PWA&utm_source=launcher',
+    display: 'standalone',
+    orientation: 'any',
+    background_color: '#fff',
+    theme_color: '#ff3385',
+    icons: [
+      {
+        src: 'google.png',
+        type: "image/png",
+        sizes: "512x512",
+      },
+      {
+        src: 'google.png',
+        type: "image/png",
+        sizes: "128x128",
+      },
+    ],
+    description:
+      'Compress and compare images with different codecs, right in your browser.',
+    lang: 'en',
+    categories: ['photo', 'productivity', 'utilities'],
+    screenshots: [
+      {
+        src: "https://squoosh.app/c/icon-demo-large-photo-18da387a.jpg",
+        type: "image/png",
+        sizes: "100x300",
+      }
+    ],
+    share_target: {
+      action: '/?utm_medium=PWA&utm_source=share-target&share-target',
+      method: 'POST',
+      enctype: 'multipart/form-data',
+      params: {
+        files: [
+          {
+            name: 'file',
+            accept: ['image/*'],
+          },
+        ],
+      },
+    },
+  }
