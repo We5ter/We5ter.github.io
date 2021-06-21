@@ -1,43 +1,43 @@
 {
-    name: "Squoosh",
-    short_name: "Squoosh",
-    start_url: "/?utm_medium=PWA&utm_source=launcher",
-    display: "standalone",
-    orientation: "any",
-    background_color: "#fff",
-    theme_color: "#ff3385",
-    icons: [
+      "name": "Squoosh",
+      "short_name": "Squoosh",
+      "start_url": "/?utm_medium=PWA&utm_source=launcher",
+      "display": "standalone",
+      "orientation": "any",
+      "background_color": "#fff",
+      "theme_color": "#ff3385",
+      "icons": [
       {
-        src: "google.png",
-        type: "image/png",
-        sizes: "512x512",
+      "src": "google.png",
+      "type": "image/png",
+      "sizes": "512x512",
       },
       {
-        src: "google.png",
-        type: "image/png",
-        sizes: "128x128",
+      ""src"": "google.png",
+      ""type"": "image/png",
+      ""sizes"": "128x128",
       },
     ],
-    description:
+      "description":
       "Compress and compare images with different codecs, right in your browser.",
-    lang: "en",
-    categories: ["photo", "productivity", "utilities"],
-    screenshots: [
+      "lang": "en",
+      "categories": ["photo", "productivity", "utilities"],
+      "screenshots": [
       {
-        src: "https://squoosh.app/c/icon-demo-large-photo-18da387a.jpg",
-        type: "image/png",
-        sizes: "100x300",
+      "src: "https"://squoosh.app/c/icon-demo-large-photo-18da387a.jpg",
+      "type": "image/png",
+      "sizes": "100x300",
       }
     ],
-    share_target: {
-      action: "/?utm_medium=PWA&utm_source=share-target&share-target",
-      method: "POST",
-      enctype: "multipart/form-data",
-      params: {
-        files: [
+      "share_target": {
+      "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
+      "method": "POST",
+      "enctype": "multipart/form-data",
+      "params": {
+      "files": [
           {
-            name: "file",
-            accept: ["image/*"],
+      "name": "file",
+      "accept": ["image/*"],
           },
         ],
       },
