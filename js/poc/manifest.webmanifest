@@ -13,9 +13,9 @@
       "sizes": "512x512",
       },
       {
-      ""src"": "google.png",
-      ""type"": "image/png",
-      ""sizes"": "128x128",
+      "src": "google.png",
+      "type": "image/png",
+      "sizes": "128x128",
       },
     ],
       "description":
@@ -24,7 +24,7 @@
       "categories": ["photo", "productivity", "utilities"],
       "screenshots": [
       {
-      "src: "https"://squoosh.app/c/icon-demo-large-photo-18da387a.jpg",
+      "src: "https://squoosh.app/c/icon-demo-large-photo-18da387a.jpg",
       "type": "image/png",
       "sizes": "100x300",
       }
