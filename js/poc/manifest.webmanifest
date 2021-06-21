@@ -36,9 +36,9 @@
       "files": [
           {
       "name": "file",
-      "accept": ["image/*"],
-          },
-        ],
-      },
-    },
+      "accept": ["image/*"]
+          }
+        ]
+      }
+    }
   }
