@@ -5213,175 +5213,175 @@ default = c
 					}, [e(s.
 				default, {
 						attrs: {
-									sections: [{
-										color: "color-4",
-										desc: "iOS 14.0  Acknowledgment",
-										url: "https://support.apple.com/en-us/HT211850",   
-										vendor: "Apple",                                                                                            vendor: "Apple",
-										target: "iOS"
-										},{
-										color: "color-2",
-										desc: "Safari 13.0.1  Acknowledgment",
-										url: "https://support.apple.com/en-us/HT210605",   
-										vendor: "Apple",                                                                                            vendor: "Apple",
-										target: "safari"
-										},{
-											color: "color-1",
-											desc: "CVE-2020-9942 Address bar spoofing on macOS safari",
-											url: "https://support.apple.com/zh-cn/HT211931",   
-											vendor: "Apple",                                                                                            vendor: "Apple",
-											target: "safari"
-										},{
-										color: "color-6",
-										desc: "CVE-2019-8535 A memory corruption in webkit",
-										url: "https://support.apple.com/en-us/HT209599",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-5",
-										desc: "CVE-2017-7019 Multiple memory corruption in webkit",
-										url: "https://support.apple.com/kb/HT207923",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-2",
-										desc: "CVE-2017-2500 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/zh-cn/HT207804",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-1",
-										desc: "CVE-2017-2511 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/zh-cn/HT207804",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-8",
-										desc: "CVE-2017-13790 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/kb/HT208223",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-7",
-										desc: "CVE-2018-4134 User interface spoofing on iOS safari",
-										url: "https://support.apple.com/zh-cn/HT208693",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-4",
-										desc: "CVE-2018-4187 LinkPresentation error lead to UI spoofing",
-										url: "https://support.apple.com/zh-cn/HT208743",
-										vendor: "Apple",
-										target: "iMessage"
-										},{
-											color: "color-1",
-											desc: "CVE-20**-305** Incorrect security UI in Payments",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-6",
-											desc: "CVE-20**-305** Incorrect security UI in Web App Installs",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-2",
-											desc: "CVE-20**-211** Insufficient policy enforcement in Downloads",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-7",
-											desc: "CVE-20**-211** Incorrect security UI in Page Info",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-3",
-											desc: "CVE-20**-160** Incorrect security UI in share",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-5",
-											desc: "CVE-20**-160** Incorrect security UI in Tab preview",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-											color: "color-9",
-											desc: "CVE-20**-653* Incorrect security UI in PWAs",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										},{
-										color: "color-3",
-										desc: "CVE-2019-13743 Incorrect security UI in Navigation",
-										url: "https://chromereleases.googleblog.com",
-										vendor: "Google",
-										target: "chrome"
-										},{
-										color: "color-9",
-										desc: "CVE-2017-5085 Inappropriate javascript execution on WebUI pages",
-										url: "https://chromereleases.googleblog.com",
-										vendor: "Google",
-										target: "chrome"
-										}, {
-										color: "color-2",
-										desc: "Arbitrary command execution in mega android client",
-										url: "https://mega.io",
-										vendor: "Mega",
-										target: "android client"
-										}, {
-										color: "color-5",
-										desc: "Server side request forgery through web outlook",
-										url: "https://www.microsoft.com/en-us/msrc/researcher-acknowledgments-online-services",
-										vendor: "Microsoft",
-										target: "outlook.com"
-										}, {
-										color: "color-4",
-										desc: "Theft of arbitrary files",
-										url: "https://security.opera.com/hall-of-fame/",
-										vendor: "Opera",
-										target: "opera browser"
-										}, {
-										color: "color-1",
-										desc: "Extension Page html injection lead to XSS on chrome and firefox browser",
-										url: "https://evernote.com/security/report-issue/#2017",
-										vendor: "Evernote",
-										target: "browser extension"
-										}, {
-										color: "color-2",
-										desc: "Remote command execution via iframe XSS",
-										url: "https://zhuanlan.zhihu.com/p/51768716",
-										vendor: "Typora",
-										target: "windows editor"
-										}, {
-										color: "color-3",
-										desc: "CVE-2017-8104 Directory traversal in smilie module",
-										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
-										vendor: "MyBB",
-										target: "forum"
-										}, {
-										color: "color-4",
-										desc: "CVE-2017-8103 XSS injection in email myCode",
-										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
-										vendor: "MyBB",
-										target: "forum"
-										}, {
-										color: "color-6",
-										desc: "Local file inclusion <= 2.2.1",
-										url: "https://cxsecurity.com/issue/WLB-2017070028",
-										vendor: "Cmsmadesimple",
-										target: "cms"
-										}, {
-										color: "color-8",
-										desc: "SS-2017-003 XSS in redirectorPage",
-										url: "https://www.silverstripe.org/download/security-releases/?start=0",
-										vendor: "Silverstripe",
-										target: "cms"
-									}]
+// 									sections: [{
+// 										color: "color-4",
+// 										desc: "iOS 14.0  Acknowledgment",
+// 										url: "https://support.apple.com/en-us/HT211850",   
+// 										vendor: "Apple",                                                                                            vendor: "Apple",
+// 										target: "iOS"
+// 										},{
+// 										color: "color-2",
+// 										desc: "Safari 13.0.1  Acknowledgment",
+// 										url: "https://support.apple.com/en-us/HT210605",   
+// 										vendor: "Apple",                                                                                            vendor: "Apple",
+// 										target: "safari"
+// 										},{
+// 											color: "color-1",
+// 											desc: "CVE-2020-9942 Address bar spoofing on macOS safari",
+// 											url: "https://support.apple.com/zh-cn/HT211931",   
+// 											vendor: "Apple",                                                                                            vendor: "Apple",
+// 											target: "safari"
+// 										},{
+// 										color: "color-6",
+// 										desc: "CVE-2019-8535 A memory corruption in webkit",
+// 										url: "https://support.apple.com/en-us/HT209599",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-5",
+// 										desc: "CVE-2017-7019 Multiple memory corruption in webkit",
+// 										url: "https://support.apple.com/kb/HT207923",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-2",
+// 										desc: "CVE-2017-2500 Address bar spoofing on macOS safari",
+// 										url: "https://support.apple.com/zh-cn/HT207804",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-1",
+// 										desc: "CVE-2017-2511 Address bar spoofing on macOS safari",
+// 										url: "https://support.apple.com/zh-cn/HT207804",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-8",
+// 										desc: "CVE-2017-13790 Address bar spoofing on macOS safari",
+// 										url: "https://support.apple.com/kb/HT208223",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-7",
+// 										desc: "CVE-2018-4134 User interface spoofing on iOS safari",
+// 										url: "https://support.apple.com/zh-cn/HT208693",
+// 										vendor: "Apple",
+// 										target: "safari"
+// 										}, {
+// 										color: "color-4",
+// 										desc: "CVE-2018-4187 LinkPresentation error lead to UI spoofing",
+// 										url: "https://support.apple.com/zh-cn/HT208743",
+// 										vendor: "Apple",
+// 										target: "iMessage"
+// 										},{
+// 											color: "color-1",
+// 											desc: "CVE-20**-305** Incorrect security UI in Payments",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-6",
+// 											desc: "CVE-20**-305** Incorrect security UI in Web App Installs",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-2",
+// 											desc: "CVE-20**-211** Insufficient policy enforcement in Downloads",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-7",
+// 											desc: "CVE-20**-211** Incorrect security UI in Page Info",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-3",
+// 											desc: "CVE-20**-160** Incorrect security UI in share",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-5",
+// 											desc: "CVE-20**-160** Incorrect security UI in Tab preview",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 											color: "color-9",
+// 											desc: "CVE-20**-653* Incorrect security UI in PWAs",
+// 											url: "https://chromereleases.googleblog.com",
+// 											vendor: "Google",
+// 											target: "chrome"
+// 										},{
+// 										color: "color-3",
+// 										desc: "CVE-2019-13743 Incorrect security UI in Navigation",
+// 										url: "https://chromereleases.googleblog.com",
+// 										vendor: "Google",
+// 										target: "chrome"
+// 										},{
+// 										color: "color-9",
+// 										desc: "CVE-2017-5085 Inappropriate javascript execution on WebUI pages",
+// 										url: "https://chromereleases.googleblog.com",
+// 										vendor: "Google",
+// 										target: "chrome"
+// 										}, {
+// 										color: "color-2",
+// 										desc: "Arbitrary command execution in mega android client",
+// 										url: "https://mega.io",
+// 										vendor: "Mega",
+// 										target: "android client"
+// 										}, {
+// 										color: "color-5",
+// 										desc: "Server side request forgery through web outlook",
+// 										url: "https://www.microsoft.com/en-us/msrc/researcher-acknowledgments-online-services",
+// 										vendor: "Microsoft",
+// 										target: "outlook.com"
+// 										}, {
+// 										color: "color-4",
+// 										desc: "Theft of arbitrary files",
+// 										url: "https://security.opera.com/hall-of-fame/",
+// 										vendor: "Opera",
+// 										target: "opera browser"
+// 										}, {
+// 										color: "color-1",
+// 										desc: "Extension Page html injection lead to XSS on chrome and firefox browser",
+// 										url: "https://evernote.com/security/report-issue/#2017",
+// 										vendor: "Evernote",
+// 										target: "browser extension"
+// 										}, {
+// 										color: "color-2",
+// 										desc: "Remote command execution via iframe XSS",
+// 										url: "https://zhuanlan.zhihu.com/p/51768716",
+// 										vendor: "Typora",
+// 										target: "windows editor"
+// 										}, {
+// 										color: "color-3",
+// 										desc: "CVE-2017-8104 Directory traversal in smilie module",
+// 										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
+// 										vendor: "MyBB",
+// 										target: "forum"
+// 										}, {
+// 										color: "color-4",
+// 										desc: "CVE-2017-8103 XSS injection in email myCode",
+// 										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
+// 										vendor: "MyBB",
+// 										target: "forum"
+// 										}, {
+// 										color: "color-6",
+// 										desc: "Local file inclusion <= 2.2.1",
+// 										url: "https://cxsecurity.com/issue/WLB-2017070028",
+// 										vendor: "Cmsmadesimple",
+// 										target: "cms"
+// 										}, {
+// 										color: "color-8",
+// 										desc: "SS-2017-003 XSS in redirectorPage",
+// 										url: "https://www.silverstripe.org/download/security-releases/?start=0",
+// 										vendor: "Silverstripe",
+// 										target: "cms"
+// 									}]
 						}
 					})])
 				}
