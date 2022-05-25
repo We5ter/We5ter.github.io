@@ -4511,7 +4511,7 @@ default = y
 					}
 				}, ["contributions.taminomartinius.de"])]), e("div", {
 					class: "footer__right"
-				}, ["©2019"])])])
+				}, ["©2021"])])])
 			}
 		}]), t
 	}();
@@ -4644,18 +4644,6 @@ default = a
 						attrs: {
 							decimals: 2,
 							sections: [{
-                                        time: "2020/05/20",
-                                        title: "Microsoft Edge on iOS UI spoofing",
-                                        url: "/2020/05/20/ms-edge-ios-spoofing"
-                                        },{
-										time: "2017/09/06",
-										title: "Chrome M60 address bar spoofing",
-										url: "/2017/09/06/chrome-m60-address-bar-spoofing"
-									}, {
-										time: "2017/06/28",
-										title: "Neterror page spoofing on firefox",
-										url: "/2017/06/08/neterror-spoofing-on-firefox"
-									}, {
 										time: "2017/05/22",
 										title: "Local file inclusion in cmsmadesimple <=2.2.1",
 										url: "/2017/05/22/local-file-inclusion-in-cmsmadesimple/"
@@ -4976,10 +4964,6 @@ default = s
 								title: "Github",
 								url: "https://github.com/We5ter"
 							}, {
-								color: "color-4",
-								title: "知乎",
-								url: "https://www.zhihu.com/people/zhiyangzeng"
-							}, {
 								color: "color-8",
 								title: "Email",
 								url: "mailto:alert@lightrains.org"
@@ -4987,6 +4971,10 @@ default = s
 								color: "color-3",
 								title: "Twitter",
 								url: "https://twitter.com/wester0x01"
+							},{
+								color: "color-1",
+								title: "Weibo",
+								url: "https://weibo.com/zzyme"
 							}],
 							columns: "1fr 1fr"
 						},
@@ -5140,7 +5128,7 @@ default = s
 						href: "https://github.com/monsterzer0",
 						target: "_blank"
 					}
-				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Browser Security & Pentest & Web Develop."]), e("br"), e("h1", ["Keep on learning new technique and innovative thinking."]), e("br"), e("h1", ["Photog, violin, swim and cooking are all on my timetable."])])
+				}, ["Monster Zero Team"]), " and UESTC's StarStudio."]), e("br"), e("h1", ["Focused on Product security and offensive security research."]), e("br"), e("h1", ["So lucky to have a lovely girlfriend and a cute bichon."]), e("br"), e("h1", ["A huge Marvel & DC fan, especially iron man and wonder woman."])])
 			}
 		}]), t
 	}();
@@ -5207,174 +5195,19 @@ default = c
 					return e(a.
 				default, {
 						attrs: {
-							title: "Bugs hunting"
+							title: "Projects"
 						},
-						class: "mybug"
+						class: "myprojects"
 					}, [e(s.
 				default, {
 						attrs: {
-									sections: [{
-										color: "color-4",
-										desc: "iOS 14.0  Acknowledgment",
-										url: "https://support.apple.com/en-us/HT211850",   
-										vendor: "Apple",                                                                                            vendor: "Apple",
-										target: "iOS"
-										},{
-										color: "color-2",
-										desc: "Safari 13.0.1  Acknowledgment",
-										url: "https://support.apple.com/en-us/HT210605",   
-										vendor: "Apple",                                                                                            vendor: "Apple",
-										target: "safari"
-										},{
-											color: "color-1",
-											desc: "CVE-2020-9942 Address bar spoofing on macOS safari",
-											url: "https://support.apple.com/zh-cn/HT211931",   
-											vendor: "Apple",                                                                                            vendor: "Apple",
-											target: "safari"
-										},{
-										color: "color-6",
-										desc: "CVE-2019-8535 A memory corruption in webkit",
-										url: "https://support.apple.com/en-us/HT209599",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-5",
-										desc: "CVE-2017-7019 Multiple memory corruption in webkit",
-										url: "https://support.apple.com/kb/HT207923",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-2",
-										desc: "CVE-2017-2500 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/zh-cn/HT207804",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-1",
-										desc: "CVE-2017-2511 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/zh-cn/HT207804",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-8",
-										desc: "CVE-2017-13790 Address bar spoofing on macOS safari",
-										url: "https://support.apple.com/kb/HT208223",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-7",
-										desc: "CVE-2018-4134 User interface spoofing on iOS safari",
-										url: "https://support.apple.com/zh-cn/HT208693",
-										vendor: "Apple",
-										target: "safari"
-										}, {
-										color: "color-4",
-										desc: "CVE-2018-4187 LinkPresentation error lead to UI spoofing",
-										url: "https://support.apple.com/zh-cn/HT208743",
-										vendor: "Apple",
-										target: "iMessage"
-										}, {
-											color: "color-2",
-											desc: "CVE-20**-211** Insufficient policy enforcement in Downloads",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										}, {
-											color: "color-7",
-											desc: "CVE-20**-211** Incorrect security UI in Page Info",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										}, {
-											color: "color-3",
-											desc: "CVE-20**-160** Incorrect security UI in share",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										}, {
-											color: "color-5",
-											desc: "CVE-20**-160** Incorrect security UI in Tab preview",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										}, {
-											color: "color-9",
-											desc: "CVE-20**-653* Incorrect security UI in PWAs",
-											url: "https://chromereleases.googleblog.com",
-											vendor: "Google",
-											target: "chrome"
-										}, {
-										color: "color-3",
-										desc: "CVE-2019-13743 Incorrect security UI in Navigation",
-										url: "https://chromereleases.googleblog.com",
-										vendor: "Google",
-										target: "chrome"
-										}, {
-										color: "color-9",
-										desc: "CVE-2017-5085 Inappropriate javascript execution on WebUI pages",
-										url: "https://chromereleases.googleblog.com",
-										vendor: "Google",
-										target: "chrome"
-										}, {
-										color: "color-5",
-										desc: "Server side request forgery through web outlook",
-										url: "https://www.microsoft.com/en-us/msrc/researcher-acknowledgments-online-services",
-										vendor: "Microsoft",
-										target: "outlook.com"
-										}, {
-										color: "color-3",
-										desc: "Account takeover and Privilege Escalation",
-										url: "https://hackerone.com/wester0x01",
-										vendor: "Paypal",
-										target: "paypal.com"
-										}, {
-										color: "color-1",
-										desc: "Extension Page html injection lead to XSS on chrome and firefox browser",
-										url: "https://evernote.com/security/report-issue/#2017",
-										vendor: "Evernote",
-										target: "browser extension"
-										}, {
-										color: "color-2",
-										desc: "Remote command execution via iframe XSS",
-										url: "https://zhuanlan.zhihu.com/p/51768716",
-										vendor: "Typora",
-										target: "windows editor"
-										}, {
-										color: "color-9",
-										desc: "URL can be replaceState by blob URL in iOS brave",
-										url: "https://hackerone.com/reports/215044",
-										vendor: "Brave",
-										target: "browser"
-										}, {
-										color: "color-1",
-										desc: "UI spoofing & address bar spoofing",
-										url: "https://hackerone.com/wester0x01",
-										vendor: "Brave",
-										target: "browser"
-										}, {
-										color: "color-3",
-										desc: "CVE-2017-8104 Directory traversal in smilie module",
-										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
-										vendor: "MyBB",
-										target: "forum"
-										}, {
-										color: "color-4",
-										desc: "CVE-2017-8103 XSS injection in email myCode",
-										url: "https://blog.mybb.com/2017/04/04/mybb-1-8-11-merge-system-1-8-11-release/",
-										vendor: "MyBB",
-										target: "forum"
-										}, {
-										color: "color-6",
-										desc: "Local file inclusion <= 2.2.1",
-										url: "https://cxsecurity.com/issue/WLB-2017070028",
-										vendor: "Cmsmadesimple",
-										target: "cms"
-										}, {
-										color: "color-8",
-										desc: "SS-2017-003 XSS in redirectorPage",
-										url: "https://www.silverstripe.org/download/security-releases/?start=0",
-										vendor: "Silverstripe",
-										target: "cms"
+ 									sections: [{
+										"color" : "color-1",
+										"project" : "https://github.com/We5ter/Scanners-Box",
+										"url" : "https://github.com/We5ter/Scanners-Box",
+										"starsrc" : "https://img.shields.io/github/stars/We5ter/Scanners-Box?style=flat-square",
+                                        "licensesrc" : "https://img.shields.io/github/license/We5ter/Scanners-Box?style=flat-square",
+                                        "sponsorsrc" : "https://img.shields.io/badge/sponsor-30363D?style=flat-square&logo=GitHub-Sponsors&logoColor=#EA4AAA"
 									}]
 						}
 					})])
@@ -5447,12 +5280,7 @@ default = l
 							}
 						}), e("div", {
 							class: "legend__title"
-						}, [e("b", ["⌈", t.vendor, "⌉⌈", t.target, "⌉"]), "  ", e("a", {
-							attrs: {
-								href: t.url,
-								target: "_blank"
-							}
-						}, [t.desc])])])
+						}, [e("a", { attrs: { href: t.url, target: "_blank" } }, [t.project]), "    ", e("img", { attrs: { "src": t.starsrc} }), "    ", e("img", { attrs: { "src": t.licensesrc} }), "    ", e("img", { attrs: { "src": t.sponsorsrc} })])])
 					});
 				return e("div", {
 					class: "legend"
@@ -5529,7 +5357,7 @@ default = l
 	]), r.locals && (e.exports = r.locals), (0, n(25).
 default)("61f38a04", r, !0, {})
 }, function(e, t, n) {
-	(e.exports = n(24)(!1)).push([e.i, ':root{--color-background: #F8F9FA;--color-foreground: #22272E;--color-foreground-light: #627386;--color-foreground: #22272E;--color-border-dark: #F2F4F6;--color-primary: #C9CBCE;--color-empty: #F4FAFF;--color-0: #D4DAE1;--color-1: #712BDE;--color-2: #5653E8;--color-3: #3174F1;--color-4: #0095F9;--color-5: #00AEF6;--color-6: #18BEE5;--color-7: #5CCED6;--color-8: red;--color-9: black;--color-open: #00D559;--color-closed: #00A5FE;--color-git: #f05033;--size-container: 880px}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Thin.otf") format("opentype");font-weight:200}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Medium.otf") format("opentype");font-weight:400}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Regular.otf") format("opentype");font-weight:500}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Semibold.otf") format("opentype");font-weight:600}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Bold.otf") format("opentype");font-weight:700}html,body,button{text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-family:"Nutanix Soft", -apple-system, BlinkMacSystemFont, sans-serif}html,body{margin:0;padding:0;background-color:var(--color-background);color:var(--color-foreground)}.myslide,.mypost,.mybug,footer{min-width:880px;}h1,h2,h3,h4,h5,h6{margin:0}h1{font-weight:600;font-size:14px}h2{font-weight:600;font-size:14px}h3{font-weight:500;font-size:18px;padding-top:14px}h4{font-weight:500;font-size:14px;padding-top:2px;color:var(--color-foreground-light)}hr{border:none;border-bottom:1px solid #D5DAE0;width:30px;margin:17px 0 16px 0}.app__content{transform:scale(0.9);transform-origin:50vw 50vh;opacity:0;animation:appContent 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards}@keyframes appContent{100%{transform:scale(1);opacity:1}}.header{line-height:50px;border-bottom:1px solid var(--color-border-dark)}.header h1{max-width:var(--size-container);margin:0 auto}.footer{margin-top:55px;line-height:48px;border-top:1px solid var(--color-border-dark);font-size:14px;color:#9AA5B5;font-weight:600}.footer__content{display:grid;grid-template-columns:1fr 1fr 1fr;max-width:var(--size-container);margin:0 auto}.footer__left{text-align:left}.footer__center{text-align:center}.footer__right{text-align:right}a{color:inherit;text-decoration:none}.row{display:grid;grid-auto-rows:1fr;max-width:var(--size-container);margin:40px auto;grid-column-gap:35px}.row--first-third{grid-template-columns:295px 550px}.row--last-third{grid-template-columns:550px 295px}.card{background:#fff;border-radius:4px;position:relative}.card__title{line-height:38px;border-bottom:1px solid #F2F3F5;text-align:left;padding-left:20px;position:relative}.card__title .button-group{position:absolute;top:0;right:20px}.card__content{position:relative;padding:0 20px}.card__footer{height:37px;line-height:37px;bottom:0;width:100%;border-top:1px solid #f2f3f5;text-align:center;position:absolute;overflow:hidden}.card__footer .legend{display:inline-block}.card__footer .legend>div{display:inline-block}.card__footer .legend__value{display:none}.card__footer .legend__color{margin-top:16px;margin-left:10px}.card__footer .legend__title{padding-right:10px;font-size:12px;font-weight:400;color:#627386}.legend{display:grid;padding-bottom:15px}.legend>*{min-width:0}.legend__title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;padding-right:12px}.legend__value{padding-top:4px;font-size:12px;font-weight:400;color:var(--color-foreground-light)}.legend__color{background-color:var(--color);width:6px;height:6px;border-radius:3px;float:left;margin:6px 10px 20px 0}.profile__legend{grid-row-gap:4px;width:268px}.profile__avatar{border-radius:999px;width:29px;height:29px;position:absolute;top:5px;right:5px}.about{line-height:100%}.about h1{color:#22272E;font-size:16px;font-weight:500}.mypost__main,.myslide__main{line-height:35px}.post__title,.slide__title{text-align:left;font-size:16px;max-width:70%;display:inline}.post__time,.slide__conf{text-align:right;max-width:25%;float:right;font-size:16px;display:inline}.mybug{height:auto}.mybug .legend{display:block}.mybug .legend>div{border-bottom:1px solid #F2F3F5;margin:0 -20px;padding:10px 20px;display:grid;grid-template-columns:1fr 20fr 3fr}.mybug .legend__title{color:#627386;font-size:16px}.mybug .legend__value{text-align:right;padding:0}.mybug .legend__color{margin-bottom:0}.mybug svg{transform:translateX(-50%);left:50%;position:absolute}\n', ""])
+	(e.exports = n(24)(!1)).push([e.i, ':root{--color-background: #F8F9FA;--color-foreground: #22272E;--color-foreground-light: #627386;--color-foreground: #22272E;--color-border-dark: #F2F4F6;--color-primary: #C9CBCE;--color-empty: #F4FAFF;--color-0: #D4DAE1;--color-1: #712BDE;--color-2: #5653E8;--color-3: #3174F1;--color-4: #0095F9;--color-5: #00AEF6;--color-6: #18BEE5;--color-7: #5CCED6;--color-8: red;--color-9: black;--color-open: #00D559;--color-closed: #00A5FE;--color-git: #f05033;--size-container: 880px}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Thin.otf") format("opentype");font-weight:200}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Medium.otf") format("opentype");font-weight:400}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Regular.otf") format("opentype");font-weight:500}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Semibold.otf") format("opentype");font-weight:600}@font-face{font-family:\'Nutanix Soft\';src:url("/fonts/NutanixSoft-Bold.otf") format("opentype");font-weight:700}html,body,button{text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-family:"Nutanix Soft", -apple-system, BlinkMacSystemFont, sans-serif}html,body{margin:0;padding:0;background-color:var(--color-background);color:var(--color-foreground)}.myslide,.mypost,.myprojects,footer{min-width:880px;}h1,h2,h3,h4,h5,h6{margin:0}h1{font-weight:600;font-size:14px}h2{font-weight:600;font-size:14px}h3{font-weight:500;font-size:18px;padding-top:14px}h4{font-weight:500;font-size:14px;padding-top:2px;color:var(--color-foreground-light)}hr{border:none;border-bottom:1px solid #D5DAE0;width:30px;margin:17px 0 16px 0}.app__content{transform:scale(0.9);transform-origin:50vw 50vh;opacity:0;animation:appContent 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards}@keyframes appContent{100%{transform:scale(1);opacity:1}}.header{line-height:50px;border-bottom:1px solid var(--color-border-dark)}.header h1{max-width:var(--size-container);margin:0 auto}.footer{margin-top:55px;line-height:48px;border-top:1px solid var(--color-border-dark);font-size:14px;color:#9AA5B5;font-weight:600}.footer__content{display:grid;grid-template-columns:1fr 1fr 1fr;max-width:var(--size-container);margin:0 auto}.footer__left{text-align:left}.footer__center{text-align:center}.footer__right{text-align:right}a{color:inherit;text-decoration:none}.row{display:grid;grid-auto-rows:1fr;max-width:var(--size-container);margin:40px auto;grid-column-gap:35px}.row--first-third{grid-template-columns:295px 550px}.row--last-third{grid-template-columns:550px 295px}.card{background:#fff;border-radius:4px;position:relative}.card__title{line-height:38px;border-bottom:1px solid #F2F3F5;text-align:left;padding-left:20px;position:relative}.card__title .button-group{position:absolute;top:0;right:20px}.card__content{position:relative;padding:0 20px}.card__footer{height:37px;line-height:37px;bottom:0;width:100%;border-top:1px solid #f2f3f5;text-align:center;position:absolute;overflow:hidden}.card__footer .legend{display:inline-block}.card__footer .legend>div{display:inline-block}.card__footer .legend__value{display:none}.card__footer .legend__color{margin-top:16px;margin-left:10px}.card__footer .legend__title{padding-right:10px;font-size:12px;font-weight:400;color:#627386}.legend{display:grid;padding-bottom:15px}.legend>*{min-width:0}.legend__title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;padding-right:12px}.legend__value{padding-top:4px;font-size:12px;font-weight:400;color:var(--color-foreground-light)}.legend__color{background-color:var(--color);width:6px;height:6px;border-radius:3px;float:left;margin:6px 10px 20px 0}.profile__legend{grid-row-gap:4px;width:268px}.profile__avatar{border-radius:999px;width:29px;height:29px;position:absolute;top:5px;right:5px}.about{line-height:100%}.about h1{color:#22272E;font-size:16px;font-weight:500}.mypost__main,.myslide__main{line-height:35px}.post__title,.slide__title{text-align:left;font-size:16px;max-width:70%;display:inline}.post__time,.slide__conf{text-align:right;max-width:25%;float:right;font-size:16px;display:inline}.myprojects{height:auto}.myprojects .legend{display:block}.myprojects .legend>div{border-bottom:1px solid #F2F3F5;margin:0 -20px;padding:10px 20px;display:grid;grid-template-columns:1fr 20fr 3fr}.myprojects .legend__title{color:#627386;font-size:16px}.myprojects .legend__value{text-align:right;padding:0}.myprojects .legend__color{margin-bottom:0}.myprojects svg{transform:translateX(-50%);left:50%;position:absolute}\n', ""])
 }, function(e, t) {
 	e.exports = function(e) {
 		var t = [];
