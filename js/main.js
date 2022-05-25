@@ -5206,7 +5206,7 @@ default = c
 										"project" : "https://github.com/We5ter/Scanners-Box",
 										"url" : "https://github.com/We5ter/Scanners-Box",
 										"starsrc" : "https://img.shields.io/github/stars/We5ter/Scanners-Box?style=flat-square",
-                                        "licensesrc" : "https://img.shields.io/github/license/We5ter/Scanners-Box?style=flat-square",
+                                        "commitsrc" : "https://img.shields.io/github/last-commit/We5ter/Scanners-Box?style=flat-square",
                                         "sponsorsrc" : "https://img.shields.io/badge/sponsor-30363D?style=flat-square&logo=GitHub-Sponsors&logoColor=#EA4AAA"
 									}]
 						}
@@ -5280,7 +5280,7 @@ default = l
 							}
 						}), e("div", {
 							class: "legend__title"
-						}, [e("a", { attrs: { href: t.url, target: "_blank" } }, [t.project]), "    ", e("img", { attrs: { "src": t.starsrc} }), "    ", e("img", { attrs: { "src": t.licensesrc} }), "    ", e("img", { attrs: { "src": t.sponsorsrc} })])])
+						}, [e("a", { attrs: { href: t.url, target: "_blank" } }, [t.project]), "    ", e("img", { attrs: { "src": t.starsrc} }), "    ", e("img", { attrs: { "src": t.commitsrc} }), "    ", e("img", { attrs: { "src": t.sponsorsrc} }), "    ", "🔥🔥🔥🔥🔥🔥"])])
 					});
 				return e("div", {
 					class: "legend"
