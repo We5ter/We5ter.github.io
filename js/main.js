@@ -4955,7 +4955,7 @@ default = s
 						},
 						slot: "title",
 						class: "profile__avatar"
-					}), e("h3", ["Love you 3000"]), e("hr"), e(s.
+					}), e("h3", ["Android/Chrome/Web Security Research"]), e("hr"), e(s.
 				default, {
 						attrs: {
 							decimals: 2,
@@ -4973,8 +4973,8 @@ default = s
 								url: "https://twitter.com/wester0x01"
 							},{
 								color: "color-1",
-								title: "Weibo",
-								url: "https://weibo.com/zzyme"
+								title: "Facebook",
+								url: "https://www.facebook.com/profile.php?id=100083068717282"
 							}],
 							columns: "1fr 1fr"
 						},
