@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Local file inclusion in cmsmadesimple &lt;=2.2.1 | 西风微雨 - Wester&#39;s blog</title>
+  <meta name="description" content="A security researcher from China, focus on Product security and offensive security research." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+
+  
+  
+  
+
+</head>
+
+
+<body class="post-template">
+
+  
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2017-05-22T11:00:41.000Z" itemprop="datePublished">
+          2017-05-22
+      </time>
+    
+    
+    | 
+    <a href='/tags/cmsmadesimple/'>cmsmadesimple</a>
+    
+    
+</span>
+    <h1 class="post-title">Local file inclusion in cmsmadesimple <=2.2.1</h1>
+    <section class="post-content">
+      <h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs due to the use of user-supplied input without proper validation.</p>
+<h2 id="Proof-of-concept"><a href="#Proof-of-concept" class="headerlink" title="Proof of concept"></a>Proof of concept</h2><p>cmsmadesimple &lt;=2.1.6<br>The vulnerability exists in /cmsms/admin/listtags.php Line 82 and line 54</p>
+<p><img src="/images/vuln-1.png" alt=""><br><img src="/images/vuln-2.png" alt=""></p>
+<p>If there is a file named “1.phpinfo.php” existed in <a href="http://127.0.0.1/1.phpinfo.php" target="_blank" rel="noopener">http://127.0.0.1/1.phpinfo.php</a><br>So when we visit the following link:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;cmsms&#x2F;admin&#x2F;listtags.php?_sk_&#x3D;08852e62af02bc03&amp;action&#x3D;showpluginhelp&amp;plugin&#x3D;phpinfo&amp;type&#x3D;..&#x2F;..&#x2F;1</span><br></pre></td></tr></table></figure>
+<p>You would find out you has include this file successfully!‌</p>
+<p><img src="/images/file-inclusion.png" alt=""></p>
+<ul>
+<li>cmsmadesimple &lt;=2.2.1</li>
+</ul>
+<p>Current version is still vulnerable.</p>
+<p><img src="/images/Screen-Shot-2017-06-28-at-11.34.16-PM.png" alt=""></p>
+<p>Disclosure Timelines</p>
+<ul>
+<li>2017/2/7 Provide vulnerability(2.1.6) detail to vendor but no reply</li>
+<li>2017/6/16 cmsmadesimple update to 2.2.1 and no reply at all</li>
+<li>2017/6/28 Public disclosure</li>
+</ul>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Wester</h4>
+    <p>Love you 3000.</p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-twitter" href="http://twitter.com/share?url=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="page-number">•</span>
+    
+    <a class="older-posts" href="/2017/02/25/cve-2017-2500/">
+        (CVE-2017-2500)Address bar spoofing on macOS Safari →
+    </a>
+    
+</nav>
+</main>
+<link rel="stylesheet" type="text/css" href="/css/screen.css" />
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Noto+Serif:400,700,400italic|Open+Sans:700,400" />
+
+
+  <script type="text/javascript" src="/js/main.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-105875921-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-105875921-1');
+</script>
+
+
+</body>
+</html>
