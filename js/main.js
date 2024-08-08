@@ -4646,7 +4646,7 @@ default = a
 							sections: [{
 								time: "2024/08/08",
 								title: "CVE-2020-16040: Analysis of Chromium V8 engine integer overflow vulnerability",
-								url: "/2024/08/08/cve-2020-16040/"
+								url: "/2024/08/08/CVE-2020-16040/"
 							}, {
 										time: "2017/05/22",
 										title: "Local file inclusion in cmsmadesimple <=2.2.1",
