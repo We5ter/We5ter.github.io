@@ -5136,7 +5136,7 @@ default = s
 						title: "About me"
 					},
 					class: "about"
-				}, [e("br"), e("h1", ["Android OS/App bug hunter"]), e("br"), e("h1", ["Chrome Low-level bug hunter"]), e("br"), e("h1", ["learning PWN"])])
+				}, [e("br"), e("h1", ["Chrome/Android-OS/App bug hunter"]), e("br"), e("h1", ["** CVEs"]), e("br"), e("h1", ["Credited by Apple/Google/Microsoft/PayPal/Amazon/Line/Huawei/Xiaomi/Yandex/Evernote/Typora/MyBB etc."])])
 			}
 		}]), t
 	}();
