@@ -98,8 +98,7 @@
 }
 
 html {
-    height: 100%;
-    max-height: 100%;
+    min-height: 100%;
     font-size: 62.5%;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
@@ -107,8 +106,7 @@ html {
 }
 
 body {
-    height: 100%;
-    max-height: 100%;
+    min-height: 100%;
     font-family: var(--font-body);
     font-size: 1.6rem;
     line-height: 1.7;
