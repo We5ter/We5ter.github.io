@@ -1,80 +1,131 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" width="128" height="96" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" width="128" height="112" shape-rendering="crispEdges">
   <defs>
     <style>
       .cw{animation:wk 10s ease-in-out infinite}
-      @keyframes wk{0%,100%{transform:translateX(0)}30%{transform:translateX(16px)}60%{transform:translateX(0)}80%{transform:translateX(-10px)}}
-      .tl{transform-origin:140px 95px;animation:tlw 2s ease-in-out infinite}
-      @keyframes tlw{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(22deg)}}
-      .eye{animation:bk 4s ease-in-out infinite}
-      @keyframes bk{0%,46%,48%,100%{transform:scaleY(1)}47%{transform:scaleY(0.1)}}
-      .bd{animation:bth 3s ease-in-out infinite}
-      @keyframes bth{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.03)}}
-      .fl{animation:pwl 5s ease-in-out infinite}
-      .fr{animation:pwr 5s ease-in-out infinite .6s}
-      @keyframes pwl{0%,70%,100%{transform:translateY(0)}75%,85%{transform:translateY(-2px)}}
-      @keyframes pwr{0%,70%,100%{transform:translateY(0)}75%,85%{transform:translateY(-2px)}}
-      .hd{animation:nd 12s ease-in-out infinite}
-      @keyframes nd{0%,65%,85%,100%{transform:rotate(0)}72%,80%{transform:rotate(4deg)}}
-      .zz{opacity:0;animation:zAn 8s ease-in-out infinite}
-      @keyframes zAn{0%,25%{opacity:0;transform:translate(0,0) scale(.5)}30%{opacity:.8;transform:translate(8px,-14px) scale(1)}45%{opacity:.8;transform:translate(14px,-26px) scale(1.1)}50%,80%{opacity:0}81%,100%{opacity:0}}
+      @keyframes wk{0%,100%{transform:translateX(0)}30%{transform:translateX(14px)}60%{transform:translateX(0)}80%{transform:translateX(-8px)}}
+      .tl{transform-origin:135px 110px;animation:tlw 2.5s ease-in-out infinite}
+      @keyframes tlw{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(25deg)}}
+      .ear-l{transform-origin:52px 32px;animation:earTwitchL 4s ease-in-out infinite}
+      .ear-r{transform-origin:108px 32px;animation:earTwitchR 4.5s ease-in-out infinite 1s}
+      @keyframes earTwitchL{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-8deg)}96%{transform:rotate(0)}}
+      @keyframes earTwitchR{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(8deg)}94%{transform:rotate(0)}}
+      .eye{animation:blink 3.5s ease-in-out infinite}
+      @keyframes blink{0%,46%,48%,100%{transform:scaleY(1)}47%{transform:scaleY(0.1)}}
+      .bd{animation:breathe 3s ease-in-out infinite}
+      @keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+      .fl{animation:pawL 5s ease-in-out infinite}
+      .fr{animation:pawR 5s ease-in-out infinite .7s}
+      @keyframes pawL{0%,75%,100%{transform:translateY(0)}80%,88%{transform:translateY(-2px)}}
+      @keyframes pawR{0%,75%,100%{transform:translateY(0)}80%,88%{transform:translateY(-2px)}}
+      .hd{animation:headTilt 12s ease-in-out infinite}
+      @keyframes headTilt{0%,65%,85%,100%{transform:rotate(0)}72%,80%{transform:rotate(3deg)}}
+      .zz{opacity:0;animation:zAn 9s ease-in-out infinite}
+      @keyframes zAn{0%,28%{opacity:0;transform:translate(0,0) scale(.5)}33%{opacity:.8;transform:translate(6px,-16px) scale(1)}48%{opacity:.8;transform:translate(12px,-28px) scale(1.1)}53%,82%{opacity:0}83%,100%{opacity:0}}
     </style>
   </defs>
-  <g class="cw" fill="#DAA554">
-    <!-- tail -->
-    <g class="tl"><rect x="138" y="82" width="4" height="16" rx="2"/><rect x="142" y="76" width="4" height="12" rx="2"/><rect x="144" y="68" width="4" height="10" rx="2"/><rect x="144" y="60" width="3" height="8" rx="1"/></g>
-    <!-- back legs -->
-    <rect x="46" y="98" width="10" height="14" rx="3" fill="#C9933F"/>
-    <rect x="102" y="98" width="10" height="14" rx="3" fill="#C9933F"/>
-    <!-- body - chubby pixel cat -->
+  <g class="cw">
+    <!-- Tail -->
+    <g class="tl">
+      <rect x="132" y="98" width="5" height="14" rx="2.5" fill="#FF8C42"/>
+      <rect x="136" y="90" width="5" height="11" rx="2.5" fill="#FF8C42"/>
+      <rect x="139" y="80" width="4" height="11" rx="2" fill="#FF8C42"/>
+      <rect x="140" y="72" width="4" height="9" rx="2" fill="#FF8C42"/>
+    </g>
+
+    <!-- Back legs (sitting) -->
+    <rect x="44" y="108" width="14" height="18" rx="5" fill="#FF8C42"/>
+    <rect x="102" y="108" width="14" height="18" rx="5" fill="#FF8C42"/>
+    <!-- Back paws - white tips -->
+    <rect x="46" y="118" width="10" height="8" rx="3" fill="#FFF5E6"/>
+    <rect x="104" y="118" width="10" height="8" rx="3" fill="#FFF5E6"/>
+
+    <!-- Body - chubby orange cat with white belly -->
     <g class="bd">
-      <rect x="44" y="64" width="72" height="42" rx="12" fill="#DAA554"/>
-      <rect x="52" y="74" width="40" height="28" rx="8" fill="#F0D9A8" opacity=".7"/>
-      <!-- belly stripe pattern -->
-      <rect x="68" y="78" width="8" height="20" rx="2" fill="#E8B87A" opacity=".4"/>
+      <!-- Main body (orange) -->
+      <rect x="40" y="64" width="80" height="52" rx="18" fill="#FF8C42"/>
+      <!-- White belly area -->
+      <rect x="54" y="76" width="52" height="36" rx="14" fill="#FFF5E6"/>
+      <!-- Orange patches on sides of belly -->
+      <rect x="46" y="70" width="16" height="24" rx="6" fill="#FF8C42" opacity=".6"/>
+      <rect x="98" y="70" width="16" height="24" rx="6" fill="#FF8C42" opacity=".6"/>
     </g>
-    <!-- front legs standing -->
-    <g class="fl"><rect x="52" y="94" width="8" height="18" rx="3" fill="#DAA554"/><rect x="53" y="106" width="6" height="6" rx="2" fill="#F0D9A8"/></g>
-    <g class="fr"><rect x="100" y="94" width="8" height="18" rx="3" fill="#DAA554"/><rect x="101" y="106" width="6" height="6" rx="2" fill="#F0D9A8"/></g>
-    <!-- head group -->
+
+    <!-- Front legs (sitting, white) -->
+    <g class="fl">
+      <rect x="50" y="100" width="12" height="22" rx="5" fill="#FFF5E6"/>
+      <rect x="51" y="114" width="9" height="8" rx="3" fill="#FFE4C4"/>
+    </g>
+    <g class="fr">
+      <rect x="98" y="100" width="12" height="22" rx="5" fill="#FFF5E6"/>
+      <rect x="99" y="114" width="9" height="8" rx="3" fill="#FFE4C4"/>
+    </g>
+
+    <!-- Head group -->
     <g class="hd">
-      <!-- ears -->
-      <polygon points="54,48 46,24 66,40" fill="#DAA554"/>
-      <polygon points="56,42 50,28 63,39" fill="#FF9999"/>
-      <polygon points="106,48 114,24 94,40" fill="#DAA554"/>
-      <polygon points="104,42 110,28 97,39" fill="#FF9999"/>
-      <!-- head base -->
-      <rect x="50" y="36" width="60" height="38" rx="16" fill="#DAA554"/>
-      <!-- lighter face area -->
-      <rect x="62" y="50" width="36" height="22" rx="10" fill="#F0D9A8" opacity=".55"/>
-      <!-- eyes - big and cute -->
-      <g class="eye" style="transform-origin:70px 48px;">
-        <rect x="64" y="44" width="8" height="9" rx="3" fill="#558B2F"/>
-        <rect x="66" y="45" width="3" height="4" rx="1" fill="#1a1a1a"/>
-        <rect x="67" y="44" width="2" height="2" fill="#fff"/>
-        <rect x="65" y="49" width="1" height="1" fill="#fff" opacity=".5"/>
+      <!-- Left ear -->
+      <g class="ear-l">
+        <polygon points="52,40 38,8 68,34" fill="#FF8C42"/>
+        <polygon points="50,34 42,14 62,32" fill="#FFB5A1"/>
+        <!-- Inner ear pink -->
+        <polygon points="51,33 45,18 59,31" fill="#FF9999"/>
       </g>
-      <g class="eye" style="transform-origin:92px 48px;">
-        <rect x="88" y="44" width="8" height="9" rx="3" fill="#558B2F"/>
-        <rect x="90" y="45" width="3" height="4" rx="1" fill="#1a1a1a"/>
-        <rect x="91" y="44" width="2" height="2" fill="#fff"/>
-        <rect x="89" y="49" width="1" height="1" fill="#fff" opacity=".5"/>
+      <!-- Right ear -->
+      <g class="ear-r">
+        <polygon points="108,40 122,8 92,34" fill="#FF8C42"/>
+        <polygon points="110,34 118,14 98,32" fill="#FFB5A1"/>
+        <!-- Inner ear pink -->
+        <polygon points="109,33 115,18 101,31" fill="#FF9999"/>
       </g>
-      <!-- nose -->
-      <rect x="77" y="58" width="6" height="4" rx="1" fill="#FF8888"/>
-      <!-- mouth -->
-      <rect x="77" y="64" width="2" height="3" fill="#C9933F" opacity=".5"/>
-      <rect x="81" y="64" width="2" height="3" fill="#C9933F" opacity=".5"/>
-      <!-- whiskers -->
-      <rect x="46" y="58" width="10" height="1" fill="#C9933F" opacity=".4"/>
-      <rect x="44" y="64" width="12" height="1" fill="#C9933F" opacity=".4"/>
-      <rect x="46" y="70" width="10" height="1" fill="#C9933F" opacity=".4"/>
-      <rect x="104" y="58" width="10" height="1" fill="#C9933F" opacity=".4"/>
-      <rect x="104" y="64" width="12" height="1" fill="#C9933F" opacity=".4"/>
-      <rect x="104" y="70" width="10" height="1" fill="#C9933F" opacity=".4"/>
+
+      <!-- Head base (orange) -->
+      <rect x="44" y="30" width="72" height="48" rx="20" fill="#FF8C42"/>
+
+      <!-- White face patch (mask area) -->
+      <rect x="56" y="44" width="48" height="30" rx="14" fill="#FFF5E6"/>
+
+      <!-- White stripe on forehead -->
+      <rect x="72" y="32" width="16" height="18" rx="6" fill="#FFF5E6"/>
+
+      <!-- Eyes - BIG and cute! -->
+      <g class="eye" style="transform-origin:66px 52px;">
+        <!-- Eye white area -->
+        <ellipse cx="66" cy="52" rx="9" ry="10" fill="#FFFFFF"/>
+        <!-- Pupil (dark, large for cute look) -->
+        <ellipse cx="67" cy="53" rx="5" ry="5.5" fill="#2D2D2D"/>
+        <!-- Catchlight (shine) -->
+        <circle cx="69" cy="50" r="2" fill="#FFFFFF"/>
+        <circle cx="65" cy="55" r="1" fill="#FFFFFF" opacity=".5"/>
+      </g>
+      <g class="eye" style="transform-origin:94px 52px;">
+        <ellipse cx="94" cy="52" rx="9" ry="10" fill="#FFFFFF"/>
+        <ellipse cx="95" cy="53" rx="5" ry="5.5" fill="#2D2D2D"/>
+        <circle cx="97" cy="50" r="2" fill="#FFFFFF"/>
+        <circle cx="93" cy="55" r="1" fill="#FFFFFF" opacity=".5"/>
+      </g>
+
+      <!-- Nose - cute pink triangle-ish -->
+      <polygon points="80,63 76,67 84,67" fill="#FF8888"/>
+      <rect x="78" y="65" width="4" height="2" rx="1" fill="#FF7777" opacity=".5"/>
+
+      <!-- Mouth - small 'w' shape -->
+      <path d="M77,70 Q80,74 80,71 Q80,74 83,70" stroke="#CC7766" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+      <!-- Blush / cheek circles -->
+      <ellipse cx="56" cy="62" rx="6" ry="4" fill="#FFB5A1" opacity=".5"/>
+      <ellipse cx="104" cy="62" rx="6" ry="4" fill="#FFB5A1" opacity=".5"/>
+
+      <!-- Whiskers -->
+      <rect x="36" y="58" width="12" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
+      <rect x="34" y="64" width="13" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
+      <rect x="36" y="70" width="11" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
+      <rect x="112" y="58" width="12" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
+      <rect x="113" y="64" width="13" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
+      <rect x="113" y="70" width="11" height="1.2" rx="0.6" fill="#CC8866" opacity=".5"/>
     </g>
+
     <!-- Zzz sleep symbols -->
-    <text class="zz" x="125" y="32" font-family="monospace" font-size="11" font-weight="bold" fill="#00f0ff">z</text>
-    <text class="zz" style="animation-delay:.5s" x="134" y="22" font-family="monospace" font-size="9" font-weight="bold" fill="#00f0ff">z</text>
-    <text class="zz" style="animation-delay:1s" x="141" y="14" font-family="monospace" font-size="7" font-weight="bold" fill="#00f0ff">z</text>
+    <text class="zz" x="122" y="30" font-family="monospace" font-size="11" font-weight="bold" fill="#00f0ff">z</text>
+    <text class="zz" style="animation-delay:.5s" x="130" y="20" font-family="monospace" font-size="9" font-weight="bold" fill="#00f0ff">z</text>
+    <text class="zz" style="animation-delay:1s" x="137" y="12" font-family="monospace" font-size="7" font-weight="bold" fill="#00f0ff">z</text>
   </g>
 </svg>
