@@ -12,8 +12,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content="hexo">
   <meta name="theme-color" content="#0a0a0f" />
-  <link rel="icon" type="image/png" href="/images/avatar.png" />
-  <link rel="apple-touch-icon" href="/images/avatar.png" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png" />
 
   
   
@@ -42,7 +42,7 @@
 
 <!-- Golden Cat - Post Page Top -->
 <div class="golden-cat-wrapper cat-post-top">
-  <img src="/images/golden-cat.svg" alt="Golden Cat" class="golden-cat">
+  <img src="/images/static/golden-cat.svg" alt="Golden Cat" class="golden-cat">
 </div>
 
 <main class="content" role="main">
@@ -53,16 +53,16 @@
     <section class="post-content">
       <h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs due to the use of user-supplied input without proper validation.</p>
 <h2 id="Proof-of-concept"><a href="#Proof-of-concept" class="headerlink" title="Proof of concept"></a>Proof of concept</h2><p>cmsmadesimple &lt;=2.1.6<br>The vulnerability exists in /cmsms/admin/listtags.php Line 82 and line 54</p>
-<p><img src="/images/cms-vuln-code.png" alt="CMSMadeSimple Vulnerability Code"><br><img src="/images/cms-listtags.png" alt="CMSMadeSimple listtags.php"></p>
+<p><img src="/images/posts/cms-vuln-code.png" alt="CMSMadeSimple Vulnerability Code"><br><img src="/images/posts/cms-listtags.png" alt="CMSMadeSimple listtags.php"></p>
 <p>If there is a file named “1.phpinfo.php” existed in <a href="http://127.0.0.1/1.phpinfo.php" target="_blank" rel="noopener">http://127.0.0.1/1.phpinfo.php</a><br>So when we visit the following link:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;cmsms&#x2F;admin&#x2F;listtags.php?_sk_&#x3D;08852e62af02bc03&amp;action&#x3D;showpluginhelp&amp;plugin&#x3D;phpinfo&amp;type&#x3D;..&#x2F;..&#x2F;1</span><br></pre></td></tr></table></figure>
 <p>You would find out you has include this file successfully!‌</p>
-<p><img src="/images/cms-file-inclusion.png" alt="File Inclusion Successful"></p>
+<p><img src="/images/posts/cms-file-inclusion.png" alt="File Inclusion Successful"></p>
 <ul>
 <li>cmsmadesimple &lt;=2.2.1</li>
 </ul>
 <p>Current version is still vulnerable.</p>
-<p><img src="/images/cms-version-check.png" alt="CMSMadeSimple Version Check"></p>
+<p><img src="/images/posts/cms-version-check.png" alt="CMSMadeSimple Version Check"></p>
 <p>Disclosure Timelines</p>
 <ul>
 <li>2017/2/7 Provide vulnerability(2.1.6) detail to vendor but no reply</li>
@@ -91,31 +91,31 @@
         <a class="icon-x" href="https://x.com/share?url=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/&text=Local file inclusion in cmsmadesimple &lt;=2.2.1"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
-            <img src="/images/x-logo.jpg" alt="X" width="22" height="22">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
         <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/&title=Local file inclusion in cmsmadesimple &lt;=2.2.1"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
-            <img src="/images/weibo.png" alt="Weibo" width="22" height="22">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
         </a>
         <!-- Xiaohongshu -->
         <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/user/profile/Local file inclusion in cmsmadesimple &lt;=2.2.1"
            onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
            title="Share on Xiaohongshu">
-            <img src="/images/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (copy link) -->
         <a class="icon-wechat" href="javascript:void(0);"
            onclick="navigator.clipboard.writeText('https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/').then(()=>alert('链接已复制到剪贴板！'));return false;"
            title="Copy link for WeChat">
-            <img src="/images/wechat.svg" alt="WeChat" width="24" height="24">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
         </a>
         <!-- LinkedIn -->
         <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://lightrains.org/2017/05/22/local-file-inclusion-in-cmsmadesimple/"
            onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
            title="Share on LinkedIn">
-            <img src="/images/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
         </a>
     </div>
 </section>
