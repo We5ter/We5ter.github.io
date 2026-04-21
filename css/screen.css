@@ -1088,6 +1088,72 @@ iframe, .fluid-width-video-wrapper {
 }
 
 /* ==========================================================================
+   Golden Cat Animation
+   ========================================================================== */
+
+.golden-cat-wrapper {
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.golden-cat {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+/* Cat at post page top - floats near the title */
+.cat-post-top {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    animation: catFloatIn 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+@keyframes catFloatIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Cat in footer - centered, walking left/right */
+.cat-footer {
+    text-align: center;
+    padding: 1.5rem 0 0.5rem;
+}
+
+.cat-footer .golden-cat {
+    width: 90px;
+}
+
+/* Cat hover effect on wrapper (for fun interaction) */
+.golden-cat-wrapper:hover .golden-cat {
+    transform: scale(1.08) rotate(2deg);
+    filter: drop-shadow(0 6px 18px rgba(212, 165, 116, 0.3));
+}
+
+/* Responsive cats */
+@media (max-width: 768px) {
+    .cat-post-top {
+        position: relative;
+        top: auto;
+        right: auto;
+        text-align: center;
+        margin-bottom: -10px;
+    }
+
+    .cat-post-top .golden-cat,
+    .cat-footer .golden-cat {
+        width: 70px;
+    }
+}
+
+/* ==========================================================================
    8. Third Party Elements
    ========================================================================== */
 

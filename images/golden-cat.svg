@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="120" height="96">
+  <defs>
+    <linearGradient id="fur" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4A574"/>
+      <stop offset="50%" stop-color="#C9956C"/>
+      <stop offset="100%" stop-color="#8B6914"/>
+    </linearGradient>
+    <linearGradient id="belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5DEB3"/>
+      <stop offset="100%" stop-color="#DEB887"/>
+    </linearGradient>
+    <linearGradient id="earPink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB6C1"/>
+      <stop offset="100%" stop-color="#FF69B4"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .cat-wrap{animation:w 12s ease-in-out infinite}
+    @keyframes w{0%,100%{transform:translateX(0)}25%{transform:translateX(30px)}50%{transform:translateX(0)}75%{transform:translateX(-20px)}}
+    .tail{transform-origin:165px 110px;animation:t 2s ease-in-out infinite}
+    @keyframes t{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(25deg)}}
+    .el{transform-origin:55px 35px;animation:eL 4s ease-in-out infinite}
+    .er{transform-origin:125px 35px;animation:eR 4.5s ease-in-out infinite}
+    @keyframes eL{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-8deg)}96%{transform:rotate(3deg)}}
+    @keyframes eR{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(6deg)}94%{transform:rotate(-4deg)}}
+    .eye{animation:b 4s ease-in-out infinite;transform-origin:center}
+    @keyframes b{0%,46%,48%,100%{transform:scaleY(1)}47%{transform:scaleY(0.1)}}
+    .nose{animation:n 3s ease-in-out infinite}
+    @keyframes n{0%,90%,100%{transform:scale(1)}93%{transform:scale(1.1) translateY(-1px)}}
+    .body{transform-origin:90px 100px;animation:br 3s ease-in-out infinite}
+    @keyframes br{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.03)}}
+    .head{transform-origin:90px 70px;animation:nod 12s ease-in-out infinite}
+    @keyframes nod{0%,60%,80%,100%{transform:rotate(0)}68%,75%{transform:rotate(8deg)}}
+    .pl{transform-origin:62px 135px;animation:pL 6s ease-in-out infinite}
+    .pr{transform-origin:118px 135px;animation:pR 6s ease-in-out infinite .5s}
+    @keyframes pL{0%,70%,100%{transform:rotate(0)}75%,85%{transform:rotate(-15deg) translateY(-3px)}}
+    @keyframes pR{0%,70%,100%{transform:rotate(0)}75%,85%{transform:rotate(15deg) translateY(-3px)}}
+    .wl{animation:wvL 3s ease-in-out infinite;transform-origin:70px 72px}
+    .wr{animation:wvR 3s ease-in-out infinite .3s;transform-origin:110px 72px}
+    @keyframes wvL{0%,100%{transform:rotate(0)}50%{transform:rotate(3deg)}}
+    @keyframes wvR{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg)}}
+    .zzz{opacity:0;animation:z 8s ease-in-out infinite}
+    @keyframes z{0%,24%{opacity:0;transform:translate(0,0) scale(.5)}30%{opacity:1;transform:translate(10px,-18px) scale(1)}45%{opacity:1;transform:translate(18px,-32px) scale(1.2)}50%,80%{opacity:0}81%,100%{opacity:0}}
+  </style>
+  <g class="cat-wrap">
+    <!-- tail -->
+    <g class="tail"><path d="M165 110Q190 90 185 60Q183 50 175 55Q180 75 170 95Q168 105 165 110" fill="url(#fur)" stroke="#8B6914" stroke-width="1"/></g>
+    <!-- back legs -->
+    <ellipse cx="58" cy="136" rx="16" ry="11" fill="url(#fur)" stroke="#8B6914" stroke-width="1"/>
+    <ellipse cx="122" cy="136" rx="16" ry="11" fill="url(#fur)" stroke="#8B6914" stroke-width="1"/>
+    <!-- body -->
+    <g class="body">
+      <ellipse cx="90" cy="108" rx="50" ry="34" fill="url(#fur)" stroke="#8B6914" stroke-width="1.5"/>
+      <ellipse cx="90" cy="115" rx="28" ry="21" fill="url(#belly)" opacity=".7"/>
+    </g>
+    <!-- front paws -->
+    <g class="pl"><ellipse cx="62" cy="136" rx="12" ry="10" fill="url(#fur)" stroke="#8B6914"/><ellipse cx="62" cy="143" rx="9" ry="5" fill="#F5DEB3" opacity=".6"/></g>
+    <g class="pr"><ellipse cx="118" cy="136" rx="12" ry="10" fill="url(#fur)" stroke="#8B6914"/><ellipse cx="118" cy="143" rx="9" ry="5" fill="#F5DEB3" opacity=".6"/></g>
+    <!-- head group -->
+    <g class="head">
+      <!-- ears -->
+      <g class="el"><path d="M52 42L42 12L72 32Z" fill="url(#fur)" stroke="#8B6914" stroke-width="1.5"/><path d="M54 36L47 18L66 32Z" fill="url(#earPink)"/></g>
+      <g class="er"><path d="M128 42L138 12L108 32Z" fill="url(#fur)" stroke="#8B6914" stroke-width="1.5"/><path d="M126 36L133 18L114 32Z" fill="url(#earPink)"/></g>
+      <!-- head shape -->
+      <ellipse cx="90" cy="62" rx="44" ry="38" fill="url(#fur)" stroke="#8B6914" stroke-width="1.5"/>
+      <ellipse cx="90" cy="73" rx="26" ry="22" fill="url(#belly)" opacity=".55"/>
+      <!-- eyes -->
+      <g class="eye"><ellipse cx="73" cy="56" rx="7" ry="8" fill="#2d1810"/><ellipse cx="75" cy="53" rx="2.5" ry="3" fill="#fff"/><ellipse cx="71" cy="58" rx="1" ry="1.5" fill="#fff" opacity=".6"/></g>
+      <g class="eye"><ellipse cx="107" cy="56" rx="7" ry="8" fill="#2d1810"/><ellipse cx="109" cy="53" rx="2.5" ry="3" fill="#fff"/><ellipse cx="105" cy="58" rx="1" ry="1.5" fill="#fff" opacity=".6"/></g>
+      <!-- nose -->
+      <g class="nose"><polygon points="90,67 86,71 94,71" fill="#FF69B4"/></g>
+      <!-- mouth -->
+      <path d="M87 74 Q90 78 87 81" fill="none" stroke="#8B6914" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M93 74 Q90 78 93 81" fill="none" stroke="#8B6914" stroke-width="1.2" stroke-linecap="round"/>
+      <!-- whiskers left -->
+      <g class="wl">
+        <line x1="52" y1="68" x2="32" y2="64" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <line x1="51" y1="73" x2="30" y2="73" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <line x1="52" y1="78" x2="33" y2="82" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+      </g>
+      <!-- whiskers right -->
+      <g class="wr">
+        <line x1="128" y1="68" x2="148" y2="64" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <line x1="129" y1="73" x2="150" y2="73" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <line x1="128" y1="78" x2="147" y2="82" stroke="#8B6914" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+      </g>
+    </g>
+    <!-- Zzz sleep symbol -->
+    <text class="zzz" x="140" y="40" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#00f0ff" opacity=".7">z</text>
+    <text class="zzz" style="animation-delay:.5s" x="152" y="28" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#00f0ff" opacity=".6">z</text>
+    <text class="zzz" style="animation-delay:1s" x="160" y="18" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#00f0ff" opacity=".5">z</text>
+  </g>
+</svg>
