@@ -958,6 +958,44 @@ iframe, .fluid-width-video-wrapper {
     background: rgba(0, 119, 181, 0.15) !important;
 }
 
+/* Back to Home Button */
+.back-to-home {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.back-to-home a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.8rem;
+    color: var(--text-secondary) !important;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.back-to-home a svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.back-to-home a:hover {
+    color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+    background: rgba(0, 240, 255, 0.08) !important;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+.back-to-home a:hover svg {
+    transform: translateX(-3px);
+}
+
 /* ==========================================================================
    8. Third Party Elements
    ========================================================================== */
