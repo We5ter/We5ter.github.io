@@ -288,6 +288,19 @@
     }
   }
 
+  // Force video playback on user interaction (for browsers that block autoplay)
+  function forceVideoPlay() {
+    const video = document.getElementById('video-bg');
+    if (video && video.paused) {
+      video.play().catch(e => console.log('[YOJO] Video autoplay blocked:', e));
+    }
+  }
+
+  // Try to play video on first interaction
+  document.addEventListener('click', forceVideoPlay, { once: true });
+  document.addEventListener('scroll', forceVideoPlay, { once: true });
+  document.addEventListener('mousemove', forceVideoPlay, { once: true });
+
   // Start when document is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
