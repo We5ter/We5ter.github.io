@@ -255,38 +255,41 @@
 
   // Initialize when DOM is ready
   function init() {
-    const canvas = document.getElementById('particle-canvas');
-    if (!canvas) {
-      console.warn('[YOJO] Particle canvas not found');
-      return;
-    }
-    
-    console.log('[YOJO] Initializing particle system...');
-    
-    // Set canvas styles
-    canvas.style.cssText = `
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-      z-index: 0 !important;
-      pointer-events: none !important;
-      display: block !important;
-    `;
-    
-    // Force resize to full viewport
-    this.resize();
+    try {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) {
+        console.warn('[YOJO] Particle canvas not found');
+        return;
+      }
+      
+      console.log('[YOJO] Initializing particle system...');
+      
+      // Set canvas styles
+      canvas.style.cssText = `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 0 !important;
+        pointer-events: none !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      `;
 
-    new ParticleSystem(canvas);
-    console.log('[YOJO] Particle system ready!');
+      new ParticleSystem(canvas);
+      console.log('[YOJO] Particle system ready!');
+    } catch (error) {
+      console.error('[YOJO] Particle system error:', error);
+    }
   }
 
   // Start when document is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    init();
+    setTimeout(init, 100);
   }
 
 })();
