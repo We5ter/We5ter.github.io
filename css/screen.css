@@ -553,6 +553,14 @@ iframe, .fluid-width-video-wrapper {
     text-shadow: none;
 }
 
+/* RSS button special hover color */
+.social-link-rss:hover {
+    color: #ff6b00 !important;
+    border-color: #ff6b00 !important;
+    background: rgba(255, 107, 0, 0.08) !important;
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.15) !important;
+}
+
 .social-link svg {
     width: 16px;
     height: 16px;
