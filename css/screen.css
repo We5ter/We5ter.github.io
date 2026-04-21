@@ -2149,30 +2149,37 @@ pre .chunk {
         height: 34px;
     }
 
-    /* Back to home button - compact for mobile */
-    .back-to-home-fixed {
-        position: fixed;
-        bottom: 0.8rem;
-        left: 0.6rem;
-        top: auto;
-        transform: none;
-        writing-mode: horizontal-tb;
-        text-orientation: initial;
-        flex-direction: row;
-        padding: 0.4rem 0.7rem;
-        font-size: 0.75rem;
-        border-radius: 10px;
-        z-index: 100;
-    }
+/* Back to home button - compact for mobile, hidden by default, slides out on swipe */
+.back-to-home-fixed {
+    position: fixed;
+    bottom: 1.2rem;
+    left: 0;
+    top: auto;
+    transform: translateX(-100%);
+    writing-mode: horizontal-tb;
+    text-orientation: initial;
+    flex-direction: row;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.75rem;
+    border-radius: 0 10px 10px 0;
+    z-index: 100;
+    border-left: none !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+}
 
-    .back-to-home-fixed svg {
-        width: 16px;
-        height: 16px;
-    }
+.back-to-home-fixed svg {
+    width: 16px;
+    height: 16px;
+}
 
-    .back-to-home-fixed span {
-        display: none;
-    }
+.back-to-home-fixed span {
+    display: none;
+}
+
+/* Slide out when user scrolls or swipes from left edge */
+.back-to-home-fixed.is-visible,
+.back-to-home-fixed:hover {
+    transform: translateX(0);
 }
 
 /* ==========================================================================

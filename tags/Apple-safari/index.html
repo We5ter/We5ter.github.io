@@ -60,7 +60,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T11:40:32.263Z" itemprop="datePublished">2026-04-21</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T13:49:55.547Z" itemprop="datePublished">2026-04-21</time></span></h4>
     
 </section>
 
@@ -134,7 +134,7 @@
         data-emit-metadata="0"
         data-input-position="bottom"
         data-theme="dark_dimmed"
-        data-lang="zh-CN"
+        data-lang="en"
         data-loading="lazy"
         crossorigin="anonymous"
         async>
@@ -309,6 +309,62 @@
         createMeteor();
         setTimeout(createMeteor, 150 + Math.random() * 300);
     }, 6000 + Math.random() * 4000);
+})();
+</script>
+
+<!-- Mobile: Back to Home button slide-out on swipe -->
+<script>
+(function() {
+    var btn = document.querySelector('.back-to-home-fixed');
+    if (!btn) return;
+
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var isSwiping = false;
+    var hideTimer = null;
+
+    function showBtn() {
+        btn.classList.add('is-visible');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function() {
+            btn.classList.remove('is-visible');
+        }, 3000); // Auto-hide after 3 seconds
+    }
+
+    // Touch swipe from left edge
+    document.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isSwiping = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        if (isSwiping) return;
+        var dx = e.touches[0].clientX - touchStartX;
+        var dy = e.touches[0].clientY - touchStartY;
+        // Swipe right from left edge (within 30px)
+        if (touchStartX < 30 && dx > 25 && Math.abs(dx) > Math.abs(dy)) {
+            isSwiping = true;
+            showBtn();
+        }
+    }, { passive: true });
+
+    // Also show on scroll down
+    var lastScrollTop = 0;
+    window.addEventListener('scroll', function() {
+        var st = window.pageYOffset || document.documentElement.scrollTop;
+        if (st > lastScrollTop && st > 200) {
+            // Scrolling down past 200px - briefly show hint
+            if (!btn.classList.contains('is-visible')) {
+                btn.classList.add('is-visible');
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(function() {
+                    btn.classList.remove('is-visible');
+                }, 1500);
+            }
+        }
+        lastScrollTop = st <= 0 ? 0 : st;
+    }, { passive: true });
 })();
 </script>
 
