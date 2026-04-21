@@ -118,6 +118,15 @@ body {
     background-attachment: fixed;
 }
 
+/* Global Navbar - core positioning (must be early) */
+.global-navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1100 !important;
+}
+
 /* Animated background grid */
 body::before {
     content: '';
