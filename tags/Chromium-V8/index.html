@@ -60,7 +60,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T11:19:02.145Z" itemprop="datePublished">2026-04-21</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T11:31:53.783Z" itemprop="datePublished">2026-04-21</time></span></h4>
     
 </section>
 
@@ -112,6 +112,36 @@
     <span class="post-nav-placeholder"></span>
     
   </nav>
+
+  <!-- Giscus Comments -->
+  
+  <section class="comments-section" id="comments">
+    <div class="comments-header">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align: -3px; margin-right: 6px;">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+      </svg>
+      Comments
+    </div>
+    <div class="giscus-wrapper">
+      <script src="https://giscus.app/client.js"
+        data-repo="We5ter/We5ter.github.io"
+        data-repo-id=""
+        data-category="Announcements"
+        data-category-id=""
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="dark_dimmed"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+      </script>
+    </div>
+  </section>
+  
 </main>
 
 <footer class="site-footer">
@@ -151,18 +181,134 @@
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
+    // Sync Giscus theme with site theme
+    function syncGiscusTheme(theme) {
+        const giscusFrame = document.querySelector('.giscus iframe');
+        if (!giscusFrame) return;
+        const giscusTheme = theme === 'light' ? 'light' : 'dark_dimmed';
+        giscusFrame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: giscusTheme } } },
+            'https://giscus.app'
+        );
+    }
+
+    // Set initial Giscus theme
+    syncGiscusTheme(savedTheme);
+
     toggle.addEventListener('click', function() {
         const current = document.documentElement.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
+        syncGiscusTheme(next);
+    });
+
+    // Listen for Giscus messages (e.g., when user changes theme in Giscus)
+    window.addEventListener('message', function(event) {
+        if (event.origin !== 'https://giscus.app') return;
+        if (!(typeof event.data === 'object' && event.data.giscus)) return;
+        const giscusData = event.data.giscus;
+        if ('theme' in giscusData) {
+            const newTheme = giscusData.theme.includes('light') ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
     });
 
     // Respect system preference on first visit (if no saved preference)
     if (!localStorage.getItem('theme')) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        syncGiscusTheme(prefersDark ? 'dark' : 'light');
     }
+})();
+</script>
+
+<!-- Meteor Shower Animation for Hero Area -->
+<script>
+(function() {
+    var siteHead = document.querySelector('.site-head');
+    if (!siteHead) return;
+
+    // Create meteor container
+    var shower = document.createElement('div');
+    shower.className = 'meteor-shower';
+    siteHead.appendChild(shower);
+
+    // Meteor color configs for dark/light mode
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var colors = isLight ? [
+        { color: '#6366f1', glow: 'rgba(99,102,241,0.3)' },
+        { color: '#a855f7', glow: 'rgba(168,85,247,0.25)' },
+        { color: '#ec4899', glow: 'rgba(236,72,153,0.2)' },
+        { color: '#818cf8', glow: 'rgba(129,140,248,0.25)' }
+    ] : [
+        { color: '#00f0ff', glow: 'rgba(0,240,255,0.4)' },
+        { color: '#a855f7', glow: 'rgba(168,85,247,0.35)' },
+        { color: '#7dd3fc', glow: 'rgba(125,211,252,0.3)' },
+        { color: '#c084fc', glow: 'rgba(192,132,252,0.3)' },
+        { color: '#22d3ee', glow: 'rgba(34,211,238,0.35)' }
+    ];
+
+    function createMeteor() {
+        var el = document.createElement('div');
+        el.className = 'meteor';
+
+        // Random config
+        var cfg = colors[Math.floor(Math.random() * colors.length)];
+        var size = 80 + Math.random() * 100; // 80-180px length
+        var thickness = 1 + Math.random() * 1.5; // 1-2.5px thick
+        var duration = 1.5 + Math.random() * 2.5; // 1.5-4s
+        var delay = Math.random() * 5; // 0-5s delay
+
+        // Start position (right side of hero area)
+        var startX = 50 + Math.random() * 45; // 50%-95% from left
+        var startY = -10 - Math.random() * 20; // above top
+
+        // End position (diagonal down-left)
+        var travelX = -(200 + Math.random() * 300); // travel left
+        var travelY = 150 + Math.random() * 300; // travel down
+
+        // Angle calculation
+        var angle = Math.atan2(travelY, Math.abs(travelX)) * (180 / Math.PI);
+
+        el.style.cssText =
+            '--meteor-color:' + cfg.color + ';' +
+            '--meteor-glow:' + cfg.glow + ';' +
+            '--tx:' + travelX + 'px;' +
+            '--ty:' + travelY + 'px;' +
+            'width:' + size + 'px;' +
+            'height:' + thickness + 'px;' +
+            'left:' + startX + '%;' +
+            'top:' + startY + '%;' +
+            'transform:rotate(' + angle + 'deg);' +
+            'animation:meteorShoot ' + duration + 's ease-out ' + delay + 's forwards;';
+
+        shower.appendChild(el);
+
+        // Remove after animation ends
+        setTimeout(function() {
+            if (el.parentNode) el.parentNode.removeChild(el);
+        }, (duration + delay) * 1000 + 500);
+    }
+
+    // Initial burst
+    for (var i = 0; i < 4; i++) {
+        createMeteor();
+    }
+
+    // Continuous meteors
+    setInterval(function() {
+        if (shower.children.length < 5) { // max 5 simultaneous
+            createMeteor();
+        }
+    }, 2500);
+
+    // Occasional double meteor
+    setInterval(function() {
+        createMeteor();
+        setTimeout(createMeteor, 150 + Math.random() * 300);
+    }, 6000 + Math.random() * 4000);
 })();
 </script>
 
