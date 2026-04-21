@@ -34,6 +34,16 @@
 
   
 
+<!-- Theme Toggle Button (top-right) -->
+<button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="切换白天/黑夜模式">
+  <svg class="theme-toggle-icon theme-toggle-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+  </svg>
+  <svg class="theme-toggle-icon theme-toggle-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+    <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.44 2.26 5.403 5.403 0 01-3.18-9.74c-.97.23-1.88.63-2.68 1.19A9 9 0 0112 3z"/>
+  </svg>
+</button>
+
 <!-- Fixed Back to Home Button (left side) -->
 <a class="back-to-home-fixed" href="/" title="Back to Home">
     <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -55,7 +65,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T08:43:11.774Z" itemprop="datePublished">2026-04-21</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T09:04:44.682Z" itemprop="datePublished">2026-04-21</time></span></h4>
     
 </section>
 
@@ -97,12 +107,31 @@
 
     </footer>
   </article>
-  <nav class="pagination" role="pagination">
+
+  <!-- Post Navigation: Previous / Next -->
+  <nav class="post-nav">
     
-    <span class="page-number">•</span>
+    <span class="post-nav-placeholder"></span>
     
-</nav>
+    
+    <span class="post-nav-placeholder"></span>
+    
+  </nav>
 </main>
+
+<footer class="site-footer">
+  <!-- Golden Cat - Footer -->
+  <div class="golden-cat-wrapper cat-footer">
+    <img src="/images/static/golden-cat.svg" alt="Golden Cat" class="golden-cat">
+  </div>
+  <div class="inner">
+    <section class="poweredby">
+      Proudly published with <a href="https://hexo.io" target="_blank">Hexo</a> &middot;
+      Theme <a href="#" target="_blank">YOYO</a>
+    </section>
+    <p>&copy; 2026 <a href="/">Wester</a>. All rights reserved.</p>
+  </div>
+</footer>
 
 
   <script type="text/javascript" src="/js/main.js"></script>
@@ -115,6 +144,31 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-372913719');
+</script>
+
+<!-- Theme Toggle: Dark / Light Mode -->
+<script>
+(function() {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    // Get saved theme or default to dark
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    toggle.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+    });
+
+    // Respect system preference on first visit (if no saved preference)
+    if (!localStorage.getItem('theme')) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }
+})();
 </script>
 
 </body>
