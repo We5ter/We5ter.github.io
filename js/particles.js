@@ -278,8 +278,11 @@
         padding: 0 !important;
       `;
 
-      new ParticleSystem(canvas);
+      const system = new ParticleSystem(canvas);
       console.log('[YOJO] Particle system ready!');
+      
+      // Initial resize
+      system.resize();
     } catch (error) {
       console.error('[YOJO] Particle system error:', error);
     }
