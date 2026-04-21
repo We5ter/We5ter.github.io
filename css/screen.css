@@ -44,8 +44,8 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
 
     /* Spacing */
-    --container-width: 900px;
-    --post-width: 800px;
+    --container-width: 1100px;
+    --post-width: 980px;
 
     /* Transitions */
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -925,6 +925,12 @@ iframe, .fluid-width-video-wrapper {
     height: 20px;
 }
 
+.post-footer .share a img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
 /* Individual icon hover colors */
 .post-footer .share a.icon-x:hover {
     color: #fff !important;
@@ -935,11 +941,6 @@ iframe, .fluid-width-video-wrapper {
     color: #ff8200 !important;
     border-color: #ff8200 !important;
     background: rgba(255, 130, 0, 0.15) !important;
-}
-.post-footer .share a.icon-zhihu:hover {
-    color: #0084ff !important;
-    border-color: #0084ff !important;
-    background: rgba(0, 132, 255, 0.15) !important;
 }
 .post-footer .share a.icon-xiaohongshu:hover {
     color: #ff2442 !important;
