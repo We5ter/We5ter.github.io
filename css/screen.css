@@ -439,28 +439,72 @@ iframe, .fluid-width-video-wrapper {
     padding: 6rem 2rem 4rem;
     text-align: center;
     color: var(--text-primary);
-    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background:
+        /* Grid pattern */
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        /* Base gradient */
+        linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    background-size: 60px 60px, 60px 60px, 100% 100%;
+    background-position: -1px -1px, -1px -1px, 0 0;
     overflow: hidden;
     z-index: 1;
 }
 
+/* Tech glow orbs for hero area */
 .site-head::before {
     content: '';
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
+    width: 500px;
+    height: 500px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(0, 240, 255, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(123, 47, 247, 0.10) 0%, transparent 50%),
+        radial-gradient(circle, rgba(0, 240, 255, 0.06) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
-    animation: pulse 8s ease-in-out infinite;
+    animation: headPulse 10s ease-in-out infinite;
+}
+
+/* Scan line effect across hero */
+.site-head::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0, 240, 255, 0.15) 20%,
+        rgba(0, 240, 255, 0.5) 50%,
+        rgba(0, 240, 255, 0.15) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1);
+    animation: scanLine 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes scanLine {
+    0% { top: 0%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
 }
 
 @keyframes pulse {
     0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
     50% { transform: translateX(-50%) scale(1.3); opacity: 0.8; }
+}
+
+@keyframes headPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+    33% { transform: translateX(-50%) scale(1.15) translateY(-10px); opacity: 1; }
+    66% { transform: translateX(-50%) scale(1.08) translateY(5px); opacity: 0.85; }
 }
 
 .blog-logo {
@@ -690,7 +734,7 @@ iframe, .fluid-width-video-wrapper {
 
 .post-title {
     margin: 0;
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.25;
@@ -1881,39 +1925,56 @@ pre .chunk {
         margin: 0.8rem 0;
     }
 
-    /* Footer - critical fix for iPhone */
+    /* Footer - fully responsive for mobile */
     .site-footer {
-        margin-top: 2rem;
-        padding: 1.5rem 10px 2rem;
-        font-size: 0.9rem;
+        margin-top: 1.2rem;
+        padding: 0.8rem 1rem 1rem;
+        font-size: 0.75rem;
         width: 100%;
+        max-width: 100vw;
+        overflow: hidden;
         box-sizing: border-box;
     }
 
     .site-footer .inner {
-        margin-left: 0;
-        margin-right: 0;
+        margin-left: auto;
+        margin-right: auto;
         width: 100%;
+        max-width: 100%;
+        padding: 0 0.5rem;
         text-align: center;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     .site-footer .poweredby {
-        font-size: 0.85rem;
-        line-height: 1.5;
+        font-size: 0.72rem;
+        line-height: 1.4;
+        white-space: normal;
+        word-break: break-word;
     }
 
     .site-footer p {
-        font-size: 0.8rem;
-        margin: 0.5rem 0 0;
+        font-size: 0.7rem;
+        margin: 0.3rem 0 0;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .cat-footer {
-        padding: 0.6rem 0 0;
+        padding: 0.3rem 0 0;
         width: 100%;
     }
 
     .cat-footer .golden-cat {
-        width: 65px;
+        width: 48px;
+    }
+
+    /* Hide cat sleep Zzz on mobile */
+    .golden-cat-wrapper::after {
+        display: none;
     }
 
     /* Code & pre */
@@ -2433,6 +2494,12 @@ a, button, .post, .social-link {
     --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
     --shadow-glow: 0 0 30px rgba(100, 100, 220, 0.08);
+
+    /* Light mode accent colors - softer for readability on light backgrounds */
+    --accent-primary: #4f6ef7;
+    --accent-secondary: #7c3aed;
+    --accent-tertiary: #db2777;
+    --accent-gradient: linear-gradient(135deg, #4f6ef7 0%, #7c3aed 50%, #db2777 100%);
 }
 
 /* Light mode specific overrides */
@@ -2458,7 +2525,34 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .site-head {
-    background: linear-gradient(180deg, #f8f9fc 0%, #ffffff 100%) !important;
+    background:
+        /* Subtle grid */
+        linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+        /* Soft gradient with warm tones */
+        linear-gradient(180deg, #f0f2f8 0%, #e8ecf6 30%, #f5f7fa 60%, #ffffff 100%) !important;
+    background-size: 50px 50px, 50px 50px, 100% 100%;
+    background-position: -1px -1px, -1px -1px, 0 0;
+}
+
+/* Light mode hero glow orbs */
+[data-theme="light"] .site-head::before {
+    background:
+        radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+        radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+}
+
+/* Light mode scan line - soft blue */
+[data-theme="light"] .site-head::after {
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(99, 102, 241, 0.08) 20%,
+        rgba(99, 102, 241, 0.3) 50%,
+        rgba(99, 102, 241, 0.08) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.12), 0 0 30px rgba(99, 102, 241, 0.05);
 }
 
 [data-theme="light"] .site-footer {
