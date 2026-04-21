@@ -490,11 +490,13 @@ iframe, .fluid-width-video-wrapper {
     position: absolute;
     width: 120px;
     height: 1.5px;
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, var(--meteor-color) 40%, #fff 100%);
+    /* Gradient: tail (transparent) → body (color) → head (bright white) */
+    /* Head is on the RIGHT side, which becomes the leading edge when rotated 45-65deg */
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, var(--meteor-color) 30%, #fff 100%);
     border-radius: 999px;
     filter: blur(0.3px);
     opacity: 0;
-    transform-origin: right center;
+    transform-origin: 100% 50%; /* right center = the head/bright tip */
     box-shadow:
         0 0 6px var(--meteor-color),
         0 0 12px var(--meteor-glow);
@@ -515,15 +517,15 @@ iframe, .fluid-width-video-wrapper {
 
 @keyframes meteorShoot {
     0% {
-        transform: translateX(0) translateY(0);
+        transform: translateX(0) translateY(0) rotate(var(--angle, 55deg));
         opacity: 0;
     }
-    3% { opacity: 1; }
-    70% {
-        opacity: 0.9;
+    2% { opacity: 1; }
+    60% {
+        opacity: 0.85;
     }
     100% {
-        transform: translateX(var(--tx)) translateY(var(--ty));
+        transform: translateX(var(--tx)) translateY(var(--ty)) rotate(var(--angle, 55deg));
         opacity: 0;
     }
 }
@@ -2920,4 +2922,119 @@ html[data-theme] *,
 html[data-theme] *::before,
 html[data-theme] *::after {
     transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ==========================================================================
+   17. Tag Page Styles
+   ========================================================================== */
+
+/* Tag page hero - compact header */
+.site-head-tag {
+    min-height: auto !important;
+    padding: 5rem 2rem 3rem !important;
+    text-align: center;
+}
+
+.tag-hero-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    margin-bottom: 1.5rem;
+    color: var(--accent-primary, #6366f1);
+}
+
+.tag-hero-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.site-head-tag .blog-title {
+    font-size: 2.8rem;
+    margin-bottom: 1rem !important;
+}
+
+.tag-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 1rem;
+    line-height: 1.7;
+}
+
+.tag-post-count {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.3rem 0.9rem;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.tag-back-home {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.tag-back-home:hover {
+    color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+/* Light mode tag page overrides */
+[data-theme="light"] .site-head-tag {
+    background:
+        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(180deg, #f8f9fc 0%, #f0f2f7 50%, #ffffff 100%) !important;
+    background-size: 50px 50px, 50px 50px, 100% 100%;
+}
+
+[data-theme="light"] .tag-hero-icon {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="light"] .tag-post-count {
+    background: #f0f2f7;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Mobile tag page */
+@media only screen and (max-width: 480px) {
+    .site-head-tag {
+        padding: 3.5rem 1rem 2rem !important;
+    }
+
+    .site-head-tag .blog-title {
+        font-size: 2rem;
+    }
+
+    .tag-description {
+        font-size: 0.95rem;
+    }
+
+    .tag-hero-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+    }
+
+    .tag-hero-icon svg {
+        width: 32px;
+        height: 32px;
+    }
 }

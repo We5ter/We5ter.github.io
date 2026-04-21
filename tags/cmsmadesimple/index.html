@@ -32,131 +32,82 @@
 
 <body class="home-template">
 
-  
+    <!-- Animated Background (Gemini-style) -->
+  <div class="ai-bg-animation">
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
 
-<!-- Theme Toggle Button (top-right) -->
-<button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="切换白天/黑夜模式">
-  <svg class="theme-toggle-icon theme-toggle-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-    <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
-  </svg>
-  <svg class="theme-toggle-icon theme-toggle-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
-    <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.44 2.26 5.403 5.403 0 01-3.18-9.74c-.97.23-1.88.63-2.68 1.19A9 9 0 0112 3z"/>
-  </svg>
-</button>
+  <!-- Particle Canvas for AI Animation -->
+  <canvas id="particle-canvas"></canvas>
 
-<!-- Fixed Back to Home Button (left side) -->
-<a class="back-to-home-fixed" href="/" title="Back to Home">
-    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    <span>Home</span>
-</a>
+  <!-- Theme Toggle Button (top-right) -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="切换白天/黑夜模式">
+    <svg class="theme-toggle-icon theme-toggle-sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+      <path fill="currentColor" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+    </svg>
+    <svg class="theme-toggle-icon theme-toggle-moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+      <path fill="currentColor" d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.44 2.26 5.403 5.403 0 01-3.18-9.74c-.97.23-1.88.63-2.68 1.19A9 9 0 0112 3z"/>
+    </svg>
+  </button>
 
-<main class="content" role="main">
-  <article class="post">
+  <header class="site-head site-head-tag">
+    <div class="inner">
+      <div class="tag-hero-icon">
+        
+        
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+        
+      </div>
+      <h1 class="blog-title">#</h1>
+      <p class="tag-description">
+        
+          收录与「」标签相关的所有文章。
+        
+      </p>
+      <span class="tag-post-count">1篇文章</span>
+      <a class="tag-back-home" href="/">← Back to Home</a>
+    </div>
+  </header>
+
+  <main class="content inner" role="main">
     
-
-    <h1 class="post-title"></h1>
-    <section class="post-content">
+    <article class="post">
+      <div class="post-header-row">
+        <time class="post-date-badge">2017-05-22</time>
+        <h2 class="post-title">
+          <a href="/2017/05/22/local-file-inclusion-in-cmsmadesimple/">Local file inclusion in cmsmadesimple &lt;=2.2.1</a>
+        </h2>
+      </div>
       
-    </section>
-    <footer class="post-footer">
-      <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-21T15:26:44.956Z" itemprop="datePublished">2026-04-21</time></span></h4>
-    
-</section>
 
-      <section class="share">
-    <h4>Share this post</h4>
-    <div class="share-buttons">
-        <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://lightrains.org/tags/cmsmadesimple/index.html&text="
-           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
-           title="Share on X">
-            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
-        </a>
-        <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://lightrains.org/tags/cmsmadesimple/index.html&title="
-           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
-           title="Share on Weibo">
-            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
-        </a>
-        <!-- Xiaohongshu -->
-        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/user/profile/"
-           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
-           title="Share on Xiaohongshu">
-            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
-        </a>
-        <!-- WeChat (copy link) -->
-        <a class="icon-wechat" href="javascript:void(0);"
-           onclick="navigator.clipboard.writeText('https://lightrains.org/tags/cmsmadesimple/index.html').then(()=>alert('链接已复制到剪贴板！'));return false;"
-           title="Copy link for WeChat">
-            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
-        </a>
-        <!-- LinkedIn -->
-        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://lightrains.org/tags/cmsmadesimple/index.html"
-           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
-           title="Share on LinkedIn">
-            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
-        </a>
+      <section class="post-excerpt">
+        <p></p>
+      </section>
+    </article>
+    
+
+    
+  </main>
+
+  <footer class="site-footer">
+    <!-- Golden Cat - Footer -->
+    <div class="golden-cat-wrapper cat-footer">
+      <img src="/images/static/golden-cat.svg" alt="Golden Cat" class="golden-cat">
     </div>
-</section>
-
-    </footer>
-  </article>
-
-  <!-- Post Navigation: Previous / Next -->
-  <nav class="post-nav">
-    
-    <span class="post-nav-placeholder"></span>
-    
-    
-    <span class="post-nav-placeholder"></span>
-    
-  </nav>
-
-  <!-- Giscus Comments -->
-  
-  <section class="comments-section" id="comments">
-    <div class="comments-header">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align: -3px; margin-right: 6px;">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-      </svg>
-      Comments
+    <div class="inner">
+      <section class="poweredby">
+        Proudly published with <a href="https://hexo.io" target="_blank">Hexo</a> &middot;
+        Theme <a href="#" target="_blank">YOYO</a>
+      </section>
+      <p>&copy; 2026 <a href="/">Wester</a>. All rights reserved.</p>
     </div>
-    <div class="giscus-wrapper">
-      <script src="https://giscus.app/client.js"
-        data-repo="We5ter/We5ter.github.io"
-        data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
-        data-category="Announcements"
-        data-category-id="DIC_kwDOD3xEaM4C7WSs"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="dark_dimmed"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async>
-      </script>
-    </div>
-  </section>
-  
-</main>
-
-<footer class="site-footer">
-  <!-- Golden Cat - Footer -->
-  <div class="golden-cat-wrapper cat-footer">
-    <img src="/images/static/golden-cat.svg" alt="Golden Cat" class="golden-cat">
-  </div>
-  <div class="inner">
-    <section class="poweredby">
-      Proudly published with <a href="https://hexo.io" target="_blank">Hexo</a> &middot;
-      Theme <a href="#" target="_blank">YOYO</a>
-    </section>
-    <p>&copy; 2026 <a href="/">Wester</a>. All rights reserved.</p>
-  </div>
-</footer>
+  </footer>
 
 
   <script type="text/javascript" src="/js/main.js"></script>
@@ -236,48 +187,53 @@
     siteHead.appendChild(shower);
 
     // Meteor color configs for dark/light mode
-    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    var colors = isLight ? [
-        { color: '#6366f1', glow: 'rgba(99,102,241,0.3)' },
-        { color: '#a855f7', glow: 'rgba(168,85,247,0.25)' },
-        { color: '#ec4899', glow: 'rgba(236,72,153,0.2)' },
-        { color: '#818cf8', glow: 'rgba(129,140,248,0.25)' }
-    ] : [
-        { color: '#00f0ff', glow: 'rgba(0,240,255,0.4)' },
-        { color: '#a855f7', glow: 'rgba(168,85,247,0.35)' },
-        { color: '#7dd3fc', glow: 'rgba(125,211,252,0.3)' },
-        { color: '#c084fc', glow: 'rgba(192,132,252,0.3)' },
-        { color: '#22d3ee', glow: 'rgba(34,211,238,0.35)' }
-    ];
+    function getColors() {
+        var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        return isLight ? [
+            { color: '#6366f1', glow: 'rgba(99,102,241,0.35)' },
+            { color: '#a855f7', glow: 'rgba(168,85,247,0.30)' },
+            { color: '#ec4899', glow: 'rgba(236,72,153,0.25)' },
+            { color: '#818cf8', glow: 'rgba(129,140,248,0.28)' }
+        ] : [
+            { color: '#00f0ff', glow: 'rgba(0,240,255,0.45)' },
+            { color: '#a855f7', glow: 'rgba(168,85,247,0.40)' },
+            { color: '#7dd3fc', glow: 'rgba(125,211,252,0.35)' },
+            { color: '#c084fc', glow: 'rgba(192,132,252,0.35)' },
+            { color: '#22d3ee', glow: 'rgba(34,211,238,0.40)' }
+        ];
+    }
 
     function createMeteor() {
+        var colors = getColors();
         var el = document.createElement('div');
         el.className = 'meteor';
 
         // Random config
         var cfg = colors[Math.floor(Math.random() * colors.length)];
-        var size = 80 + Math.random() * 100; // 80-180px length
+        var length = 100 + Math.random() * 150; // 100-250px length
         var thickness = 1 + Math.random() * 1.5; // 1-2.5px thick
-        var duration = 1.5 + Math.random() * 2.5; // 1.5-4s
-        var delay = Math.random() * 5; // 0-5s delay
+        var duration = 1.2 + Math.random() * 2; // 1.2-3.2s
+        var delay = Math.random() * 4; // 0-4s delay
 
-        // Start position (right side of hero area)
-        var startX = 50 + Math.random() * 45; // 50%-95% from left
-        var startY = -10 - Math.random() * 20; // above top
+        // Fixed diagonal angle: top-right to bottom-left (45-65 degrees)
+        var angle = 45 + Math.random() * 20; // 45-65 deg from horizontal
 
-        // End position (diagonal down-left)
-        var travelX = -(200 + Math.random() * 300); // travel left
-        var travelY = 150 + Math.random() * 300; // travel down
+        // Start position: upper-right area of the hero
+        var startX = 30 + Math.random() * 60; // 30%-90% from left
+        var startY = -5 - Math.random() * 15; // above top edge
 
-        // Angle calculation
-        var angle = Math.atan2(travelY, Math.abs(travelX)) * (180 / Math.PI);
+        // Travel distance based on angle
+        var travelDist = 350 + Math.random() * 400;
+        var rad = angle * (Math.PI / 180);
+        var travelX = -travelDist * Math.cos(rad); // negative = go left
+        var travelY = travelDist * Math.sin(rad);  // positive = go down
 
         el.style.cssText =
             '--meteor-color:' + cfg.color + ';' +
             '--meteor-glow:' + cfg.glow + ';' +
             '--tx:' + travelX + 'px;' +
             '--ty:' + travelY + 'px;' +
-            'width:' + size + 'px;' +
+            'width:' + length + 'px;' +
             'height:' + thickness + 'px;' +
             'left:' + startX + '%;' +
             'top:' + startY + '%;' +
@@ -293,22 +249,22 @@
     }
 
     // Initial burst
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 3; i++) {
         createMeteor();
     }
 
     // Continuous meteors
     setInterval(function() {
-        if (shower.children.length < 5) { // max 5 simultaneous
+        if (shower.children.length < 4) {
             createMeteor();
         }
-    }, 2500);
+    }, 2200);
 
     // Occasional double meteor
     setInterval(function() {
         createMeteor();
-        setTimeout(createMeteor, 150 + Math.random() * 300);
-    }, 6000 + Math.random() * 4000);
+        setTimeout(createMeteor, 120 + Math.random() * 250);
+    }, 7000 + Math.random() * 5000);
 })();
 </script>
 
