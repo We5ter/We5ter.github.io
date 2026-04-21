@@ -114,8 +114,11 @@ body {
     background-color: var(--bg-primary);
     overflow-x: hidden;
     position: relative;
-    background-image: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
-    background-attachment: fixed;
+    background-image: url('../images/ai-bg.svg'), linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-attachment: fixed, fixed;
+    background-repeat: no-repeat, no-repeat;
 }
 
 /* Animated background grid */
@@ -607,6 +610,10 @@ iframe, .fluid-width-video-wrapper {
 /* ==========================================================================
    6. Post List Items (Home Page)
    ========================================================================== */
+
+.content.inner {
+    padding-top: 4rem;
+}
 
 .post {
     position: relative;
