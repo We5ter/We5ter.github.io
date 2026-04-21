@@ -2030,11 +2030,11 @@ pre .chunk {
     /* Footer - fully responsive for mobile */
     .site-footer {
         margin-top: 1rem !important;
-        padding: 0.6rem 1.5% 0.8rem !important;
+        padding: 0.6rem 1% 0.8rem !important;
         font-size: 0.72rem !important;
         line-height: 1.4 !important;
-        width: auto !important;
-        max-width: none !important;
+        width: 100% !important;
+        max-width: 100vw !important;
         overflow: hidden !important;
         box-sizing: border-box !important;
         border-top: none !important;
@@ -2044,10 +2044,10 @@ pre .chunk {
     .site-footer .inner {
         display: block !important;
         position: static !important;
-        width: auto !important;
-        max-width: none !important;
-        margin-left: 1.5% !important;
-        margin-right: 1.5% !important;
+        width: 96% !important;
+        max-width: 96vw !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
         padding: 0 !important;
         text-align: center !important;
         box-sizing: border-box !important;
@@ -2575,7 +2575,6 @@ a, button, .post, .social-link {
 .theme-toggle-icon {
     position: absolute;
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
 }
 
 .theme-toggle-sun {
@@ -2902,24 +2901,9 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .theme-toggle {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.88);
     border-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    color: #555;
-}
-
-/* Article detail page: theme toggle always uses dark-ish style for visibility */
-.post-template .theme-toggle {
-    background: rgba(26, 26, 46, 0.88) !important;
-    border-color: rgba(99, 102, 241, 0.2) !important;
-    color: var(--text-primary) !important;
-    backdrop-filter: blur(12px);
-}
-
-.post-template [data-theme="light"] .theme-toggle {
-    background: rgba(30, 30, 50, 0.85) !important;
-    border-color: rgba(99, 102, 241, 0.2) !important;
-    color: #e8e8f0 !important;
 }
 
 [data-theme="light"] .theme-toggle:hover {
