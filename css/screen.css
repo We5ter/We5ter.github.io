@@ -663,8 +663,33 @@ iframe, .fluid-width-video-wrapper {
     display: none;
 }
 
+/* Post header row: date badge + title */
+.post-header-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.post-date-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.85rem;
+    font-size: 1.15rem;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--accent-primary);
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.18);
+    border-radius: 8px;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+
 .post-title {
-    margin: 0 0 0.8rem 0;
+    margin: 0;
     font-size: 2.2rem;
     font-weight: 700;
     letter-spacing: -0.03em;
@@ -1731,6 +1756,17 @@ pre .chunk {
 
     .post-title {
         font-size: 1.8rem;
+    }
+
+    .post-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .post-date-badge {
+        font-size: 1.05rem;
+        padding: 0.25rem 0.7rem;
     }
 
     .post-footer {

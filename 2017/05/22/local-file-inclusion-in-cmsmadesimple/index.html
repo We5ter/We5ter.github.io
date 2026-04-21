@@ -12,7 +12,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content="hexo">
   <meta name="theme-color" content="#0a0a0f" />
-  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link rel="icon" type="image/png" href="/images/avatar.png" />
+  <link rel="apple-touch-icon" href="/images/avatar.png" />
 
   
   
@@ -52,16 +53,16 @@
     <section class="post-content">
       <h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs due to the use of user-supplied input without proper validation.</p>
 <h2 id="Proof-of-concept"><a href="#Proof-of-concept" class="headerlink" title="Proof of concept"></a>Proof of concept</h2><p>cmsmadesimple &lt;=2.1.6<br>The vulnerability exists in /cmsms/admin/listtags.php Line 82 and line 54</p>
-<p><img src="/images/vuln-1.png" alt=""><br><img src="/images/vuln-2.png" alt=""></p>
+<p><img src="/images/cms-vuln-code.png" alt="CMSMadeSimple Vulnerability Code"><br><img src="/images/cms-listtags.png" alt="CMSMadeSimple listtags.php"></p>
 <p>If there is a file named “1.phpinfo.php” existed in <a href="http://127.0.0.1/1.phpinfo.php" target="_blank" rel="noopener">http://127.0.0.1/1.phpinfo.php</a><br>So when we visit the following link:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;cmsms&#x2F;admin&#x2F;listtags.php?_sk_&#x3D;08852e62af02bc03&amp;action&#x3D;showpluginhelp&amp;plugin&#x3D;phpinfo&amp;type&#x3D;..&#x2F;..&#x2F;1</span><br></pre></td></tr></table></figure>
 <p>You would find out you has include this file successfully!‌</p>
-<p><img src="/images/file-inclusion.png" alt=""></p>
+<p><img src="/images/cms-file-inclusion.png" alt="File Inclusion Successful"></p>
 <ul>
 <li>cmsmadesimple &lt;=2.2.1</li>
 </ul>
 <p>Current version is still vulnerable.</p>
-<p><img src="/images/Screen-Shot-2017-06-28-at-11.34.16-PM.png" alt=""></p>
+<p><img src="/images/cms-version-check.png" alt="CMSMadeSimple Version Check"></p>
 <p>Disclosure Timelines</p>
 <ul>
 <li>2017/2/7 Provide vulnerability(2.1.6) detail to vendor but no reply</li>
