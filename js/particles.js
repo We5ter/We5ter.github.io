@@ -268,12 +268,15 @@
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
       z-index: 0 !important;
       pointer-events: none !important;
       display: block !important;
     `;
+    
+    // Force resize to full viewport
+    this.resize();
 
     new ParticleSystem(canvas);
     console.log('[YOJO] Particle system ready!');

@@ -557,13 +557,13 @@ iframe, .fluid-width-video-wrapper {
     fill: currentColor;
 }
 
-/* Decorative scroll indicator */
+/* Decorative scroll indicator - only show on mobile */
 .scroll-indicator {
     position: absolute;
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    display: flex;
+    display: none; /* Hidden by default on desktop */
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
