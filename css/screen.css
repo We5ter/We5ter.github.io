@@ -1596,45 +1596,14 @@ pre .chunk {
 }
 
 /* ==========================================================================
-   11. Media Queries - Tablet (< 900px)
+   11. Post Navigation: Previous / Next (base styles)
    ========================================================================== */
 
-@media only screen and (max-width: 900px) {
-
-    blockquote {
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    .site-head {
-        min-height: auto;
-        padding: 5rem 2rem 3rem;
-    }
-
-    .blog-title {
-        font-size: 3.2rem;
-    }
-
-    .blog-description {
-        font-size: 1.4rem;
-    }
-
-    .post {
-        font-size: 0.96em;
-        padding: 2rem;
-        margin-bottom: 2rem;
-    }
-
-.post-template .post {
-    padding-bottom: 1rem;
-}
-
-/* Post Navigation: Previous / Next */
 .post-nav {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: stretch;
-    gap: 1.5rem;
+    gap: 2rem;
     max-width: var(--post-width);
     margin: 4rem auto 0;
     padding: 0;
@@ -1651,8 +1620,8 @@ pre .chunk {
     border: 1px solid rgba(0, 240, 255, 0.25);
     background: rgba(0, 240, 255, 0.04);
     transition: all 0.35s var(--ease-out-expo);
-    max-width: 48%;
     flex: 1;
+    min-width: 0;
     gap: 0.6rem;
 }
 
@@ -1688,7 +1657,7 @@ pre .chunk {
 .post-nav-title {
     font-size: 1.45rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #e0e0f0;
     line-height: 1.45;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1704,6 +1673,52 @@ pre .chunk {
 
 .post-nav-placeholder {
     display: none;
+}
+
+/* ==========================================================================
+   12. Media Queries - Tablet (< 900px)
+   ========================================================================== */
+
+@media only screen and (max-width: 900px) {
+
+    blockquote {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .site-head {
+        min-height: auto;
+        padding: 5rem 2rem 3rem;
+    }
+
+    .blog-title {
+        font-size: 3.2rem;
+    }
+
+    .blog-description {
+        font-size: 1.4rem;
+    }
+
+    .post {
+        font-size: 0.96em;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .post-template .post {
+        padding-bottom: 1rem;
+    }
+
+    /* Post Navigation: stack vertically on tablet */
+    .post-nav {
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    .post-nav-prev,
+    .post-nav-next {
+        max-width: 100%;
+    }
 }
 
 .post-template .post-header {
@@ -1727,22 +1742,31 @@ pre .chunk {
 @media only screen and (max-width: 500px) {
 
     .blog-logo img {
-        max-height: 70px;
+        max-height: 60px;
     }
 
     .inner,
     .pagination {
         width: auto;
-        margin-left: 16px;
-        margin-right: 16px;
+        margin-left: 12px;
+        margin-right: 12px;
     }
 
     .post {
         width: auto;
-        margin: 0 12px 1.5rem;
-        padding: 1.6rem;
-        font-size: 0.92em;
+        margin: 0 8px 1.5rem;
+        padding: 1.4rem;
+        font-size: 0.88em;
         border-radius: 12px;
+        overflow: hidden;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Article detail page */
+    .post-template .post {
+        padding: 1.2rem;
+        margin: 0 8px 1.5rem;
     }
 
     .site-head {
@@ -1751,7 +1775,7 @@ pre .chunk {
     }
 
     .blog-title {
-        font-size: 2.6rem;
+        font-size: 2.2rem;
     }
 
     .blog-description {
@@ -1768,13 +1792,13 @@ pre .chunk {
     }
 
     h1, h2 {
-        font-size: 2.2rem;
-        line-height: 1.2em;
+        font-size: 1.9rem;
+        line-height: 1.25em;
         letter-spacing: -0.02em;
     }
 
-    h3 { font-size: 1.8rem; }
-    h4 { font-size: 1.6rem; }
+    h3 { font-size: 1.6rem; }
+    h4 { font-size: 1.4rem; }
 
     .post-template .post-header {
         padding: 2.5rem 0 1.5rem;
@@ -1783,11 +1807,22 @@ pre .chunk {
     .post-nav {
         flex-direction: column;
         gap: 1rem;
+        margin: 2.5rem auto 0;
+        padding: 0 12px;
     }
 
     .post-nav-prev,
     .post-nav-next {
         max-width: 100%;
+        padding: 1.3rem 1.5rem;
+    }
+
+    .post-nav-label {
+        font-size: 1.15rem;
+    }
+
+    .post-nav-title {
+        font-size: 1.2rem;
     }
 
     .post-meta {
@@ -1842,19 +1877,56 @@ pre .chunk {
     }
 
     .site-footer {
-        margin-top: 4rem;
-        padding: 2.5rem 0;
-        font-size: 1.1rem;
+        margin-top: 3rem;
+        padding: 2rem 12px;
+        font-size: 1rem;
+    }
+
+    .site-footer .inner {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .cat-footer {
+        padding: 0.8rem 0 0.2rem;
     }
 
     code, tt {
-        font-size: 0.82em;
+        font-size: 0.8em;
+        word-break: break-all;
     }
 
     pre {
-        font-size: 0.82em;
-        padding: 1em;
+        font-size: 0.78em;
+        padding: 0.8rem;
         border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    figure.highlight {
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .post-content a,
+    .post-excerpt a {
+        word-break: break-all;
+    }
+
+    h1, h2 {
+        word-break: break-word;
+    }
+
+    .post-title {
+        word-break: break-word;
     }
 }
 
@@ -2278,9 +2350,9 @@ a, button, .post, .social-link {
 
 /* Light mode specific overrides */
 
-/* Hide dark particle canvas in light mode - it clashes with the light theme */
+/* Light mode: particle canvas visible with soft starry style */
 [data-theme="light"] #particle-canvas {
-    display: none !important;
+    opacity: 1;
 }
 
 /* Body: clean light gradient */
@@ -2424,6 +2496,10 @@ a, button, .post, .social-link {
 [data-theme="light"] .post-nav-next {
     background: rgba(67, 97, 238, 0.05);
     border-color: rgba(67, 97, 238, 0.2);
+}
+
+[data-theme="light"] .post-nav {
+    gap: 1.5rem;
 }
 
 [data-theme="light"] .post-nav-label {

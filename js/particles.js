@@ -1,25 +1,50 @@
 /**
- * YOYO Theme - AI Era Particle System
- * Mouse-following 3D DNA/Neural Network Animation
- * Inspired by Google Gemini's interactive effects
+ * YOYO Theme - Dual-mode Particle System
+ * Dark mode: Cyber neon particles (original style)
+ * Light mode: Soft starry ocean / gentle floating orbs
  */
 
 (function() {
   'use strict';
 
-  // Configuration
-  const CONFIG = {
-    particleCount: 60,
-    connectionDistance: 120,
-    mouseRadius: 180,
-    particleSize: { min: 1.5, max: 3 },
-    speed: 0.4,
-    colors: {
-      primary: '#00f0ff',
-      secondary: '#7b2ff7',
-      tertiary: '#ff2d75'
+  // Theme-specific configurations
+  const THEMES = {
+    dark: {
+      particleCount: 55,
+      connectionDistance: 120,
+      mouseRadius: 180,
+      particleSize: { min: 1.5, max: 3 },
+      speed: 0.4,
+      trailAlpha: 'rgba(10, 10, 15, 0.15)',
+      colors: {
+        primary: '#00f0ff',
+        secondary: '#7b2ff7',
+        tertiary: '#ff2d75'
+      },
+      connectionColor: (opacity) => `rgba(0, 240, 255, ${opacity})`,
+      glowIntensity: 1.0,
+      particleOpacity: { outer: [0.35, 0.1], core: 1 }
+    },
+    light: {
+      particleCount: 40,
+      connectionDistance: 140,
+      mouseRadius: 200,
+      particleSize: { min: 1.2, max: 2.8 },
+      speed: 0.25,
+      trailAlpha: 'rgba(248, 249, 252, 0.12)',
+      colors: {
+        primary: '#6366f1',     // indigo
+        secondary: '#8b5cf6',   // violet
+        tertiary: '#ec4899'     // pink
+      },
+      connectionColor: (opacity) => `rgba(99, 102, 241, ${opacity * 0.5})`,
+      glowIntensity: 0.4,
+      particleOpacity: { outer: [0.18, 0.05], core: 0.7 }
     }
   };
+
+  let currentTheme = 'dark';
+  let CONFIG = THEMES.dark;
 
   class ParticleSystem {
     constructor(canvas) {
@@ -29,7 +54,7 @@
       this.mouse = { x: -1000, y: -1000, radius: CONFIG.mouseRadius };
       this.animationId = null;
       this.time = 0;
-      
+
       this.resize();
       this.init();
       this.bindEvents();
@@ -46,6 +71,15 @@
       for (let i = 0; i < CONFIG.particleCount; i++) {
         this.particles.push(new Particle(this));
       }
+    }
+
+    switchTheme(theme) {
+      if (theme === currentTheme) return;
+      currentTheme = theme;
+      CONFIG = THEMES[theme];
+      this.mouse.radius = CONFIG.mouseRadius;
+      // Re-init particles with new config
+      this.init();
     }
 
     bindEvents() {
@@ -67,10 +101,10 @@
 
     animate() {
       // Clear with semi-transparent background for trail effect
-      this.ctx.fillStyle = 'rgba(10, 10, 15, 0.15)';
+      this.ctx.fillStyle = CONFIG.trailAlpha;
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-      this.time += 0.008;
+      this.time += currentTheme === 'dark' ? 0.008 : 0.005;
 
       // Update and draw particles
       this.particles.forEach(particle => {
@@ -78,10 +112,10 @@
         particle.draw();
       });
 
-      // Draw connections (neural network style)
+      // Draw connections
       this.drawConnections();
 
-      // Draw mouse glow effect
+      // Draw mouse glow (subtle in light mode)
       this.drawMouseGlow();
 
       this.animationId = requestAnimationFrame(() => this.animate());
@@ -92,17 +126,18 @@
         for (let j = i + 1; j < this.particles.length; j++) {
           const p1 = this.particles[i];
           const p2 = this.particles[j];
-          
+
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
           if (distance < CONFIG.connectionDistance) {
-            const opacity = (1 - distance / CONFIG.connectionDistance) * 0.4;
-            
+            const opacity = (1 - distance / CONFIG.connectionDistance) *
+              (currentTheme === 'dark' ? 0.4 : 0.25);
+
             this.ctx.beginPath();
-            this.ctx.strokeStyle = `rgba(0, 240, 255, ${opacity})`;
-            this.ctx.lineWidth = 0.8;
+            this.ctx.strokeStyle = CONFIG.connectionColor(opacity);
+            this.ctx.lineWidth = currentTheme === 'dark' ? 0.8 : 0.5;
             this.ctx.moveTo(p1.x, p1.y);
             this.ctx.lineTo(p2.x, p2.y);
             this.ctx.stroke();
@@ -114,46 +149,59 @@
     drawMouseGlow() {
       if (this.mouse.x < 0) return;
 
-      // Main glow
+      const intensity = CONFIG.glowIntensity;
       const gradient = this.ctx.createRadialGradient(
         this.mouse.x, this.mouse.y, 0,
         this.mouse.x, this.mouse.y, this.mouse.radius
       );
-      
-      gradient.addColorStop(0, 'rgba(0, 240, 255, 0.12)');
-      gradient.addColorStop(0.4, 'rgba(123, 47, 247, 0.06)');
-      gradient.addColorStop(1, 'rgba(123, 47, 247, 0)');
+
+      if (currentTheme === 'dark') {
+        gradient.addColorStop(0, 'rgba(0, 240, 255, 0.12)');
+        gradient.addColorStop(0.4, 'rgba(123, 47, 247, 0.06)');
+        gradient.addColorStop(1, 'rgba(123, 47, 247, 0)');
+      } else {
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.06)');
+        gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.03)');
+        gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+      }
 
       this.ctx.fillStyle = gradient;
       this.ctx.beginPath();
       this.ctx.arc(this.mouse.x, this.mouse.y, this.mouse.radius, 0, Math.PI * 2);
       this.ctx.fill();
 
-      // Orbiting particles around mouse
-      for (let i = 0; i < 4; i++) {
-        const angle = this.time * 2.5 + (i * Math.PI * 2 / 4);
+      // Orbiting particles around mouse (fewer & smaller in light mode)
+      const orbitCount = currentTheme === 'dark' ? 4 : 2;
+      for (let i = 0; i < orbitCount; i++) {
+        const angle = this.time * 2.5 + (i * Math.PI * 2 / orbitCount);
         const orbitRadius = 25 + i * 18;
         const x = this.mouse.x + Math.cos(angle) * orbitRadius;
         const y = this.mouse.y + Math.sin(angle) * orbitRadius;
 
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 2.5 - i * 0.4, 0, Math.PI * 2);
-        
-        if (i === 0) this.ctx.fillStyle = CONFIG.colors.primary;
-        else if (i === 1) this.ctx.fillStyle = CONFIG.colors.secondary;
-        else if (i === 2) this.ctx.fillStyle = CONFIG.colors.tertiary;
-        else this.ctx.fillStyle = CONFIG.colors.primary;
-        
-        this.ctx.fill();
+        const size = (2.5 - i * 0.4) * intensity;
+        if (size < 0.3) continue;
 
-        // Glow for orbiting particles
-        const orbGlow = this.ctx.createRadialGradient(x, y, 0, x, y, 10);
-        orbGlow.addColorStop(0, this.ctx.fillStyle.replace(')', ', 0.3)').replace('rgb', 'rgba'));
-        orbGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        this.ctx.fillStyle = orbGlow;
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 10, 0, Math.PI * 2);
+        this.ctx.arc(x, y, size, 0, Math.PI * 2);
+
+        if (i % 3 === 0) this.ctx.fillStyle = CONFIG.colors.primary;
+        else if (i % 3 === 1) this.ctx.fillStyle = CONFIG.colors.secondary;
+        else this.ctx.fillStyle = CONFIG.colors.tertiary;
+
+        this.ctx.globalAlpha = intensity;
         this.ctx.fill();
+        this.ctx.globalAlpha = 1;
+
+        // Subtle glow for orbiting particles
+        if (currentTheme === 'dark') {
+          const orbGlow = this.ctx.createRadialGradient(x, y, 0, x, y, 10);
+          orbGlow.addColorStop(0, this.ctx.fillStyle.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+          orbGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          this.ctx.fillStyle = orbGlow;
+          this.ctx.beginPath();
+          this.ctx.arc(x, y, 10, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
       }
     }
 
@@ -176,7 +224,8 @@
       this.y = Math.random() * this.system.canvas.height;
       this.baseX = this.x;
       this.baseY = this.y;
-      this.size = CONFIG.particleSize.min + Math.random() * (CONFIG.particleSize.max - CONFIG.particleSize.min);
+      this.size = CONFIG.particleSize.min +
+        Math.random() * (CONFIG.particleSize.max - CONFIG.particleSize.min);
       this.speedX = (Math.random() - 0.5) * CONFIG.speed;
       this.speedY = (Math.random() - 0.5) * CONFIG.speed;
       this.colorIndex = Math.floor(Math.random() * 3);
@@ -187,12 +236,12 @@
     }
 
     update() {
-      // DNA-like orbital motion
       this.angle += this.orbitSpeed;
-      
-      // Base movement with sine wave for organic feel
+
+      // Light mode: gentler movement, more floaty
+      const waveAmp = currentTheme === 'dark' ? 0.25 : 0.15;
       this.baseX += this.speedX;
-      this.baseY += this.speedY + Math.sin(this.angle) * 0.25;
+      this.baseY += this.speedY + Math.sin(this.angle) * waveAmp;
 
       // Boundary check with wrapping
       if (this.baseX < -50) this.baseX = this.system.canvas.width + 50;
@@ -200,12 +249,12 @@
       if (this.baseY < -50) this.baseY = this.system.canvas.height + 50;
       if (this.baseY > this.system.canvas.height + 50) this.baseY = -50;
 
-      // Apply DNA helix offset
+      // Apply orbital offset
       const helixOffset = Math.sin(this.angle + this.x * 0.008) * this.orbitRadius;
       this.x = this.baseX + helixOffset * 0.4;
       this.y = this.baseY + Math.cos(this.angle) * this.orbitRadius * 0.25;
 
-      // Mouse interaction - gentle attraction
+      // Mouse interaction
       const dx = this.system.mouse.x - this.x;
       const dy = this.system.mouse.y - this.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
@@ -213,11 +262,12 @@
       if (distance < this.system.mouse.radius) {
         const force = (this.system.mouse.radius - distance) / this.system.mouse.radius;
         const angle = Math.atan2(dy, dx);
-        
-        this.x += Math.cos(angle) * force * 1.5;
-        this.y += Math.sin(angle) * force * 1.5;
-        
-        this.currentSize = this.size + force * 2.5;
+
+        const pushStrength = currentTheme === 'dark' ? 1.5 : 0.8;
+        this.x += Math.cos(angle) * force * pushStrength;
+        this.y += Math.sin(angle) * force * pushStrength;
+
+        this.currentSize = this.size + force * (currentTheme === 'dark' ? 2.5 : 1.2);
       } else {
         this.currentSize = this.size;
       }
@@ -227,14 +277,15 @@
       const ctx = this.system.ctx;
       const colors = [CONFIG.colors.primary, CONFIG.colors.secondary, CONFIG.colors.tertiary];
       const color = colors[this.colorIndex];
+      const op = CONFIG.particleOpacity;
 
       // Outer glow
       const glowGradient = ctx.createRadialGradient(
         this.x, this.y, 0,
         this.x, this.y, this.currentSize * 4
       );
-      glowGradient.addColorStop(0, this.system.hexToRgba(color, 0.35));
-      glowGradient.addColorStop(0.5, this.system.hexToRgba(color, 0.1));
+      glowGradient.addColorStop(0, this.system.hexToRgba(color, op.outer[0] * CONFIG.glowIntensity));
+      glowGradient.addColorStop(0.5, this.system.hexToRgba(color, op.outer[1] * CONFIG.glowIntensity));
       glowGradient.addColorStop(1, this.system.hexToRgba(color, 0));
 
       ctx.beginPath();
@@ -245,11 +296,13 @@
       // Core particle
       ctx.beginPath();
       ctx.fillStyle = color;
+      ctx.globalAlpha = op.core;
       ctx.shadowColor = color;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = currentTheme === 'dark' ? 8 : 4;
       ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
     }
   }
 
@@ -261,9 +314,15 @@
         console.warn('[YOJO] Particle canvas not found');
         return;
       }
-      
-      console.log('[YOJO] Initializing particle system...');
-      
+
+      // Detect initial theme
+      currentTheme =
+        document.documentElement.getAttribute('data-theme') ||
+        (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      CONFIG = THEMES[currentTheme];
+
+      console.log(`[YOJO] Particle system init (mode: ${currentTheme})...`);
+
       // Set canvas styles
       canvas.style.cssText = `
         position: fixed !important;
@@ -280,26 +339,36 @@
 
       const system = new ParticleSystem(canvas);
       console.log('[YOJO] Particle system ready!');
-      
-      // Initial resize
+
+      // Listen for theme changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'data-theme') {
+            const newTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            system.switchTheme(newTheme);
+            console.log(`[YOJO] Particle theme switched to: ${newTheme}`);
+          }
+        });
+      });
+
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+      });
+
+      // Also listen for toggle button clicks as fallback
+      document.addEventListener('click', () => {
+        setTimeout(() => {
+          const t = document.documentElement.getAttribute('data-theme') || 'dark';
+          if (t !== currentTheme) system.switchTheme(t);
+        }, 50);
+      });
+
       system.resize();
     } catch (error) {
       console.error('[YOJO] Particle system error:', error);
     }
   }
-
-  // Force video playback on user interaction (for browsers that block autoplay)
-  function forceVideoPlay() {
-    const video = document.getElementById('video-bg');
-    if (video && video.paused) {
-      video.play().catch(e => console.log('[YOJO] Video autoplay blocked:', e));
-    }
-  }
-
-  // Try to play video on first interaction
-  document.addEventListener('click', forceVideoPlay, { once: true });
-  document.addEventListener('scroll', forceVideoPlay, { once: true });
-  document.addEventListener('mousemove', forceVideoPlay, { once: true });
 
   // Start when document is ready
   if (document.readyState === 'loading') {
