@@ -62,20 +62,17 @@
 
     <!-- Head group -->
     <g class="hd">
-      <!-- Left ear - rounder, shorter, cuter -->
+      <!-- Left ear - very round & short, like a cute kitten -->
       <g class="ear-l">
-        <!-- Outer ear (shorter & rounder) -->
-        <polygon points="52,38 44,14 64,32" fill="#FF8C42" stroke="#FF8C42" stroke-width="2" stroke-linejoin="round"/>
-        <!-- Inner ear (lighter) -->
-        <polygon points="51,33 46,18 60,31" fill="#FFB5A1"/>
-        <!-- Inner pink -->
-        <polygon points="50,31 47,20 57,29" fill="#FF9999"/>
+        <polygon points="52,36 46,18 64,32" fill="#FF8C42" stroke="#FF8C42" stroke-width="3" stroke-linejoin="round"/>
+        <polygon points="51,32 48,21 60,31" fill="#FFB5A1"/>
+        <polygon points="50,30 48,23 57,29" fill="#FF9999"/>
       </g>
-      <!-- Right ear - rounder, shorter, cuter -->
+      <!-- Right ear - very round & short -->
       <g class="ear-r">
-        <polygon points="108,38 116,14 96,32" fill="#FF8C42" stroke="#FF8C42" stroke-width="2" stroke-linejoin="round"/>
-        <polygon points="109,33 114,18 100,31" fill="#FFB5A1"/>
-        <polygon points="110,31 113,20 103,29" fill="#FF9999"/>
+        <polygon points="108,36 114,18 96,32" fill="#FF8C42" stroke="#FF8C42" stroke-width="3" stroke-linejoin="round"/>
+        <polygon points="109,32 112,21 100,31" fill="#FFB5A1"/>
+        <polygon points="110,30 112,23 103,29" fill="#FF9999"/>
       </g>
 
       <!-- Head base (orange) -->
