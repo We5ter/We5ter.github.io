@@ -1098,18 +1098,46 @@ iframe, .fluid-width-video-wrapper {
 }
 
 .golden-cat {
-    width: 100px;
+    /* Golden color filter - turn the cat into golden British Shorthair */
+    width: 110px;
     height: auto;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
-    transition: transform 0.3s ease;
+    border-radius: 12px;
+    filter:
+        sepia(40%)
+        saturate(140%)
+        hue-rotate(-5deg)
+        brightness(1.05)
+        contrast(1.08)
+        drop-shadow(0 4px 16px rgba(180, 130, 60, 0.35));
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Walking animation */
+    animation: catWalk 14s ease-in-out infinite;
+}
+
+@keyframes catWalk {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    20% { transform: translateX(12px) rotate(1deg); }
+    40% { transform: translateX(-8px) rotate(-0.5deg); }
+    60% { transform: translateX(6px) rotate(0.5deg); }
+    80% { transform: translateX(-4px) rotate(-0.3deg); }
+}
+
+/* Subtle bounce - like a real cat walking */
+.cat-post-top .golden-cat {
+    animation: catWalk 14s ease-in-out infinite, catBounce 3s ease-in-out infinite;
+}
+
+@keyframes catBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
 }
 
 /* Cat at post page top - floats near the title */
 .cat-post-top {
     position: absolute;
-    top: -10px;
-    right: 20px;
-    animation: catFloatIn 1s ease-out forwards;
+    top: -15px;
+    right: 15px;
+    animation: catFloatIn 0.8s ease-out forwards;
     opacity: 0;
     transform: translateY(-20px);
 }
@@ -1124,17 +1152,61 @@ iframe, .fluid-width-video-wrapper {
 /* Cat in footer - centered, walking left/right */
 .cat-footer {
     text-align: center;
-    padding: 1.5rem 0 0.5rem;
+    padding: 1.2rem 0 0.3rem;
 }
 
 .cat-footer .golden-cat {
-    width: 90px;
+    width: 95px;
+    border-radius: 50%;
+    /* Footer cat has its own walk cycle offset */
+    animation: catWalkFooter 16s ease-in-out infinite, catBounce 3.5s ease-in-out infinite 1s;
 }
 
-/* Cat hover effect on wrapper (for fun interaction) */
+@keyframes catWalkFooter {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-18px) rotate(-1deg); }
+    50% { transform: translateX(0) rotate(0deg); }
+    75% { transform: translateX(18px) rotate(1deg); }
+}
+
+/* Cat hover effect - playful interaction */
 .golden-cat-wrapper:hover .golden-cat {
-    transform: scale(1.08) rotate(2deg);
-    filter: drop-shadow(0 6px 18px rgba(212, 165, 116, 0.3));
+    transform: scale(1.12) rotate(3deg) !important;
+    filter:
+        sepia(45%)
+        saturate(150%)
+        hue-rotate(-3deg)
+        brightness(1.1)
+        contrast(1.1)
+        drop-shadow(0 8px 24px rgba(212, 165, 116, 0.45));
+    animation-play-state: paused;
+}
+
+/* Sleep mode - every ~30s the cat "naps" briefly */
+.golden-cat-wrapper::after {
+    content: '💤';
+    position: absolute;
+    font-size: 1rem;
+    opacity: 0;
+    animation: catSleep 25s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.cat-post-top::after {
+    top: -5px;
+    right: -5px;
+}
+
+.cat-footer::after {
+    top: 0;
+    right: 30%;
+}
+
+@keyframes catSleep {
+    0%, 75% { opacity: 0; transform: scale(0.5) translateY(0); }
+    78% { opacity: 0.7; transform: scale(1) translateY(-8px); }
+    85% { opacity: 0.7; transform: scale(1.1) translateY(-16px); }
+    92%, 100% { opacity: 0; transform: scale(0.8) translateY(-24px); }
 }
 
 /* Responsive cats */
@@ -1144,12 +1216,12 @@ iframe, .fluid-width-video-wrapper {
         top: auto;
         right: auto;
         text-align: center;
-        margin-bottom: -10px;
+        margin-bottom: -8px;
     }
 
     .cat-post-top .golden-cat,
     .cat-footer .golden-cat {
-        width: 70px;
+        width: 75px;
     }
 }
 
