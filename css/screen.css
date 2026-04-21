@@ -1098,19 +1098,12 @@ iframe, .fluid-width-video-wrapper {
 }
 
 .golden-cat {
-    /* Golden color filter - turn the cat into golden British Shorthair */
     width: 110px;
     height: auto;
-    border-radius: 12px;
-    filter:
-        sepia(40%)
-        saturate(140%)
-        hue-rotate(-5deg)
-        brightness(1.05)
-        contrast(1.08)
-        drop-shadow(0 4px 16px rgba(180, 130, 60, 0.35));
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 3px 12px rgba(218, 165, 84, 0.25));
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    /* Walking animation */
     animation: catWalk 14s ease-in-out infinite;
 }
 
@@ -1157,7 +1150,6 @@ iframe, .fluid-width-video-wrapper {
 
 .cat-footer .golden-cat {
     width: 95px;
-    border-radius: 50%;
     /* Footer cat has its own walk cycle offset */
     animation: catWalkFooter 16s ease-in-out infinite, catBounce 3.5s ease-in-out infinite 1s;
 }
@@ -1171,14 +1163,8 @@ iframe, .fluid-width-video-wrapper {
 
 /* Cat hover effect - playful interaction */
 .golden-cat-wrapper:hover .golden-cat {
-    transform: scale(1.12) rotate(3deg) !important;
-    filter:
-        sepia(45%)
-        saturate(150%)
-        hue-rotate(-3deg)
-        brightness(1.1)
-        contrast(1.1)
-        drop-shadow(0 8px 24px rgba(212, 165, 116, 0.45));
+    transform: scale(1.15) rotate(2deg) !important;
+    filter: drop-shadow(0 6px 20px rgba(218, 165, 84, 0.4));
     animation-play-state: paused;
 }
 
