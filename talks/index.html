@@ -336,7 +336,7 @@
   gap: 2rem;
 }
 .talk-card {
-  position: relative;
+  position: relative !important;
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.35s var(--ease-out-expo);
@@ -373,10 +373,10 @@
 
 /* Logo - top left */
 .talk-cover-label {
-  position: absolute;
+  position: absolute !important;
   top: 18px;
   left: 20px;
-  z-index: 2;
+  z-index: 2 !important;
 }
 .talk-cover-label img {
   height: 76px;
@@ -415,11 +415,11 @@
 
 /* Action buttons - bottom centered */
 .talk-cover-actions {
-  position: absolute;
+  position: absolute !important;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 2 !important;
   display: flex;
   align-items: center;
   gap: 0.7rem;
@@ -499,7 +499,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:27:31.641Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:31:24.465Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -525,7 +525,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776850062191"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776850295438"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
