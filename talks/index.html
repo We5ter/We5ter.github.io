@@ -373,20 +373,26 @@
   position: absolute;
   top: 12px;
   left: 12px;
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background: rgba(0, 240, 255, 0.15);
-  color: #00f0ff;
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.talk-cover.poc .talk-cover-label {
-  background: rgba(168, 85, 247, 0.15);
-  color: #a855f7;
-  border-color: rgba(168, 85, 247, 0.2);
+.talk-cover-label img {
+  height: 22px;
+  width: auto;
+  object-fit: contain;
+}
+.talk-cover.bh .talk-cover-label img {
+  filter: brightness(0); /* invert to black */
+}
+.talk-cover.poc .talk-cover-label img {
+  /* POC logo keep original colors */
 }
 .talk-cover-title {
   text-align: center;
@@ -486,7 +492,7 @@
     <!-- Talk 1: BlackHat Asia 2021 -->
     <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card">
       <div class="talk-cover bh">
-        <span class="talk-cover-label">BlackHat Asia 2021</span>
+        <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
         <div class="talk-cover-title">
           <h3>A New Era of One-Click Attacks</h3>
           <span class="talk-author">Zhiyang Zeng (@Wester)</span>
@@ -506,7 +512,7 @@
     <!-- Talk 2: POC 2019 -->
     <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card">
       <div class="talk-cover poc">
-        <span class="talk-cover-label">POC 2019</span>
+        <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
         <div class="talk-cover-title">
           <h3>Safari Adventure: A Dive into Apple Browser Internals</h3>
           <span class="talk-author">Zhiyang Zeng (@Wester)</span>
@@ -529,7 +535,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:00:26.057Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:04:29.016Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -555,7 +561,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776848434686"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776848722485"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
