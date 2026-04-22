@@ -1580,19 +1580,21 @@ pre .chunk {
     z-index: 1;
 }
 
-/* Footer Calligraphy - 王羲之书法体 欲穷千里目 / 更上一层楼 */
+/* Footer Calligraphy - English Quotes */
 .footer-calligraphy {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-family: "STXingkai", "Xingkai SC", "行楷", "华文行楷", "王羲之书法字体", cursive;
-    font-size: 3.2rem;
-    letter-spacing: 0.5em;
+    font-family: "Cormorant Garamond", "Playfair Display", "Baskerville", "Georgia", "Times New Roman", serif;
+    font-size: 2rem;
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: 0.08em;
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
-    color: rgba(255, 255, 255, 0.25);
-    transition: color 0.5s ease, text-shadow 0.5s ease;
+    color: rgba(255, 255, 255, 0.22);
+    transition: color 0.5s ease;
 }
 
 .footer-calligraphy-left {
