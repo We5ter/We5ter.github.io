@@ -470,6 +470,37 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
 
+/* ===== Light Mode ===== */
+[data-theme="light"] .talks-container {
+  padding-top: 5rem;
+}
+[data-theme="light"] .talks-header p {
+  color: #6666a0;
+}
+[data-theme="light"] .talk-card:hover {
+  box-shadow: 0 12px 40px rgba(67, 97, 238, 0.1), 0 4px 12px rgba(123, 47, 247, 0.06);
+}
+[data-theme="light"] .talk-cover-title h3 {
+  color: #1a1a2e;
+  text-shadow: none;
+}
+[data-theme="light"] .talk-cover-title .talk-author {
+  color: #555580;
+  text-shadow: none;
+}
+[data-theme="light"] .talk-cover-actions a {
+  color: #333355;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+[data-theme="light"] .talk-cover-actions a:hover {
+  color: #4361ee;
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(67, 97, 238, 0.2);
+  box-shadow: 0 4px 16px rgba(67, 97, 238, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
 @media (max-width: 640px) {
   .talks-container { padding: 2rem 1.2rem; }
   .talks-header h1 { font-size: 2.4rem; }
@@ -527,7 +558,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T11:13:55.987Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T11:16:09.651Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
