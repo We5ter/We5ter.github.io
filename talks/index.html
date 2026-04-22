@@ -330,7 +330,9 @@
   <article class="post post-detail">
     
 
+    
     <h1 class="post-title">Wester&#39;s Talks &amp; Slides</h1>
+    
     <section class="post-content">
       <style>
 .talks-container {
@@ -341,6 +343,15 @@
 .talks-header {
   text-align: center;
   margin-bottom: 4rem;
+}
+.talks-header h1 {
+  font-size: 3.6rem;
+  letter-spacing: -0.04em;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.8rem;
 }
 .talks-header p {
   font-size: 1.2rem;
@@ -463,6 +474,7 @@
 
 @media (max-width: 640px) {
   .talks-container { padding: 2rem 1.2rem; }
+  .talks-header h1 { font-size: 2.4rem; }
   .talks-header p { font-size: 1rem; }
   .talk-grid { grid-template-columns: 1fr; }
   .talk-card-content { min-height: 280px; }
@@ -477,6 +489,7 @@
 
 <main class="content talks-container">
   <div class="talks-header">
+    <h1>Wester's Talks & Slides</h1>
     <p>Conference talks, presentations, and slide decks</p>
   </div>
   <div class="talk-grid" id="talk-grid"></div>
@@ -516,7 +529,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:59:37.466Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T11:02:15.660Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
