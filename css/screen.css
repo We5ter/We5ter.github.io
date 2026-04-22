@@ -1571,31 +1571,6 @@ pre .chunk {
     z-index: 1;
 }
 
-/* Footer Calligraphy - English Quotes */
-.footer-calligraphy {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: "Cormorant Garamond", "Playfair Display", "Baskerville", "Georgia", "Times New Roman", serif;
-    font-size: 2rem;
-    font-weight: 600;
-    font-style: italic;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
-    color: rgba(255, 255, 255, 0.35);
-    transition: color 0.5s ease;
-}
-
-.footer-calligraphy-left {
-    left: 4rem;
-}
-
-.footer-calligraphy-right {
-    right: 4rem;
-}
-
 .site-footer a {
     color: var(--text-muted);
     text-decoration: none;
@@ -1906,20 +1881,6 @@ pre .chunk {
 
 /* Tablet: footer responsive adjustments */
 @media only screen and (max-width: 768px) {
-    .footer-calligraphy {
-        font-size: 1.3rem !important;
-        letter-spacing: 0.04em !important;
-        opacity: 0.5;
-    }
-
-    .footer-calligraphy-left {
-        left: 1.5rem !important;
-    }
-
-    .footer-calligraphy-right {
-        right: 1.5rem !important;
-    }
-
     .site-footer {
         padding: 2.5rem 2% !important;
         min-width: 0 !important;
@@ -2129,11 +2090,6 @@ main.content:not(.inner) .post-title {
 
     main.content {
         min-height: calc(100vh - 200px) !important;
-    }
-
-    /* Hide calligraphy on small screens to prevent overflow */
-    .footer-calligraphy {
-        display: none !important;
     }
 
     .site-footer > .inner,
@@ -2809,11 +2765,6 @@ a, button, .post, .social-link {
 
 [data-theme="light"] .site-footer {
     background: #ffffff;
-}
-
-/* Light mode: calligraphy - black color for visibility on white */
-[data-theme="light"] .footer-calligraphy {
-    color: rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="light"] .post-template .site-head {
