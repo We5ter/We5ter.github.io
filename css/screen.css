@@ -2705,8 +2705,13 @@ a, button, .post, .social-link {
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
-    background-color: #f8f9fc;
-    background-image: linear-gradient(180deg, #ffffff 0%, #fcfdfe 50%, #ffffff 100%);
+    background-color: #f0f2f7;
+    background-image:
+        linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+        linear-gradient(180deg, #f0f2f7 0%, #e8ecf6 30%, #f5f7fa 60%, #ffffff 100%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    background-position: -1px -1px, -1px -1px, 0 0;
 }
 
 /* Light mode: home page content area background */
@@ -2952,6 +2957,12 @@ a, button, .post, .social-link {
     box-shadow: 0 2px 20px rgba(0,0,0,0.05) !important;
 }
 
+/* Light mode: post footer - subtle background */
+[data-theme="light"] .post-footer {
+    background: linear-gradient(180deg, #f8f9fc 0%, #ffffff 100%) !important;
+    border-top-color: rgba(0,0,0,0.06) !important;
+}
+
 /* Light mode: post navigation */
 [data-theme="light"] .post-nav-prev,
 [data-theme="light"] .post-nav-next {
@@ -2982,7 +2993,14 @@ a, button, .post, .social-link {
     border-bottom-color: rgba(0,0,0,0.08) !important;
 }
 [data-theme="light"] .comments-section {
-    background: transparent !important;
+    background: linear-gradient(180deg, #f5f6fa 0%, #ffffff 100%) !important;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 3rem;
+}
+[data-theme="light"] .giscus-wrapper {
+    background: #ffffff !important;
+    border-radius: 10px;
 }
 
 [data-theme="light"] .tag-badge {
@@ -3056,9 +3074,17 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .post-footer .share a {
-    border-color: rgba(0,0,0,0.14) !important;
+    border: 1px solid rgba(0,0,0,0.12) !important;
     background: #ffffff !important;
-    color: #555570 !important;
+    color: #444460 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+}
+
+[data-theme="light"] .post-footer .share a:hover {
+    border-color: #888 !important;
+    background: #f8f9fc !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
 }
 
 /* Light mode: article content headings - darker for readability */
