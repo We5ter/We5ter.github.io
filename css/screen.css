@@ -2518,7 +2518,7 @@ main.content:not(.inner) .post-detail {
     width: 100% !important;
     max-width: var(--post-width) !important;
     margin: 0 auto 3rem !important;
-    padding: 2.4rem !important;
+    padding: 10.4rem !important;
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 16px !important;
@@ -2930,9 +2930,50 @@ a, button, .post, .social-link {
 /* Light mode: article detail page full area background */
 [data-theme="light"] main.content:not(.inner) {
     background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
+    min-height: 100vh;
 }
 [data-theme="light"] .post-template .site-head {
     background: #ffffff !important;
+}
+
+/* Light mode: article detail page post card */
+[data-theme="light"] .post-detail {
+    background: #ffffff !important;
+    border-color: rgba(0,0,0,0.08) !important;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.05) !important;
+}
+
+/* Light mode: post navigation */
+[data-theme="light"] .post-nav-prev,
+[data-theme="light"] .post-nav-next {
+    background: #ffffff !important;
+    border-color: rgba(67,97,238,0.15) !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+}
+[data-theme="light"] .post-nav-label {
+    color: #4361ee !important;
+}
+[data-theme="light"] .post-nav-title {
+    color: #1a1a2e !important;
+}
+[data-theme="light"] .post-nav-prev:hover,
+[data-theme="light"] .post-nav-next:hover {
+    border-color: #4361ee !important;
+    box-shadow: 0 0 28px rgba(67,97,238,0.12) !important;
+    background: rgba(67,97,238,0.06) !important;
+}
+[data-theme="light"] .post-nav-prev:hover .post-nav-title,
+[data-theme="light"] .post-nav-next:hover .post-nav-title {
+    color: #4361ee !important;
+}
+
+/* Light mode: comments section */
+[data-theme="light"] .comments-header {
+    color: #1a1a2e !important;
+    border-bottom-color: rgba(0,0,0,0.08) !important;
+}
+[data-theme="light"] .comments-section {
+    background: transparent !important;
 }
 
 [data-theme="light"] .tag-badge {
