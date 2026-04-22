@@ -1586,26 +1586,21 @@ pre .chunk {
     top: 50%;
     transform: translateY(-50%);
     font-family: "STXingkai", "Xingkai SC", "行楷", "华文行楷", "王羲之书法字体", cursive;
-    font-size: 2.4rem;
-    letter-spacing: 0.35em;
+    font-size: 3.2rem;
+    letter-spacing: 0.5em;
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
-    color: rgba(255, 255, 255, 0.06);
-    text-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.25);
     transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 
 .footer-calligraphy-left {
     left: 2rem;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
 }
 
 .footer-calligraphy-right {
     right: 2rem;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
 }
 
 .site-footer a {
@@ -2787,10 +2782,9 @@ a, button, .post, .social-link {
     background: #ffffff;
 }
 
-/* Light mode: calligraphy - deeper ink color for visibility on white */
+/* Light mode: calligraphy - black color for visibility on white */
 [data-theme="light"] .footer-calligraphy {
-    color: rgba(0, 0, 0, 0.07);
-    text-shadow: 0 0 20px rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.18);
 }
 
 [data-theme="light"] .post-template .site-head {
