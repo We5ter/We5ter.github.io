@@ -78,6 +78,14 @@
       currentTheme = theme;
       CONFIG = THEMES[theme];
       this.mouse.radius = CONFIG.mouseRadius;
+      // Control canvas visibility based on theme (CSS handles the rest)
+      if (theme === 'light') {
+        this.canvas.style.opacity = '0';
+        this.canvas.style.zIndex = '-1';
+      } else {
+        this.canvas.style.opacity = '';
+        this.canvas.style.zIndex = '';
+      }
       // Re-init particles with new config
       this.init();
     }
@@ -323,19 +331,24 @@
 
       console.log(`[YOJO] Particle system init (mode: ${currentTheme})...`);
 
-      // Set canvas styles
+      // Set canvas styles (note: z-index is controlled by CSS for light/dark mode switching)
       canvas.style.cssText = `
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        z-index: 0 !important;
         pointer-events: none !important;
         display: block !important;
         margin: 0 !important;
         padding: 0 !important;
       `;
+
+      // If initial theme is light, hide canvas immediately
+      if (currentTheme === 'light') {
+        canvas.style.opacity = '0';
+        canvas.style.zIndex = '-1';
+      }
 
       const system = new ParticleSystem(canvas);
       console.log('[YOJO] Particle system ready!');
