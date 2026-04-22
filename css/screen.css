@@ -2513,12 +2513,12 @@ main.content:not(.inner) {
 }
 
 /* Article detail page: full post styles */
-main.content:not(.inner) .post {
+main.content:not(.inner) .post-detail {
     position: relative !important;
     width: 100% !important;
     max-width: var(--post-width) !important;
     margin: 0 auto 3rem !important;
-    padding: 10.4rem !important;
+    padding: 2.4rem !important;
     background: var(--bg-card) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 16px !important;
