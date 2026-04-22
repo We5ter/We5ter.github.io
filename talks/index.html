@@ -336,7 +336,7 @@
   gap: 2rem;
 }
 
-/* Card wrapper - use div instead of relying on <a> for positioning */
+/* Card */
 .talk-card {
   border-radius: 16px;
   overflow: hidden;
@@ -344,11 +344,18 @@
   text-decoration: none;
   color: inherit;
   display: block;
-  position: relative;
 }
 
-/* Background image covers entire card via ::before */
-.talk-card::before {
+/* Content wrapper with background image */
+.talk-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+}
+
+/* Background image via ::before on content wrapper (same stacking context as content) */
+.talk-card-content::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -356,20 +363,17 @@
   background-position: center;
   z-index: 0;
 }
-.talk-card.bh::before {
+.talk-card.bh .talk-card-content::before {
   background-image: url('/images/talks/bh-2021-bg.jpg');
 }
-.talk-card.poc::before {
+.talk-card.poc .talk-card-content::before {
   background-image: url('/images/talks/poc-2019-bg.png');
 }
 
-/* Content layer on top of bg */
-.talk-card-content {
+/* All content above bg */
+.talk-card-content > * {
   position: relative;
   z-index: 2;
-  display: flex;
-  flex-direction: column;
-  min-height: 340px;
 }
 
 .talk-card:hover {
@@ -506,7 +510,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:44:20.390Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:52:52.930Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -532,7 +536,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776851085518"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776851586183"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
