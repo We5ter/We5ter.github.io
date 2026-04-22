@@ -3032,7 +3032,7 @@ a, button, .post, .social-link {
 
 /* Light mode: post footer text visibility fix */
 [data-theme="light"] .post-footer h4 {
-    color: #000000 !important;
+    color: #2a2a3e !important;
 }
 
 [data-theme="light"] .post-footer .author-name {
@@ -3052,7 +3052,7 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .post-footer .share h4 {
-    color: #000000 !important;
+    color: #2a2a3e !important;
 }
 
 /* Light mode: share buttons - add border */
@@ -3065,17 +3065,17 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .post-footer .share a {
-    border: 1px solid black !important;
-    background: #ffffff !important;
-    color: #444460 !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+    border: 1px solid #d0d4e0 !important;
+    background: #f8f9fc !important;
+    color: #555570 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
 }
 
 [data-theme="light"] .post-footer .share a:hover {
-    border-color: #888 !important;
-    background: #f8f9fc !important;
+    border-color: #8888aa !important;
+    background: #eeeef5 !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
 }
 
 /* Light mode: article content headings - darker for readability */
