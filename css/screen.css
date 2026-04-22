@@ -2706,13 +2706,15 @@ a, button, .post, .social-link {
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
-    background-color: #f5f7fa;
+    background-color: #f5f7fa !important;
     background-image:
         linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
         linear-gradient(180deg, #f5f7fa 0%, #edf0f7 30%, #f0f2f7 60%, #e8ecf6 100%);
     background-size: 40px 40px, 40px 40px, 100% 100%;
     background-position: -1px -1px, -1px -1px, 0 0;
+    background-attachment: scroll !important;
+    background-repeat: repeat, repeat, repeat;
 }
 
 /* Light mode: home page content area background */
@@ -3002,7 +3004,10 @@ a, button, .post, .social-link {
 
 /* Light mode: ensure area between comments and footer is never dark */
 [data-theme="light"] main.content:not(.inner) {
-    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
+    background:
+        radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.03) 1px, transparent 0),
+        linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
+    background-size: 20px 20px, 100% 100%;
     min-height: auto;
     padding-bottom: 3rem;
 }
