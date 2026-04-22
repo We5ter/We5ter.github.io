@@ -723,6 +723,11 @@ iframe, .fluid-width-video-wrapper {
     overflow: hidden;
 }
 
+/* Article detail page: override padding */
+.post-detail {
+    padding: 10.4rem !important;
+}
+
 .post::before {
     content: '';
     position: absolute;
