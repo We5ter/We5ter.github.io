@@ -488,8 +488,41 @@
   padding-top: 5rem;
 }
 [data-theme="light"] main.content {
-  background: linear-gradient(180deg, #f8f9fc 0%, #ffffff 50%, #f5f7fa 100%) !important;
+  background:
+    /* Subtle dot pattern */
+    radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.05) 1px, transparent 0),
+    /* Soft gradient */
+    linear-gradient(180deg, #f8f9fc 0%, #ffffff 30%, #f5f7fa 60%, #eef1f8 100%) !important;
+  background-size: 24px 24px, 100% 100%;
+  background-position: -1px -1px, 0 0;
   min-height: 100vh;
+  position: relative;
+}
+/* Soft glow orb top-right */
+[data-theme="light"] main.content::before {
+  content: '';
+  position: fixed;
+  top: -150px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Soft glow orb bottom-left */
+[data-theme="light"] main.content::after {
+  content: '';
+  position: fixed;
+  bottom: -200px;
+  left: -150px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.03) 0%, rgba(99, 102, 241, 0.04) 40%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 [data-theme="light"] .post.post-detail {
   background: transparent !important;
@@ -593,7 +626,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T11:22:55.799Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T12:47:36.591Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
