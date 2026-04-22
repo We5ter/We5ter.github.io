@@ -2700,9 +2700,9 @@ a, button, .post, .social-link {
 
 /* Light mode specific overrides */
 
-/* Light mode: particle canvas - keep visible with soft ocean style */
+/* Light mode: particle canvas - hide to reveal light background */
 [data-theme="light"] #particle-canvas {
-    opacity: 1 !important;
+    opacity: 0 !important;
     z-index: -1 !important;
 }
 
