@@ -2005,6 +2005,11 @@ main.content:not(.inner) .post-title {
     font-size: 3rem;
 }
 
+/* Home page mobile: add more top spacing to clear navbar + avatar */
+.content.inner {
+    padding-top: 50px;
+}
+
     .post-header-row {
         flex-direction: column;
         align-items: flex-start;
