@@ -2257,6 +2257,7 @@ main.content:not(.inner) .post-title {
     width: 18px;
     height: 18px;
 }
+/* END @media (max-width: 480px) */
 
 /* ==========================================================================
    13. Particle Canvas & Avatar Effects
