@@ -16,7 +16,7 @@
     <atom:link href="https://lightrains.org/atom.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>CVE-2020-16040:Analysis of Chromium V8 engine integer overflow vulnerability</title>
-      <link>https://lightrains.org/blogs/2024/08/08/CVE-2020-16040/</link>
+      <link>https://lightrains.org/blogs/CVE-2020-16040/</link>
       <description>
         <![CDATA[<h3 id="Vulnerability-Overview"><a href="#Vulnerability-Overview" class="headerlink" title="Vulnerability Overview"></a>Vulnerability Overview</h3><p>V8 is the JavaScript engine in the Chromium kernel, responsible for interpreting, optimizing, and executing JavaScript code. CVE-2020-16040 (crbug.com]]>
       </description>
@@ -31,7 +31,7 @@
       <title>
         <![CDATA[Local file inclusion in cmsmadesimple <=2.2.1]]>
       </title>
-      <link>https://lightrains.org/blogs/2017/05/22/local-file-inclusion-in-cmsmadesimple/</link>
+      <link>https://lightrains.org/blogs/local-file-inclusion-in-cmsmadesimple/</link>
       <description>
         <![CDATA[<h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs]]>
       </description>
@@ -44,7 +44,7 @@
     </item>
     <item>
       <title>(CVE-2017-2500)Address bar spoofing on macOS Safari</title>
-      <link>https://lightrains.org/blogs/2017/02/25/cve-2017-2500/</link>
+      <link>https://lightrains.org/blogs/cve-2017-2500/</link>
       <description>
         <![CDATA[<h2 id="Affected-Products"><a href="#Affected-Products" class="headerlink" title="Affected Products"></a>Affected Products</h2><p>Safari &lt;10.1.1 on macOS</p>
 <h2 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h2><p>When we input an URL including a]]>
