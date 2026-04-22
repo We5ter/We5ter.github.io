@@ -347,18 +347,19 @@
   position: relative;
 }
 
-/* Background image covers entire card */
-.talk-card-bg {
+/* Background image covers entire card via ::before */
+.talk-card::before {
+  content: "";
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
-  z-index: 1;
+  z-index: 0;
 }
-.talk-card-bg.bh {
+.talk-card.bh::before {
   background-image: url('/images/talks/bh-2021-bg.jpg');
 }
-.talk-card-bg.poc {
+.talk-card.poc::before {
   background-image: url('/images/talks/poc-2019-bg.png');
 }
 
@@ -473,7 +474,6 @@
 
     <!-- Talk 1: BlackHat Asia 2021 -->
     <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card bh">
-      <div class="talk-card-bg bh"></div>
       <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
         <div class="talk-cover-title">
@@ -481,7 +481,6 @@
           <span class="talk-author">Zhiyang Zeng (@Wester)</span>
         </div>
         <div class="talk-cover-actions">
-          <a href="https://i.blackhat.com/asia-21/Friday-Handouts/as21-Zeng-A-New-Era-Of-One-Click.pdf" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
           <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
         </div>
       </div>
@@ -489,7 +488,6 @@
 
     <!-- Talk 2: POC 2019 -->
     <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card poc">
-      <div class="talk-card-bg poc"></div>
       <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
         <div class="talk-cover-title">
@@ -497,7 +495,6 @@
           <span class="talk-author">Zhiyang Zeng (@Wester)</span>
         </div>
         <div class="talk-cover-actions">
-          <a href="https://powerofcommunity.net/assets/v0/poc2019/Zhiyang.pdf" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
           <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
         </div>
       </div>
@@ -509,7 +506,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:38:21.477Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:44:20.390Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -535,7 +532,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776850728880"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776851085518"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
