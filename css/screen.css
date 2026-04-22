@@ -999,7 +999,7 @@ main.content:not(.inner) .post-title {
 .post-footer h4 {
     font-size: 1.6rem;
     margin: 0 0 1rem 0;
-    color: #000000 !important;
+    color: var(--text-primary);
 }
 
 .post-footer .posted-on {
@@ -1079,7 +1079,6 @@ main.content:not(.inner) .post-title {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.06) !important;
     border-radius: 10px;
-    border: 1px solid black !important;
     opacity: 1 !important;
     visibility: visible !important;
 }
@@ -3046,7 +3045,7 @@ a, button, .post, .social-link {
 
 /* Light mode: post footer text visibility fix */
 [data-theme="light"] .post-footer h4 {
-    color: #0d0d1a !important;
+    color: #000000 !important;
 }
 
 [data-theme="light"] .post-footer .author-name {
@@ -3079,7 +3078,7 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .post-footer .share a {
-    border: 1px solid rgba(0,0,0,0.12) !important;
+    border: 1px solid black !important;
     background: #ffffff !important;
     color: #444460 !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
