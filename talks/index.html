@@ -356,18 +356,18 @@
   height: 200px;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
   border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
 }
 .talk-cover.bh {
-  background: linear-gradient(135deg, #0d1117 0%, #161b22 30%, #21262d 70%, #30363d 100%);
+  background-image: url('https://blackhat.com/images/backgrounds/2021.jpg');
 }
 .talk-cover.poc {
-  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 30%, #1a3a5c 70%, #0a192f 100%);
+  background-image: url('https://powerofcommunity.net/assets/v1/img/el/header-bg.png');
 }
 .talk-cover-label {
   position: absolute;
@@ -487,7 +487,7 @@
         <span class="talk-cover-label">BlackHat Asia 2021</span>
         <div class="talk-cover-title">
           <h3>A New Era of One-Click Attacks</h3>
-          <span class="talk-author">Zhi Zhou (@CodeColorist)</span>
+          <span class="talk-author">Zhiyang Zeng (@Wester)</span>
         </div>
       </div>
       <div class="talk-body">
@@ -508,13 +508,13 @@
       <div class="talk-cover poc">
         <span class="talk-cover-label">POC 2019</span>
         <div class="talk-cover-title">
-          <h3>Runtime Dynamic Code Execution</h3>
-          <span class="talk-author">Zhi Zhou (@CodeColorist)</span>
+          <h3>Safari Adventure: A Dive into Apple Browser Internals</h3>
+          <span class="talk-author">Zhiyang Zeng (@Wester)</span>
         </div>
       </div>
       <div class="talk-body">
-        <h3>See No Eval: Runtime Dynamic Code Execution in Objective-C</h3>
-        <p>Investigating dynamic code execution mechanisms in the Objective-C runtime, uncovering security implications and potential abuse scenarios.</p>
+        <h3>Safari Adventure: A Dive into Apple Browser Internals</h3>
+        <p>Deep exploration of Apple's Safari browser internals, uncovering the architecture and security mechanisms of WebKit.</p>
         <div class="talk-meta">
           <span class="talk-tag">Event</span>
           <div class="talk-links">
@@ -531,7 +531,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T08:49:18.480Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T08:57:12.534Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -556,10 +556,10 @@
            title="Share on Xiaohongshu">
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
-        <!-- WeChat (copy link) -->
-        <a class="icon-wechat" href="javascript:void(0);"
-           onclick="navigator.clipboard.writeText('https://lightrains.org/talks/index.html').then(()=>alert('链接已复制到剪贴板！'));return false;"
-           title="Copy link for WeChat">
+        <!-- WeChat (launch WeChat app) -->
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776848250499"
+           onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
+           title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
         </a>
         <!-- LinkedIn -->
