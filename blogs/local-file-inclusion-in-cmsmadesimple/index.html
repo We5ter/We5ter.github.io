@@ -321,10 +321,9 @@
   
 
 
-<!-- Fixed Back to Home Button (left side) -->
-<a class="back-to-home-fixed" href="/" title="Back to Home">
-    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-    <span>Home</span>
+<!-- Back to Top Button (bottom-right) -->
+<a class="back-to-top-fixed" href="javascript:void(0);" id="back-to-top-btn" title="Back to Top">
+    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
 </a>
 
 <main class="content" role="main">
@@ -387,10 +386,10 @@
            title="Share on Xiaohongshu">
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
-        <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776854900387"
-           onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
-           title="Share via WeChat">
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="navigator.clipboard.writeText('https://lightrains.org/blogs/local-file-inclusion-in-cmsmadesimple/').then(function(){alert('链接已复制，快去微信分享吧！');}).catch(function(){prompt('请手动复制链接：','https://lightrains.org/blogs/local-file-inclusion-in-cmsmadesimple/');});"
+           title="Copy link for WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
         </a>
         <!-- LinkedIn -->
@@ -654,58 +653,25 @@
 })();
 </script>
 
-<!-- Mobile: Back to Home button slide-out on swipe -->
+<!-- Back to Top Button: show on scroll, click to scroll to top -->
 <script>
 (function() {
-    var btn = document.querySelector('.back-to-home-fixed');
+    var btn = document.getElementById('back-to-top-btn');
     if (!btn) return;
 
-    var touchStartX = 0;
-    var touchStartY = 0;
-    var isSwiping = false;
-    var hideTimer = null;
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-    function showBtn() {
-        btn.classList.add('is-visible');
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(function() {
-            btn.classList.remove('is-visible');
-        }, 3000); // Auto-hide after 3 seconds
-    }
-
-    // Touch swipe from left edge
-    document.addEventListener('touchstart', function(e) {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        isSwiping = false;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function(e) {
-        if (isSwiping) return;
-        var dx = e.touches[0].clientX - touchStartX;
-        var dy = e.touches[0].clientY - touchStartY;
-        // Swipe right from left edge (within 30px)
-        if (touchStartX < 30 && dx > 25 && Math.abs(dx) > Math.abs(dy)) {
-            isSwiping = true;
-            showBtn();
-        }
-    }, { passive: true });
-
-    // Also show on scroll down
-    var lastScrollTop = 0;
+    // Show button when scrolled down past 300px
     window.addEventListener('scroll', function() {
         var st = window.pageYOffset || document.documentElement.scrollTop;
-        if (st > lastScrollTop && st > 200) {
-            // Scrolling down past 200px - briefly show hint
-            if (!btn.classList.contains('is-visible')) {
-                btn.classList.add('is-visible');
-                clearTimeout(hideTimer);
-                hideTimer = setTimeout(function() {
-                    btn.classList.remove('is-visible');
-                }, 1500);
-            }
+        if (st > 300) {
+            btn.classList.add('is-visible');
+        } else {
+            btn.classList.remove('is-visible');
         }
-        lastScrollTop = st <= 0 ? 0 : st;
     }, { passive: true });
 })();
 </script>

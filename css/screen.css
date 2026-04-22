@@ -1160,61 +1160,53 @@ main.content:not(.inner) .post-title {
     transform: translateX(-3px);
 }
 
-/* Fixed Back to Home Button (left side of post) */
-.back-to-home-fixed {
+/* Back to Top Button (bottom-right) */
+.back-to-top-fixed {
     position: fixed;
-    left: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 2rem;
+    bottom: 3rem;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.9rem 0.7rem;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
     color: var(--text-muted) !important;
     text-decoration: none;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
     background: rgba(26, 26, 46, 0.85) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: 14px;
+    border-radius: 50%;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
 }
 
-.back-to-home-fixed svg {
+.back-to-top-fixed svg {
     width: 22px;
     height: 22px;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.back-to-home-fixed span {
-    font-size: 0.85rem;
+.back-to-top-fixed.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
-.back-to-home-fixed:hover {
+.back-to-top-fixed:hover {
     color: var(--accent-primary) !important;
     border-color: var(--accent-primary) !important;
     background: rgba(0, 240, 255, 0.1) !important;
     box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), 0 4px 20px rgba(0, 0, 0, 0.4);
-    transform: translateY(-50%) scale(1.05);
+    transform: translateY(-3px);
 }
 
-.back-to-home-fixed:hover svg {
-    transform: translateY(-2px);
-}
-
-/* Hide on medium screens, but show compact on mobile */
-@media (max-width: 1200px) and (min-width: 481px) {
-    .back-to-home-fixed {
-        display: none;
-    }
+.back-to-top-fixed:hover svg {
+    transform: translateY(-3px);
 }
 
 /* ==========================================================================
@@ -2206,37 +2198,17 @@ main.content:not(.inner) .post-title {
         height: 34px !important;
     }
 
-/* Back to home button - compact for mobile, hidden by default, slides out on swipe */
-.back-to-home-fixed {
-    position: fixed;
-    bottom: 1.2rem;
-    left: 0;
-    top: auto;
-    transform: translateX(-100%);
-    writing-mode: horizontal-tb;
-    text-orientation: initial;
-    flex-direction: row;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.75rem;
-    border-radius: 0 10px 10px 0;
-    z-index: 100;
-    border-left: none !important;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+/* Back to top button - compact for mobile */
+.back-to-top-fixed {
+    right: 1.2rem;
+    bottom: 1.5rem;
+    width: 38px;
+    height: 38px;
 }
 
-.back-to-home-fixed svg {
-    width: 16px;
-    height: 16px;
-}
-
-.back-to-home-fixed span {
-    display: none;
-}
-
-/* Slide out when user scrolls or swipes from left edge */
-.back-to-home-fixed.is-visible,
-.back-to-home-fixed:hover {
-    transform: translateX(0);
+.back-to-top-fixed svg {
+    width: 18px;
+    height: 18px;
 }
 
 /* ==========================================================================
@@ -2950,14 +2922,14 @@ a, button, .post, .social-link {
     color: #4361ee;
 }
 
-/* Light mode: Back to Home button (left side) */
-[data-theme="light"] .back-to-home-fixed {
+/* Light mode: Back to Top button (bottom-right) */
+[data-theme="light"] .back-to-top-fixed {
     background: rgba(255, 255, 255, 0.92) !important;
     border-color: rgba(0, 0, 0, 0.1) !important;
     color: #4a4a6a !important;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
 }
-[data-theme="light"] .back-to-home-fixed:hover {
+[data-theme="light"] .back-to-top-fixed:hover {
     color: #4361ee !important;
     border-color: #4361ee !important;
     background: rgba(67, 97, 238, 0.08) !important;
@@ -3036,13 +3008,13 @@ a, button, .post, .social-link {
     background: rgba(67, 97, 238, 0.12);
 }
 
-[data-theme="light"] .back-to-home-fixed {
+[data-theme="light"] .back-to-top-fixed {
     background: rgba(255, 255, 255, 0.92) !important;
     border-color: rgba(0, 0, 0, 0.08) !important;
     color: #4a4a6a !important;
 }
 
-[data-theme="light"] .back-to-home-fixed:hover {
+[data-theme="light"] .back-to-top-fixed:hover {
     color: #4361ee !important;
     border-color: #4361ee !important;
     background: rgba(67, 97, 238, 0.08) !important;
