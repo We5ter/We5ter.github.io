@@ -316,6 +316,16 @@
       opacity: 1 !important;
       z-index: -1 !important;
     }
+    /* CRITICAL: Force body background to light in light mode (overrides Giscus and base styles) */
+    [data-theme="light"] body {
+      background-color: #f5f7fa !important;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(99,102,241,0.04) 1px, transparent 0),
+        radial-gradient(circle at 1px 1px, rgba(99,102,241,0.04) 1px, transparent 0),
+        linear-gradient(180deg, #f5f7fa 0%, #edf0f7 30%, #f0f2f7 60%, #e8ecf6 100%) !important;
+      background-size: 24px 24px, 24px 24px, 100% 100% !important;
+      background-attachment: scroll !important;
+    }
     /* Post footer h4 + share buttons - soft dark text in light mode (not harsh black) */
     [data-theme="light"] .post-footer h4 {
       color: #2a2a3e !important;
