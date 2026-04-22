@@ -1904,6 +1904,31 @@ pre .chunk {
     }
 }
 
+/* Tablet: footer responsive adjustments */
+@media only screen and (max-width: 768px) {
+    .footer-calligraphy {
+        font-size: 1.3rem !important;
+        letter-spacing: 0.04em !important;
+        opacity: 0.5;
+    }
+
+    .footer-calligraphy-left {
+        left: 1.5rem !important;
+    }
+
+    .footer-calligraphy-right {
+        right: 1.5rem !important;
+    }
+
+    .site-footer {
+        padding: 2.5rem 2% !important;
+    }
+
+    .cat-footer .golden-cat {
+        width: 50px !important;
+    }
+}
+
 /* ==========================================================================
    12. Media Queries - Mobile (< 500px)
    ========================================================================== */
@@ -2085,9 +2110,14 @@ main.content:not(.inner) .post-title {
         line-height: 1.4 !important;
         width: 100% !important;
         max-width: 100vw !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         box-sizing: border-box !important;
         border-top: none !important;
+    }
+
+    /* Hide calligraphy on small screens to prevent overflow */
+    .footer-calligraphy {
+        display: none !important;
     }
 
     .site-footer > .inner,
