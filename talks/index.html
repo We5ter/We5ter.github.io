@@ -344,7 +344,7 @@
   color: inherit;
   display: flex;
   flex-direction: column;
-  min-height: 320px;
+  min-height: 340px;
 }
 /* Background image covers entire card */
 .talk-card::before {
@@ -379,7 +379,7 @@
   z-index: 2;
 }
 .talk-cover-label img {
-  height: 38px;
+  height: 76px;
   width: auto;
   object-fit: contain;
 }
@@ -407,9 +407,10 @@
   text-shadow: 0 2px 14px rgba(0,0,0,0.65), 0 1px 4px rgba(0,0,0,0.45);
 }
 .talk-cover-title .talk-author {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.5);
-  font-weight: 400;
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
 
 /* Action buttons - bottom centered */
@@ -453,7 +454,7 @@
   .talk-grid { grid-template-columns: 1fr; }
   .talk-cover-title { padding: 3rem 1.5rem 1.5rem; }
   .talk-cover-title h3 { font-size: 1.25rem; }
-  .talk-cover-label img { height: 30px; }
+  .talk-cover-label img { height: 52px; }
   .talk-cover-actions a { padding: 0.45rem 1.1rem; font-size: 0.9rem; }
 }
 </style>
@@ -498,7 +499,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:24:37.792Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:27:31.641Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -524,7 +525,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776849890335"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776850062191"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
