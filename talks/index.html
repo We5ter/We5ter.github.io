@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Talks &amp; Slides | 西风微雨 - Wester&#39;s blog</title>
+  <title>Wester&#39;s Talks &amp; Slides | 西风微雨 - Wester&#39;s blog</title>
   <meta name="description" content="A security researcher from China, focus on Product security and offensive security research." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research" />
   <meta name="HandheldFriendly" content="True" />
@@ -305,11 +305,11 @@
   <article class="post post-detail">
     
 
-    <h1 class="post-title">Talks &amp; Slides</h1>
+    <h1 class="post-title">Wester&#39;s Talks &amp; Slides</h1>
     <section class="post-content">
       <style>
 .talks-container {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 3rem 2rem;
 }
@@ -332,7 +332,7 @@
 }
 .talk-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 2rem;
 }
 .talk-card {
@@ -341,9 +341,10 @@
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.35s var(--ease-out-expo);
-  cursor: pointer;
   text-decoration: none;
-  display: block;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
 }
 .talk-card:hover {
   border-color: rgba(0, 240, 255, 0.25);
@@ -352,24 +353,69 @@
 }
 .talk-cover {
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
-  background: var(--bg-secondary);
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
   font-size: 3rem;
+  border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.06));
+}
+.talk-cover.bh {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 30%, #21262d 70%, #30363d 100%);
+}
+.talk-cover.poc {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 30%, #1a3a5c 70%, #0a192f 100%);
+}
+.talk-cover-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+}
+.talk-cover.poc .talk-cover-label {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.2);
+}
+.talk-cover-title {
+  text-align: center;
+  padding: 0 1.5rem;
+}
+.talk-cover-title h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  margin-bottom: 0.3rem;
+}
+.talk-cover-title .talk-author {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.45);
+  font-weight: 400;
 }
 .talk-body {
   padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .talk-body h3 {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
 }
 .talk-body p {
@@ -377,37 +423,53 @@
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1rem;
+  flex: 1;
 }
 .talk-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 .talk-tag {
   display: inline-block;
-  padding: 0.2rem 0.65rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 6px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   background: rgba(0, 240, 255, 0.1);
   color: var(--accent-primary);
 }
-.empty-state {
-  text-align: center;
-  padding: 5rem 2rem;
-  color: var(--text-muted);
+.talk-links {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
-.empty-state .icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.4;
+.talk-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  transition: all 0.25s ease;
+}
+.talk-links a:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: rgba(67, 97, 238, 0.08);
 }
 @media (max-width: 640px) {
   .talks-container { padding: 2rem 1.2rem; }
   .talks-header h1 { font-size: 2.4rem; }
   .talk-grid { grid-template-columns: 1fr; }
+  .talk-cover { height: 180px; }
+  .talk-cover-title h3 { font-size: 1.15rem; }
 }
 </style>
 
@@ -418,19 +480,58 @@
   </div>
 
   <div class="talk-grid">
-    <!-- Coming soon placeholder -->
-    <div class="empty-state" style="grid-column: 1 / -1;">
-      <div class="icon">🎤</div>
-      <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">Coming Soon</p>
-      <p>Slides and talk recordings will be added here.</p>
-    </div>
+
+    <!-- Talk 1: BlackHat Asia 2021 -->
+    <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card">
+      <div class="talk-cover bh">
+        <span class="talk-cover-label">BlackHat Asia 2021</span>
+        <div class="talk-cover-title">
+          <h3>A New Era of One-Click Attacks</h3>
+          <span class="talk-author">Zhi Zhou (@CodeColorist)</span>
+        </div>
+      </div>
+      <div class="talk-body">
+        <h3>A New Era of One-Click Attacks: How to Break Install-Less Apps</h3>
+        <p>Deep dive into modern one-click attack surfaces on macOS/iOS, exploring novel exploitation techniques against install-less application architectures.</p>
+        <div class="talk-meta">
+          <span class="talk-tag">Event</span>
+          <div class="talk-links">
+            <a href="https://i.blackhat.com/asia-21/Friday-Handouts/as21-Zeng-A-New-Era-Of-One-Click.pdf" target="_blank" rel="noopener" title="Download PDF">📄 Slides</a>
+            <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" title="Event Page">🔗 Event</a>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Talk 2: POC 2019 -->
+    <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card">
+      <div class="talk-cover poc">
+        <span class="talk-cover-label">POC 2019</span>
+        <div class="talk-cover-title">
+          <h3>Runtime Dynamic Code Execution</h3>
+          <span class="talk-author">Zhi Zhou (@CodeColorist)</span>
+        </div>
+      </div>
+      <div class="talk-body">
+        <h3>See No Eval: Runtime Dynamic Code Execution in Objective-C</h3>
+        <p>Investigating dynamic code execution mechanisms in the Objective-C runtime, uncovering security implications and potential abuse scenarios.</p>
+        <div class="talk-meta">
+          <span class="talk-tag">Event</span>
+          <div class="talk-links">
+            <a href="https://powerofcommunity.net/assets/v0/poc2019/Zhiyang.pdf" target="_blank" rel="noopener" title="Download PDF">📄 Slides</a>
+            <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" title="Event Page">🔗 Event</a>
+          </div>
+        </div>
+      </div>
+    </a>
+
   </div>
 </main>
 
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T08:36:23.202Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T08:49:18.480Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -438,19 +539,19 @@
     <h4>Share this post</h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://lightrains.org/talks/index.html&text=Talks &amp; Slides"
+        <a class="icon-x" href="https://x.com/share?url=https://lightrains.org/talks/index.html&text=Wester&#39;s Talks &amp; Slides"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://lightrains.org/talks/index.html&title=Talks &amp; Slides"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://lightrains.org/talks/index.html&title=Wester&#39;s Talks &amp; Slides"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
         </a>
         <!-- Xiaohongshu -->
-        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/user/profile/Talks &amp; Slides"
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
            onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
            title="Share on Xiaohongshu">
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
