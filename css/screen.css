@@ -2786,7 +2786,7 @@ a, button, .post, .social-link {
 
 /* Light mode: calligraphy - black color for visibility on white */
 [data-theme="light"] .footer-calligraphy {
-    color: rgba(0, 0, 0, 0.18);
+    color: rgba(0, 0, 0, 0.35);
 }
 
 [data-theme="light"] .post-template .site-head {
