@@ -402,7 +402,7 @@
   min-width: 0;
 }
 .repo-info h3 {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.02em;
@@ -410,8 +410,8 @@
   text-shadow: 0 1px 6px rgba(0,0,0,0.4);
 }
 .repo-info .repo-desc {
-  font-size: 0.95rem;
-  color: rgba(255,255,255,0.65);
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
   line-height: 1.5;
   text-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
@@ -425,17 +425,28 @@
 .repo-stars {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.65rem;
+  gap: 0.35rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: rgba(255, 200, 50, 0.12);
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: rgba(255, 200, 50, 0.15);
   color: #ffd832;
 }
+.repo-forks {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: rgba(100, 180, 255, 0.12);
+  color: #6eb5ff;
+}
 .repo-author {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.45);
+  font-size: 1rem;
+  color: rgba(255,255,255,0.5);
 }
 .repo-link {
   margin-left: auto;
@@ -444,10 +455,10 @@
 .repo-link a {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 1.1rem;
+  gap: 0.4rem;
+  padding: 0.5rem 1.3rem;
   border-radius: 20px;
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
   color: #e0e0e0;
@@ -470,8 +481,9 @@
   .repo-logo-wrap { width: 110px; min-height: 110px; padding: 1rem; }
   .repo-logo-wrap img { max-height: 55px; }
   .repo-info { padding: 1.2rem 1.3rem; }
-  .repo-info h3 { font-size: 1.2rem; }
-  .repo-info .repo-desc { font-size: 0.85rem; }
+  .repo-info h3 { font-size: 1.35rem; }
+  .repo-info .repo-desc { font-size: 0.95rem; }
+  .repo-stars, .repo-forks { font-size: 0.9rem; padding: 0.25rem 0.6rem; }
   .repo-card { min-height: 110px; }
 }
 </style>
@@ -494,6 +506,11 @@ fetch('/repositories.json')
         ? repo.backgroundValue
         : `url('${repo.background}')`;
 
+      // Extract owner/repo from GitHub URL for API call
+      const match = repo.repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+      const apiOwner = match ? match[1] : '';
+      const apiRepo = match ? match[2] : '';
+
       const card = document.createElement('div');
       card.className = 'repo-card';
       card.style.setProperty('--card-bg', bgStyle);
@@ -507,22 +524,44 @@ fetch('/repositories.json')
           <h3>${repo.title}</h3>
           <p class="repo-desc">${repo.description}</p>
           <div class="repo-meta">
-            ${repo.stars ? `<span class="repo-stars">⭐ ${repo.stars}</span>` : ''}
+            <span class="repo-stars" data-repo-owner="${apiOwner}" data-repo-name="${apiRepo}">⭐ ...</span>
+            <span class="repo-forks" data-fork-owner="${apiOwner}" data-fork-name="${apiRepo}">🍴 ...</span>
             <span class="repo-author">${repo.author}</span>
             <span class="repo-link"><a href="${repo.repoUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 GitHub</a></span>
           </div>
         </div>`;
 
       list.appendChild(card);
+
+      // Fetch real-time stars & forks from GitHub API
+      if (apiOwner && apiRepo) {
+        fetch(`https://api.github.com/repos/${apiOwner}/${apiRepo}`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.message) {
+              const starsEl = card.querySelector('.repo-stars');
+              const forksEl = card.querySelector('.repo-forks');
+              if (starsEl) starsEl.innerHTML = `⭐ ${formatNumber(data.stargazers_count)}`;
+              if (forksEl) forksEl.innerHTML = `🍴 ${formatNumber(data.forks_count)}`;
+            }
+          })
+          .catch(() => {});
+      }
     });
   })
   .catch(err => console.error('Failed to load repos:', err));
+
+function formatNumber(n) {
+  if (n >= 10000) return (n / 1000).toFixed(1) + 'k';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+  return n.toString();
+}
 </script>
 
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:37:36.342Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:42:37.729Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -548,7 +587,7 @@ fetch('/repositories.json')
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776854269691"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776854571267"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
