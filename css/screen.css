@@ -2694,10 +2694,9 @@ a, button, .post, .social-link {
 
 /* Light mode specific overrides */
 
-/* Light mode: particle canvas - hide completely for clean look */
+/* Light mode: particle canvas - keep visible but softer */
 [data-theme="light"] #particle-canvas {
-    opacity: 0 !important;
-    pointer-events: none;
+    opacity: 0.5 !important;
 }
 
 /* Body: clean light gradient */
