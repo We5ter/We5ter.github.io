@@ -592,6 +592,22 @@
   .talk-cover-actions a { padding: 0.45rem 1.1rem; font-size: 0.9rem; }
   .talk-cover-actions { padding-bottom: 1.2rem; }
 }
+
+/* Mobile responsive for talks */
+@media (max-width: 480px) {
+  .talks-container { padding-top: 4rem; padding-left: 1rem; padding-right: 1rem; }
+  .talk-grid { grid-template-columns: 1fr !important; gap: 1.2rem !important; }
+  .talk-card { border-radius: 12px; }
+  .talk-card-content { min-height: 220px; }
+  .talk-cover-title h3 { font-size: 1.3rem !important; }
+  .talk-cover-label img { width: 48px !important; height: 48px !important; }
+  .talk-cover-actions a { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+  /* Fix footer stick to bottom */
+  main.content { min-height: calc(100vh - 120px) !important; padding-bottom: 1rem; }
+}
+@media (max-width: 640px) and (min-width: 481px) {
+  .talk-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; gap: 1.5rem; }
+}
 </style>
 
 <main class="content talks-container">
@@ -636,7 +652,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T12:47:36.591Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T14:10:58.381Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 

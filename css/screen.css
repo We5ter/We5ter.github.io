@@ -2104,7 +2104,7 @@ main.content:not(.inner) .post-title {
 
     /* Footer - fully responsive for mobile */
     .site-footer {
-        margin-top: 1rem !important;
+        margin-top: 0 !important;
         padding: 0.6rem 1% 0.8rem !important;
         font-size: 0.72rem !important;
         line-height: 1.4 !important;
@@ -2113,6 +2113,15 @@ main.content:not(.inner) .post-title {
         overflow: visible !important;
         box-sizing: border-box !important;
         border-top: none !important;
+    }
+
+    /* Ensure content area doesn't push footer off screen on mobile */
+    .content {
+        min-height: auto !important;
+    }
+
+    main.content {
+        min-height: calc(100vh - 200px) !important;
     }
 
     /* Hide calligraphy on small screens to prevent overflow */
