@@ -309,7 +309,7 @@
     <section class="post-content">
       <style>
 .repos-container {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 3rem 2rem;
 }
@@ -330,91 +330,152 @@
   font-size: 1.2rem;
   color: var(--text-secondary);
 }
-.repo-list {
+.repo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 2rem;
+}
+
+/* Card - same style as talks */
+.repo-card {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.35s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+/* Content wrapper with background image */
+.repo-card-content {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  min-height: 340px;
 }
-.repo-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.2rem;
-  padding: 1.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color, rgba(255,255,255,0.06));
-  border-radius: 14px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.35s var(--ease-out-expo);
+
+/* Background image */
+.repo-card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
 }
+
+/* All content above bg */
+.repo-card-content > * {
+  position: relative;
+  z-index: 2;
+}
+
 .repo-card:hover {
-  border-color: rgba(123, 47, 247, 0.25);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 36px rgba(123, 47, 247, 0.08), 0 4px 12px rgba(0, 240, 255, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 240, 255, 0.08), 0 4px 12px rgba(123, 47, 247, 0.06);
 }
-.repo-info {
-  flex: 1;
-  min-width: 0;
+
+/* Logo - top left */
+.repo-cover-label {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 10;
 }
-.repo-info h3 {
-  font-size: 1.2rem;
+.repo-cover-label img {
+  height: 76px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Title & info - centered */
+.repo-cover-title {
+  text-align: center;
+  padding: 5rem 2rem 1.5rem;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.repo-cover-title h3 {
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.35rem;
-  letter-spacing: -0.02em;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.65), 0 1px 4px rgba(0,0,0,0.45);
 }
-.repo-info h3 a {
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: color 0.25s;
+.repo-cover-title .repo-desc {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  max-width: 360px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
-.repo-info h3 a:hover {
-  color: var(--accent-primary);
+.repo-cover-title .repo-author {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  margin-top: 0.5rem;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
-.repo-desc {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 1.55;
-  margin-bottom: 0.6rem;
-}
-.repo-meta {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-.repo-meta span {
-  display: flex;
+
+/* Stars badge */
+.repo-stars {
+  display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(255, 200, 50, 0.15);
+  color: #ffd832;
+  margin-top: 0.6rem;
 }
-.lang-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
+
+/* Action buttons - bottom centered */
+.repo-cover-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0 1.5rem 1.4rem;
 }
-.empty-state {
-  text-align: center;
-  padding: 5rem 2rem;
-  color: var(--text-muted);
+.repo-cover-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #e8e8e8;
+  background: rgba(15, 15, 25, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.14);
+  transition: all 0.25s ease;
 }
-.empty-state .icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.4;
+.repo-cover-actions a:hover {
+  color: #fff;
+  background: rgba(50, 50, 70, 0.92);
+  border-color: rgba(255,255,255,0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
+
 @media (max-width: 640px) {
   .repos-container { padding: 2rem 1.2rem; }
   .repos-header h1 { font-size: 2.4rem; }
-  .repo-card { padding: 1.2rem; }
-  .repo-icon { width: 38px; height: 38px; }
-  .repo-icon svg { width: 18px; height: 18px; }
-  .repo-meta { flex-wrap: wrap; gap: 0.8rem; }
+  .repo-grid { grid-template-columns: 1fr; }
+  .repo-card-content { min-height: 280px; }
+  .repo-cover-title { padding: 4rem 1.5rem 1.2rem; }
+  .repo-cover-title h3 { font-size: 1.4rem; }
+  .repo-cover-title .repo-desc { font-size: 0.88rem; }
+  .repo-cover-label img { height: 52px; }
+  .repo-cover-actions a { padding: 0.45rem 1.1rem; font-size: 0.9rem; }
+  .repo-cover-actions { padding-bottom: 1.2rem; }
 }
 </style>
 
@@ -423,30 +484,48 @@
     <h1>Wester's Repositories</h1>
     <p>Open source projects & security research tools</p>
   </div>
-
-  <div class="repo-list">
-
-    <!-- Repository Card -->
-    <a href="https://github.com/We5ter/lightrains.org" target="_blank" rel="noopener" class="repo-card">
-      <div class="repo-info">
-        <h3><a href="https://github.com/We5ter/lightrains.org" target="_blank" rel="noopener">lightrains.org</a></h3>
-        <p class="repo-desc">Personal blog powered by Hexo — Security research writeups, vulnerability analysis & technical articles.</p>
-        <div class="repo-meta">
-          <span><span class="lang-dot" style="background:#e34c26;"></span>HTML/EJS</span>
-          <span>📝 Blog</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- More repos can be added here following the same pattern -->
-
-  </div>
+  <div class="repo-grid" id="repo-grid"></div>
 </main>
+
+<script>
+fetch('/repositories.json')
+  .then(r => r.json())
+  .then(repos => {
+    const grid = document.getElementById('repo-grid');
+    repos.forEach(repo => {
+      const card = document.createElement('div');
+      card.className = 'repo-card';
+      card.onclick = () => window.open(repo.repoUrl, '_blank');
+
+      const bgStyle = repo.backgroundType === 'gradient'
+        ? `background:${repo.backgroundValue};`
+        : `background-image:url('${repo.background}');`;
+
+      card.innerHTML = `
+        <div class="repo-card-content">
+          <div class="repo-card-bg" style="${bgStyle}"></div>
+          <span class="repo-cover-label"><img src="${repo.logo}" alt="${repo.title} logo"></span>
+          <div class="repo-cover-title">
+            <h3>${repo.title}</h3>
+            <p class="repo-desc">${repo.description}</p>
+            ${repo.stars ? `<span class="repo-stars">⭐ ${repo.stars}</span>` : ''}
+            <span class="repo-author">${repo.author}</span>
+          </div>
+          <div class="repo-cover-actions">
+            <a href="${repo.repoUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="View on GitHub">🔗 GitHub</a>
+          </div>
+        </div>`;
+
+      grid.appendChild(card);
+    });
+  })
+  .catch(err => console.error('Failed to load repos:', err));
+</script>
 
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T08:49:33.526Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:19:55.299Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -472,7 +551,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776852777204"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776853229810"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
