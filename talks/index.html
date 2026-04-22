@@ -602,11 +602,14 @@
   .talk-cover-title h3 { font-size: 1.3rem !important; }
   .talk-cover-label img { width: 48px !important; height: 48px !important; }
   .talk-cover-actions a { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+  /* Fix post-detail huge padding on mobile */
+  .post.post-detail { padding: 2rem 1rem !important; width: auto !important; max-width: none !important; }
   /* Fix footer stick to bottom */
   main.content { min-height: calc(100vh - 120px) !important; padding-bottom: 1rem; }
 }
 @media (max-width: 640px) and (min-width: 481px) {
   .talk-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; gap: 1.5rem; }
+  .post.post-detail { padding: 3rem 2rem !important; }
 }
 </style>
 
@@ -652,7 +655,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T14:10:58.381Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T14:24:33.488Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
