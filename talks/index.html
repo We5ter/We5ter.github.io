@@ -336,14 +336,12 @@
   gap: 2rem;
 }
 
-/* Card */
+/* Card - use div to avoid nested <a> issues */
 .talk-card {
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.35s var(--ease-out-expo);
-  text-decoration: none;
-  color: inherit;
-  display: block;
+  cursor: pointer;
 }
 
 /* Content wrapper with background image */
@@ -354,7 +352,7 @@
   min-height: 340px;
 }
 
-/* Background image via ::before on content wrapper (same stacking context as content) */
+/* Background image via ::before on content wrapper */
 .talk-card-content::before {
   content: "";
   position: absolute;
@@ -477,7 +475,7 @@
   <div class="talk-grid">
 
     <!-- Talk 1: BlackHat Asia 2021 -->
-    <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card bh">
+    <div class="talk-card bh" onclick="window.open('https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259','_blank')">
       <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
         <div class="talk-cover-title">
@@ -488,10 +486,10 @@
           <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
         </div>
       </div>
-    </a>
+    </div>
 
     <!-- Talk 2: POC 2019 -->
-    <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card poc">
+    <div class="talk-card poc" onclick="window.open('https://powerofcommunity.net/#archive','_blank')">
       <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
         <div class="talk-cover-title">
@@ -502,7 +500,7 @@
           <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
         </div>
       </div>
-    </a>
+    </div>
 
   </div>
 </main>
@@ -510,7 +508,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:52:52.930Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:01:37.323Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -536,7 +534,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776851586183"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776852131243"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
