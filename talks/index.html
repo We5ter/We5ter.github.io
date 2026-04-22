@@ -336,48 +336,47 @@
   gap: 2rem;
 }
 
-/* Card = full background image with overlay content */
+/* Card wrapper - use div instead of relying on <a> for positioning */
 .talk-card {
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.35s var(--ease-out-expo);
   text-decoration: none;
   color: inherit;
-  display: flex;
-  flex-direction: column;
+  display: block;
   position: relative;
 }
-/* Background image covers entire card via ::before */
-.talk-card::before {
-  content: "";
+
+/* Background image covers entire card */
+.talk-card-bg {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
-  z-index: 0;
+  z-index: 1;
 }
-.talk-card.bh::before {
+.talk-card-bg.bh {
   background-image: url('/images/talks/bh-2021-bg.jpg');
 }
-.talk-card.poc::before {
+.talk-card-bg.poc {
   background-image: url('/images/talks/poc-2019-bg.png');
 }
+
+/* Content layer on top of bg */
+.talk-card-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-height: 340px;
+}
+
 .talk-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 240, 255, 0.08), 0 4px 12px rgba(123, 47, 247, 0.06);
 }
 
-/* Inner wrapper for non-absolute content - establishes stacking context */
-.talk-card-inner {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  position: relative;
-  z-index: 2;
-  min-height: 340px;
-}
-
-/* Logo - top left (absolute over bg) */
+/* Logo - top left */
 .talk-cover-label {
   position: absolute;
   top: 18px;
@@ -393,7 +392,7 @@
   filter: brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 
-/* Title & author - centered, takes remaining space */
+/* Title & author - centered */
 .talk-cover-title {
   text-align: center;
   padding: 5rem 2rem 1.5rem;
@@ -419,16 +418,13 @@
   text-shadow: 0 1px 6px rgba(0,0,0,0.5);
 }
 
-/* Action buttons - bottom of card, absolute within inner wrapper */
+/* Action buttons - bottom centered */
 .talk-cover-actions {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.7rem;
+  padding: 0 1.5rem 1.4rem;
 }
 .talk-cover-actions a {
   display: inline-flex;
@@ -458,11 +454,12 @@
   .talks-container { padding: 2rem 1.2rem; }
   .talks-header h1 { font-size: 2.4rem; }
   .talk-grid { grid-template-columns: 1fr; }
-  .talk-card-inner { min-height: 280px; }
+  .talk-card-content { min-height: 280px; }
   .talk-cover-title { padding: 4rem 1.5rem 1.2rem; }
   .talk-cover-title h3 { font-size: 1.25rem; }
   .talk-cover-label img { height: 52px; }
   .talk-cover-actions a { padding: 0.45rem 1.1rem; font-size: 0.9rem; }
+  .talk-cover-actions { padding-bottom: 1.2rem; }
 }
 </style>
 
@@ -476,7 +473,8 @@
 
     <!-- Talk 1: BlackHat Asia 2021 -->
     <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card bh">
-      <div class="talk-card-inner">
+      <div class="talk-card-bg bh"></div>
+      <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
         <div class="talk-cover-title">
           <h3>A New Era of One-Click Attacks:<br>How to Break Install-Less Apps</h3>
@@ -491,7 +489,8 @@
 
     <!-- Talk 2: POC 2019 -->
     <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card poc">
-      <div class="talk-card-inner">
+      <div class="talk-card-bg poc"></div>
+      <div class="talk-card-content">
         <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
         <div class="talk-cover-title">
           <h3>Safari Adventure:<br>A Dive into Apple Browser Internals</h3>
@@ -510,7 +509,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:35:35.563Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:38:21.477Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -536,7 +535,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776850548292"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776850728880"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
