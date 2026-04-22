@@ -1587,22 +1587,22 @@ pre .chunk {
     transform: translateY(-50%);
     font-family: "Cormorant Garamond", "Playfair Display", "Baskerville", "Georgia", "Times New Roman", serif;
     font-size: 2rem;
-    font-weight: 300;
+    font-weight: 600;
     font-style: italic;
     letter-spacing: 0.08em;
     white-space: nowrap;
     pointer-events: none;
     user-select: none;
-    color: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.35);
     transition: color 0.5s ease;
 }
 
 .footer-calligraphy-left {
-    left: 2rem;
+    left: 4rem;
 }
 
 .footer-calligraphy-right {
-    right: 2rem;
+    right: 4rem;
 }
 
 .site-footer a {
