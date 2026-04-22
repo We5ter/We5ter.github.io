@@ -34,11 +34,11 @@
 
 
   <!-- Global Transparent Navbar -->
-  <nav id="global-navbar" style="position:fixed;top:0;left:0;right:0;z-index:1100;display:block;padding:0.6rem 1.5rem;background:rgba(10,10,18,0.65);backdrop-filter:blur(20px)saturate(180%);-webkit-backdrop-filter:blur(20px)saturate(180%);border-bottom:1px solid rgba(255,255,255,0.08);">
-    <div style="display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;height:40px;">
-      <a href="/" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;flex-shrink:0;display:none;">
+  <nav id="global-navbar" style="position:fixed;top:0;left:0;right:0;z-index:1100;display:block;padding:0.4rem 1.5rem;background:rgba(10,10,18,0.65);backdrop-filter:blur(20px)saturate(180%);-webkit-backdrop-filter:blur(20px)saturate(180%);border-bottom:1px solid rgba(255,255,255,0.08);">
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;height:36px;">
+      <a href="/" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;flex-shrink:0;">
         <img src="/images/static/avatar.png" alt="" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
-        <span style="font-size:1.8rem;font-weight:700;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 0%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Wester</span>
+        <span style="font-size:1.8rem;font-weight:700;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 0%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Google Sans','Noto Sans',sans-serif;">Wester's blog</span>
       </a>
       <div style="display:flex;align-items:center;gap:0.25rem;" class="navbar-links-desktop">
         <a href="/" class="nav-link-active" style="font-size:1.8rem;font-weight:600;color:#fff;text-decoration:none;padding:0.45rem 1rem;border-radius:8px;transition:all 0.25s;background:rgba(255,255,255,0.1);">Blog</a>
@@ -80,15 +80,25 @@
     }
     /* Light mode overrides */
     [data-theme="light"] #global-navbar {
-      background: rgba(255,255,255,0.80) !important;
+      background: rgba(255,255,255,0.88) !important;
       border-bottom-color: rgba(0,0,0,0.06) !important;
+      box-shadow: 0 1px 12px rgba(0,0,0,0.06) !important;
     }
-    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.6)"] {
-      color: rgba(0,0,0,0.5) !important;
+    /* Nav links: match both 0.6 and 0.7 opacity white colors */
+    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.6)"],
+    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.7)"] {
+      color: rgba(0,0,0,0.55) !important;
     }
-    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.6)"]:hover {
-      color: rgba(0,0,0,0.85) !important;
-      background: rgba(0,0,0,0.05) !important;
+    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.6)"]:hover,
+    [data-theme="light"] #global-navbar a[style*="color:rgba(255,255,255,0.7)"]:hover {
+      color: #4361ee !important;
+      background: rgba(67,97,238,0.08) !important;
+    }
+    /* Active nav link (Blog) in light mode */
+    [data-theme="light"] #global-navbar a[style*="background:rgba(255,255,255,0.1)"],
+    [data-theme="light"] #global-navbar a.nav-link-active[style*="background:rgba(255,255,255,0.1)"] {
+      background: rgba(67,97,238,0.1) !important;
+      color: #4361ee !important;
     }
     [data-theme="light"] #theme-toggle {
       border-color: rgba(0,0,0,0.08) !important;
@@ -251,9 +261,29 @@
       filter: brightness(0.95);
     }
 
+    /* Social buttons (Github/Email/X/RSS) - light mode */
+    [data-theme="light"] .social-link {
+      color: #4a4a6a !important;
+      border-color: rgba(0,0,0,0.1) !important;
+      background: rgba(255,255,255,0.7) !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+    }
+    [data-theme="light"] .social-link:hover {
+      color: #4361ee !important;
+      border-color: #4361ee !important;
+      background: rgba(67,97,238,0.06) !important;
+      box-shadow: 0 2px 12px rgba(67,97,238,0.12) !important;
+    }
+    [data-theme="light"] .social-link-rss:hover {
+      color: #ff6b00 !important;
+      border-color: #ff6b00 !important;
+      background: rgba(255,107,0,0.06) !important;
+      box-shadow: 0 2px 12px rgba(255,107,0,0.12) !important;
+    }
+
     /* Particle canvas: ensure visible in light mode with soft starry/ocean feel */
     [data-theme="light"] #particle-canvas {
-      opacity: 0.6 !important;
+      opacity: 0.25 !important;
     }
   </style>
 
@@ -340,53 +370,79 @@
 <!-- Theme Toggle: Dark / Light Mode -->
 <script>
 (function() {
-    const toggle = document.getElementById('theme-toggle');
-    if (!toggle) return;
+  const toggle = document.getElementById('theme-toggle');
+  if (!toggle) return;
 
-    // Get saved theme or default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
+  // Get saved theme or default to dark
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Sync Giscus theme with site theme
-    function syncGiscusTheme(theme) {
-        const giscusFrame = document.querySelector('.giscus iframe');
-        if (!giscusFrame) return;
-        const giscusTheme = theme === 'light' ? 'light' : 'dark_dimmed';
-        giscusFrame.contentWindow.postMessage(
-            { giscus: { setConfig: { theme: giscusTheme } } },
-            'https://giscus.app'
-        );
+  // Sync Giscus theme with site theme
+  function syncGiscusTheme(theme) {
+    const giscusFrame = document.querySelector('.giscus iframe');
+    if (!giscusFrame) return false;
+    const giscusTheme = theme === 'light' ? 'light' : 'dark_dimmed';
+    giscusFrame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: giscusTheme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  // Set initial Giscus theme with retry (iframe may not be ready yet)
+  function syncGiscusWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncGiscusWithRetry(theme, attempts + 1); }, 300);
     }
+  }
+  syncGiscusWithRetry(savedTheme);
 
-    // Set initial Giscus theme
-    syncGiscusTheme(savedTheme);
-
-    toggle.addEventListener('click', function() {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        syncGiscusTheme(next);
-    });
-
-    // Listen for Giscus messages (e.g., when user changes theme in Giscus)
-    window.addEventListener('message', function(event) {
-        if (event.origin !== 'https://giscus.app') return;
-        if (!(typeof event.data === 'object' && event.data.giscus)) return;
-        const giscusData = event.data.giscus;
-        if ('theme' in giscusData) {
-            const newTheme = giscusData.theme.includes('light') ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+  // Also watch for Giscus iframe insertion via MutationObserver
+  var giscusObserver = new MutationObserver(function(mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+        var node = mutations[i].addedNodes[j];
+        if (node.nodeType === 1 && (node.classList && node.classList.contains('giscus') ||
+            (node.querySelector && node.querySelector('.giscus')))) {
+          // Giscus container added, wait a tick then sync
+          var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+          setTimeout(function() { syncGiscusTheme(currentTheme); }, 500);
         }
-    });
-
-    // Respect system preference on first visit (if no saved preference)
-    if (!localStorage.getItem('theme')) {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-        syncGiscusTheme(prefersDark ? 'dark' : 'light');
+      }
     }
+  });
+  if (document.body) {
+    giscusObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  toggle.addEventListener('click', function() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    syncGiscusTheme(next);
+  });
+
+  // Listen for Giscus messages (e.g., when user changes theme in Giscus)
+  window.addEventListener('message', function(event) {
+    if (event.origin !== 'https://giscus.app') return;
+    if (!(typeof event.data === 'object' && event.data.giscus)) return;
+    const giscusData = event.data.giscus;
+    if ('theme' in giscusData) {
+      const newTheme = giscusData.theme.includes('light') ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+  });
+
+  // Respect system preference on first visit (if no saved preference)
+  if (!localStorage.getItem('theme')) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    syncGiscusWithRetry(prefersDark ? 'dark' : 'light');
+  }
 })();
 </script>
 

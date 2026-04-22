@@ -2512,6 +2512,11 @@ main.content:not(.inner) {
     margin-top: 7.5rem;
 }
 
+/* Article detail page: post padding */
+main.content:not(.inner) .post {
+    padding: 10.4rem;
+}
+
 .content .post:nth-child(1) { animation-delay: 0.05s; }
 .content .post:nth-child(2) { animation-delay: 0.1s; }
 .content .post:nth-child(3) { animation-delay: 0.15s; }
@@ -2679,22 +2684,22 @@ a, button, .post, .social-link {
 
 /* Light mode: particle canvas visible with soft starry style */
 [data-theme="light"] #particle-canvas {
-    opacity: 1;
+    opacity: 0.25;
 }
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
-    background-image: linear-gradient(180deg, #f8f9fc 0%, #edeef5 50%, #f8f9fc 100%);
+    background-image: linear-gradient(180deg, #ffffff 0%, #fafbfc 40%, #f5f7fa 100%);
 }
 
 [data-theme="light"] body::before {
     background-image:
-        linear-gradient(rgba(100, 100, 220, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(100, 100, 220, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(99, 102, 241, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.015) 1px, transparent 1px);
 }
 
 [data-theme="light"] body::after {
-    background: radial-gradient(circle, rgba(100, 120, 255, 0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
 }
 
 [data-theme="light"] .site-head {
@@ -2862,8 +2867,9 @@ a, button, .post, .social-link {
 
 [data-theme="light"] .post-nav-prev,
 [data-theme="light"] .post-nav-next {
-    background: rgba(67, 97, 238, 0.05);
-    border-color: rgba(67, 97, 238, 0.2);
+    background: #ffffff !important;
+    border-color: rgba(67, 97, 238, 0.15) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
 }
 
 [data-theme="light"] .post-nav {
@@ -2888,6 +2894,28 @@ a, button, .post, .social-link {
 [data-theme="light"] .post-nav-prev:hover .post-nav-title,
 [data-theme="light"] .post-nav-next:hover .post-nav-title {
     color: #4361ee;
+}
+
+/* Light mode: Back to Home button (left side) */
+[data-theme="light"] .back-to-home-fixed {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: #4a4a6a !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+[data-theme="light"] .back-to-home-fixed:hover {
+    color: #4361ee !important;
+    border-color: #4361ee !important;
+    background: rgba(67, 97, 238, 0.08) !important;
+    box-shadow: 0 0 20px rgba(67, 97, 238, 0.12), 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Light mode: article detail page full area background */
+[data-theme="light"] main.content:not(.inner) {
+    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
+}
+[data-theme="light"] .post-template .site-head {
+    background: #ffffff !important;
 }
 
 [data-theme="light"] .tag-badge {
@@ -2916,15 +2944,37 @@ a, button, .post, .social-link {
 
 /* Light mode: post footer text visibility fix */
 [data-theme="light"] .post-footer h4 {
-    color: #555580 !important;
+    color: #2a2a4a !important;
 }
 
 [data-theme="light"] .post-footer .author-name {
-    color: #555580 !important;
+    color: #2a2a4a !important;
 }
 
 [data-theme="light"] .post-footer .post-meta {
-    color: #6666a0 !important;
+    color: #555580 !important;
+}
+
+[data-theme="light"] .post-footer .share h4 {
+    color: #2a2a4a !important;
+}
+
+/* Light mode: article content headings - darker for readability */
+[data-theme="light"] .post-content h2 {
+    color: #1a1a2e !important;
+}
+
+[data-theme="light"] .post-content h3 {
+    color: #252545 !important;
+}
+
+[data-theme="light"] .post-content h4 {
+    color: #333355 !important;
+}
+
+[data-theme="light"] .post-content p,
+[data-theme="light"] .post-content li {
+    color: #3a3a5a !important;
 }
 
 [data-theme="light"] figure.highlight {
