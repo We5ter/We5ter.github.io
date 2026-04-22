@@ -2701,7 +2701,14 @@ a, button, .post, .social-link {
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
+    background-color: #f8f9fc;
     background-image: linear-gradient(180deg, #ffffff 0%, #fcfdfe 50%, #ffffff 100%);
+}
+
+/* Light mode: home page content area background */
+[data-theme="light"] .content.inner {
+    background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 50%, #f0f2f7 100%) !important;
+    min-height: calc(100vh - 400px);
 }
 
 [data-theme="light"] body::before {
