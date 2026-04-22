@@ -3065,7 +3065,7 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] .post-footer .share h4 {
-    color: #0d0d1a !important;
+    color: #000000 !important;
 }
 
 /* Light mode: share buttons - add border */
