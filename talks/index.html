@@ -332,13 +332,11 @@
 }
 .talk-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
   gap: 2rem;
 }
 .talk-card {
-  background: var(--bg-card);
-  border: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  position: relative;
   border-radius: 16px;
   overflow: hidden;
   transition: all 0.35s var(--ease-out-expo);
@@ -346,141 +344,117 @@
   color: inherit;
   display: flex;
   flex-direction: column;
+  min-height: 320px;
+}
+/* Background image covers entire card */
+.talk-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+.talk-card.bh::before {
+  background-image: url('/images/talks/bh-2021-bg.jpg');
+}
+.talk-card.poc::before {
+  background-image: url('/images/talks/poc-2019-bg.png');
 }
 .talk-card:hover {
-  border-color: rgba(0, 240, 255, 0.25);
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 240, 255, 0.08), 0 4px 12px rgba(123, 47, 247, 0.06);
 }
-.talk-cover {
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
+/* All content sits on top of the background */
+.talk-card > * {
   position: relative;
-  background-size: cover;
-  background-position: center;
+  z-index: 1;
 }
-.talk-cover.bh {
-  background-image: url('/images/talks/bh-2021-bg.jpg');
-}
-.talk-cover.poc {
-  background-image: url('/images/talks/poc-2019-bg.png');
-}
+
+/* Logo - top left */
 .talk-cover-label {
   position: absolute;
-  top: 14px;
-  left: 16px;
+  top: 18px;
+  left: 20px;
   z-index: 2;
 }
 .talk-cover-label img {
-  height: 36px;
+  height: 38px;
   width: auto;
   object-fit: contain;
 }
-.talk-cover.bh .talk-cover-label img {
+.talk-card.bh .talk-cover-label img {
   filter: brightness(0) invert(1) drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
-.talk-cover.poc .talk-cover-label img {
-  /* POC logo keep original colors */
+
+/* Title & author - centered */
+.talk-cover-title {
+  text-align: center;
+  padding: 4rem 2rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-/* Floating action buttons on cover image */
+.talk-cover-title h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.65), 0 1px 4px rgba(0,0,0,0.45);
+}
+.talk-cover-title .talk-author {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+
+/* Action buttons - bottom centered */
 .talk-cover-actions {
   position: absolute;
-  bottom: 14px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
 }
 .talk-cover-actions a {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 1.3rem;
-  border-radius: 20px;
+  padding: 0.55rem 1.4rem;
+  border-radius: 24px;
   font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
-  color: #e0e0e0;
-  background: rgba(20, 20, 30, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.15);
+  color: #e8e8e8;
+  background: rgba(15, 15, 25, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.14);
   transition: all 0.25s ease;
 }
 .talk-cover-actions a:hover {
   color: #fff;
-  background: rgba(60, 60, 80, 0.9);
-  border-color: rgba(255,255,255,0.25);
-  transform: translateY(-1px);
+  background: rgba(50, 50, 70, 0.92);
+  border-color: rgba(255,255,255,0.28);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 }
-.talk-cover-title {
-  text-align: center;
-  padding: 0 1.5rem;
-  padding-bottom: 3rem; /* space for floating buttons */
-}
-.talk-cover-title h3 {
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  margin-bottom: 0.4rem;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);
-}
-.talk-cover-title .talk-author {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.45);
-  font-weight: 400;
-}
-.talk-body {
-  padding: 1rem 1.5rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.talk-body h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-}
-.talk-body p {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  flex: 1;
-}
-.talk-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-.talk-tag {
-  display: inline-block;
-  padding: 0.25rem 0.7rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--accent-primary);
-}
-.talk-links {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
+
 @media (max-width: 640px) {
   .talks-container { padding: 2rem 1.2rem; }
   .talks-header h1 { font-size: 2.4rem; }
   .talk-grid { grid-template-columns: 1fr; }
-  .talk-cover { height: 180px; }
-  .talk-cover-title h3 { font-size: 1.15rem; }
+  .talk-cover-title { padding: 3rem 1.5rem 1.5rem; }
+  .talk-cover-title h3 { font-size: 1.25rem; }
+  .talk-cover-label img { height: 30px; }
+  .talk-cover-actions a { padding: 0.45rem 1.1rem; font-size: 0.9rem; }
 }
 </style>
 
@@ -493,32 +467,28 @@
   <div class="talk-grid">
 
     <!-- Talk 1: BlackHat Asia 2021 -->
-    <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card">
-      <div class="talk-cover bh">
-        <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
-        <div class="talk-cover-title">
-          <h3>A New Era of One-Click Attacks:<br>How to Break Install-Less Apps</h3>
-          <span class="talk-author">Zhiyang Zeng (@Wester)</span>
-        </div>
-        <div class="talk-cover-actions">
-          <a href="https://i.blackhat.com/asia-21/Friday-Handouts/as21-Zeng-A-New-Era-Of-One-Click.pdf" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
-          <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
-        </div>
+    <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" class="talk-card bh">
+      <span class="talk-cover-label"><img src="https://blackhat.com/images/logo.png" alt="BlackHat"></span>
+      <div class="talk-cover-title">
+        <h3>A New Era of One-Click Attacks:<br>How to Break Install-Less Apps</h3>
+        <span class="talk-author">Zhiyang Zeng (@Wester)</span>
+      </div>
+      <div class="talk-cover-actions">
+        <a href="https://i.blackhat.com/asia-21/Friday-Handouts/as21-Zeng-A-New-Era-Of-One-Click.pdf" target="__blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
+        <a href="https://blackhat.com/asia-21/briefings/schedule/index.html#a-new-era-of-one-click-attacks-how-to-break-install-less-apps-22259" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
       </div>
     </a>
 
     <!-- Talk 2: POC 2019 -->
-    <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card">
-      <div class="talk-cover poc">
-        <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
-        <div class="talk-cover-title">
-          <h3>Safari Adventure: A Dive into Apple Browser Internals</h3>
-          <span class="talk-author">Zhiyang Zeng (@Wester)</span>
-        </div>
-        <div class="talk-cover-actions">
-          <a href="https://powerofcommunity.net/assets/v0/poc2019/Zhiyang.pdf" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
-          <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
-        </div>
+    <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" class="talk-card poc">
+      <span class="talk-cover-label"><img src="https://powerofcommunity.net/assets/v1/img/company/poc/R-wide.png" alt="POC"></span>
+      <div class="talk-cover-title">
+        <h3>Safari Adventure:<br>A Dive into Apple Browser Internals</h3>
+        <span class="talk-author">Zhiyang Zeng (@Wester)</span>
+      </div>
+      <div class="talk-cover-actions">
+        <a href="https://powerofcommunity.net/assets/v0/poc2019/Zhiyang.pdf" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>
+        <a href="https://powerofcommunity.net/#archive" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
       </div>
     </a>
 
@@ -528,7 +498,7 @@
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:21:10.493Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T09:24:37.792Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -554,7 +524,7 @@
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776849682270"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776849890335"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
