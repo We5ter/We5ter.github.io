@@ -3041,27 +3041,27 @@ a, button, .post, .social-link {
 
 /* Light mode: post footer text visibility fix */
 [data-theme="light"] .post-footer h4 {
-    color: #12121f !important;
+    color: #0d0d1a !important;
 }
 
 [data-theme="light"] .post-footer .author-name {
-    color: #12121f !important;
+    color: #0d0d1a !important;
 }
 
 [data-theme="light"] .post-footer .posted-on {
-    color: #2a2a44 !important;
+    color: #1a1a30 !important;
 }
 
 [data-theme="light"] .post-footer p {
-    color: #3a3a56 !important;
+    color: #2a2a44 !important;
 }
 
 [data-theme="light"] .post-footer .post-meta {
-    color: #2e2e4c !important;
+    color: #1e1e36 !important;
 }
 
 [data-theme="light"] .post-footer .share h4 {
-    color: #12121f !important;
+    color: #0d0d1a !important;
 }
 
 /* Light mode: share buttons - add border */
