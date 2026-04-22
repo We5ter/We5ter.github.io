@@ -353,7 +353,8 @@
 }
 
 /* Background image */
-.repo-card-bg {
+.repo-card-content::before {
+  content: "";
   position: absolute;
   inset: 0;
   background-size: cover;
@@ -498,12 +499,11 @@ fetch('/repositories.json')
       card.onclick = () => window.open(repo.repoUrl, '_blank');
 
       const bgStyle = repo.backgroundType === 'gradient'
-        ? `background:${repo.backgroundValue};`
-        : `background-image:url('${repo.background}');`;
+        ? `--card-bg:${repo.backgroundValue};`
+        : `--card-bg:url('${repo.background}');`;
 
       card.innerHTML = `
-        <div class="repo-card-content">
-          <div class="repo-card-bg" style="${bgStyle}"></div>
+        <div class="repo-card-content" style="${bgStyle}">
           <span class="repo-cover-label"><img src="${repo.logo}" alt="${repo.title} logo"></span>
           <div class="repo-cover-title">
             <h3>${repo.title}</h3>
@@ -525,7 +525,7 @@ fetch('/repositories.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:19:55.299Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:23:52.962Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -551,7 +551,7 @@ fetch('/repositories.json')
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776853229810"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776853448006"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">

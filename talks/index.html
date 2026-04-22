@@ -352,12 +352,14 @@
   min-height: 340px;
 }
 
-/* Background image via inline style */
-.talk-card-bg {
+/* Background image via ::before pseudo-element */
+.talk-card-content::before {
+  content: "";
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
+  background-image: var(--card-bg);
   z-index: 0;
 }
 
@@ -478,8 +480,7 @@ fetch('/talks.json')
       const logoFilterStyle = talk.logoFilter ? `filter:${talk.logoFilter};` : '';
 
       card.innerHTML = `
-        <div class="talk-card-content">
-          <div class="talk-card-bg" style="background-image:url('${talk.background}')"></div>
+        <div class="talk-card-content" style="--card-bg:url('${talk.background}')">
           <span class="talk-cover-label"><img src="${talk.logo}" alt="logo" style="${logoFilterStyle}"></span>
           <div class="talk-cover-title">
             <h3>${talk.title}</h3>
@@ -500,7 +501,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:11:35.870Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T10:23:24.143Z" itemprop="datePublished">2026-04-22</time></span></h4>
     
 </section>
 
@@ -526,7 +527,7 @@ fetch('/talks.json')
             <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
         </a>
         <!-- WeChat (launch WeChat app) -->
-        <a class="icon-wechat" href="weixin://dl/business/?t=1776853229811"
+        <a class="icon-wechat" href="weixin://dl/business/?t=1776853448006"
            onclick="try{location.href='weixin://dl/business/?t='+Date.now();}catch(e){alert('请打开微信扫码分享');}return false;"
            title="Share via WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
