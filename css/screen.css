@@ -2514,19 +2514,19 @@ main.content:not(.inner) {
 
 /* Article detail page: full post styles */
 main.content:not(.inner) .post {
-    position: relative;
-    width: 100%;
-    max-width: var(--post-width);
-    margin: 0 auto 3rem;
-    padding: 10.4rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    word-break: break-word;
-    hyphens: auto;
-    transition: all 0.4s var(--ease-out-expo);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
+    position: relative !important;
+    width: 100% !important;
+    max-width: var(--post-width) !important;
+    margin: 0 auto 3rem !important;
+    padding: 10.4rem !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+    transition: all 0.4s var(--ease-out-expo) !important;
+    backdrop-filter: blur(10px) !important;
+    overflow: hidden !important;
 }
 
 .content .post:nth-child(1) { animation-delay: 0.05s; }
