@@ -200,13 +200,13 @@
       background-clip: text !important;
     }
 
-    /* Article cards (home page list) */
-    [data-theme="light"] .post {
+    /* Article cards (home page list) - only match .post-card, not .post-detail */
+    [data-theme="light"] .post:not(.post-detail) {
       background: #ffffff !important;
       border-color: rgba(0,0,0,0.06) !important;
       box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
     }
-    [data-theme="light"] .post:hover {
+    [data-theme="light"] .post:not(.post-detail):hover {
       border-color: rgba(67,97,238,0.25) !important;
       box-shadow: 0 8px 30px rgba(67,97,238,0.08), 0 2px 8px rgba(0,0,0,0.04) !important;
     }
