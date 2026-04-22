@@ -2707,11 +2707,11 @@ a, button, .post, .social-link {
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
-    background-color: #f0f2f7;
+    background-color: #f5f7fa;
     background-image:
         linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-        linear-gradient(180deg, #f0f2f7 0%, #e8ecf6 30%, #f5f7fa 60%, #ffffff 100%);
+        linear-gradient(180deg, #f5f7fa 0%, #edf0f7 30%, #f0f2f7 60%, #e8ecf6 100%);
     background-size: 40px 40px, 40px 40px, 100% 100%;
     background-position: -1px -1px, -1px -1px, 0 0;
 }
@@ -2727,7 +2727,7 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] body::after {
-    background: none;
+    display: none;
 }
 
 [data-theme="light"] .site-head {
@@ -2943,11 +2943,6 @@ a, button, .post, .social-link {
     box-shadow: 0 0 20px rgba(67, 97, 238, 0.12), 0 2px 12px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Light mode: article detail page full area background */
-[data-theme="light"] main.content:not(.inner) {
-    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
-    min-height: 100vh;
-}
 [data-theme="light"] .post-template .site-head {
     background: #ffffff !important;
 }
@@ -2999,10 +2994,18 @@ a, button, .post, .social-link {
     border-radius: 12px;
     padding: 1.5rem;
     margin-top: 3rem;
+    margin-bottom: 0;
 }
 [data-theme="light"] .giscus-wrapper {
     background: #ffffff !important;
     border-radius: 10px;
+}
+
+/* Light mode: ensure area between comments and footer is never dark */
+[data-theme="light"] main.content:not(.inner) {
+    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 50%, #f5f7fa 100%) !important;
+    min-height: auto;
+    padding-bottom: 3rem;
 }
 
 [data-theme="light"] .tag-badge {
