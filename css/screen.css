@@ -3030,19 +3030,6 @@ a, button, .post, .social-link {
     background: rgba(67, 97, 238, 0.12);
 }
 
-[data-theme="light"] .back-to-top-fixed {
-    background: rgba(255, 255, 255, 0.92) !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
-    color: #4a4a6a !important;
-}
-
-[data-theme="light"] .back-to-top-fixed:hover {
-    color: #4361ee !important;
-    border-color: #4361ee !important;
-    background: rgba(67, 97, 238, 0.08) !important;
-    box-shadow: 0 0 30px rgba(67, 97, 238, 0.15), 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
 /* Light mode: post footer text visibility fix */
 [data-theme="light"] .post-footer h4 {
     color: #000000 !important;
