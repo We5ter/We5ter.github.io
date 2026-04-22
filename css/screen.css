@@ -2512,9 +2512,21 @@ main.content:not(.inner) {
     margin-top: 7.5rem;
 }
 
-/* Article detail page: post padding */
+/* Article detail page: full post styles */
 main.content:not(.inner) .post {
+    position: relative;
+    width: 100%;
+    max-width: var(--post-width);
+    margin: 0 auto 3rem;
     padding: 10.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    word-break: break-word;
+    hyphens: auto;
+    transition: all 0.4s var(--ease-out-expo);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
 }
 
 .content .post:nth-child(1) { animation-delay: 0.05s; }
@@ -2682,24 +2694,23 @@ a, button, .post, .social-link {
 
 /* Light mode specific overrides */
 
-/* Light mode: particle canvas visible with soft starry style */
+/* Light mode: particle canvas - hide completely for clean look */
 [data-theme="light"] #particle-canvas {
-    opacity: 0.25;
+    opacity: 0 !important;
+    pointer-events: none;
 }
 
 /* Body: clean light gradient */
 [data-theme="light"] body {
-    background-image: linear-gradient(180deg, #ffffff 0%, #fafbfc 40%, #f5f7fa 100%);
+    background-image: linear-gradient(180deg, #ffffff 0%, #fcfdfe 50%, #ffffff 100%);
 }
 
 [data-theme="light"] body::before {
-    background-image:
-        linear-gradient(rgba(99, 102, 241, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99, 102, 241, 0.015) 1px, transparent 1px);
+    background-image: none;
 }
 
 [data-theme="light"] body::after {
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
+    background: none;
 }
 
 [data-theme="light"] .site-head {

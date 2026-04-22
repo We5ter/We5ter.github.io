@@ -281,9 +281,10 @@
       box-shadow: 0 2px 12px rgba(255,107,0,0.12) !important;
     }
 
-    /* Particle canvas: ensure visible in light mode with soft starry/ocean feel */
+    /* Particle canvas: hide in light mode for clean look */
     [data-theme="light"] #particle-canvas {
-      opacity: 0.25 !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
   </style>
 
