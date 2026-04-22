@@ -999,7 +999,7 @@ main.content:not(.inner) .post-title {
 .post-footer h4 {
     font-size: 1.6rem;
     margin: 0 0 1rem 0;
-    color: #e8e8f0 !important;
+    color: #000000 !important;
 }
 
 .post-footer .posted-on {
@@ -1079,7 +1079,7 @@ main.content:not(.inner) .post-title {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.06) !important;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid black !important;
     opacity: 1 !important;
     visibility: visible !important;
 }
@@ -1840,6 +1840,8 @@ pre .chunk {
 
 [data-theme="light"] .comments-header {
     border-bottom-color: rgba(0, 0, 0, 0.06);
+        color: black;
+
 }
 
 /* ==========================================================================
