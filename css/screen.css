@@ -1922,6 +1922,7 @@ pre .chunk {
 
     .site-footer {
         padding: 2.5rem 2% !important;
+        min-width: 0 !important;
     }
 
     .cat-footer .golden-cat {
@@ -2110,9 +2111,15 @@ main.content:not(.inner) .post-title {
         line-height: 1.4 !important;
         width: 100% !important;
         max-width: 100vw !important;
+        min-width: 0 !important;
         overflow: visible !important;
         box-sizing: border-box !important;
         border-top: none !important;
+    }
+
+    /* CRITICAL: Override global footer{min-width:880px} from slides main.js bundle */
+    footer {
+        min-width: 0 !important;
     }
 
     /* Ensure content area doesn't push footer off screen on mobile */
