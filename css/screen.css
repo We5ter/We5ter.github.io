@@ -1954,6 +1954,14 @@ pre .chunk {
         padding: 0 !important;
     }
 
+    @media only screen and (max-width: 480px) {
+        .post-content {
+            padding: 0 !important;
+            margin-left: -90px;
+            margin-right: -90px;
+        }
+    }
+
     /* Push content below fixed navbar (75px) on small screens */
     .site-head {
         margin-top: 95px;
@@ -2034,9 +2042,13 @@ pre .chunk {
     word-break: break-word;
 }
 
-/* Article detail page: double title size on mobile too */
-main.content:not(.inner) .post-title {
-    font-size: 3rem;
+@media only screen and (max-width: 480px) {
+    main.content:not(.inner) .post-title {
+        font-size: 3rem;
+        width: 500px;
+        margin-left: -90px;
+        margin-top: -45px;
+    }
 }
 
 /* Home page mobile: add more top spacing to clear navbar + avatar */
@@ -2060,6 +2072,15 @@ main.content:not(.inner) .post-title {
         text-align: center;
     }
 
+    @media only screen and (max-width: 480px) {
+        .post-footer {
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-left: -90px;
+            margin-right: -90px;
+        }
+    }
+
     .post-footer .author {
         margin: 0 0 1.5rem 0;
         padding: 0 0 1.2rem 0;
@@ -2069,6 +2090,15 @@ main.content:not(.inner) .post-title {
     .post-footer .share {
         position: static;
         width: auto;
+    }
+
+    @media only screen and (max-width: 480px) {
+        .post-footer .share {
+            position: static;
+            width: auto;
+            margin-left: 35px;
+            margin-right: 20px;
+        }
     }
 
     .post-footer .share a {
