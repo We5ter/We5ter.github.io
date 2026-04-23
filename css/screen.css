@@ -755,6 +755,66 @@ iframe, .fluid-width-video-wrapper {
     display: none;
 }
 
+/* ====== Post Card with Preview Image (Split Layout) ====== */
+.post {
+    display: block;
+}
+
+/* When preview image exists: horizontal split layout */
+.post:has(.post-preview-wrap) {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+}
+
+.post-preview-wrap {
+    flex: 0 0 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+    background: var(--bg-secondary);
+    min-height: 200px;
+}
+
+.post-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s var(--ease-out-expo);
+}
+
+.post:hover .post-preview-img {
+    transform: scale(1.05);
+}
+
+.post:has(.post-preview-wrap) .post-body {
+    flex: 1;
+    padding: 2rem 2.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0; /* prevent flex overflow */
+}
+
+/* Responsive: stack vertically on smaller screens */
+@media (max-width: 680px) {
+    .post:has(.post-preview-wrap) {
+        flex-direction: column;
+    }
+    .post-preview-wrap {
+        flex: 0 0 auto;
+        height: 200px;
+        width: 100%;
+    }
+    .post:has(.post-preview-wrap) .post-body {
+        padding: 1.6rem 1.8rem;
+    }
+}
+
 /* Post header row: date badge + title */
 .post-header-row {
     display: flex;
