@@ -1936,10 +1936,18 @@ pre .chunk {
         overflow-wrap: break-word;
     }
 
-    /* Article detail page */
+    /* Article detail page - more breathing room on small screens */
     .post-template .post {
-        padding: 1rem;
-        margin: 0 6px 1.2rem;
+        padding: 1.8rem 1.2rem;
+        margin: 0 0.8rem 1.2rem;
+    }
+
+    .post-detail {
+        padding: 2rem 1.2rem !important;
+    }
+
+    .post-content {
+        padding: 0 !important;
     }
 
     /* Push content below fixed navbar (75px) on small screens */
