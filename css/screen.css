@@ -1940,11 +1940,14 @@ pre .chunk {
     .post-template .post {
         padding: 1.8rem 0;
         margin: 0 auto 1.2rem;
-        width: 80%;
+        width: 80% !important;
+        max-width: 80% !important;
     }
 
     .post-detail {
         padding: 2rem 1.5rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .post-content {
