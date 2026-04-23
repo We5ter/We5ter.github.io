@@ -880,29 +880,45 @@ main.content:not(.inner) .post-title {
 .post-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.3rem 0.6rem;
     margin-top: 1rem;
+    font-size: 1.15rem;
+    color: var(--text-muted);
+}
+
+.post-tags::before {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/1374/1374863.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.6;
+    vertical-align: middle;
 }
 
 .post-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    font-size: 1.1rem;
+    display: inline;
+    font-size: 1.15rem;
     font-family: var(--font-mono);
-    line-height: 1.4;
-    color: var(--accent-primary);
-    text-decoration: none;
-    border: 1px solid rgba(0, 240, 255, 0.2);
-    border-radius: 20px;
-    background: rgba(0, 240, 255, 0.06);
-    transition: all 0.3s var(--ease-out-expo);
+    line-height: 1.6;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(136, 136, 160, 0.3);
+    transition: all 0.25s var(--ease-out-expo);
+    border: none;
+    border-radius: 0;
+    background: none;
+    padding: 0;
 }
 
 .post-tag:hover {
-    color: var(--bg-primary);
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    text-decoration-color: var(--accent-primary);
     text-decoration: none;
 }
 
