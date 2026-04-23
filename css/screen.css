@@ -2045,7 +2045,7 @@ pre .chunk {
 @media only screen and (max-width: 480px) {
     main.content:not(.inner) .post-title {
         font-size: 3rem;
-        width: 500px;
+        max-width: 180%;
         margin-left: -90px;
         margin-top: -45px;
     }
