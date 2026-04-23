@@ -501,6 +501,10 @@
   background: rgba(100, 180, 255, 0.12);
   color: #6eb5ff;
 }
+.fork-icon {
+  vertical-align: text-bottom;
+  flex-shrink: 0;
+}
 .repo-author {
   font-size: 1.4rem;
   color: rgba(255,255,255,0.5);
@@ -698,7 +702,7 @@ fetch('/repositories.json')
           <p class="repo-desc">${repo.description}</p>
           <div class="repo-meta">
             <span class="repo-stars" data-repo-owner="${apiOwner}" data-repo-name="${apiRepo}">⭐ ...</span>
-            <span class="repo-forks" data-fork-owner="${apiOwner}" data-fork-name="${apiRepo}">🍴 ...</span>
+            <span class="repo-forks" data-fork-owner="${apiOwner}" data-fork-name="${apiRepo}"><svg class="fork-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm-.61 4.146a.25.25 0 0 0-.28.376c.382.474.941.891 1.655 1.227.01.172.027.352.048.53.06.462.16.887.293 1.268a8.415 8.415 0 0 1-2.36-.794.75.75 0 0 0-.71 1.32c.95.512 1.98.86 3.039 1.05a10.73 10.73 0 0 0 1.42 3.976.75.75 0 1 0 1.315-.72c-.394-.72-.706-1.508-.93-2.34A12.3 12.3 0 0 0 8 15.75c1.817 0 3.457-.48 4.78-1.263a.75.75 0 0 0-.708-1.321 11.07 11.07 0 0 1-2.334.777c.133-.38.233-.806.293-1.268.021-.178.038-.358.048-.53.714-.336 1.273-.753 1.655-1.227a.25.25 0 0 0-.28-.376c-.095.066-.194.13-.296.192-.273.166-.573.31-.897.43C9.993 9.256 9.025 9 8 9c-1.025 0-1.993.256-2.51.686a5.171 5.171 0 0 1-.897-.43 4.116 4.116 0 0 0-.296-.192l.003-.008Zm.98 1.947c.097.03.196.058.296.084a5.66 5.66 0 0 1-.296-.084Zm3.26 0c.1.026.199.054.296.084a5.663 5.663 0 0 1-.296-.084ZM6.5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"></path></svg> ...</span>
             <span class="repo-author">${repo.author}</span>
             <span class="repo-link"><a href="${repo.repoUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 GitHub</a></span>
           </div>
@@ -715,7 +719,7 @@ fetch('/repositories.json')
               const starsEl = card.querySelector('.repo-stars');
               const forksEl = card.querySelector('.repo-forks');
               if (starsEl) starsEl.innerHTML = `⭐ ${formatNumber(data.stargazers_count)}`;
-              if (forksEl) forksEl.innerHTML = `🍴 ${formatNumber(data.forks_count)}`;
+              if (forksEl) forksEl.innerHTML = `<svg class="fork-icon" viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm-.61 4.146a.25.25 0 0 0-.28.376c.382.474.941.891 1.655 1.227.01.172.027.352.048.53.06.462.16.887.293 1.268a8.415 8.415 0 0 1-2.36-.794.75.75 0 0 0-.71 1.32c.95.512 1.98.86 3.039 1.05a10.73 10.73 0 0 0 1.42 3.976.75.75 0 1 0 1.315-.72c-.394-.72-.706-1.508-.93-2.34A12.3 12.3 0 0 0 8 15.75c1.817 0 3.457-.48 4.78-1.263a.75.75 0 0 0-.708-1.321 11.07 11.07 0 0 1-2.334.777c.133-.38.233-.806.293-1.268.021-.178.038-.358.048-.53.714-.336 1.273-.753 1.655-1.227a.25.25 0 0 0-.28-.376c-.095.066-.194.13-.296.192-.273.166-.573.31-.897.43C9.993 9.256 9.025 9 8 9c-1.025 0-1.993.256-2.51.686a5.171 5.171 0 0 1-.897-.43 4.116 4.116 0 0 0-.296-.192l.003-.008Zm.98 1.947c.097.03.196.058.296.084a5.66 5.66 0 0 1-.296-.084Zm3.26 0c.1.026.199.054.296.084a5.663 5.663 0 0 1-.296-.084ZM6.5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"></path></svg> ${formatNumber(data.forks_count)}`;
             }
           })
           .catch(() => {});
@@ -734,7 +738,7 @@ function formatNumber(n) {
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T14:25:40.946Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-23T02:20:06.153Z" itemprop="datePublished">2026-04-23</time></span></h4>
     
 </section>
 
