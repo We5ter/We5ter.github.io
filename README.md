@@ -22,7 +22,6 @@ Personal blog & portfolio of **We5ter (西风微雨)**, a security researcher fo
 - **SSG**: [Hexo](https://hexo.io)
 - **Theme**: yoyo (custom dark/light theme with particle animations)
 - **Hosting**: GitHub Pages + Cloudflare CDN
-- **Deployment**: Automated via `deploy-all.sh`
 
 ## Site Sections
 
@@ -36,7 +35,3 @@ Personal blog & portfolio of **We5ter (西风微雨)**, a security researcher fo
 
 - GitHub: [@We5ter](https://github.com/We5ter)
 - Blog: [lightrains.org](https://lightrains.org)
-
----
-
-*This repository is auto-deployed from [BLOG_DEPLOY_SCAFFOLDS](https://github.com/We5ter/BLOG_DEPLOY_SCAFFOLDS). Do not edit files here directly.*
