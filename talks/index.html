@@ -764,6 +764,7 @@ fetch('/talks.json')
             <span class="talk-author">${talk.author}</span>
           </div>
           <div class="talk-cover-actions">
+            ${talk.demoUrl ? `<a href="${talk.demoUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="View Demo">🛠️ Demo</a>` : ''}
             ${talk.slideUrl ? `<a href="${talk.slideUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Download PDF">📄 Slides</a>` : ''}
             <a href="${talk.eventUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Event Page">🔗 Event</a>
           </div>
@@ -778,7 +779,7 @@ fetch('/talks.json')
     </section>
     <footer class="post-footer">
       <section class="author">
-    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-22T14:24:33.488Z" itemprop="datePublished">2026-04-22</time></span></h4>
+    <h4>Wester <span class="posted-on">posted on <time datetime="2026-04-23T07:49:53.165Z" itemprop="datePublished">2026-04-23</time></span></h4>
     
 </section>
 
