@@ -1944,18 +1944,18 @@ pre .chunk {
 
     /* Push content below fixed navbar (75px) on small screens */
     .site-head {
-        margin-top: 75px;
+        margin-top: 95px;
         padding: 2.5rem 0.8rem 1.8rem;
         min-height: auto;
     }
 
     .post-template .site-head {
-        margin-top: 75px;
+        margin-top: 95px;
         padding: 5rem 0.8rem 3rem;
     }
 
     main.content {
-        margin-top: 75px;
+        margin-top: 95px;
     }
 
     .blog-title {
