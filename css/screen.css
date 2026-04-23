@@ -876,6 +876,36 @@ main.content:not(.inner) .post-title {
     color: var(--text-secondary);
 }
 
+/* Post tags on homepage card */
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.post-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    line-height: 1.4;
+    color: var(--accent-primary);
+    text-decoration: none;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 20px;
+    background: rgba(0, 240, 255, 0.06);
+    transition: all 0.3s var(--ease-out-expo);
+}
+
+.post-tag:hover {
+    color: var(--bg-primary);
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    text-decoration: none;
+}
+
 .post-meta {
     display: inline-flex;
     align-items: center;
