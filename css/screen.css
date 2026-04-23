@@ -1942,9 +1942,20 @@ pre .chunk {
         margin: 0 6px 1.2rem;
     }
 
+    /* Push content below fixed navbar (75px) on small screens */
     .site-head {
-        padding: 9rem 0.8rem 1.8rem;
+        margin-top: 75px;
+        padding: 2.5rem 0.8rem 1.8rem;
         min-height: auto;
+    }
+
+    .post-template .site-head {
+        margin-top: 75px;
+        padding: 5rem 0.8rem 3rem;
+    }
+
+    main.content {
+        margin-top: 75px;
     }
 
     .blog-title {
