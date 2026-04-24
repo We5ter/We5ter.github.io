@@ -1,119 +1,266 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0a0a1a"/>
-      <stop offset="50%" stop-color="#1a1040"/>
-      <stop offset="100%" stop-color="#0d0828"/>
+    <!-- Deep blue tech background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a1628"/>
+      <stop offset="40%" stop-color="#0d2137"/>
+      <stop offset="70%" stop-color="#102a4a"/>
+      <stop offset="100%" stop-color="#061020"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4361ee"/>
-      <stop offset="50%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#db2777"/>
+
+    <!-- Accent glow gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#4361ee" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#4361ee" stop-opacity="0"/>
+
+    <!-- Shield gradient -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#2563eb" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.5"/>
+    </linearGradient>
+
+    <!-- Brain/AI core glow -->
+    <radialGradient id="brainGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
     </radialGradient>
+
+    <!-- Node glow -->
+    <filter id="nodeGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMergeNode>
+    </filter>
+
+    <!-- Strong glow for shield -->
+    <filter id="shieldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMergeNode>
+    </filter>
+
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#3b82f6" stroke-width="0.4" stroke-opacity="0.07"/>
+    </pattern>
+
+    <!-- Circuit line pattern -->
+    <pattern id="circuit" width="80" height="80" patternUnits="userSpaceOnUse">
+      <circle cx="80" cy="0" r="1" fill="#3b82f6" fill-opacity="0.15"/>
+      <circle cx="0" cy="80" r="1" fill="#8b5cf6" fill-opacity="0.12"/>
+    </pattern>
   </defs>
 
   <!-- Background -->
-  <rect width="800" height="400" fill="url(#bg)" rx="12"/>
+  <rect width="800" height="450" fill="url(#bgGrad)" rx="12"/>
 
-  <!-- Grid pattern -->
-  <g stroke="#ffffff" stroke-opacity="0.03" stroke-width="1">
-    <line x1="0" y1="80" x2="800" y2="80"/>
-    <line x1="0" y1="160" x2="800" y2="160"/>
-    <line x1="0" y1="240" x2="800" y2="240"/>
-    <line x1="0" y1="320" x2="800" y2="320"/>
-    <line x1="200" y1="0" x2="200" y2="400"/>
-    <line x1="400" y1="0" x2="400" y2="400"/>
-    <line x1="600" y1="0" x2="600" y2="400"/>
-  </g>
+  <!-- Grid overlay -->
+  <rect width="800" height="450" fill="url(#grid)"/>
 
-  <!-- Glow orbs -->
-  <circle cx="650" cy="80" r="120" fill="#4361ee" fill-opacity="0.06" filter="url(#glow)"/>
-  <circle cx="150" cy="320" r="100" fill="#7c3aed" fill-opacity="0.05" filter="url(#glow)"/>
-  <circle cx="400" cy="200" r="150" fill="#db2777" fill-opacity="0.03" filter="url(#glow)"/>
+  <!-- Circuit dots -->
+  <rect width="800" height="450" fill="url(#circuit)"/>
 
-  <!-- Central AI Brain / Shield Icon -->
-  <g transform="translate(400, 180)" filter="url(#glow)">
-    <!-- Shield outline -->
-    <path d="M0,-60 C-35,-60 -55,-30 -55,0 C-55,45 -20,70 0,85 C20,70 55,45 55,0 C55,-30 35,-60 0,-60Z"
-          fill="none" stroke="url(#accent)" stroke-width="2.5" stroke-opacity="0.8"/>
-    
-    <!-- Inner circuit lines -->
-    <path d="M0,-45 C-25,-45 -40,-22 -40,0 C-40,33 -15,52 0,64 C15,52 40,33 40,0 C40,-22 25,-45 0,-45Z"
-          fill="none" stroke="#4361ee" stroke-width="1" stroke-opacity="0.3"/>
-    <path d="M0,-28 C-15,-28 -24,-12 -24,0 C-24,18 -9,30 0,38 C9,30 24,18 24,0 C24,-12 15,-28 0,-28Z"
-          fill="none" stroke="#7c3aed" stroke-width="1" stroke-opacity="0.25"/>
-    
-    <!-- AI Core nodes -->
-    <circle cx="0" cy="-10" r="5" fill="#4361ee" fill-opacity="0.9">
-      <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="-22" cy="8" r="4" fill="#7c3aed" fill-opacity="0.8">
-      <animate attributeName="r" values="4;6;4" dur="2.5s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="22" cy="8" r="4" fill="#db2777" fill-opacity="0.8">
-      <animate attributeName="r" values="4;6;4" dur="2.2s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="-12" cy="28" r="3" fill="#4f6ef7" fill-opacity="0.7">
-      <animate attributeName="r" values="3;5;3" dur="3s" repeatCount="indefinite"/>
-    </circle>
-    <circle cx="12" cy="28" r="3" fill="#4f6ef7" fill-opacity="0.7">
-      <animate attributeName="r" values="3;5;3" dur="2.8s" repeatCount="indefinite"/>
-    </circle>
-    
-    <!-- Connection lines -->
-    <line x1="0" y1="-10" x2="-22" y2="8" stroke="#4361ee" stroke-opacity="0.2" stroke-width="1"/>
-    <line x1="0" y1="-10" x2="22" y2="8" stroke="#4361ee" stroke-opacity="0.2" stroke-width="1"/>
-    <line x1="-22" y1="8" x2="-12" y2="28" stroke="#7c3aed" stroke-opacity="0.15" stroke-width="1"/>
-    <line x1="22" y1="8" x2="12" y2="28" stroke="#db2777" stroke-opacity="0.15" stroke-width="1"/>
-    <line x1="-12" y1="28" x2="12" y2="28" stroke="#4f6ef7" stroke-opacity="0.15" stroke-width="1"/>
-    
-    <!-- Lock/Security icon at center -->
-    <g transform="translate(0, 5)">
-      <rect x="-10" y="-8" width="20" height="14" rx="2" fill="none" stroke="#00f0ff" stroke-width="1.5" stroke-opacity="0.9"/>
-      <path d="M-5,-8 L-5,-13 C-5,-16 5,-16 5,-13 L5,-8" fill="none" stroke="#00f0ff" stroke-width="1.5" stroke-opacity="0.9"/>
-      <circle cx="0" cy="0" r="2.5" fill="#00f0ff" fill-opacity="0.9">
-        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>
+  <!-- Ambient glow orbs -->
+  <ellipse cx="200" cy="120" rx="180" ry="120" fill="#3b82f6" fill-opacity="0.04" filter="url(#shieldGlow)"/>
+  <ellipse cx="600" cy="340" rx="200" ry="140" fill="#8b5cf6" fill-opacity="0.03" filter="url(#shieldGlow)"/>
+
+  <!-- Central brain glow -->
+  <ellipse cx="400" cy="210" rx="220" ry="180" fill="url(#brainGlow)"/>
+
+  <!-- ═══════ AI BRAIN / NEURAL NETWORK ═══════ -->
+  <g transform="translate(400, 195)">
+    <!-- Outer ring - neural connections -->
+    <g stroke="#3b82f6" stroke-width="0.8" fill="none" stroke-opacity="0.15">
+      <ellipse rx="130" ry="95"/>
+      <ellipse rx="105" ry="75" transform="rotate(15)"/>
+      <ellipse rx="85" ry="60" transform="rotate(-10)"/>
+    </g>
+
+    <!-- Neural connection lines (brain-like web) -->
+    <g stroke="#3b82f6" stroke-width="0.6" fill="none" stroke-opacity="0.18">
+      <!-- Left hemisphere -->
+      <path d="M-10,-5 Q-35,-35 -65,-25 Q-90,-10 -100,20 Q-105,45 -85,65"/>
+      <path d="M-10,-5 Q-40,-15 -70,-5 Q-95,10 -90,40"/>
+      <path d="M-5,8 Q-30,25 -55,35 Q-78,42 -80,68"/>
+      <path d="M-10,-5 Q-25,10 -48,18 Q-72,26 -65,52"/>
+      <path d="M-65,-25 Q-50,0 -55,35"/>
+      <path d="M-100,20 Q-70,28 -55,35"/>
+      <!-- Right hemisphere -->
+      <path d="M10,-5 Q35,-35 65,-25 Q90,-10 100,20 Q105,45 85,65"/>
+      <path d="M10,-5 Q40,-15 70,-5 Q95,10 90,40"/>
+      <path d="M5,8 Q30,25 55,35 Q78,42 80,68"/>
+      <path d="M10,-5 Q25,10 48,18 Q72,26 65,52"/>
+      <path d="M65,-25 Q50,0 55,35"/>
+      <path d="M100,20 Q70,28 55,35"/>
+      <!-- Cross connections (corpus callosum) -->
+      <path d="M-30,-15 Q0,-25 30,-15" stroke-opacity="0.22"/>
+      <path d="M-45,5 Q0,0 45,5" stroke-opacity="0.2"/>
+      <path d="M-35,30 Q0,38 35,30" stroke-opacity="0.2"/>
+      <path d="M-15,50 Q0,58 15,50" stroke-opacity="0.18"/>
+    </g>
+
+    <!-- Neural nodes (synapses) -->
+    <g filter="url(#nodeGlow)">
+      <!-- Core center node -->
+      <circle cx="0" cy="0" r="7" fill="#3b82f6" fill-opacity="0.9">
+        <animate attributeName="r" values="7;9;7" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="0" r="3" fill="#fff" fill-opacity="0.8"/>
+
+      <!-- Left hemisphere nodes -->
+      <circle cx="-65" cy="-25" r="5" fill="#3b82f6" fill-opacity="0.7">
+        <animate attributeName="r" values="5;6.5;5" dur="2.3s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.7;0.35;0.7" dur="2.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-100" cy="20" r="4.5" fill="#60a5fa" fill-opacity="0.65">
+        <animate attributeName="r" values="4.5;6;4.5" dur="2.8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-85" cy="65" r="4" fill="#8b5cf6" fill-opacity="0.6">
+        <animate attributeName="r" values="4;5.5;4" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-70" cy="-5" r="4" fill="#3b82f6" fill-opacity="0.55">
+        <animate attributeName="r" values="4;5.5;4" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-90" cy="40" r="3.5" fill="#60a5fa" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="3.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-55" cy="35" r="3.5" fill="#8b5cf6" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="2.7s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-80" cy="68" r="3" fill="#a78bfa" fill-opacity="0.45">
+        <animate attributeName="r" values="3;4.5;3" dur="3.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-65" cy="52" r="3" fill="#60a5fa" fill-opacity="0.4">
+        <animate attributeName="r" values="3;4.5;3" dur="2.9s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Right hemisphere nodes -->
+      <circle cx="65" cy="-25" r="5" fill="#3b82f6" fill-opacity="0.7">
+        <animate attributeName="r" values="5;6.5;5" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="fill-opacity" values="0.7;0.35;0.7" dur="2.4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="100" cy="20" r="4.5" fill="#60a5fa" fill-opacity="0.65">
+        <animate attributeName="r" values="4.5;6;4.5" dur="2.6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="85" cy="65" r="4" fill="#8b5cf6" fill-opacity="0.6">
+        <animate attributeName="r" values="4;5.5;4" dur="3.1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="70" cy="-5" r="4" fill="#3b82f6" fill-opacity="0.55">
+        <animate attributeName="r" values="4;5.5;4" dur="2.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="90" cy="40" r="3.5" fill="#60a5fa" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="2.7s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="55" cy="35" r="3.5" fill="#8b5cf6" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="3.3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="80" cy="68" r="3" fill="#a78bfa" fill-opacity="0.45">
+        <animate attributeName="r" values="3;4.5;3" dur="2.8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="65" cy="52" r="3" fill="#60a5fa" fill-opacity="0.4">
+        <animate attributeName="r" values="3;4.5;3" dur="3.4s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Top nodes -->
+      <circle cx="-30" cy="-15" r="3.5" fill="#3b82f6" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="30" cy="-15" r="3.5" fill="#3b82f6" fill-opacity="0.5">
+        <animate attributeName="r" values="3.5;5;3.5" dur="2.1s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- Bottom nodes -->
+      <circle cx="-35" cy="30" r="3" fill="#8b5cf6" fill-opacity="0.45">
+        <animate attributeName="r" values="3;4.5;3" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="35" cy="30" r="3" fill="#8b5cf6" fill-opacity="0.45">
+        <animate attributeName="r" values="3;4.5;3" dur="2.9s" repeatCount="indefinite"/>
       </circle>
     </g>
   </g>
 
-  <!-- Floating particles -->
-  <g fill="#4361ee" fill-opacity="0.4">
-    <circle cx="120" cy="100" r="2"><animate attributeName="cy" values="100;90;100" dur="4s" repeatCount="indefinite"/></circle>
-    <circle cx="680" cy="140" r="1.5"><animate attributeName="cy" values="140;155;140" dur="3s" repeatCount="indefinite"/></circle>
-    <circle cx="200" cy="300" r="2.5"><animate attributeName="cy" values="300;285;300" dur="5s" repeatCount="indefinite"/></circle>
-    <circle cx="620" cy="280" r="2"><animate attributeName="cy" values="280;295;280" dur="3.5s" repeatCount="indefinite"/></circle>
-    <circle cx="100" cy="220" r="1.5"><animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite"/></circle>
-    <circle cx="700" cy="250" r="2"><animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite"/></circle>
-  </g>
-  <g fill="#7c3aed" fill-opacity="0.3">
-    <circle cx="160" cy="150" r="1.5"><animate attributeName="cx" values="160;170;160" dur="4s" repeatCount="indefinite"/></circle>
-    <circle cx="640" cy="100" r="2"><animate attributeName="cx" values="640;625;640" dur="3s" repeatCount="indefinite"/></circle>
-    <circle cx="720" cy="320" r="1.5"><animate attributeName="cx" values="720;730;720" dur="5s" repeatCount="indefinite"/></circle>
+  <!-- ═══════ SHIELD + LOCK (Security overlay) ═══════ -->
+  <g transform="translate(400, 205)" filter="url(#shieldGlow)">
+    <!-- Main shield shape -->
+    <path d="M0,-115 C-62,-115 -98,-58 -98,0 C-98,84 -36,128 0,155 C36,128 98,84 98,0 C98,-58 62,-115 0,-115Z"
+          fill="url(#shieldGrad)" stroke="url(#accentGrad)" stroke-width="2" stroke-opacity="0.6"/>
+
+    <!-- Inner shield outline -->
+    <path d="M0,-96 C-52,-96 -82,-48 -82,0 C-82,70 -30,108 0,132 C30,108 82,70 82,0 C82,-48 52,-96 0,-96Z"
+          fill="none" stroke="#3b82f6" stroke-width="1" stroke-opacity="0.2"/>
+
+    <!-- Checkmark / Security symbol inside shield -->
+    <g transform="translate(0, 5)" opacity="0.9">
+      <path d="M-32,-8 L-12,14 L34,-24" fill="none" stroke="#00e5ff" stroke-width="5"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-opacity="0.85">
+        <animate attributeName="stroke-dasharray" values="0,150;150,0" dur="1.5s" fill="freeze"/>
+      </path>
+    </g>
+
+    <!-- Lock icon at bottom of shield -->
+    <g transform="translate(0, 55)">
+      <rect x="-11" y="-9" width="22" height="16" rx="2.5" fill="none" stroke="#00e5ff" stroke-width="1.8" stroke-opacity="0.8"/>
+      <path d="M-6,-9 L-6,-15 C-6,-19 6,-19 6,-15 L6,-9" fill="none" stroke="#00e5ff" stroke-width="1.8" stroke-opacity="0.8"/>
+      <circle cx="0" cy="0" r="2.8" fill="#00e5ff" fill-opacity="0.9">
+        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
   </g>
 
-  <!-- Title text area -->
-  <text x="400" y="310" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="url(#accent)" letter-spacing="1">
+  <!-- ═══════ FLOATING DATA PARTICLES ═══════ -->
+  <g>
+    <!-- Binary / data streams floating up left side -->
+    <g fill="#3b82f6" font-family="monospace" font-size="8" fill-opacity="0.12">
+      <text x="30" y="380">01001</text>
+      <text x="30" y="395">11010</text>
+      <text x="30" y="410">00111</text>
+      <text x="55" y="365">10110</text>
+      <text x="55" y="420">01101</text>
+    </g>
+    <g fill="#8b5cf6" font-family="monospace" font-size="8" fill-opacity="0.1">
+      <text x="720" y="370">10010</text>
+      <text x="720" y="385">01110</text>
+      <text x="745" y="400">11001</text>
+      <text x="745" y="415">10101</text>
+    </g>
+
+    <!-- Floating particles with animation -->
+    <g fill="#3b82f6">
+      <circle cx="80" cy="100" r="2" fill-opacity="0.35"><animate attributeName="cy" values="100;85;100" dur="4s" repeatCount="indefinite"/></circle>
+      <circle cx="720" cy="120" r="2.5" fill-opacity="0.3"><animate attributeName="cy" values="120;138;120" dur="3.5s" repeatCount="indefinite"/></circle>
+      <circle cx="150" cy="350" r="2" fill-opacity="0.25"><animate attributeName="cy" values="350;338;350" dur="5s" repeatCount="indefinite"/></circle>
+      <circle cx="660" cy="320" r="2" fill-opacity="0.3"><animate attributeName="cy" values="320;335;320" dur="4.2s" repeatCount="indefinite"/></circle>
+      <circle cx="60" cy="240" r="1.5" fill-opacity="0.2"><animate attributeName="opacity" values="0.2;0.05;0.2" dur="3s" repeatCount="indefinite"/></circle>
+      <circle cx="740" cy="250" r="2" fill-opacity="0.25"><animate attributeName="opacity" values="0.25;0.5;0.25" dur="4.5s" repeatCount="indefinite"/></circle>
+      <circle cx="110" cy="170" r="1.5" fill-opacity="0.2"><animate attributeName="cx" values="110;122;110" dur="4s" repeatCount="indefinite"/></circle>
+      <circle cx="690" cy="190" r="1.8" fill-opacity="0.22"><animate attributeName="cx" values="690;676;690" dur="3.8s" repeatCount="indefinite"/></circle>
+    </g>
+    <g fill="#8b5cf6">
+      <circle cx="130" cy="130" r="1.5" fill-opacity="0.25"><animate attributeName="cx" values="130;142;130" dur="4.5s" repeatCount="indefinite"/></circle>
+      <circle cx="670" cy="100" r="2" fill-opacity="0.2"><animate attributeName="cx" values="670;658;670" dur="3.2s" repeatCount="indefinite"/></circle>
+      <circle cx="760" cy="360" r="1.5" fill-opacity="0.2"><animate attributeName="cx" values="760;772;760" dur="5s" repeatCount="indefinite"/></circle>
+    </g>
+    <g fill="#00e5ff">
+      <circle cx="50" cy="300" r="1.5" fill-opacity="0.2"><animate attributeName="cy" values="300;290;300" dur="3.5s" repeatCount="indefinite"/></circle>
+      <circle cx="750" cy="280" r="1.5" fill-opacity="0.18"><animate attributeName="cy" values="280;292;280" dur="4s" repeatCount="indefinite"/></circle>
+    </g>
+  </g>
+
+  <!-- ═══════ TITLE TEXT ═══════ -->
+  <text x="400" y="395" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="24" font-weight="700" fill="url(#accentGrad)" letter-spacing="2">
     AI SECURITY
+    <animate attributeName="opacity" values="1;0.85;1" dur="3s" repeatCount="indefinite"/>
   </text>
-  <text x="400" y="340" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#8888a8" letter-spacing="3" text-transform="uppercase">
+  <text x="400" y="422" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="13" fill="#64748b" letter-spacing="4" text-transform="uppercase" font-weight="500">
     Daily Digest
   </text>
 
-  <!-- Binary decoration -->
-  <text x="40" y="380" font-family="monospace" font-size="9" fill="#4361ee" fill-opacity="0.2">01001</text>
-  <text x="90" y="380" font-family="monospace" font-size="9" fill="#7c3aed" fill-opacity="0.15">11010</text>
-  <text x="680" y="380" font-family="monospace" font-size="9" fill="#db2777" fill-opacity="0.2">10110</text>
-  <text x="730" y="380" font-family="monospace" font-size="9" fill="#4f6ef7" fill-opacity="0.15">01101</text>
+  <!-- Bottom accent line -->
+  <line x1="310" y1="436" x2="490" y2="436" stroke="url(#accentGrad)" stroke-width="1.5" stroke-opacity="0.4" stroke-linecap="round"/>
 </svg>
