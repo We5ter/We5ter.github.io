@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Security Bulletin (ASB) OSV Search</title>
+<style>
+/* ── Reset & Base ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2235;
+  --bg-hover: #222d44;
+  --border: #2a3548;
+  --text: #e2e8f0;
+  --text-muted: #8896ab;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --critical: #ef4444;
+  --high: #f97316;
+  --moderate: #eab308;
+  --low: #22c55e;
+  --unknown: #6b7280;
+  --radius: 10px;
+  --shadow: 0 4px 24px rgba(0,0,0,.3);
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Header ──────────────────────────────────────── */
+.header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(59,130,246,.08) 0%, transparent 50%);
+  animation: pulse 8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: .5; }
+  50% { transform: scale(1.1); opacity: .8; }
+}
+.header-inner { position: relative; z-index: 1; }
+.header h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: .3rem;
+}
+.header p {
+  color: var(--text-muted);
+  font-size: .9rem;
+}
+.header .stats {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .85rem;
+  color: var(--text-muted);
+}
+.stat-item .num { font-weight: 700; color: var(--text); font-size: 1.1rem; }
+
+/* ── Search Bar ──────────────────────────────────── */
+.search-section {
+  max-width: 900px;
+  margin: -1.5rem auto 0;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+.search-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.search-row {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+.search-input-wrapper svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+#searchInput {
+  width: 100%;
+  padding: .75rem .75rem .75rem 2.8rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: .95rem;
+  outline: none;
+  transition: border-color .2s;
+}
+#searchInput:focus { border-color: var(--accent); }
+#searchInput::placeholder { color: var(--text-muted); }
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-label {
+  font-size: .8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.filter-btn {
+  padding: .3rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: .78rem;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.filter-btn.active.critical { background: var(--critical); border-color: var(--critical); }
+.filter-btn.active.high { background: var(--high); border-color: var(--high); }
+.filter-btn.active.moderate { background: var(--moderate); border-color: var(--moderate); }
+.filter-btn.active.low { background: var(--low); border-color: var(--low); }
+
+.sort-select {
+  padding: .35rem .6rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: .8rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Results info */
+.results-info {
+  max-width: 900px;
+  margin: 1.25rem auto 0;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .85rem;
+  color: var(--text-muted);
+}
+.results-info .count strong { color: var(--accent); }
+
+/* ── Results List ────────────────────────────────── */
+.results-list {
+  max-width: 900px;
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+.result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+  transition: all .15s;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.result-card:hover {
+  border-color: rgba(59,130,246,.4);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: .5rem;
+}
+.card-id {
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--accent-hover);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+.card-id a {
+  color: inherit;
+  text-decoration: none;
+}
+.card-id a:hover { text-decoration: underline; }
+
+/* Severity badges */
+.sev-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .65rem;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sev-badge.critical { background: rgba(239,68,68,.15); color: var(--critical); border: 1px solid rgba(239,68,68,.3); }
+.sev-badge.high { background: rgba(249,115,22,.15); color: var(--high); border: 1px solid rgba(249,115,22,.3); }
+.sev-badge.moderate { background: rgba(234,179,8,.15); color: var(--moderate); border: 1px solid rgba(234,179,8,.3); }
+.sev-badge.low { background: rgba(34,197,94,.15); color: var(--low); border: 1px solid rgba(34,197,94,.3); }
+.sev-badge.unknown { background: rgba(107,114,128,.15); color: var(--unknown); border: 1px solid rgba(107,114,128,.3); }
+
+.card-details {
+  font-size: .87rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: .65rem;
+  font-size: .76rem;
+  color: var(--text-muted);
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+}
+.meta-item a { color: var(--accent-hover); text-decoration: none; }
+.meta-item a:hover { text-decoration: underline; }
+.tag {
+  background: rgba(59,130,246,.12);
+  color: var(--accent-hover);
+  padding: .1rem .5rem;
+  border-radius: 4px;
+  font-size: .72rem;
+  font-family: 'SF Mono', monospace;
+}
+
+/* ── Loading / Empty States ─────────────────────── */
+#loadingState, #emptyState, #errorState {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+#loadingState .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+#errorState { color: var(--critical); }
+
+/* ── Detail Modal ───────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  animation: modalIn .2s ease-out;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(-20px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 1;
+}
+.modal-header h2 {
+  font-size: 1.05rem;
+  font-family: 'SF Mono', monospace;
+  color: var(--accent-hover);
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: .25rem .5rem;
+  border-radius: 6px;
+  transition: all .15s;
+}
+.modal-close:hover { background: var(--bg-hover); color: var(--text); }
+.modal-body { padding: 1.5rem; }
+.modal-section { margin-bottom: 1.2rem; }
+.modal-section h3 {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  margin-bottom: .4rem;
+}
+.modal-section p, .modal-section div {
+  font-size: .9rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+.alias-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ref-list a {
+  display: block;
+  color: var(--accent-hover);
+  text-decoration: none;
+  font-size: .85rem;
+  padding: .25rem 0;
+  word-break: break-all;
+}
+.ref-list a:hover { text-decoration: underline; }
+
+/* ── Footer ─────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: .78rem;
+  border-top: 1px solid var(--border);
+}
+.footer a { color: var(--accent-hover); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 600px) {
+  .search-row { flex-direction: column; }
+  .filters { justify-content: center; }
+  .card-header { flex-direction: column; gap: .5rem; }
+  .card-meta { flex-direction: column; gap: .3rem; }
+  .header .stats { gap: 1rem; }
+  .modal { max-height: 90vh; margin: .5rem 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <h1>Android Security Bulletin OSV</h1>
+    <p>Searchable Android vulnerability database powered by Google OSV</p>
+    <div class="stats" id="headerStats"></div>
+  </div>
+</header>
+
+<!-- Search Section -->
+<section class="search-section">
+  <div class="search-box">
+    <div class="search-row">
+      <div class="search-input-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by keyword, CVE ID, ASB ID, component name..." autocomplete="off">
+      </div>
+      <select id="sortSelect" class="sort-select" title="Sort order">
+        <option value="date-desc">Newest First</option>
+        <option value="date-asc">Oldest First</option>
+        <option value="severity">By Severity</option>
+        <option value="id">By ID</option>
+      </select>
+    </div>
+    <div class="filters">
+      <span class="filter-label">Severity:</span>
+      <button class="filter-btn active" data-severity="all">All</button>
+      <button class="filter-btn critical" data-severity="Critical">🔴 Critical</button>
+      <button class="filter-btn high" data-severity="High">🟠 High</button>
+      <button class="filter-btn moderate" data-severity="Moderate">🟡 Moderate</button>
+      <button class="filter-btn low" data-severity="Low">🟢 Low</button>
+    </div>
+  </div>
+</section>
+
+<!-- Results Info -->
+<div class="results-info" id="resultsInfo" style="display:none;">
+  <span class="count">Showing <strong id="resultCount">0</strong> results</span>
+  <span id="searchQuery"></span>
+</div>
+
+<!-- Results List -->
+<div class="results-list" id="resultsList"></div>
+
+<!-- Loading State -->
+<div id="loadingState">
+  <div class="spinner"></div>
+  <p>Loading Android Security Bulletin data...</p>
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" style="display:none;">
+  <p>🔍 No results found for your search.</p>
+  <p style="margin-top:.5rem;font-size:.85rem;">Try different keywords or filters.</p>
+</div>
+
+<!-- Error State -->
+<div id="errorState" style="display:none;">
+  <p>⚠️ Failed to load data. Please try again later.</p>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle"></h2>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  Data sourced from <a href="https://osv.dev/" target="_blank" rel="noopener">Google OSV</a> ·
+  <a href="https://source.android.com/security/bulletin/" target="_blank" rel="noopener">Android Security Bulletin</a><br>
+  Auto-updated bi-monthly via GitHub Actions · <span id="updatedAt"></span>
+</footer>
+
+<script>
+// ── State ─────────────────────────────────────────
+let allData = [];
+let filteredData = [];
+let activeSeverity = 'all';
+let searchQuery = '';
+let sortBy = 'date-desc';
+
+const SEVERITY_ORDER = { Critical: 0, High: 1, Moderate: 2, Low: 3, Unknown: 99 };
+
+// ── DOM Refs ─────────────────────────────────────
+const $searchInput = document.getElementById('searchInput');
+const $sortSelect = document.getElementById('sortSelect');
+const $resultsList = document.getElementById('resultsList');
+const $resultsInfo = document.getElementById('resultsInfo');
+const $resultCount = document.getElementById('resultCount');
+const $searchQueryEl = document.getElementById('searchQuery');
+const $loadingState = document.getElementById('loadingState');
+const $emptyState = document.getElementById('emptyState');
+const $errorState = document.getElementById('errorState');
+const $headerStats = document.getElementById('headerStats');
+const $modalOverlay = document.getElementById('modalOverlay');
+const $modalTitle = document.getElementById('modalTitle');
+const $modalBody = document.getElementById('modalBody');
+const $modalClose = document.getElementById('modalClose');
+const $filterBtns = document.querySelectorAll('.filter-btn[data-severity]');
+const $updatedAt = document.getElementById('updatedAt');
+
+// ── Load Data ─────────────────────────────────────
+async function loadData() {
+  try {
+    const resp = await fetch('data/asb-data.json');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    allData = await resp.json();
+
+    // Load metadata
+    try {
+      const metaResp = await fetch('data/metadata.json');
+      if (metaResp.ok) {
+        const meta = await metaResp.json();
+        renderHeaderStats(meta);
+        if (meta.generated_at) {
+          const d = new Date(meta.generated_at);
+          $updatedAt.textContent = `Last updated: ${d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })}`;
+        }
+      }
+    } catch(e) { /* metadata optional */ }
+
+    $loadingState.style.display = 'none';
+    applyFilters();
+  } catch (err) {
+    console.error('Load error:', err);
+    $loadingState.style.display = 'none';
+    $errorState.style.display = 'block';
+  }
+}
+
+function renderHeaderStats(meta) {
+  const counts = meta.severity_counts || {};
+  const total = meta.total_count || allData.length;
+  let html = `<div class="stat-item"><span class="num">${total}</span> Total</div>`;
+  const sevIcons = { Critical:'🔴', High:'🟠', Moderate:'🟡', Low:'🟢' };
+  for (const [sev, count] of Object.entries(counts)) {
+    const icon = sevIcons[sev] || '⚪';
+    html += `<div class="stat-item">${icon} <span class="num">${count}</span> ${sev}</div>`;
+  }
+  $headerStats.innerHTML = html;
+}
+
+// ── Filter & Sort ─────────────────────────────────
+function applyFilters() {
+  let data = [...allData];
+
+  // Text search
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    const terms = q.split(/\s+/).filter(Boolean);
+    data = data.filter(item => {
+      return terms.every(term => item._search_text.includes(term));
+    });
+  }
+
+  // Severity filter
+  if (activeSeverity !== 'all') {
+    data = data.filter(item => item.severity === activeSeverity);
+  }
+
+  // Sort
+  data.sort((a, b) => {
+    switch (sortBy) {
+      case 'date-desc': return (b.published || '').localeCompare(a.published || '');
+      case 'date-asc': return (a.published || '').localeCompare(b.published || '');
+      case 'severity':
+        return (SEVERITY_ORDER[a.severity] ?? 99) - (SEVERITY_ORDER[b.severity] ?? 99)
+            || (b.published || '').localeCompare(a.published || '');
+      case 'id': return a.id.localeCompare(b.id);
+      default: return 0;
+    }
+  });
+
+  filteredData = data;
+  renderResults();
+}
+
+function renderResults() {
+  if (filteredData.length === 0) {
+    $resultsList.innerHTML = '';
+    $resultsInfo.style.display = 'none';
+    $emptyState.style.display = 'block';
+    return;
+  }
+
+  $emptyState.style.display = 'none';
+  $resultsInfo.style.display = 'flex';
+  $resultCount.textContent = filteredData.length;
+
+  if (searchQuery.trim()) {
+    $searchQueryEl.textContent = `for "${escapeHtml(searchQuery)}"`;
+  } else {
+    $searchQueryEl.textContent = '';
+  }
+
+  $resultsList.innerHTML = filteredData.map(item => renderCard(item)).join('');
+}
+
+function renderCard(item) {
+  const sevClass = item.severity.toLowerCase().replace(/\s+/g, '-');
+  const cveTags = (item.cve_ids || []).map(cve =>
+    `<span class="tag">${escapeHtml(cve)}</span>`
+  ).join('');
+  const aospTags = (item.aosp_ids || []).map(aid =>
+    `<span class="tag" style="background:rgba(249,115,22,.12);color:#f97316">${escapeHtml(aid)}</span>`
+  ).join('');
+  const osvLink = `https://osv.dev/vulnerability/${item.id}`;
+
+  return `
+    <div class="result-card" data-id="${escapeHtml(item.id)}">
+      <div class="card-header">
+        <div class="card-id">
+          <a href="${osvLink}" target="_blank" rel="noopener" onclick="event.stopPropagation();">${escapeHtml(item.id)}</a>
+        </div>
+        <span class="sev-badge ${sevClass}">${escapeHtml(item.severity)}</span>
+      </div>
+      <div class="card-details" title="${escapeHtml(item.details)}">${escapeHtml(item.details)}</div>
+      <div class="card-meta">
+        ${item.published ? `<span class="meta-item">📅 ${escapeHtml(item.published)}</span>` : ''}
+        ${item.type && item.type !== 'Unknown' ? `<span class="meta-item">🏷️ ${escapeHtml(item.type)}</span>` : ''}
+        ${cveTags ? `<span class="meta-item">${cveTags}</span>` : ''}
+        ${aospTags ? `<span class="meta-item">${aospTags}</span>` : ''}
+        ${(item.related_asbs || []).length > 0 ? `<span class="meta-item">🔗 +${item.related_asbs.length} related</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+// ── Modal ─────────────────────────────────────────
+function showModal(item) {
+  $modalTitle.textContent = item.id;
+  const osvLink = `https://osv.dev/vulnerability/${item.id}`;
+
+  let aliasesHtml = '';
+  const allAliases = item.aliases || [];
+  if (allAliases.length > 0) {
+    aliasesHtml = '<div class="alias-list">' + allAliases.map(a => {
+      if (a.startsWith('CVE-')) return `<span class="tag">${escapeHtml(a)}</span>`;
+      if (a.startsWith('ASB-')) return `<span class="tag" style="background:rgba(167,139,250,.12);color:#a78bfa">${escapeHtml(a)}</span>`;
+      return `<span class="tag">${escapeHtml(a)}</span>`;
+    }).join('') + '</div>';
+  }
+
+  let refsHtml = '';
+  const refs = item.references || [];
+  if (refs.length > 0) {
+    refsHtml = '<div class="ref-list">' + refs.map(r =>
+      `<a href="${escapeHtml(r)}" target="_blank" rel="noopener">${escapeHtml(r)}</a>`
+    ).join('') + '</div>';
+  }
+
+  $modalBody.innerHTML = `
+    <div class="modal-section">
+      <h3>Severity</h3>
+      <div><span class="sev-badge ${item.severity.toLowerCase().replace(/\s+/g,'-')}">${escapeHtml(item.severity)}</span></div>
+    </div>
+    <div class="modal-section">
+      <h3>Description</h3>
+      <p>${escapeHtml(item.details)}</p>
+    </div>
+    ${item.published ? `<div class="modal-section"><h3>Published</h3><div>${escapeHtml(item.published)}</div></div>` : ''}
+    ${item.spl ? `<div class="modal-section"><h3>Security Patch Level</h3><div>${escapeHtml(item.spl)}</div></div>` : ''}
+    ${item.type && item.type !== 'Unknown' ? `<div class="modal-section"><h3>Type</h3><div>${escapeHtml(item.type)}</div></div>` : ''}
+    ${aliasesHtml ? `<div class="modal-section"><h3>Aliases (${allAliases.length})</h3>${aliasesHtml}</div>` : ''}
+    ${refsHtml ? `<div class="modal-section"><h3>References</h3>${refsHtml}</div>` : ''}
+    <div class="modal-section">
+      <h3>Links</h3>
+      <div class="ref-list">
+        <a href="${osvLink}" target="_blank" rel="noopener">View on OSV.dev →</a>
+      </div>
+    </div>
+  `;
+  $modalOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function hideModal() {
+  $modalOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ── Event Listeners ──────────────────────────────
+$searchInput.addEventListener('input', () => {
+  searchQuery = $searchInput.value;
+  applyFilters();
+});
+
+$sortSelect.addEventListener('change', () => {
+  sortBy = $sortSelect.value;
+  applyFilters();
+});
+
+$filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    $filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeSeverity = btn.dataset.severity;
+    applyFilters();
+  });
+});
+
+$modalClose.addEventListener('click', hideModal);
+$modalOverlay.addEventListener('click', (e) => {
+  if (e.target === $modalOverlay) hideModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideModal();
+});
+
+// Click card to open modal
+$resultsList.addEventListener('click', (e) => {
+  const card = e.target.closest('.result-card');
+  if (!card) return;
+  const itemId = card.dataset.id;
+  const item = allData.find(d => d.id === itemId);
+  if (item) showModal(item);
+});
+
+// ── Utils ─────────────────────────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Init ──────────────────────────────────────────
+loadData();
+
+// Focus search input on "/" key
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+      document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    $searchInput.focus();
+  }
+});
+</script>
+
+</body>
+</html>
