@@ -2074,13 +2074,11 @@ pre .chunk {
         padding: 0 !important;
     }
 
-    @media only screen and (max-width: 480px) {
-        .post-content {
+    .post-content {
             padding: 0 !important;
             margin-left: -90px;
             margin-right: -90px;
         }
-    }
 
     /* Push content below fixed navbar (75px) on small screens */
     .site-head {
@@ -2192,14 +2190,12 @@ pre .chunk {
         text-align: center;
     }
 
-    @media only screen and (max-width: 480px) {
-        .post-footer {
+    .post-footer {
             padding: 1.5rem 0;
             text-align: center;
             margin-left: -90px;
             margin-right: -90px;
         }
-    }
 
     .post-footer .author {
         margin: 0 0 1.5rem 0;
@@ -2212,14 +2208,12 @@ pre .chunk {
         width: auto;
     }
 
-    @media only screen and (max-width: 480px) {
-        .post-footer .share {
+    .post-footer .share {
             position: static;
             width: auto;
             margin-left: 35px;
             margin-right: 20px;
         }
-    }
 
     .post-footer .share a {
         margin: 0.8rem 0.6rem 0 0.6rem;
