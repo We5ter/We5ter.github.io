@@ -3026,11 +3026,25 @@ a, button, .post, .social-link {
 [data-theme="light"] table {
     background: #ffffff;
     border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="light"] table th {
     color: #4361ee;
     background: #f0f2f7;
+    border-bottom-color: rgba(67, 97, 238, 0.15);
+}
+
+[data-theme="light"] table td {
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] table tbody > tr:nth-child(odd) > td {
+    background-color: #fafbfc;
+}
+
+[data-theme="light"] table tbody > tr:hover > td {
+    background-color: #eef1f7;
 }
 
 [data-theme="light"] blockquote {
