@@ -2380,6 +2380,7 @@ pre .chunk {
     width: 18px;
     height: 18px;
 }
+}
 /* END @media (max-width: 480px) */
 
 /* ==========================================================================
@@ -3686,4 +3687,4 @@ html[data-theme] *::after {
         height: 24px;
     }
 }
-}
+
