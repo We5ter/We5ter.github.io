@@ -513,10 +513,20 @@
 
   <main class="content inner" role="main">
     
-    <article class="post">
+    <article class="post post-pinned">
+      
+      <div class="pinned-badge" title="Pinned / 置顶">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 12V4H17V2H7V4H8V12L6 14V16H11.2V22H12.8V16H18V14L16 12Z"/></svg>
+      </div>
+      
+      
+      <a class="post-preview-wrap" href="/blogs/ai-security-daily-digest/">
+        <img class="post-preview-img" src="/images/posts/ai-security-daily.svg" alt="AI Security Daily Digest | 每日AI安全资讯" loading="lazy" />
+      </a>
+      <div class="post-body">
       
         <div class="post-header-row">
-          <time class="post-date-badge">2026-04-24</time>
+          <time class="post-date-badge pinned-time">📌 Pinned</time>
           <h2 class="post-title">
             <a href="/blogs/ai-security-daily-digest/">AI Security Daily Digest | 每日AI安全资讯</a>
           </h2>
@@ -534,9 +544,12 @@
         </div>
         
       
+      </div>
+      
     </article>
     
     <article class="post">
+      
       
       <a class="post-preview-wrap" href="/blogs/CVE-2020-16040/">
         <img class="post-preview-img" src="/images/posts/v8-turbofan-workflow.png" alt="CVE-2020-16040:Analysis of Chromium V8 engine integer overflow vulnerability" loading="lazy" />
@@ -568,6 +581,7 @@
     
     <article class="post">
       
+      
       <a class="post-preview-wrap" href="/blogs/local-file-inclusion-in-cmsmadesimple/">
         <img class="post-preview-img" src="/images/posts/cms-vuln-code.png" alt="Local file inclusion in cmsmadesimple &lt;=2.2.1" loading="lazy" />
       </a>
@@ -597,6 +611,7 @@
     </article>
     
     <article class="post">
+      
       
       <a class="post-preview-wrap" href="/blogs/cve-2017-2500/">
         <img class="post-preview-img" src="/images/posts/safari-spoofing-poc.png" alt="(CVE-2017-2500)Address bar spoofing on macOS Safari" loading="lazy" />
