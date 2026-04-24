@@ -3024,27 +3024,29 @@ a, button, .post, .social-link {
 }
 
 [data-theme="light"] table {
-    background: #ffffff;
-    border-color: rgba(0, 0, 0, 0.08);
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme="light"] table th {
     color: #4361ee;
-    background: #f0f2f7;
+    background: #f0f2f7 !important;
+    background-color: #f0f2f7 !important;
     border-bottom-color: rgba(67, 97, 238, 0.15);
 }
 
 [data-theme="light"] table td {
-    border-top-color: rgba(0, 0, 0, 0.06);
+    border-top-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 [data-theme="light"] table tbody > tr:nth-child(odd) > td {
-    background-color: #fafbfc;
+    background-color: #fafbfc !important;
 }
 
 [data-theme="light"] table tbody > tr:hover > td {
-    background-color: #eef1f7;
+    background-color: #eef1f7 !important;
 }
 
 [data-theme="light"] blockquote {
@@ -3212,12 +3214,12 @@ a, button, .post, .social-link {
 }
 
 [data-theme=\"light\"] .tag-link {
-    color: #3b6fd4 !important;
+    color: #5a6a9a !important;
 }
 
 [data-theme="light"] .tag-link:hover {
     color: #4361ee !important;
-    background: rgba(67, 97, 238, 0.12);
+    background: rgba(67, 97, 238, 0.08);
 }
 
 /* Light mode: post footer text visibility fix */
