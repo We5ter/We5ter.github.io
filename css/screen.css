@@ -478,66 +478,7 @@ iframe, .fluid-width-video-wrapper {
     animation: headPulse 10s ease-in-out infinite;
 }
 
-/* Meteor shower container (JS will populate meteors inside) */
-.site-head::after {
-    content: none;
-}
-
-/* Individual meteor element styles (created by JS) */
-.meteor-shower {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 2;
-}
-
-.meteor {
-    position: absolute;
-    width: 120px;
-    height: 1.5px;
-    /* Gradient: tail (transparent) → body (color) → head (bright white) */
-    /* Head is on the RIGHT side, which becomes the leading edge when rotated 45-65deg */
-    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, var(--meteor-color) 30%, #fff 100%);
-    border-radius: 999px;
-    filter: blur(0.3px);
-    opacity: 0;
-    transform-origin: 100% 50%; /* right center = the head/bright tip */
-    box-shadow:
-        0 0 6px var(--meteor-color),
-        0 0 12px var(--meteor-glow);
-}
-
-.meteor::before {
-    content: '';
-    position: absolute;
-    right: -1px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 3px;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 4px var(--meteor-color), 0 0 8px var(--meteor-glow);
-}
-
-@keyframes meteorShoot {
-    0% {
-        transform: translateX(0) translateY(0) rotate(var(--angle, 55deg));
-        opacity: 0;
-    }
-    2% { opacity: 1; }
-    60% {
-        opacity: 0.85;
-    }
-    100% {
-        transform: translateX(var(--tx)) translateY(var(--ty)) rotate(var(--angle, 55deg));
-        opacity: 0;
-    }
-}
+/* (Meteor shower removed — replaced by Antigravity particle system) */
 
 @keyframes pulse {
     0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
@@ -2983,15 +2924,7 @@ a, button, .post, .social-link {
         radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
 }
 
-/* Light mode meteor shower - soft colors */
-[data-theme="light"] .meteor {
-    filter: blur(0.5px);
-}
-
-[data-theme="light"] .meteor::before {
-    background: #f0f2f8;
-    box-shadow: 0 0 3px var(--meteor-color), 0 0 6px var(--meteor-glow);
-}
+/* (Meteor shower styles removed — replaced by Antigravity particle system) */
 
 [data-theme="light"] .site-footer {
     background: #ffffff;
