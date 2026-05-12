@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-04-27T07:42:52.808740+00:00",
-  "total_count": 3261,
+  "generated_at": "2026-05-12T09:30:33.758567+00:00",
+  "total_count": 3262,
   "failed_count": 0,
-  "data_size_kb": 3438.4,
+  "data_size_kb": 3439.5,
   "source": "GCS osv-vulnerabilities/all.zip",
   "severity_counts": {
-    "Critical": 248,
+    "Critical": 249,
     "High": 2236,
     "Moderate": 776,
     "Low": 1
