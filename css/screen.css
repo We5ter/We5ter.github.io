@@ -1332,79 +1332,52 @@ main.content:not(.inner) .post-title {
 }
 
 /* ==========================================================================
-   Golden Cat Animation (Footer)
+   Android Bot Animation (Footer)
    ========================================================================== */
 
-.golden-cat-wrapper {
+.android-bot-wrapper {
     position: relative;
     z-index: 10;
     pointer-events: none;
 }
 
-.golden-cat {
-    width: 95px;
+.android-bot {
+    width: 85px;
     height: auto;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    filter: drop-shadow(0 3px 12px rgba(255, 140, 66, 0.2));
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.25));
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Cat in footer - centered, walking left/right */
-.cat-footer {
+/* Android Bot in footer - centered, slow head shake left/right */
+.android-footer {
     text-align: center;
     padding: 1.2rem 0 0.3rem;
 }
 
-.cat-footer .golden-cat {
-    animation: catWalkFooter 16s ease-in-out infinite, catBounce 3.5s ease-in-out infinite 1s;
+.android-footer .android-bot {
+    animation: androidShake 6s ease-in-out infinite;
 }
 
-@keyframes catWalkFooter {
-    0%, 100% { transform: translateX(0) rotate(0deg); }
-    25% { transform: translateX(-18px) rotate(-1deg); }
-    50% { transform: translateX(0) rotate(0deg); }
-    75% { transform: translateX(18px) rotate(1deg); }
+@keyframes androidShake {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(8deg); }
+    40% { transform: rotate(-6deg); }
+    60% { transform: rotate(5deg); }
+    80% { transform: rotate(-3deg); }
 }
 
-@keyframes catBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
-}
-
-/* Cat hover effect - playful interaction */
-.golden-cat-wrapper:hover .golden-cat {
-    transform: scale(1.15) rotate(2deg) !important;
-    filter: drop-shadow(0 6px 20px rgba(255, 140, 66, 0.35));
+/* Hover effect - playful interaction */
+.android-bot-wrapper:hover .android-bot {
+    transform: scale(1.15) !important;
+    filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.4));
     animation-play-state: paused;
 }
 
-/* Sleep mode - every ~30s the cat "naps" briefly */
-.golden-cat-wrapper::after {
-    content: '💤';
-    position: absolute;
-    font-size: 1rem;
-    opacity: 0;
-    animation: catSleep 25s ease-in-out infinite;
-    pointer-events: none;
-}
-
-.cat-footer::after {
-    top: 0;
-    right: 30%;
-}
-
-@keyframes catSleep {
-    0%, 75% { opacity: 0; transform: scale(0.5) translateY(0); }
-    78% { opacity: 0.7; transform: scale(1) translateY(-8px); }
-    85% { opacity: 0.7; transform: scale(1.1) translateY(-16px); }
-    92%, 100% { opacity: 0; transform: scale(0.8) translateY(-24px); }
-}
-
-/* Responsive cats */
+/* Responsive */
 @media (max-width: 768px) {
-    .cat-footer .golden-cat {
-        width: 75px;
+    .android-footer .android-bot {
+        width: 65px;
     }
 }
 
