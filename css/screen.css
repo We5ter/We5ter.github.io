@@ -1344,7 +1344,6 @@ main.content:not(.inner) .post-title {
 .android-bot {
     width: 85px;
     height: auto;
-    border-radius: 50%;
     filter: drop-shadow(0 4px 16px rgba(59, 130, 246, 0.25));
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
