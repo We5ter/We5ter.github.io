@@ -6,15 +6,15 @@
   <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <title>Local file inclusion in cmsmadesimple &lt;=2.2.1 | 西风微雨 - Wester&#39;s blog</title>
-  <meta name="description" content="Security Researcher & Bug Hunter from China. Focus: AI security | AI safety | Offensive Security" />
-  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, AI security, AI safety, AI安全, 人工智能安全" />
+  <meta name="description" content="Security Researcher & Bug Hunter from China. Focus: Security for AI | AI safety | Offensive Security" />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety, AI安全, 人工智能安全" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content="hexo">
   <meta name="theme-color" content="#0a0a0f" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1779430120172" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1779430120172" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1779431451101" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1779431451101" />
 
   
   
@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1779430120172" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1779431451101" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
@@ -38,7 +38,7 @@
   <nav id="global-navbar" style="position: fixed;top: 0px;left:0;right:0;z-index:1100;display:block;padding: 1.2rem 1.2rem;background:rgba(10,10,18,0.65);backdrop-filter:blur(20px)saturate(180%);-webkit-backdrop-filter:blur(20px)saturate(180%);border-bottom:1px solid rgba(255,255,255,0.08);height: 75px;">
     <div style="display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin: 0px auto;height:36px;padding-top: 10px;">
       <a href="/" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:inherit;flex-shrink:0;">
-        <img src="/images/static/avatar.png?v=1779430120172" alt="" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
+        <img src="/images/static/avatar.png?v=1779431451101" alt="" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">
         <span style="font-size:1.8rem;font-weight:700;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 0%,#a5b4fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Google Sans','Noto Sans',sans-serif;">Wester's blog</span>
       </a>
       <div style="display:flex;align-items:center;gap:0.25rem;" class="navbar-links-desktop">
@@ -235,15 +235,18 @@
       background-clip: text !important;
     }
 
-    /* Article cards (home page list) - only match .post-card, not .post-detail */
+    /* Article cards (home page list) - frosted glass in light mode */
     [data-theme="light"] .post:not(.post-detail) {
-      background: #ffffff !important;
-      border-color: rgba(0,0,0,0.06) !important;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+      background: rgba(255, 255, 255, 0.62) !important;
+      border-color: rgba(255, 255, 255, 0.85) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
     }
     [data-theme="light"] .post:not(.post-detail):hover {
-      border-color: rgba(67,97,238,0.25) !important;
-      box-shadow: 0 8px 30px rgba(67,97,238,0.08), 0 2px 8px rgba(0,0,0,0.04) !important;
+      background: rgba(255, 255, 255, 0.80) !important;
+      border-color: rgba(99,102,241,0.25) !important;
+      box-shadow: 0 12px 40px rgba(99,102,241,0.1), 0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1) !important;
     }
     [data-theme="light"] .post-title a {
       color: #1a1a2e !important;
@@ -370,9 +373,11 @@
       background-clip: text !important;
     }
     [data-theme="light"] .post-detail {
-      background: #ffffff !important;
-      border-color: rgba(0, 0, 0, 0.06) !important;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04) !important;
+      background: rgba(255, 255, 255, 0.72) !important;
+      border-color: rgba(255, 255, 255, 0.9) !important;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.95) !important;
+      backdrop-filter: blur(24px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
     }
     [data-theme="light"] .post-content {
       color: #2a2a3e !important;
@@ -611,7 +616,7 @@
 <footer class="site-footer">
     <!-- Android Bot - Footer -->
     <div class="android-bot-wrapper android-footer">
-    <img src="/images/static/android-bot.png?v=1779430120169" alt="Android Bot" class="android-bot">
+    <img src="/images/static/android-bot.png?v=1779431451099" alt="Android Bot" class="android-bot">
   </div>
   <div class="inner">
     <section class="poweredby">
@@ -624,7 +629,7 @@
 
 
   <!-- YOYO Theme Particle Animation -->
-<script type="text/javascript" src="/js/particles.js?v=1779430120172"></script>
+<script type="text/javascript" src="/js/particles.js?v=1779431451101"></script>
 <!-- Google Analytics 4 (GA4) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
 <script>
