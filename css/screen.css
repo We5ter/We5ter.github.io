@@ -2378,80 +2378,10 @@ pre .chunk {
   background: transparent !important;
 }
 
-/* ==========================================================================
-   Cyberpunk / Sci-Fi Animated Background
-   - Dynamic gradient mesh
-   - Scanning beam lines
-   - Floating glow orbs
-   - Animated grid
-   - Particle dots
-   ========================================================================== */
-
-.ai-bg-animation {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 0 !important;
-  pointer-events: none !important;
-  overflow: hidden !important;
-
-  /* Dark mode: deep space gradient */
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 120%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(129, 140, 248, 0.09) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(99, 102, 241, 0.07) 0%, transparent 50%),
-    linear-gradient(180deg, #09090b 0%, #0e0e12 25%, #111115 50%, #0e0e12 75%, #09090b 100%) !important;
-}
-
-/* ===== Animated gradient overlay (shimmer) ===== */
-.ai-bg-animation::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 200% !important;
-  height: 200% !important;
-  background:
-    linear-gradient(
-      45deg,
-      transparent 30%,
-      rgba(99, 102, 241, 0.025) 35%,
-      rgba(129, 140, 248, 0.025) 40%,
-      transparent 45%,
-      transparent 55%,
-      rgba(99, 102, 241, 0.015) 60%,
-      rgba(129, 140, 248, 0.015) 65%,
-      transparent 70%
-    );
-  animation: bg-shimmer 15s ease-in-out infinite !important;
-}
-
 @keyframes bg-shimmer {
   0% { transform: translate(-25%, -25%) rotate(0deg); }
   50% { transform: translate(0%, 0%) rotate(3deg); }
   100% { transform: translate(-25%, -25%) rotate(0deg); }
-}
-
-/* ===== Scanning beam line (horizontal sweep) ===== */
-.ai-bg-animation::after {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 2px !important;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(99, 102, 241, 0) 20%,
-    rgba(129, 140, 248, 0.25) 50%,
-    rgba(99, 102, 241, 0) 80%,
-    transparent 100%
-  );
-  animation: scan-beam 6s ease-in-out infinite !important;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12), 0 0 40px rgba(99, 102, 241, 0.05);
 }
 
 @keyframes scan-beam {
@@ -2459,45 +2389,6 @@ pre .chunk {
   5% { opacity: 1; }
   95% { opacity: 1; }
   100% { top: 100vh; opacity: 0; }
-}
-
-/* ===== Floating Glow Orbs (main ambient lights) ===== */
-.ai-bg-animation .orb-1 {
-  position: absolute !important;
-  border-radius: 50% !important;
-  filter: blur(70px) !important;
-  width: 500px !important;
-  height: 500px !important;
-  top: -8% !important;
-  left: -5% !important;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.42) 0%, rgba(99, 102, 241, 0.14) 40%, transparent 70%) !important;
-  animation: orb-float-1 18s ease-in-out infinite !important;
-}
-
-.ai-bg-animation .orb-2 {
-  position: absolute !important;
-  border-radius: 50% !important;
-  filter: blur(70px) !important;
-  width: 450px !important;
-  height: 450px !important;
-  bottom: -10% !important;
-  right: -8% !important;
-  background: radial-gradient(circle, rgba(138, 43, 226, 0.38) 0%, rgba(138, 43, 226, 0.12) 40%, transparent 70%) !important;
-  animation: orb-float-2 22s ease-in-out infinite !important;
-  animation-delay: -5s !important;
-}
-
-.ai-bg-animation .orb-3 {
-  position: absolute !important;
-  border-radius: 50% !important;
-  filter: blur(60px) !important;
-  width: 350px !important;
-  height: 350px !important;
-  top: 35% !important;
-  right: 15% !important;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.32) 0%, rgba(139, 92, 246, 0.10) 40%, transparent 70%) !important;
-  animation: orb-float-3 20s ease-in-out infinite !important;
-  animation-delay: -10s !important;
 }
 
 @keyframes orb-float-1 {
@@ -2515,24 +2406,6 @@ pre .chunk {
 @keyframes orb-float-3 {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(-40px, 50px) scale(1.2); }
-}
-
-/* ===== Animated Grid Overlay ===== */
-.ai-bg-animation .grid-overlay {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 150% !important;
-  height: 150% !important;
-  background-image:
-    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    /* perspective dots */
-    radial-gradient(circle, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
-  background-size: 60px 60px, 60px 60px, 20px 20px;
-  background-position: 0 0, 0 0, 0 0;
-  animation: grid-drift 25s linear infinite !important;
-  opacity: 0.5;
 }
 
 @keyframes grid-drift {
@@ -2913,68 +2786,10 @@ a, button, .post, .social-link {
 }
 
 /* AI Background: soft warm gradient for light mode */
-[data-theme="light"] .ai-bg-animation {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 120%, rgba(99, 102, 241, 0.1) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 50%),
-    linear-gradient(180deg, #f0f2f8 0%, #e8ecf6 20%, #f0f2f8 40%, #e8ecf6 60%, #f0f2f8 100%) !important;
-}
-
 /* Light mode shimmer - subtle but visible */
-[data-theme="light"] .ai-bg-animation::before {
-  background:
-    linear-gradient(
-      45deg,
-      transparent 30%,
-      rgba(99, 102, 241, 0.04) 35%,
-      rgba(168, 85, 247, 0.04) 40%,
-      transparent 45%,
-      transparent 55%,
-      rgba(236, 72, 153, 0.03) 60%,
-      rgba(99, 102, 241, 0.03) 65%,
-      transparent 70%
-    ) !important;
-}
-
 /* Light mode scan beam - soft blue */
-[data-theme="light"] .ai-bg-animation::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(99, 102, 241, 0) 20%,
-    rgba(99, 102, 241, 0.25) 50%,
-    rgba(99, 102, 241, 0) 80%,
-    transparent 100%
-  ) !important;
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.12), 0 0 50px rgba(99, 102, 241, 0.05);
-}
-
 /* Light mode orbs - visible and colorful */
-[data-theme="light"] .ai-bg-animation .orb-1 {
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0.05) 40%, transparent 70%) !important;
-  opacity: 0.7;
-}
-
-[data-theme="light"] .ai-bg-animation .orb-2 {
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%) !important;
-  opacity: 0.6;
-}
-
-[data-theme="light"] .ai-bg-animation .orb-3 {
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(236, 72, 153, 0.03) 40%, transparent 70%) !important;
-  opacity: 0.5;
-}
-
 /* Light mode grid - visible */
-[data-theme="light"] .ai-bg-animation .grid-overlay {
-  background-image:
-    linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px),
-    radial-gradient(circle, rgba(99, 102, 241, 0.09) 1px, transparent 1px) !important;
-  opacity: 0.8;
-}
-
 [data-theme="light"] code, [data-theme="light"] tt {
     background: #f0f2f7;
     border-color: rgba(0, 0, 0, 0.08);
