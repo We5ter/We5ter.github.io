@@ -2366,18 +2366,6 @@ pre .chunk {
    13. Particle Canvas & Avatar Effects
    ========================================================================== */
 
-#particle-canvas {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 1 !important;
-  pointer-events: none !important;
-  display: block !important;
-  background: transparent !important;
-}
-
 @keyframes bg-shimmer {
   0% { transform: translate(-25%, -25%) rotate(0deg); }
   50% { transform: translate(0%, 0%) rotate(3deg); }
@@ -2724,12 +2712,7 @@ a, button, .post, .social-link {
 /* Light mode specific overrides */
 
 /* Light mode: particle canvas - keep visible with soft ocean style */
-[data-theme="light"] #particle-canvas {
-    opacity: 1 !important;
-    z-index: -1 !important;
-}
-
-/* Body: clean light gradient */
+[data-theme="light"] /* Body: clean light gradient */
 [data-theme="light"] body {
     background-color: #f5f7fa !important;
     background-image:
