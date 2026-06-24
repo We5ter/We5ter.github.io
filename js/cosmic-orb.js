@@ -103,6 +103,7 @@ uniform float   uNoiseFreq,uNoiseAmp,uNoiseOffset;
 uniform vec3    uCA,uCB;
 varying vec3    vColor;
 varying float   vAlpha;
+varying vec2    vUv;     /* quad UV: position.xy mapped 0→1 */
 
 ${NOISE_GLSL}
 
@@ -119,6 +120,8 @@ void main(){
   gl_Position=projectionMatrix*vp;
   vColor=mix(uCA,uCB,clamp(rnd,0.,1.));
   vAlpha=0.35+rnd*0.65;
+  /* PlaneGeometry vertices go -0.5→0.5; shift to 0→1 for UV */
+  vUv=position.xy+0.5;
 }
 `;
 
@@ -128,8 +131,9 @@ uniform sampler2D uTex;
 uniform float     uOpacity;
 varying vec3  vColor;
 varying float vAlpha;
+varying vec2  vUv;
 void main(){
-  float a=texture2D(uTex,gl_PointCoord).r;
+  float a=texture2D(uTex,vUv).r;   /* use passed UV, not gl_PointCoord */
   gl_FragColor=vec4(vColor,a*vAlpha*uOpacity);
 }
 `;
