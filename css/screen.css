@@ -1138,6 +1138,7 @@ html[data-lang="en"] .i18n-en { display: inline; }
   flex-wrap: wrap;
   gap: .35rem;
 }
+/* 编号不可点（不带链接）：不伪装成可交互元素，去掉 hover 反馈 */
 .cve-chip {
   padding: .26rem .55rem;
   background: var(--accent-soft);
@@ -1148,13 +1149,16 @@ html[data-lang="en"] .i18n-en { display: inline; }
   font-weight: 500;
   letter-spacing: -.01em;
   color: var(--accent);
-  transition: background-color .15s ease, border-color .15s ease;
+  cursor: default;
 }
-.cve-chip:hover {
-  background: #d6e6ea;
-  border-color: var(--accent);
-  color: var(--accent);
-  text-decoration: none;
+/* 末尾省略号：暗示「这只是其中一部分」 */
+.cve-ellipsis {
+  align-self: center;
+  padding: 0 .15rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  letter-spacing: .1em;
 }
 
 /* 厂商致谢：编号墙下面另起一块，描边素底，只留厂商名 */
