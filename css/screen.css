@@ -1151,6 +1151,8 @@ html[data-lang="en"] .i18n-en { display: inline; }
   color: var(--accent);
   cursor: default;
 }
+/* 每次刷新随机隐藏掉的那部分（JS 加 class） */
+.cve-chip.is-hidden { display: none; }
 /* 末尾省略号：暗示「这只是其中一部分」 */
 .cve-ellipsis {
   align-self: center;
