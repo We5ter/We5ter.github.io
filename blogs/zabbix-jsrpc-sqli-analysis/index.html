@@ -43,7 +43,7 @@
         en: { title: "Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = "Local file inclusion in cmsmadesimple <=2.2.1";
+      var pageTitle = "一个曾经的 Zabbix SQL 注入漏洞分析";
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -55,7 +55,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Local file inclusion in cmsmadesimple &lt;=2.2.1 | Wester's blog — Security Research & AI Tooling</title>
+  <title>一个曾经的 Zabbix SQL 注入漏洞分析 | Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710818" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710818" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710803" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710803" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710818" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710803" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -235,19 +235,19 @@
 <article class="post post-detail">
   
   <header class="article-header">
-    <h1 class="post-title">Local file inclusion in cmsmadesimple &lt;=2.2.1</h1>
+    <h1 class="post-title">一个曾经的 Zabbix SQL 注入漏洞分析</h1>
     <div class="article-meta">
-      <time class="article-date" datetime="2017-05-22">
-        <span class="i18n-zh">2017年5月22日</span>
-        <span class="i18n-en">May 22, 2017</span>
+      <time class="article-date" datetime="2019-05-18">
+        <span class="i18n-zh">2019年5月18日</span>
+        <span class="i18n-en">May 18, 2019</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 2 分钟</span><span class="i18n-en">2 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 7 分钟</span><span class="i18n-en">7 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-tags">
         
-        <a class="post-tag" href="/tags/CVEs-Disclosure/">CVEs Disclosure</a>
+        <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
         
       </span>
       
@@ -260,24 +260,39 @@
   
 
   <section class="post-content">
-    <h2 id="Description"><a href="#Description" class="headerlink" title="Description:"></a>Description:</h2><p>The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file inclusion” mechanisms implemented in the target application. The vulnerability occurs due to the use of user-supplied input without proper validation.</p>
-<h2 id="Proof-of-concept"><a href="#Proof-of-concept" class="headerlink" title="Proof of concept"></a>Proof of concept</h2><p>cmsmadesimple &lt;&#x3D;2.1.6<br>The vulnerability exists in &#x2F;cmsms&#x2F;admin&#x2F;listtags.php Line 82 and line 54</p>
-<p><img src="/images/posts/cms-vuln-code.png" alt="CMSMadeSimple Vulnerability Code"><br><img src="/images/posts/cms-listtags.png" alt="CMSMadeSimple listtags.php"></p>
-<p>If there is a file named “1.phpinfo.php” existed in <a target="_blank" rel="noopener" href="http://127.0.0.1/1.phpinfo.php">http://127.0.0.1/1.phpinfo.php</a><br>So when we visit the following link:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1/cmsms/admin/listtags.php?_sk_=08852e62af02bc03&amp;action=showpluginhelp&amp;plugin=phpinfo&amp;type=../../1</span><br></pre></td></tr></table></figure>
-<p>You would find out you has include this file successfully!‌</p>
-<p><img src="/images/posts/cms-file-inclusion.png" alt="File Inclusion Successful"></p>
-<ul>
-<li>cmsmadesimple &lt;&#x3D;2.2.1</li>
-</ul>
-<p>Current version is still vulnerable.</p>
-<p><img src="/images/posts/cms-version-check.png" alt="CMSMadeSimple Version Check"></p>
-<p>Disclosure Timelines</p>
-<ul>
-<li>2017&#x2F;2&#x2F;7 Provide vulnerability(2.1.6) detail to vendor but no reply</li>
-<li>2017&#x2F;6&#x2F;16 cmsmadesimple update to 2.2.1 and no reply at all</li>
-<li>2017&#x2F;6&#x2F;28 Public disclosure</li>
-</ul>
+    <blockquote>
+<p>本文原发于知乎专栏，<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/66248991">查看原文</a>。</p>
+</blockquote>
+<h2 id="0x00-漏洞背景"><a href="#0x00-漏洞背景" class="headerlink" title="0x00. 漏洞背景"></a>0x00. 漏洞背景</h2><p>Zabbix 是一个开源的企业级性能监控解决方案。zabbix 的 jsrpc 的 profileIdx2 参数存在 insert 方式的 SQL 注入漏洞，攻击者无需授权登陆即可登陆 zabbix 管理系统，也可通过 script 等功能轻易直接获取 zabbix 服务器的操作系统权限。</p>
+<p>通过 zoomeye 搜索 zabbix 组件，共搜索到大约 13963 个主机，而其中很大一部分主机未禁用 guest 账户，因而漏洞影响相对很广。</p>
+<h2 id="0x01-影响版本"><a href="#0x01-影响版本" class="headerlink" title="0x01. 影响版本"></a>0x01. 影响版本</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">version 2.x (&lt;2.2.14)</span><br><span class="line">version 3.x (&lt;3.0.4)</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x02-漏洞说明"><a href="#0x02-漏洞说明" class="headerlink" title="0x02. 漏洞说明"></a>0x02. 漏洞说明</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POC:url+/jsrpc.php?sid=0bcd4ade648214dc&amp;type=9&amp;method=screen.get&amp;timestamp=1471403798083&amp;mode=2&amp;screenid=&amp;groupid=&amp;hostid=0&amp;pageFile=history.php&amp;profileIdx=web.item.graph&amp;profileIdx2=2&#x27;3297&amp;updateProfile=true&amp;screenitemid=&amp;period=3600&amp;stime=20160817050632&amp;resourcetype=17&amp;itemids%5B23297%5D=23297&amp;action=showlatest&amp;filter=&amp;filter_task=&amp;mark_color=1</span><br></pre></td></tr></table></figure>
+
+<p>注：该 poc 只在未禁用 guest 账户的情况下生效，禁用 guest 账户时无法进行报错注入。</p>
+<h2 id="0x03-漏洞详情"><a href="#0x03-漏洞详情" class="headerlink" title="0x03. 漏洞详情"></a>0x03. 漏洞详情</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">参数走向：</span><br><span class="line">jsrpc.php -&gt; CScreenBuilder.php 构造函数 -&gt; CScreenBase.php calculateTime 函数</span><br><span class="line">        -&gt; profiles.inc.php update 函数 -&gt; profiles.inc.php get 函数 -&gt; profiles.inc.php update 函数</span><br><span class="line"></span><br><span class="line">sql 语句执行：</span><br><span class="line">page_footer.php 46 行 -&gt; profile.inc.php::flush 函数 -&gt; profiles.inc.php::inserDB 函数</span><br><span class="line">        -&gt; db.inc.php::DBexecute 函数</span><br></pre></td></tr></table></figure>
+
+<p>最初的注入产生在 latest.php，这里根据其衍生注入 jsrpc.php 的 poc 进行分析。</p>
+<p><code>jsrpc.php</code> 文件 profileIdx2 参数存在注入。首先跟进 jsrpc 文件 <code>case:&#39;screen.get&#39;</code>（178 行），出现 resourcetype 的 if 判断。全局搜索 <code>SCREEN_RESOURCE_HISTORY</code> 以及 <code>SCREEN_RESOURCE_CHART</code>，在 <code>include/defines.inc.php</code> 知 <code>SCREEN_RESOURCE_HISTORY = 17</code>，<code>SCREEN_RESOURCE_CHART</code> 为 18；poc 中 resourcetype 参数为 17，满足 if 语句，函数执行至大约 205 行 <code>$screenBase = CScreenBuilder::getScreen($options)</code>。</p>
+<p><code>$options</code> 进入 CScreenBuilder 类的 getScreen 函数，跟进 <code>include/classes/screens/CScreenBuilder.php</code> 函数 148 行。</p>
+<p>在 CScreenBuilder 类的构造函数中（大约 148 行），我们可以看到 profileIdx2 参数进入了 CScreenBase 类 calculateTime 函数。</p>
+<p>继续跟进 <code>include/classes/screens/CScreenBase.php</code>，我们看到经过 344 行的 if 语句判断，profileIdx2 进入 CProfile 类的 update 函数。</p>
+<p>跟进 <code>include/classes/profiles.inc.php</code> 中 CProfile 类的 update 方法（大约 154 行）。<code>$current</code> 由 get 函数获得，跟进 get 函数（88 行）。</p>
+<p>我们打印 <code>CWebUser::data</code> 发现，在不禁用以及禁用 guest 账户两种情况下，该变量均不为空；而根据 profile 变量可知 get 函数中两个 if 语句均不成立，函数在 104 行返回空值。进而 update 方法中 <code>$current</code> 变量为空，函数执行至 161 行 <code>self::$insert[$idx][$idx2] = $profile;</code> —— 到这儿程序仍未执行任何 db 操作，仅仅把参数代入了 <code>$insert</code> 变量。</p>
+<p>接下来我们回到 <code>jsrpc.php</code>，发现末尾包含了 <code>page_footer.php</code>，跟进该文件。在经过一系列 if 语句后，在 46 行处调用了 <code>include/classes/class.cwebuser.php</code> 中 <code>CProfile::flush()</code>。</p>
+<p>跟进 flush 函数：我们看到如果 <code>$insert</code> 或者 <code>$update</code> 变量发生改变，即执行 db 相关操作，调用 insertDB 函数，因此变量最终进入 insertDB 函数 187 行执行，而 <code>include/db.inc.php</code> 中仍然对恶意参数没有任何过滤，进而导致注入产生。</p>
+<p>最后我们需要明确两个问题：</p>
+<p><strong>1. <code>CWebUser::data</code> 变量为什么始终不为空？</strong></p>
+<p>跟进 <code>include/classes/core/Zbase.php</code>：我们可以看到在整个程序框架初始化时会验证用户 session，如果为空，则调用 <code>setDefault()</code> 方法。</p>
+<p>跟进 <code>include/classes/class.cwebuser.php</code> 的 <code>setDefault()</code> 方法：我们发现 <code>setDefault()</code> 方法会默认赋值给 data。因此未禁用以及禁用 guest 账户两种情况，<code>CWebUser::data</code> 都不会为空。</p>
+<p><strong>2. 禁用 guest 账户为什么无法进行注入？</strong></p>
+<p>我们看到执行 flush 函数是需要 <code>userid &gt; 0</code> 的。当未禁用账户时，虽然 <code>setDefault()</code> 方法会使得 <code>userid = 0</code>，我们跟进 <code>include/classes/class.cwebuser.php</code> 中 checkAuthentication 函数。</p>
+<p>由 <code>defines.inc.php</code> 知，<code>ZBX_GUEST_USER</code> 为 guest 账户，guest 账户 <code>userid = 2</code>，因此在未禁用 guest 账户时可以进行注入。</p>
+<p>我们继续跟进 <code>API::User()-&gt;login()</code> 方法：我们发现这儿对 userid 有权限检查，当我们禁用 guest 账户时，就会在 1066 行产生异常，以至于 userid 仍然为 0，flush 函数无法执行，因此禁用 guest 账户时无法进行注入。</p>
+<h2 id="0x04-漏洞修复"><a href="#0x04-漏洞修复" class="headerlink" title="0x04. 漏洞修复"></a>0x04. 漏洞修复</h2><ol>
+<li>在 <code>include/classes/class.cwebuser.php</code> 中 flush 函数，将 75 行 foreach 处 <code>$idx2</code> 更改为 <code>zbx_dbstr($idx2)</code>，即使用 zabbix 自带过滤函数对参数 <code>$idx2</code>（即 profileIdx2 参数）进行过滤（临时方案）</li>
+<li>Version 2.x 版本更新至 2.2.14，Version 3.x 版本更新至 3.0.4（推荐）</li>
+</ol>
 
   </section>
 
@@ -290,13 +305,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/&text=Local file inclusion in cmsmadesimple &lt;=2.2.1"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/&text=一个曾经的 Zabbix SQL 注入漏洞分析"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/&title=Local file inclusion in cmsmadesimple &lt;=2.2.1"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/&title=一个曾经的 Zabbix SQL 注入漏洞分析"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
@@ -309,12 +324,12 @@
         </a>
         <!-- WeChat (copy link) -->
         <a class="icon-wechat" href="javascript:void(0);"
-           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/');});"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/');});"
            title="Copy link for WeChat">
             <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
         </a>
         <!-- LinkedIn -->
-        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/"
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/"
            onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
            title="Share on LinkedIn">
             <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
@@ -331,15 +346,15 @@
 <!-- Post Navigation: Previous / Next -->
 <nav class="post-nav">
   
-  <a class="post-nav-prev" href="/blogs/peekaboo-cve-2018-1149-camera-malware/">
+  <a class="post-nav-prev" href="/blogs/roundcube-122-command-execution-via-email/">
     <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
-    <span class="post-nav-title">威胁快讯 | 腾讯 Tencent Blade Team 首度公开，恶意代码威胁全球摄像头</span>
+    <span class="post-nav-title">Roundcube 1.2.2: Command Execution via Email</span>
   </a>
   
   
-  <a class="post-nav-next" href="/blogs/cve-2017-2500/">
+  <a class="post-nav-next" href="/blogs/typora-rce-via-iframe-sandbox/">
     <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
-    <span class="post-nav-title">(CVE-2017-2500)Address bar spoofing on macOS Safari</span>
+    <span class="post-nav-title">如何在 Typora 编辑器上实现远程命令执行</span>
   </a>
   
 </nav>
