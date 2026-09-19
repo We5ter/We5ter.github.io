@@ -54,6 +54,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/blogs/peekaboo-cve-2018-1149-camera-malware/</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/tags/Browser-Security/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.3</priority>
@@ -65,6 +71,11 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/tags/Vulnerability-Analysis/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/tags/Threat-Intel/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.3</priority>
   </url>
