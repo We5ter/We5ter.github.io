@@ -36,6 +36,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/shannon-ai-pentester/</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/shannon-ai-pentester/</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/tags/Browser-Security/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.3</priority>
