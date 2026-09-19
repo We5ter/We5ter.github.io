@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710803" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710803" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789835346207" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789835346207" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710803" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789835346207" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -273,23 +273,35 @@
 <h2 id="0x03-漏洞详情"><a href="#0x03-漏洞详情" class="headerlink" title="0x03. 漏洞详情"></a>0x03. 漏洞详情</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">参数走向：</span><br><span class="line">jsrpc.php -&gt; CScreenBuilder.php 构造函数 -&gt; CScreenBase.php calculateTime 函数</span><br><span class="line">        -&gt; profiles.inc.php update 函数 -&gt; profiles.inc.php get 函数 -&gt; profiles.inc.php update 函数</span><br><span class="line"></span><br><span class="line">sql 语句执行：</span><br><span class="line">page_footer.php 46 行 -&gt; profile.inc.php::flush 函数 -&gt; profiles.inc.php::inserDB 函数</span><br><span class="line">        -&gt; db.inc.php::DBexecute 函数</span><br></pre></td></tr></table></figure>
 
 <p>最初的注入产生在 latest.php，这里根据其衍生注入 jsrpc.php 的 poc 进行分析。</p>
-<p><code>jsrpc.php</code> 文件 profileIdx2 参数存在注入。首先跟进 jsrpc 文件 <code>case:&#39;screen.get&#39;</code>（178 行），出现 resourcetype 的 if 判断。全局搜索 <code>SCREEN_RESOURCE_HISTORY</code> 以及 <code>SCREEN_RESOURCE_CHART</code>，在 <code>include/defines.inc.php</code> 知 <code>SCREEN_RESOURCE_HISTORY = 17</code>，<code>SCREEN_RESOURCE_CHART</code> 为 18；poc 中 resourcetype 参数为 17，满足 if 语句，函数执行至大约 205 行 <code>$screenBase = CScreenBuilder::getScreen($options)</code>。</p>
+<p><code>jsrpc.php</code> 文件 profileIdx2 参数存在注入。首先跟进 jsrpc 文件 <code>case:&#39;screen.get&#39;</code>（178 行），出现 resourcetype 的 if 判断。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-01.jpg" alt="jsrpc.php 第 178 行起 &#96;case &#39;screen.get&#39;&#96; 段，可见 resourcetype 判断与 CScreenBuilder::getScreen 调用"></p>
+<p>全局搜索 <code>SCREEN_RESOURCE_HISTORY</code> 以及 <code>SCREEN_RESOURCE_CHART</code>，在 <code>include/defines.inc.php</code> 知 <code>SCREEN_RESOURCE_HISTORY = 17</code>，<code>SCREEN_RESOURCE_CHART</code> 为 18；poc 中 resourcetype 参数为 17，满足 if 语句，函数执行至大约 205 行 <code>$screenBase = CScreenBuilder::getScreen($options)</code>。</p>
 <p><code>$options</code> 进入 CScreenBuilder 类的 getScreen 函数，跟进 <code>include/classes/screens/CScreenBuilder.php</code> 函数 148 行。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-02.jpg" alt="CScreenBuilder 构造函数第 148 行附近的 calculateTime 参数数组"></p>
 <p>在 CScreenBuilder 类的构造函数中（大约 148 行），我们可以看到 profileIdx2 参数进入了 CScreenBase 类 calculateTime 函数。</p>
 <p>继续跟进 <code>include/classes/screens/CScreenBase.php</code>，我们看到经过 344 行的 if 语句判断，profileIdx2 进入 CProfile 类的 update 函数。</p>
 <p>跟进 <code>include/classes/profiles.inc.php</code> 中 CProfile 类的 update 方法（大约 154 行）。<code>$current</code> 由 get 函数获得，跟进 get 函数（88 行）。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-03.jpg" alt="CProfile::update（138-176 行），含 154 行 $current &#x3D; CProfile::get 与 161 行 self::$insert 赋值"></p>
 <p>我们打印 <code>CWebUser::data</code> 发现，在不禁用以及禁用 guest 账户两种情况下，该变量均不为空；而根据 profile 变量可知 get 函数中两个 if 语句均不成立，函数在 104 行返回空值。进而 update 方法中 <code>$current</code> 变量为空，函数执行至 161 行 <code>self::$insert[$idx][$idx2] = $profile;</code> —— 到这儿程序仍未执行任何 db 操作，仅仅把参数代入了 <code>$insert</code> 变量。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-04.jpg" alt="CProfile::get 函数 88-106 行，可见 var_dump(CWebUser::$data) 与 104 行返回空值"></p>
 <p>接下来我们回到 <code>jsrpc.php</code>，发现末尾包含了 <code>page_footer.php</code>，跟进该文件。在经过一系列 if 语句后，在 46 行处调用了 <code>include/classes/class.cwebuser.php</code> 中 <code>CProfile::flush()</code>。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-05.jpg" alt="CProfile::flush() 函数（54-81 行）：userDetails[&#39;userid&#39;]&lt;&#x3D;0 直接返回，insert&#x2F;update 不空则走 insertDB&#x2F;updateDB"></p>
 <p>跟进 flush 函数：我们看到如果 <code>$insert</code> 或者 <code>$update</code> 变量发生改变，即执行 db 相关操作，调用 insertDB 函数，因此变量最终进入 insertDB 函数 187 行执行，而 <code>include/db.inc.php</code> 中仍然对恶意参数没有任何过滤，进而导致注入产生。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-06.png" alt="最终执行 SQL 的位置：db.inc.php 第 189 行 &#96;DBexecute(&#39;INSERT INTO profiles (...) VALUES (...)&#39;)&#96;，profileIdx2 直接拼接到 SQL 语句里"></p>
 <p>最后我们需要明确两个问题：</p>
 <p><strong>1. <code>CWebUser::data</code> 变量为什么始终不为空？</strong></p>
 <p>跟进 <code>include/classes/core/Zbase.php</code>：我们可以看到在整个程序框架初始化时会验证用户 session，如果为空，则调用 <code>setDefault()</code> 方法。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-07.jpg" alt="Zbase.php 中 authenticateUser（374-384 行）：session 校验失败时调用 CWebUser::setDefault()"></p>
 <p>跟进 <code>include/classes/class.cwebuser.php</code> 的 <code>setDefault()</code> 方法：我们发现 <code>setDefault()</code> 方法会默认赋值给 data。因此未禁用以及禁用 guest 账户两种情况，<code>CWebUser::data</code> 都不会为空。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-08.jpg" alt="setDefault()（111-120 行）：data 数组默认值——userid&#x3D;0、alias&#x3D;ZBX_GUEST_USER"></p>
 <p><strong>2. 禁用 guest 账户为什么无法进行注入？</strong></p>
 <p>我们看到执行 flush 函数是需要 <code>userid &gt; 0</code> 的。当未禁用账户时，虽然 <code>setDefault()</code> 方法会使得 <code>userid = 0</code>，我们跟进 <code>include/classes/class.cwebuser.php</code> 中 checkAuthentication 函数。</p>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-09.jpg" alt="checkAuthentication（79-92 行）：session 为空时调用 setDefault()，并以 ZBX_GUEST_USER 调 API::User()-&gt;login"></p>
 <p>由 <code>defines.inc.php</code> 知，<code>ZBX_GUEST_USER</code> 为 guest 账户，guest 账户 <code>userid = 2</code>，因此在未禁用 guest 账户时可以进行注入。</p>
 <p>我们继续跟进 <code>API::User()-&gt;login()</code> 方法：我们发现这儿对 userid 有权限检查，当我们禁用 guest 账户时，就会在 1066 行产生异常，以至于 userid 仍然为 0，flush 函数无法执行，因此禁用 guest 账户时无法进行注入。</p>
-<h2 id="0x04-漏洞修复"><a href="#0x04-漏洞修复" class="headerlink" title="0x04. 漏洞修复"></a>0x04. 漏洞修复</h2><ol>
+<p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-10.png" alt="API::User()-&gt;login() 第 1065-1067 行：check_perm2system 失败时抛 ZBX_API_ERROR_PARAMETERS，导致 userid 仍为 0、flush 不执行"></p>
+<h2 id="0x04-漏洞证明"><a href="#0x04-漏洞证明" class="headerlink" title="0x04. 漏洞证明"></a>0x04. 漏洞证明</h2><p><img src="/images/posts/zabbix-jsrpc-sqli-analysis-11.jpg" alt="注入报错截图：访问 127.0.0.1&#x2F;zabbix2.2.13rc&#x2F;jsrpc.php?method&#x3D;screen.get&amp;profileIdx2&#x3D;... 触发的 XPATH syntax error，profileIdx2 被直接拼进 INSERT 语句执行"></p>
+<h2 id="0x05-漏洞修复"><a href="#0x05-漏洞修复" class="headerlink" title="0x05. 漏洞修复"></a>0x05. 漏洞修复</h2><ol>
 <li>在 <code>include/classes/class.cwebuser.php</code> 中 flush 函数，将 75 行 foreach 处 <code>$idx2</code> 更改为 <code>zbx_dbstr($idx2)</code>，即使用 zabbix 自带过滤函数对参数 <code>$idx2</code>（即 profileIdx2 参数）进行过滤（临时方案）</li>
 <li>Version 2.x 版本更新至 2.2.14，Version 3.x 版本更新至 3.0.4（推荐）</li>
 </ol>

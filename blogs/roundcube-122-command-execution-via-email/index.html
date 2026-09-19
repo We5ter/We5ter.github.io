@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710741" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710741" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789835346204" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789835346204" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710741" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789835346204" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -265,7 +265,10 @@
 </blockquote>
 <h2 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00. 前言"></a>0x00. 前言</h2><p>Roundcube 是一个在全球范围内被广泛使用的开源网络邮件程序。例如，SourceForge 上的镜像在过去 12 个月中的下载量就超过 26 万，这也只是当今用户群体中的一小部分。Roundcube 提供了人性化的 Web 界面，以便已认证用户通过 Web 浏览器发送和接收电子邮件。</p>
 <p>在这篇文章中，我们将会分析恶意用户如何通过 Roundcube 1.2.2（&gt;&#x3D; 1.0）发送一封电子邮件就可在远程操作系统上执行任意命令。由于所有使用默认安装方式安装的 Roundcube 都会受到影响，因此此漏洞具有极高的危害性。我们建议大家尽快将 Roundcube 升级到最新版本 1.2.3。</p>
-<p>RIPS 完整扫描 Roundcube 应用程序后给出了大量结果，其中很多问题代码其实是安装代码的一部分或历史遗留代码。因此这些问题看起来都不是很严重，但无论如何，RIPS 也建议修复这些漏洞和删除遗留代码，以防止以后这些代码被不安全的调用或与其他安全漏洞形成漏洞组合。</p>
+<p>RIPS 完整扫描 Roundcube 应用程序后给出了大量结果，其中很多问题代码其实是安装代码的一部分或历史遗留代码。</p>
+<p><img src="/images/posts/roundcube-122-command-execution-via-email-01.jpg" alt="RIPS 扫描结果（按严重程度）：Low 15、Medium 11、High 16、Critical 1"></p>
+<p><img src="/images/posts/roundcube-122-command-execution-via-email-02.jpg" alt="RIPS 扫描结果（按漏洞类型）：Other 46.5%、Path Traversal 20.9%、SQL Injection &#x2F; XSS &#x2F; File Create &#x2F; File Delete &#x2F; File Write 各 7% 等"></p>
+<p>因此这些问题看起来都不是很严重，但无论如何，RIPS 也建议修复这些漏洞和删除遗留代码，以防止以后这些代码被不安全的调用或与其他安全漏洞形成漏洞组合。</p>
 <p>上述代码分析结果可以在在线 demo 程序中获得 —— <a target="_blank" rel="noopener" href="https://demo.ripstech.com/project/10/">https://demo.ripstech.com/project/10/</a>。但是为了确保大家都能及时获知这个漏洞的修复方案，我们在分析结果中仅展示了本文所述漏洞。</p>
 <h2 id="0x01-漏洞利用条件"><a href="#0x01-漏洞利用条件" class="headerlink" title="0x01. 漏洞利用条件"></a>0x01. 漏洞利用条件</h2><ul>
 <li>Roundcube 必须配置为使用 PHP 的 <code>mail()</code> 函数（如果安装时没有对 SMTP 进行特殊设置，默认满足）</li>

