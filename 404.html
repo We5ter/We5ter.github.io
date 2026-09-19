@@ -16,6 +16,17 @@
          _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
          的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
       var forced = null;
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
       if (forced) {
         lang = forced;
       } else {
@@ -56,8 +67,8 @@
   <meta name="robots" content="noindex, follow">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789792867065" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789792867065" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789793192298" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789793192298" />
 
   
   
@@ -68,7 +79,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789792867065" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789793192298" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
