@@ -1204,3 +1204,72 @@ a.cve-hof:hover {
   color: var(--text-muted);
 }
 .cvewall-empty { color: var(--text-muted); }
+
+/* ---- 标题 banner 背景图 ----
+   只在 front-matter 里显式写了 `banner: /images/xxx.jpg` 时才加 --banner 类，
+   没写就是原来的素标题，不会多出空框。
+   文章页：<header class="article-header article-header--banner">
+   专栏页：<h1 class="section-heading section-heading--banner">
+   背景图靠内联 style 给，CSS 只负责裁切、压暗和文字反白。 */
+.article-header--banner,
+.section-heading--banner {
+  position: relative;
+  background-color: #1f5a6b;          /* 图没加载出来时的兜底底色 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.article-header--banner {
+  margin-bottom: 2rem;
+  padding: 3rem 1.75rem 2.25rem;
+  border-bottom: 0;
+  border-radius: var(--radius);
+}
+.section-heading--banner {
+  margin: 0 0 1rem;
+  padding: 2.5rem 1.75rem 2rem;
+  border-bottom: 0;
+  border-radius: var(--radius);
+}
+/* 压暗层：保证浅色学术风下白字依然可读 */
+.article-header--banner::before,
+.section-heading--banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 24, 31, .38) 0%, rgba(10, 24, 31, .70) 100%);
+}
+.article-header--banner > *,
+.section-heading--banner > * { position: relative; z-index: 1; }
+.article-header--banner .post-title,
+.section-heading--banner .i18n-zh,
+.section-heading--banner .i18n-en {
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .45);
+}
+.article-header--banner .article-meta { color: rgba(255, 255, 255, .88); }
+.article-header--banner .article-meta .article-date,
+.article-header--banner .article-meta .article-readtime { color: rgba(255, 255, 255, .82); }
+.article-header--banner .meta-sep { color: rgba(255, 255, 255, .45); }
+.article-header--banner .post-tag {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .38);
+  color: #fff;
+}
+.article-header--banner .post-tag:hover {
+  background: rgba(255, 255, 255, .28);
+  border-color: #fff;
+  color: #fff;
+}
+.article-header--banner .post-lang-toggle {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .38);
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .article-header--banner { padding: 2rem 1.1rem 1.5rem; }
+  .section-heading--banner { padding: 1.75rem 1.1rem 1.35rem; }
+  .article-header--banner .post-title,
+  .section-heading--banner { font-size: 1.45rem; }
+}
