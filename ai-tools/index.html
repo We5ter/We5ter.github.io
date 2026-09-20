@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789872846785" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789872846785" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789874425459" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789874425459" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789872846785" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789874425459" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -207,6 +207,13 @@
         <ul class="sw-list">
           
           <li class="sw-item">
+            <a href="/ai-tools/#tool-20260920-cairn">
+              <time class="sw-date">9.20</time>
+              <span class="sw-name">Cairn</span>
+            </a>
+          </li>
+          
+          <li class="sw-item">
             <a href="/ai-tools/#tool-20260919-shannon">
               <time class="sw-date">9.19</time>
               <span class="sw-name">Shannon</span>
@@ -243,6 +250,59 @@
 
   
 
+  
+    
+    <div class="aitools-day">
+      <h2 class="aitools-date">
+        <span class="aitools-issue">
+          <span class="i18n-zh">第 003 期</span>
+          <span class="i18n-en">No. 3</span>
+        </span>
+        <time datetime="2026-09-20">
+          <span class="i18n-zh">2026.9.20 <span class="aitools-week">周日</span></span>
+          <span class="i18n-en">Sep 20, 2026</span>
+        </time>
+      </h2>
+
+      
+      <article class="aitools-item" id="tool-20260920-cairn">
+        <div class="aitools-head">
+          
+          
+          
+          <a class="i18n-zh aitools-name" href="/ai-tools/cairn-state-space-search/">Cairn</a>
+          <a class="i18n-en aitools-name" href="/en/ai-tools/cairn-state-space-search/">Cairn</a>
+          
+        </div>
+
+        <p class="aitools-tagline">
+          <span class="i18n-zh">通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 Agent 在黑板上自己搜路</span>
+          <span class="i18n-en">A general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard</span>
+        </p>
+
+        
+        <div class="aitools-note">
+          <span class="i18n-zh">Python 写的 2.8k star 项目。黑板架构 + 事实/意图图，只有 Fact / Intent / Hint 三个原语；Worker 跑 OODA 循环，靠 Stigmergy 间接协作，彼此不通信。Bootstrap / Reason / Explore 三类任务由同一个 Worker 执行，角色在运行时长出来而非写死。腾讯云黑客松 AI 渗透挑战赛第二届，610 支队伍里唯一 AK（54/54）。AGPL-3.0。</span>
+          <span class="i18n-en">A 2.8k-star Python project built on a blackboard architecture with an explicit fact-intent graph: just three primitives — Fact, Intent, Hint. Workers run an OODA loop and coordinate purely through stigmergy, with no direct agent-to-agent messaging. Bootstrap / Reason / Explore are all executed by the same worker, so roles emerge at runtime instead of being hardcoded. At the Tencent Cloud Hackathon AI Pentesting Challenge (2nd edition) it was the only team out of 610 to AK, solving 54/54. AGPL-3.0.</span>
+        </div>
+        
+
+        <a class="aitools-link" href="https://github.com/oritera/Cairn" target="_blank" rel="noopener">https://github.com/oritera/Cairn</a>
+
+        
+        
+        <a class="i18n-zh aitools-more" href="/ai-tools/cairn-state-space-search/">
+          <span class="i18n-zh">详细分析</span> →
+        </a>
+        
+        
+        <a class="i18n-en aitools-more" href="/en/ai-tools/cairn-state-space-search/">
+          <span class="i18n-en">Deep dive</span> →
+        </a>
+        
+      </article>
+      
+    </div>
   
     
     <div class="aitools-day">
@@ -368,6 +428,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "Cairn",
+        "description": "通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 Agent 在黑板上自己搜路",
+        "url": "https://github.com/oritera/Cairn",
+        "datePublished": "2026-09-20",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "Shannon",
         "description": "AI 渗透测试 Agent：读源码找攻击面，再真打一遍验证，只有跑通 PoC 的漏洞才进报告",
         "url": "https://github.com/KeygraphHQ/shannon",
@@ -379,7 +453,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",
