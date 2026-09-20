@@ -1232,13 +1232,14 @@ a.cve-hof:hover {
   border-bottom: 0;
   border-radius: var(--radius);
 }
-/* 压暗层：保证浅色学术风下白字依然可读 */
+/* 压暗层：保证浅色学术风下白字依然可读。深色 / 浅色 banner 都要扛得住，
+   所以顶部 ≥ .52（白底 banner 顶部要够暗才能托住白字），底部 .78 压出层次感 */
 .article-header--banner::before,
 .section-heading--banner::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 24, 31, .38) 0%, rgba(10, 24, 31, .70) 100%);
+  background: linear-gradient(180deg, rgba(8, 20, 28, .52) 0%, rgba(8, 20, 28, .78) 100%);
 }
 .article-header--banner > *,
 .section-heading--banner > * { position: relative; z-index: 1; }
