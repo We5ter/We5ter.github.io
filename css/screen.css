@@ -1274,3 +1274,21 @@ a.cve-hof:hover {
   .article-header--banner .post-title,
   .section-heading--banner { font-size: 1.45rem; }
 }
+
+/* ===== 专栏长文文末来源块：本文地址 + 项目仓库 =====
+   与导出 md 的文末保持一致（溯源 + 给 Scanners-Box 导流）。
+   用主题变量而非硬编码色，深色模式下自适应。 */
+.post-source {
+  margin: 1.75rem 0 0;
+  padding: .8rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+.post-source-line { margin: 0; }
+.post-source-line + .post-source-line { margin-top: .1rem; }
+.post-source-link { color: var(--accent); word-break: break-all; }
+.post-source-link:hover { text-decoration: underline; }
