@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789874425471" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789874425471" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1789965366788" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1789965366788" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789874425471" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1789965366788" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -548,10 +548,6 @@
     });
   }
 
-  function fmt(n) {
-    return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
-  }
-
   function readCache(key) {
     try {
       var raw = sessionStorage.getItem(key);
@@ -566,14 +562,17 @@
     try { sessionStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
   }
 
+  // stars/forks 已经是 shields.io 格式化好的字符串（如 "9.1k"），直接拼进现有排版
   function applyStats(item, stars, forks) {
     var s = item.querySelector('.repo-stars');
     var f = item.querySelector('.repo-forks');
-    if (s && stars != null) s.textContent = '★ ' + fmt(stars);
-    if (f && forks != null) f.innerHTML = FORK_SVG + ' ' + fmt(forks);
+    if (s && stars) s.textContent = '★ ' + stars;
+    if (f && forks) f.innerHTML = FORK_SVG + ' ' + forks;
   }
 
-  // 拉取实时数据；失败/限流/超时时保留静态兜底值，不做任何改动
+  // 实时数据走 shields.io：它用自己的 GitHub token 取值，不受访客侧
+  // api.github.com 的 60 次/小时/IP 限流，国内可达性也更好。
+  // 失败/超时时保留静态兜底值，不做任何改动。
   function fetchLive(item, owner, repo) {
     var key = 'gh-repo-' + owner + '-' + repo;
     var cached = readCache(key);
@@ -583,16 +582,22 @@
     var opts = ctrl ? { signal: ctrl.signal } : undefined;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, API_TIMEOUT);
 
-    fetch('https://api.github.com/repos/' + owner + '/' + repo, opts)
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
+    function grab(kind) {
+      return fetch(
+        'https://img.shields.io/github/' + kind + '/' + owner + '/' + repo + '.json',
+        opts
+      ).then(function (r) { return r.ok ? r.json() : null; })
+       .catch(function () { return null; });
+    }
+
+    Promise.all([grab('stars'), grab('forks')])
+      .then(function (res) {
         clearTimeout(timer);
-        if (!data || data.message || data.stargazers_count == null) return;
-        applyStats(item, data.stargazers_count, data.forks_count);
-        writeCache(key, { s: data.stargazers_count, f: data.forks_count, t: Date.now() });
+        var s = res[0] && res[0].value ? res[0].value : null;
+        var f = res[1] && res[1].value ? res[1].value : null;
+        if (!s && !f) return;
+        applyStats(item, s, f);
+        writeCache(key, { s: s, f: f, t: Date.now() });
       })
       .catch(function () { clearTimeout(timer); });
   }
