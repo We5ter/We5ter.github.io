@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "OpenShell deep dive: NVIDIA's runtime for autonomous AI agents — not approval, not a container, a policy-bounded execution environment";
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>OpenShell deep dive: NVIDIA&#39;s runtime for autonomous AI agents — not approval, not a container, a policy-bounded execution environment | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790084505083" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790084505083" />
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790084505083" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+<body class="post-template">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        <a class="site-title" href="/"><span class="i18n-zh">Wester的自留地</span><span class="i18n-en">Wester's Space</span></a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        <h3 class="author-name">Wester</h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+      </div>
+
+      
+      <div class="sidebar-widget">
+        <h4 class="sidebar-widget-title">
+          <span class="i18n-zh">最新 AI 工具推荐</span>
+          <span class="i18n-en">Latest AI Tool Picks</span>
+        </h4>
+        <ul class="sw-list">
+          
+          <li class="sw-item">
+            <a href="/ai-tools/#tool-20260921-pentagi">
+              <time class="sw-date">9.21</time>
+              <span class="sw-name">PentAGI</span>
+            </a>
+          </li>
+          
+          <li class="sw-item">
+            <a href="/ai-tools/#tool-20260920-cairn">
+              <time class="sw-date">9.20</time>
+              <span class="sw-name">Cairn</span>
+            </a>
+          </li>
+          
+          <li class="sw-item">
+            <a href="/ai-tools/#tool-20260919-shannon">
+              <time class="sw-date">9.19</time>
+              <span class="sw-name">Shannon</span>
+            </a>
+          </li>
+          
+        </ul>
+        <a class="sw-more" href="/ai-tools/">
+          <span class="i18n-zh">查看全部</span><span class="i18n-en">View all</span>
+        </a>
+      </div>
+      
+    </aside>
+
+    <div class="page-content">
+      
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/openshell-banner.png)">
+    <h1 class="post-title">OpenShell deep dive: NVIDIA&#39;s runtime for autonomous AI agents — not approval, not a container, a policy-bounded execution environment</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-22">
+        <span class="i18n-zh">2026年9月22日</span>
+        <span class="i18n-en">Sep 22, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 38 分钟</span><span class="i18n-en">38 min read</span></span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/openshell-nvidia-agent-runtime/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="I-At-a-glance"><a href="#I-At-a-glance" class="headerlink" title="I. At a glance"></a>I. At a glance</h2><p>★★★★☆ (4&#x2F;5). A Rust project from NVIDIA, Apache-2.0, 8.7k stars &#x2F; 1.3k forks (as of 2026-09-22). It fills the gap left when you strip away <a href="../repositories/">agentgate-style approval workflows</a> and <a href="../../cve/">SkillSpector-style skill auditing</a>: a <strong>policy-bounded runtime for autonomous AI agents</strong>. The agent is not waiting for approval — it runs inside an isolated container wrapped in four layers of declarative policy, and every outbound request passes through a three-state gate (allow &#x2F; bind credentials &#x2F; deny). One star off because 0.1.0 has not shipped yet (the repo is alpha and the very first line of the README says “OpenShell 0.1.0 is coming soon”), and the 403 open issues show this is a project still moving fast — <strong>don’t put it in production, but research &#x2F; internal &#x2F; controlled environments can absolutely try it</strong>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Main language</td>
+<td>Rust (core + Gateway), with SDKs in Python &#x2F; TypeScript &#x2F; Go &#x2F; Rust</td>
+</tr>
+<tr>
+<td>License</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>Stars &#x2F; Forks</td>
+<td>8,746 &#x2F; 1,269</td>
+</tr>
+<tr>
+<td>First release</td>
+<td>2026-02-24 (less than six months ago)</td>
+</tr>
+<tr>
+<td>Last commit</td>
+<td>2026-09-22 (still iterating at high frequency)</td>
+</tr>
+<tr>
+<td>Open issues</td>
+<td>403 (typical for an early-stage project; the README itself expects many before 0.1.0)</td>
+</tr>
+<tr>
+<td>Compute backends</td>
+<td>Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes</td>
+</tr>
+<tr>
+<td>Network policy granularity</td>
+<td>L7 (HTTP method + path)</td>
+</tr>
+<tr>
+<td>Repo</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell">https://github.com/NVIDIA/OpenShell</a></td>
+</tr>
+</tbody></table>
+<p><strong>Who is it for</strong> (per-audience score, 5-point scale):</p>
+<table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Score</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Enterprise security operations &#x2F; CISO</td>
+<td>5</td>
+<td>One of the few “gate before letting an agent touch a production system” products out there. Endpoint-bound credentials and method&#x2F;path-level network controls are dramatically safer than handing an agent an API key and hoping</td>
+</tr>
+<tr>
+<td>AI security researcher</td>
+<td>5</td>
+<td>The four-layer policy model, endpoint-bound credentials, and L7 policy enforcement are all great research material. The repo ships a ready-made target range at <code>examples/sandbox-policy-quickstart/</code></td>
+</tr>
+<tr>
+<td>Red team &#x2F; pentester</td>
+<td>3</td>
+<td>Not an offensive tool, but it can host Claude Code &#x2F; Codex &#x2F; OpenCode as opponents — useful for adversarial testing like “can I push the agent past its policy from inside the sandbox”</td>
+</tr>
+<tr>
+<td>CTF player</td>
+<td>2</td>
+<td>Not directly relevant to CTFs, but the walkthroughs under <code>examples/</code> are good practice for tuning L7 policy by feel</td>
+</tr>
+<tr>
+<td>Hobbyist &#x2F; self-hoster</td>
+<td>3</td>
+<td>Easy to install (<code>openshell sandbox create</code> is one command), but the alpha status means the official guidance is still to run it on a dev cluster, not against a production database</td>
+</tr>
+</tbody></table>
+<p><strong>Forks</strong> (Apache-2.0, three difficulty tiers):</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>What you can do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tweak config</td>
+<td>Add a new provider profile (<code>openshell provider profile import</code>); write a sandbox policy YAML for your use case; ship a custom image for a supported agent</td>
+</tr>
+<tr>
+<td>Tweak integrations</td>
+<td>Write a new compute driver (the <code>crates/</code> directory has reference implementations for container &#x2F; MicroVM &#x2F; K8s); add a new SDK language</td>
+</tr>
+<tr>
+<td>Tweak the kernel</td>
+<td>Modify the policy engine (it spans filesystem &#x2F; network &#x2F; process &#x2F; provider and is the most interesting part to read); modify the Gateway control plane</td>
+</tr>
+</tbody></table>
+<h2 id="II-What-it-is-what-it-isn’t"><a href="#II-What-it-is-what-it-isn’t" class="headerlink" title="II. What it is, what it isn’t"></a>II. What it is, what it isn’t</h2><p>Before you open <code>https://github.com/NVIDIA/OpenShell</code>, three clarifications, because OpenShell <strong>is not</strong> several things that share the same neighborhood:</p>
+<p><strong>Not an approval workflow.</strong> <a href="../repositories/">agentgate</a> — same broad category of “AI Agent control” — takes the approach: agent wants to act, dashboard &#x2F; Slack &#x2F; Discord approves. OpenShell goes the opposite way: <strong>deny by default, allow by policy</strong>. The agent is not applying for permission; it is running inside a container already surrounded by policy. Want to hit the GitHub API? Check the YAML first.</p>
+<p><strong>Not an agent vulnerability scanner.</strong> <a href="../../cve/">NVIDIA&#x2F;SkillSpector</a> scans agent skills for prompt injection or dangerous commands — entry point is the skill file. OpenShell doesn’t scan; it <strong>manages runtime</strong>. Assume your skills are clean and your agent is well-behaved; OpenShell adds the “what if it goes off the rails” safety net.</p>
+<p><strong>Not a CALDERA-style BAS.</strong> CALDERA is MITRE’s red-team automation platform (adversary emulation). OpenShell is a blue-team tool for “letting the agent act inside a smaller, trusted boundary.” They face opposite directions — OpenShell assumes you are defending production and the agent is a “trusted-but-needs-constraints” subject, not an attacker you are simulating.</p>
+<p>So what is OpenShell? The official one-liner:</p>
+<blockquote>
+<p>OpenShell is the safe, private runtime for autonomous AI agents. It provides sandboxed execution environments that protect your data, credentials, and infrastructure — governed by declarative YAML policies that prevent unauthorized file access, data exfiltration, and uncontrolled network activity.</p>
+</blockquote>
+<p>Three keywords: <strong>sandboxed execution &#x2F; declarative YAML policies &#x2F; protect data credentials infrastructure</strong>.</p>
+<h2 id="III-Four-protection-layers-×-four-components"><a href="#III-Four-protection-layers-×-four-components" class="headerlink" title="III. Four protection layers × four components"></a>III. Four protection layers × four components</h2><p>OpenShell’s architecture splits cleanly into “<strong>four components</strong> managing <strong>four protection layers</strong>“:</p>
+<p><strong>Four components</strong> (<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell#how-it-works">README</a>):</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gateway</td>
+<td>Control-plane API, owns sandbox lifecycle, acts as the auth boundary</td>
+</tr>
+<tr>
+<td>Sandbox</td>
+<td>Isolated runtime with container supervision and policy-enforced egress routing</td>
+</tr>
+<tr>
+<td>Policy Engine</td>
+<td>Enforces filesystem, network, and process constraints from application layer down to kernel</td>
+</tr>
+<tr>
+<td>Provider Access</td>
+<td>Profile-defined endpoints, binary policy, and endpoint-bound credential injection for model APIs and other services</td>
+</tr>
+</tbody></table>
+<p><strong>Four protection layers</strong> (<code>defense in depth</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What it protects</th>
+<th>When it locks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Filesystem</td>
+<td>Prevents reads&#x2F;writes outside allowed paths</td>
+<td><strong>Locked at sandbox creation</strong></td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Blocks unauthorized outbound connections</td>
+<td><strong>Hot-reloadable at runtime</strong></td>
+</tr>
+<tr>
+<td>Process</td>
+<td>Blocks privilege escalation and dangerous syscalls</td>
+<td><strong>Locked at sandbox creation</strong></td>
+</tr>
+<tr>
+<td>Providers</td>
+<td>Grants endpoint-bound credentials and network access</td>
+<td><strong>Hot-reloadable at runtime</strong></td>
+</tr>
+</tbody></table>
+<p>Why are Filesystem and Process locked at creation while Network and Providers can hot-reload? Because the first two are hard to walk back once granted (a file may have been copied somewhere else, an escalated process can spawn any child process), while the latter two are more like temporary passes — adding GitHub API to the network whitelist, attaching a new model profile for a different provider — both can be loaded live.</p>
+<h2 id="IV-Network-policy-and-credential-model-L7-endpoint-bound"><a href="#IV-Network-policy-and-credential-model-L7-endpoint-bound" class="headerlink" title="IV. Network policy and credential model (L7 + endpoint-bound)"></a>IV. Network policy and credential model (L7 + endpoint-bound)</h2><p>The two pieces worth expanding on are <strong>network policy</strong> and <strong>credential model</strong>, because these are the biggest gap between OpenShell and “just another Docker sandbox.”</p>
+<h3 id="Network-L7-granularity-minimal-egress-by-default"><a href="#Network-L7-granularity-minimal-egress-by-default" class="headerlink" title="Network: L7 granularity, minimal egress by default"></a>Network: L7 granularity, minimal egress by default</h3><p>The Quickstart in the README shows a full “deny, then allow” cycle:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Create a sandbox (starts with minimal outbound access)</span></span><br><span class="line">openshell sandbox create</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Inside the sandbox — blocked</span></span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">curl: (56) Received HTTP code 403 from proxy after CONNECT</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Back on the host — apply a read-only GitHub API policy</span></span><br><span class="line">openshell policy <span class="built_in">set</span> demo --policy examples/sandbox-policy-quickstart/policy.yaml --<span class="built_in">wait</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. Reconnect — GET allowed, POST blocked by L7</span></span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">Anything added dilutes everything <span class="keyword">else</span>.</span><br><span class="line"></span><br><span class="line">sandbox$ curl -sS -X POST https://api.github.com/repos/octocat/hello-world/issues -d <span class="string">&#x27;&#123;&quot;title&quot;:&quot;oops&quot;&#125;&#x27;</span></span><br><span class="line">&#123;<span class="string">&quot;error&quot;</span>:<span class="string">&quot;policy_denied&quot;</span>,<span class="string">&quot;detail&quot;</span>:<span class="string">&quot;POST /repos/octocat/hello-world/issues not permitted by policy&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Three details worth noting:</p>
+<ol>
+<li><strong>The 403 comes from the proxy, not from GitHub</strong> — the agent cannot get out at the network layer, regardless of DNS &#x2F; IP &#x2F; HTTPS tricks;</li>
+<li><strong>GET is allowed, POST is blocked</strong> — the policy is not a domain allow&#x2F;deny list, it is “GET to <a target="_blank" rel="noopener" href="https://api.github.com/">https://api.github.com</a> is allowed, POST is not.” That is L7 granularity, a big step up from most “egress allowlist” products that stop at L4 (IP + port);</li>
+<li><strong>Hot-reload does not require restarting the sandbox</strong> — the sandbox keeps running while <code>openshell policy set ... --wait</code> applies the new policy.</li>
+</ol>
+<p>L7 policy is written in YAML. OpenShell’s policy engine compiles it into eBPF &#x2F; iptables rules (depending on kernel), and the in-sandbox proxy enforces it. This means even if the agent tries to “switch DNS to get around it,” it can’t — outbound only goes through the proxy, and the proxy follows the policy.</p>
+<h3 id="Credentials-never-touch-disk-bound-to-endpoints"><a href="#Credentials-never-touch-disk-bound-to-endpoints" class="headerlink" title="Credentials: never touch disk, bound to endpoints"></a>Credentials: never touch disk, bound to endpoints</h3><p>OpenShell abstracts all API keys &#x2F; tokens &#x2F; service accounts as <strong>Providers</strong> (named credential bundles):</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># providers/ holds reviewable profile examples</span></span><br><span class="line"><span class="string">provider</span> <span class="string">profile</span> <span class="string">import</span> <span class="string">&lt;path-to-profile.yaml&gt;</span></span><br><span class="line"><span class="comment"># A profile declares: what credentials the provider needs, what endpoints it covers,</span></span><br><span class="line"><span class="comment"># and which client binaries are allowed to use it</span></span><br></pre></td></tr></table></figure>
+
+<p>Key design choices:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Credentials never land on the sandbox filesystem</td>
+<td>The agent cannot <code>cat ~/.aws/credentials</code> to exfiltrate them</td>
+</tr>
+<tr>
+<td>Credentials are injected as environment variables, bound to the profile’s authorized endpoints</td>
+<td>Even if the agent reads the env var, it only works against the authorized target — stealing a key to send to another service does not work</td>
+</tr>
+<tr>
+<td>Profiles are import-only; the gateway ships none of its own</td>
+<td>Before deploying, you must have reviewed and imported every profile; no “OpenShell bundles a sample credential” surprise</td>
+</tr>
+<tr>
+<td>The CLI can auto-discover credentials from your shell environment</td>
+<td>You don’t have to type every key in, but you do need to have already exported them in your shell</td>
+</tr>
+</tbody></table>
+<p>“Endpoint-bound” is the biggest difference from a regular secret manager: a secret manager hands the agent the full key and lets it go, OpenShell only gives the agent a <strong>temporary</strong> use of the key for the specific request the policy admits, and the moment the request ends, the binding is gone.</p>
+<h2 id="V-SDKs-and-ecosystem"><a href="#V-SDKs-and-ecosystem" class="headerlink" title="V. SDKs and ecosystem"></a>V. SDKs and ecosystem</h2><h3 id="Four-official-SDKs"><a href="#Four-official-SDKs" class="headerlink" title="Four official SDKs"></a>Four official SDKs</h3><table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Package</th>
+<th>Install</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python</td>
+<td><code>openshell</code> (PyPI)</td>
+<td><code>uv add openshell</code></td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td><code>@nvidia/openshell-sdk</code> (GitHub Packages)</td>
+<td><code>npm install @nvidia/openshell-sdk</code> (configure the <code>@nvidia</code> scope to point at <code>npm.pkg.github.com</code> first)</td>
+</tr>
+<tr>
+<td>Go</td>
+<td><code>github.com/NVIDIA/OpenShell/sdk/go</code></td>
+<td><code>go get github.com/NVIDIA/OpenShell/sdk/go@latest</code></td>
+</tr>
+<tr>
+<td>Rust</td>
+<td><code>openshell-sdk</code> (currently source-only)</td>
+<td><code>cargo add openshell-sdk --git ... --tag &lt;release-tag&gt;</code></td>
+</tr>
+</tbody></table>
+<p>Note the Rust SDK is still source-only — the README explicitly says “pin the Git dependency to the same OpenShell release as the gateway.” With 0.1.0 unreleased, the crate has not landed on crates.io.</p>
+<h3 id="Officially-supported-agents"><a href="#Officially-supported-agents" class="headerlink" title="Officially supported agents"></a>Officially supported agents</h3><table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Integration</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude Code</td>
+<td>Package into a workload image and attach a <code>claude-code</code> provider or another endpoint-bearing model profile</td>
+</tr>
+<tr>
+<td>OpenCode</td>
+<td>Package into an image and attach its model provider and policy</td>
+</tr>
+<tr>
+<td>Codex</td>
+<td>Same idea, with an OpenAI provider</td>
+</tr>
+<tr>
+<td>GitHub Copilot CLI</td>
+<td>Package into an image and attach GitHub credentials and policy</td>
+</tr>
+<tr>
+<td>OpenClaw</td>
+<td>Use the NemoClaw blueprint</td>
+</tr>
+<tr>
+<td>Hermes Agent</td>
+<td>Use the NemoClaw blueprint</td>
+</tr>
+</tbody></table>
+<p>These are not “OpenShell takes over the agent” — they are “OpenShell knows the agent’s binary paths, required endpoints, and credential types, and ships profiles pre-tuned for them.” Any other agent (custom, in-house SDK) can also run — you write the image, write the profile, declare the endpoint.</p>
+<h3 id="How-to-put-an-agent-inside"><a href="#How-to-put-an-agent-inside" class="headerlink" title="How to put an agent inside"></a>How to put an agent inside</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># The default image contains only Ubuntu 24.04 — no agent CLI.</span></span><br><span class="line"><span class="comment"># You either build your own image or pull one from a registry:</span></span><br><span class="line">openshell sandbox create --from registry.example.com/agents/my-agent:1.0 -- my-agent</span><br></pre></td></tr></table></figure>
+
+<p>“Installing OpenShell” and “having an agent run inside OpenShell” are two different things. OpenShell provides isolation and policy; you are responsible for putting the agent into the image. That is a deliberate responsibility split: the runtime does not take the blame for an agent that misbehaves.</p>
+<h2 id="VI-Model-freedom-compute-backends-GPU"><a href="#VI-Model-freedom-compute-backends-GPU" class="headerlink" title="VI. Model freedom &#x2F; compute backends &#x2F; GPU"></a>VI. Model freedom &#x2F; compute backends &#x2F; GPU</h2><p>What you can and cannot change, per the README:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>What you can change</th>
+<th>What you cannot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Compute backend</td>
+<td>Switch between Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes (the README lists all four drivers)</td>
+<td>No Firecracker &#x2F; gVisor beyond the early MicroVM integration</td>
+</tr>
+<tr>
+<td>Workload image</td>
+<td>Bring your own container (BYOC), pull from a registry, ship custom images</td>
+<td>The image must contain the agent — the default Ubuntu image is bare-bones</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td><code>--gpu</code> flag enables GPU passthrough (experimental)</td>
+<td>Requires NVIDIA drivers + NVIDIA Container Toolkit on the host, plus GPU libraries inside the image</td>
+</tr>
+<tr>
+<td>Policy</td>
+<td>Network and Providers can be hot-reloaded</td>
+<td>Filesystem and Process are immutable after creation (this is intentional — see previous section)</td>
+</tr>
+<tr>
+<td>Credential injection</td>
+<td>Profiles can declare endpoints and binaries freely</td>
+<td>Credentials cannot be injected into endpoints not registered in the profile</td>
+</tr>
+<tr>
+<td>Telemetry</td>
+<td>Can be compiled out at build time (Docker &#x2F; VM build flags)</td>
+<td>The official support matrix does not cover builds with telemetry disabled</td>
+</tr>
+</tbody></table>
+<p><strong>GPU passthrough</strong> deserves its own paragraph. <code>openshell sandbox create --gpu ...</code> will attempt CDI (Container Device Interface) first and fall back to Docker’s <code>--gpus all</code> if CDI is not available. The documentation is refreshingly honest: “Expect rough edges and breaking changes.” It is genuinely experimental — do not stake production on it.</p>
+<p><strong>Choosing a compute backend in practice</strong>: Docker is the easiest for single-machine demos and dev. Kubernetes makes sense if you already run agents on a k8s cluster (many enterprise deployments do). MicroVM is the right call when you need stronger isolation than a container provides (e.g. container-escape protection). Podman is the alternative when you do not want a Docker daemon.</p>
+<h2 id="VII-Boundaries-and-risks"><a href="#VII-Boundaries-and-risks" class="headerlink" title="VII. Boundaries and risks"></a>VII. Boundaries and risks</h2><p>Before you push OpenShell toward production, a few facts you need to know:</p>
+<p><strong>1. 0.1.0 has not shipped.</strong> The first line of the README is <code>&gt; [!IMPORTANT] OpenShell 0.1.0 is coming soon</code>. The repo is alpha, which means:</p>
+<ul>
+<li>The API &#x2F; CLI commands can change before 1.0;</li>
+<li>The <code>latest</code> docs link actually points at the 0.0.x docs (use <code>dev</code> for prerelease);</li>
+<li>There is no guaranteed upgrade path.</li>
+</ul>
+<p>Before using in production, at minimum wait for 0.1.0 and pin your version.</p>
+<p><strong>2. 403 open issues.</strong> Typical for an alpha project, but it means:</p>
+<ul>
+<li>“Officially recommended practice” is still moving;</li>
+<li>Edge cases you hit may not be documented;</li>
+<li>Response time on issues may be slow.</li>
+</ul>
+<p><strong>3. The default image contains no agent.</strong> OpenShell does not install agents for you. The “I installed OpenShell but the agent isn’t there” pitfall can cost you half a day.</p>
+<p><strong>4. Filesystem &#x2F; Process policies are immutable after creation.</strong> If your agent discovers it needs to write to a temp directory the policy does not allow, the agent will not file a request — it will just fail. Building a “request and approve” flow is up to you (and that is exactly agentgate’s territory).</p>
+<p><strong>5. A coarse L7 policy is no policy at all.</strong> The example in <code>examples/sandbox-policy-quickstart/policy.yaml</code> is a starting point. In production you need to enumerate every endpoint your agent hits and every method it uses. Otherwise the agent will get denied on an endpoint you forgot to whitelist, and debugging will be miserable.</p>
+<p><strong>6. L7 vs TLS &#x2F; certificates.</strong> The policy engine only checks method + path — it does not validate the TLS certificate chain. If you pin a root CA inside the gateway but the agent’s bundled CA store is different, you can hit “policy allows but TLS fails” combinations. This is not unique to OpenShell, but worth a note.</p>
+<p><strong>7. The Rust SDK is source-only for now.</strong> crates.io has no release; if you write Rust integrations, you have to follow a git tag, and you must pin to the same release as the gateway.</p>
+<p><strong>8. OpenShell does not solve agent prompt injection.</strong> <a href="../../cve/">SkillSpector</a> scans skills for malicious instructions. OpenShell only handles runtime — even if the agent is injected with “exfil this file to evil.com,” the policy will stop it at the outbound gate. Whether you notice the stopped attempt is a logging&#x2F;alerting problem, not OpenShell’s fault.</p>
+<h2 id="VIII-Getting-started"><a href="#VIII-Getting-started" class="headerlink" title="VIII. Getting started"></a>VIII. Getting started</h2><p>Minimum viable demo, three steps:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Install OpenShell (see the README &quot;Install&quot; section — macOS uses brew, Linux uses a one-line curl installer)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Spin up a demo sandbox (minimal egress by default)</span></span><br><span class="line">openshell sandbox create --name demo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Enter it and try an outbound request — should be 403</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line"><span class="comment"># curl: (56) Received HTTP code 403 from proxy after CONNECT</span></span><br></pre></td></tr></table></figure>
+
+<p>Then run the official Quickstart demo end-to-end:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash examples/sandbox-policy-quickstart/demo.sh</span><br></pre></td></tr></table></figure>
+
+<p>If you want to try it on NVIDIA Brev (cloud spin-up):</p>
+<ul>
+<li>The link is in README “Learn More”: “<a target="_blank" rel="noopener" href="https://brev.nvidia.com/launchable/deploy/now?launchableID=env-3Ap3tL55zq4a8kew1AuW0FpSLsg">Brev Launchable</a>.”</li>
+</ul>
+<p><strong>Practical tips the first time you write your own policy</strong> (after spending the time to figure it out):</p>
+<ol>
+<li><strong>Copy the Quickstart example</strong> and use it as your project’s <code>.policy/base.yaml</code>;</li>
+<li><strong>Start strict, loosen carefully</strong> — easier to audit than “start wide, tighten later”;</li>
+<li><strong>Split provider profiles narrowly</strong> — do not make an “all permissions” provider; make <code>provider-github-readonly</code> &#x2F; <code>provider-openai-inference</code> &#x2F; <code>provider-aws-s3-write</code> and so on;</li>
+<li><strong>Test your policy with curl before wiring up the agent</strong> — verify your YAML actually does what you think it does for the request shapes you care about;</li>
+<li><strong>Align TLS root CAs</strong> — the boundaries section flagged this; agent image and gateway CAs must match.</li>
+</ol>
+<h2 id="IX-One-line-takeaway"><a href="#IX-One-line-takeaway" class="headerlink" title="IX. One-line takeaway"></a>IX. One-line takeaway</h2><p>OpenShell is not a new agent tool — it is a <strong>gate that lets existing agents safely touch production systems</strong>. Four policy layers (filesystem &#x2F; network &#x2F; process &#x2F; provider) plus L7 network control plus endpoint-bound credentials place the agent inside a bounded world. NVIDIA’s official backing, Apache-2.0, and a Rust implementation mean this is <strong>worth keeping on the radar as a serious foundation</strong>, but with 0.1.0 unreleased it is <strong>a tool for research &#x2F; internal &#x2F; controlled environments today</strong>. Production deployments should wait for at least a couple of minor releases past 0.1.0. When you start using it, clone an example policy and write your own first before plugging in an agent — skipping that step will cost you an hour on TLS &#x2F; endpoint matching, just like it did me.</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/">https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/openshell-nvidia-agent-runtime/&text=OpenShell deep dive: NVIDIA&#39;s runtime for autonomous AI agents — not approval, not a container, a policy-bounded execution environment"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/openshell-nvidia-agent-runtime/&title=OpenShell deep dive: NVIDIA&#39;s runtime for autonomous AI agents — not approval, not a container, a policy-bounded execution environment"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/openshell-nvidia-agent-runtime/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/openshell-nvidia-agent-runtime/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/openshell-nvidia-agent-runtime/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/openshell-nvidia-agent-runtime/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <a class="post-nav-prev" href="/ai-tools/openshell-nvidia-agent-runtime/">
+    <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
+    <span class="post-nav-title">OpenShell 拆解：NVIDIA 给自主 AI Agent 的沙箱不是审批，也不是容器，是带策略边界的运行时</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/en/ai-tools/pentagi-autonomous-pentest-platform/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">PentAGI Dissected: 13 Agent Roles, a Monitoring Stack, and a Knowledge Graph in One Pentest Platform</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      <p>&copy; 2026 Wester</p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
