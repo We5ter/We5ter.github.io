@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790086993959" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790086993959" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790087564474" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790087564474" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790086993959" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790087564474" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -207,6 +207,13 @@
         <ul class="sw-list">
           
           <li class="sw-item">
+            <a href="/ai-tools/#tool-20260922-nvidia-openshell">
+              <time class="sw-date">9.22</time>
+              <span class="sw-name">NVIDIA OpenShell</span>
+            </a>
+          </li>
+          
+          <li class="sw-item">
             <a href="/ai-tools/#tool-20260921-pentagi">
               <time class="sw-date">9.21</time>
               <span class="sw-name">PentAGI</span>
@@ -217,13 +224,6 @@
             <a href="/ai-tools/#tool-20260920-cairn">
               <time class="sw-date">9.20</time>
               <span class="sw-name">Cairn</span>
-            </a>
-          </li>
-          
-          <li class="sw-item">
-            <a href="/ai-tools/#tool-20260919-shannon">
-              <time class="sw-date">9.19</time>
-              <span class="sw-name">Shannon</span>
             </a>
           </li>
           
@@ -250,6 +250,59 @@
 
   
 
+  
+    
+    <div class="aitools-day">
+      <h2 class="aitools-date">
+        <span class="aitools-issue">
+          <span class="i18n-zh">第 005 期</span>
+          <span class="i18n-en">No. 5</span>
+        </span>
+        <time datetime="2026-09-22">
+          <span class="i18n-zh">2026.9.22 <span class="aitools-week">周二</span></span>
+          <span class="i18n-en">Sep 22, 2026</span>
+        </time>
+      </h2>
+
+      
+      <article class="aitools-item" id="tool-20260922-nvidia-openshell">
+        <div class="aitools-head">
+          
+          
+          
+          <a class="i18n-zh aitools-name" href="/ai-tools/openshell-nvidia-agent-runtime/">NVIDIA OpenShell</a>
+          <a class="i18n-en aitools-name" href="/en/ai-tools/openshell-nvidia-agent-runtime/">NVIDIA OpenShell</a>
+          
+        </div>
+
+        <p class="aitools-tagline">
+          <span class="i18n-zh">面向自主 AI Agent 的安全私有运行时：用声明式 YAML 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点</span>
+          <span class="i18n-en">A safe, private runtime for autonomous AI agents: declarative YAML policies enforce boundaries across filesystem, network, process and provider access, and credentials only flow into policy-admitted endpoints</span>
+        </p>
+
+        
+        <div class="aitools-note">
+          <span class="i18n-zh">Rust 编写的 8.7k star 项目，Apache-2.0。定位是 autonomous AI agents 的运行时管控：把 agent 关进一个被策略包围的隔离容器，默认最小出站，按 &#34;允许 / 凭 / 拒&#34; 三态拦截每一次 outbound。四个保护层：Filesystem 与 Process 在沙箱创建时锁定，Network 与 Providers 可运行时热更新。Provider 模型把凭证绑在端点上，凭证从不落盘，运行时以环境变量注入被策略放行的端点，网络策略细到 HTTP method 与 path（L7）。支持 Docker / Podman / MicroVM / Kubernetes 四种算力后端，SDK 覆盖 Python / TypeScript / Go / Rust，可托管 Claude Code / Codex / OpenCode / Copilot CLI。NVIDIA 官方出品（docs.nvidia.com/openshell），目前 alpha（0.1.0 即将发布），403 个 open issues。</span>
+          <span class="i18n-en">An 8.7k-star Rust project under Apache-2.0. Positioned as runtime control for autonomous AI agents: the agent runs in an isolated container wrapped in declarative policy, every outbound request goes through a three-state gate (allow / bind credentials / deny). Four protection layers: Filesystem and Process are locked at sandbox creation, Network and Providers are hot-reloadable at runtime. The Provider model binds credentials to authorized endpoints — keys never touch the sandbox filesystem, they are injected as environment variables at runtime only into requests the policy admits, with the network policy enforced at HTTP method and path granularity (L7). Four compute backends (Docker, Podman, MicroVM, Kubernetes), SDKs for Python, TypeScript, Go and Rust, and a curated set of supported agents (Claude Code, Codex, OpenCode, Copilot CLI). Officially from NVIDIA (docs.nvidia.com/openshell), currently in alpha with 0.1.0 imminent and 403 open issues.</span>
+        </div>
+        
+
+        <a class="aitools-link" href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener">https://github.com/NVIDIA/OpenShell</a>
+
+        
+        
+        <a class="i18n-zh aitools-more" href="/ai-tools/openshell-nvidia-agent-runtime/">
+          <span class="i18n-zh">详细分析</span> →
+        </a>
+        
+        
+        <a class="i18n-en aitools-more" href="/en/ai-tools/openshell-nvidia-agent-runtime/">
+          <span class="i18n-en">Deep dive</span> →
+        </a>
+        
+      </article>
+      
+    </div>
   
     
     <div class="aitools-day">
@@ -481,6 +534,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "NVIDIA OpenShell",
+        "description": "面向自主 AI Agent 的安全私有运行时：用声明式 YAML 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点",
+        "url": "https://github.com/NVIDIA/OpenShell",
+        "datePublished": "2026-09-22",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "PentAGI",
         "description": "全自主渗透平台：Docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞",
         "url": "https://github.com/vxcontrol/pentagi",
@@ -492,7 +559,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Cairn",
@@ -506,7 +573,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Shannon",
@@ -520,7 +587,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 5,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",
