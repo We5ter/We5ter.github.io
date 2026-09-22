@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790084505083" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790084505083" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790086993960" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790086993960" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790084505083" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790086993960" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -249,7 +249,7 @@
         <span class="i18n-en">Sep 22, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 22 分钟</span><span class="i18n-en">22 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 39 分钟</span><span class="i18n-en">39 min read</span></span>
       
       
       
@@ -397,7 +397,7 @@
 <p>OpenShell is the safe, private runtime for autonomous AI agents. It provides sandboxed execution environments that protect your data, credentials, and infrastructure — governed by declarative YAML policies that prevent unauthorized file access, data exfiltration, and uncontrolled network activity.</p>
 </blockquote>
 <p>三个关键词：<strong>sandboxed execution &#x2F; declarative YAML policies &#x2F; protect data credentials infrastructure</strong>。</p>
-<h2 id="三、四层保护-四个组件"><a href="#三、四层保护-四个组件" class="headerlink" title="三、四层保护 + 四个组件"></a>三、四层保护 + 四个组件</h2><p>OpenShell 的架构可以拆成「<strong>四个组件</strong>管<strong>四个保护层</strong>」：</p>
+<h2 id="三、四层保护-四个组件"><a href="#三、四层保护-四个组件" class="headerlink" title="三、四层保护 + 四个组件"></a>三、四层保护 + 四个组件</h2><p>OpenShell 的架构可以拆成「<strong>四个组件</strong>管<strong>四个保护层</strong>」，但比表格更重要的是<strong>组件之间的交互时序和责任边界</strong>。</p>
 <p><strong>四个组件</strong>（<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell#how-it-works">README</a>）：</p>
 <table>
 <thead>
@@ -423,6 +423,20 @@
 <td>profile 定义的端点 + 二进制策略 + 端点绑定的凭证注入</td>
 </tr>
 </tbody></table>
+<p><strong>Gateway 是控制平面，但不是策略执行点</strong>。架构文档里写得很清楚：Gateway 暴露 gRPC API（生命周期、provider 管理、策略更新、日志、watch stream、relay forwarding）和 HTTP 端点（health、WebSocket tunnel、edge-auth），但它<strong>不做 per-request 的网络策略决策</strong> —— 那些决策在 sandbox 内部的 supervisor + proxy 里完成。Gateway 只负责存储和下发策略，真正的强制发生在 kernel 层。这个设计让 Gateway 可以水平扩展而不成为性能瓶颈，同时也避免了「策略在外部、agent 在内部」的绕路问题。</p>
+<p><strong>Sandbox Readiness 状态机</strong>。Gateway 把 driver 报告的状态和 supervisor 会话状态组合成对外暴露的 <code>SandboxPhase</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">backend_phase = derive_phase(driver_status)</span><br><span class="line"></span><br><span class="line">public_phase =</span><br><span class="line">  backend_phase ∈ &#123;Error, Deleting&#125;                → 直接透传（终态优先）</span><br><span class="line">  driver_reports_runtime_readiness &amp;&amp; Ready        → Ready</span><br><span class="line">  backend_phase == Ready &amp;&amp; session connected      → Ready</span><br><span class="line">  backend_phase == Ready &amp;&amp; no session             → Provisioning</span><br></pre></td></tr></table></figure>
+
+<p>也就是说，对于 Docker&#x2F;Podman&#x2F;VM 这类 supervisor-controlled driver，driver 说 Ready 还不够，必须等 supervisor gRPC 会话建立才算 Ready；对于 K8s 这类 driver-reports-runtime-readiness 的 driver，driver 的 Ready 就是最终 Ready。这个区分决定了你调 <code>openshell sandbox create</code> 后多久能 <code>connect</code> —— Docker 本地通常秒级，K8s 可能要等 Pod 调度 + 镜像拉取。</p>
+<p><strong>Policy Engine 的 6 步网络决策流程</strong>。所有 outbound 流量在 sandbox 内部被强制通过 proxy，proxy 按以下顺序决策（<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell/blob/main/architecture/security-policy.md">architecture&#x2F;security-policy.md</a>）：</p>
+<ol>
+<li><strong>Force proxy</strong> — 用 namespace + seccomp 控制确保流量只能过 proxy；</li>
+<li><strong>Binary identity</strong> — 识别发起请求的进程二进制路径，和策略中 <code>binaries</code> 白名单比对；</li>
+<li><strong>Hard-block</strong> — 拒绝危险内部 IP 段（如 169.254.x.x、10.x.x.x 等），除非显式允许；</li>
+<li><strong>Policy match</strong> — 把 destination + port + binary 和 network policy block 匹配；</li>
+<li><strong>L7 rules</strong> — 对启用了 protocol inspection 的 endpoint，检查 HTTP method + path；</li>
+<li><strong>Action</strong> — allow &#x2F; deny &#x2F; audit &#x2F; log。显式 deny 和 hardening 检查优先于 allow；没有匹配到任何规则 → deny。</li>
+</ol>
 <p><strong>四个保护层</strong>（<code>defense in depth</code>）：</p>
 <table>
 <thead>
@@ -464,9 +478,28 @@
 <li><strong>GET 通、POST 拦</strong> —— 策略不是「域名黑 &#x2F; 白」，是「到 <a target="_blank" rel="noopener" href="https://api.github.com/">https://api.github.com</a> 的 GET 允许 &#x2F; POST 不允许」。这是 L7 级别，对比大多数「出站白名单」产品只到 L4（IP + 端口）是一大进步；</li>
 <li><strong>热更新不需要重启沙箱</strong> —— <code>openshell policy set ... --wait</code> 期间沙箱还在跑。</li>
 </ol>
-<p>L7 策略用 YAML 写，OpenShell 在 <code>policy engine</code> 里把它编译成 eBPF &#x2F; iptables 规则（取决于 kernel），再由 sandbox 内的 proxy 强制。这意味着 agent 即使想「换 DNS 绕开」也做不到 —— 出站只能过 proxy，proxy 按策略走。</p>
-<h3 id="凭证：从不落盘，按端点注入"><a href="#凭证：从不落盘，按端点注入" class="headerlink" title="凭证：从不落盘，按端点注入"></a>凭证：从不落盘，按端点注入</h3><p>OpenShell 把所有 API key &#x2F; token &#x2F; service account 抽象为 <strong>Provider</strong>（命名凭证包）：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># providers/ 里是 reviewable 的 profile 样例</span></span><br><span class="line"><span class="string">provider</span> <span class="string">profile</span> <span class="string">import</span> <span class="string">&lt;path-to-profile.yaml&gt;</span></span><br><span class="line"><span class="comment"># profile 声明：这个 provider 需要哪些凭证、对应哪些端点、允许跑哪些 client 二进制</span></span><br></pre></td></tr></table></figure>
+<h3 id="Policy-YAML-的字段结构"><a href="#Policy-YAML-的字段结构" class="headerlink" title="Policy YAML 的字段结构"></a>Policy YAML 的字段结构</h3><p><code>examples/sandbox-policy-quickstart/policy.yaml</code> 的完整结构如下，这是理解 L7 策略的起点：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">filesystem_policy:</span></span><br><span class="line">  <span class="attr">include_workdir:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">read_only:</span> [<span class="string">/usr</span>, <span class="string">/lib</span>, <span class="string">/proc</span>, <span class="string">/dev/urandom</span>, <span class="string">/app</span>, <span class="string">/etc</span>, <span class="string">/var/log</span>]</span><br><span class="line">  <span class="attr">read_write:</span> [<span class="string">/sandbox</span>, <span class="string">/tmp</span>, <span class="string">/dev/null</span>]</span><br><span class="line"></span><br><span class="line"><span class="attr">landlock:</span></span><br><span class="line">  <span class="attr">compatibility:</span> <span class="string">best_effort</span></span><br><span class="line"></span><br><span class="line"><span class="attr">network_policies:</span></span><br><span class="line">  <span class="attr">github_api:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">github-api-readonly</span></span><br><span class="line">    <span class="attr">endpoints:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.github.com</span></span><br><span class="line">        <span class="attr">port:</span> <span class="number">443</span></span><br><span class="line">        <span class="attr">protocol:</span> <span class="string">rest</span></span><br><span class="line">        <span class="attr">enforcement:</span> <span class="string">enforce</span></span><br><span class="line">        <span class="attr">access:</span> <span class="string">read-only</span></span><br><span class="line">    <span class="attr">binaries:</span></span><br><span class="line">      <span class="bullet">-</span> &#123; <span class="attr">path:</span> <span class="string">/usr/bin/curl</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>关键字段：</p>
+<ul>
+<li><code>version: 1</code> — 当前唯一支持的版本号，parser 遇到未知字段直接拒绝，没有宽松模式；</li>
+<li><code>filesystem_policy</code> — 静态文件系统策略，<code>read_only</code> &#x2F; <code>read_write</code> 列表决定 agent 能碰哪些路径；</li>
+<li><code>landlock</code> — Linux Landlock LSM 的兼容性设置，<code>best_effort</code> 表示如果内核不支持也不会让沙箱起不来（但会记录警告）；</li>
+<li><code>network_policies.&lt;key&gt;</code> — 命名策略块，每个块包含 <code>endpoints</code>（目标 host&#x2F;port&#x2F;protocol&#x2F;access）和 <code>binaries</code>（允许发起请求的进程白名单）。</li>
+</ul>
+<p><strong>Host wildcard 规则</strong>。<code>endpoints[].host</code> 支持 <code>*</code> 通配符，但有两个硬约束：只能出现在第一个 DNS label，或作为完整的中间 label；OPA runtime 用 <code>.</code> 作为 label 边界匹配，所以 <code>*.github.com</code> 能匹配 <code>api.github.com</code>，但 <code>api.*.com</code> 不行。validator 在策略加载时就校验这个边界，避免运行时静默不匹配。</p>
+<h3 id="Landlock-的实现细节"><a href="#Landlock-的实现细节" class="headerlink" title="Landlock 的实现细节"></a>Landlock 的实现细节</h3><p>OpenShell 用 Linux Landlock LSM 做文件系统强制，不是简单的 <code>chroot</code>：</p>
+<ul>
+<li><strong>Inode type 区分 rights</strong>。Landlock 规则根据已打开路径描述符报告的 inode 类型来分配权限：目录保留目录权限 + 文件权限；普通文件、设备节点、socket 只保留文件兼容权限。这让混合路径策略（如 <code>/dev</code> 下既有目录又有设备节点）不会在不 weaken <code>hard_requirement</code> 的前提下被拒绝。</li>
+<li><strong>Baseline path enrichment</strong>。在应用 Landlock 之前，supervisor 会自动补充 runtime 需要的基础路径（如 <code>/proc</code>、<code>/dev/urandom</code>）。如果某个基础路径不存在，会跳过而不是让整个规则集失效。</li>
+<li><strong>GPU 特殊处理</strong>。当沙箱启用 GPU 时，supervisor 会把现有 GPU 设备节点加入 read-write 路径，并把 <code>/proc</code> 提升为 read-write —— 因为 CUDA workload 会在 <code>/proc/&lt;pid&gt;/task/&lt;tid&gt;/comm</code> 写线程元数据。</li>
+</ul>
+<h3 id="凭证：从不落盘，按端点注入"><a href="#凭证：从不落盘，按端点注入" class="headerlink" title="凭证：从不落盘，按端点注入"></a>凭证：从不落盘，按端点注入</h3><p>OpenShell 把所有 API key &#x2F; token &#x2F; service account 抽象为 <strong>Provider</strong>（命名凭证包）。Provider 的声明来自 <strong>provider profile</strong>，以 <code>providers/anthropic.yaml</code> 为例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">id:</span> <span class="string">anthropic</span></span><br><span class="line"><span class="attr">display_name:</span> <span class="string">Anthropic</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Anthropic</span> <span class="string">inference</span> <span class="string">API</span></span><br><span class="line"><span class="attr">category:</span> <span class="string">inference</span></span><br><span class="line"><span class="attr">inference_capable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">credentials:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">api_key</span></span><br><span class="line">    <span class="attr">description:</span> <span class="string">Anthropic</span> <span class="string">API</span> <span class="string">key</span></span><br><span class="line"></span><br><span class="line"><span class="attr">endpoints:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.anthropic.com</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">443</span></span><br><span class="line">    <span class="attr">protocol:</span> <span class="string">rest</span></span><br><span class="line">    <span class="attr">enforcement:</span> <span class="string">enforce</span></span><br><span class="line">    <span class="attr">access:</span> <span class="string">read-write</span></span><br><span class="line"></span><br><span class="line"><span class="attr">binaries:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/bin/curl</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/local/bin/curl</span></span><br></pre></td></tr></table></figure>
+
+<p>再看 <code>providers/claude-code.yaml</code>，它展示了 agent 型 profile 的复杂度：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">id:</span> <span class="string">claude-code</span></span><br><span class="line"><span class="attr">display_name:</span> <span class="string">Claude</span> <span class="string">Code</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Claude</span> <span class="string">Code</span> <span class="string">CLI</span></span><br><span class="line"><span class="attr">category:</span> <span class="string">agent</span></span><br><span class="line"><span class="attr">inference_capable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">credentials:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">api_key</span></span><br><span class="line">    <span class="attr">description:</span> <span class="string">ANTHROPIC_API_KEY</span> <span class="string">or</span> <span class="string">CLAUDE_API_KEY</span></span><br><span class="line"></span><br><span class="line"><span class="attr">endpoints:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.anthropic.com</span>        <span class="comment"># 推理端点</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">statsig.anthropic.com</span>    <span class="comment"># CLI telemetry</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">sentry.io</span>                <span class="comment"># 错误上报</span></span><br><span class="line"></span><br><span class="line"><span class="attr">binaries:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/bin/claude</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/local/bin/claude</span></span><br></pre></td></tr></table></figure>
 
 <p>关键设计：</p>
 <table>
@@ -492,8 +525,12 @@
 <td>CLI 能从 shell 环境 auto-discover credential</td>
 <td>部署时不用手动输每个 key，但前提是 user 自己已经把它们 export 出来了</td>
 </tr>
+<tr>
+<td><code>binaries</code> 是最小权限控制</td>
+<td>即使 endpoint 和 credential 都匹配，发起请求的进程路径不在 <code>binaries</code> 列表里也会被拒绝</td>
+</tr>
 </tbody></table>
-<p>「绑端点」这一条是和「普通 secret manager」最大的差异：secret manager 给 agent 完整 key 让它自己去用，OpenShell 只在策略承认的请求上<strong>临时</strong>给 agent 用一下，request 一结束回收。</p>
+<p>「绑端点」这一条是和「普通 secret manager」最大的差异：secret manager 给 agent 完整 key 让它自己去用，OpenShell 只在策略承认的请求上<strong>临时</strong>给 agent 用一下，request 一结束回收。而 <code>binaries</code> 字段则是「即使 key 被读到，也只能由特定进程使用」的第二层保护。</p>
 <h2 id="五、SDK-与生态"><a href="#五、SDK-与生态" class="headerlink" title="五、SDK 与生态"></a>五、SDK 与生态</h2><h3 id="四个官方-SDK"><a href="#四个官方-SDK" class="headerlink" title="四个官方 SDK"></a>四个官方 SDK</h3><table>
 <thead>
 <tr>
@@ -557,11 +594,78 @@
 </tr>
 </tbody></table>
 <p>这些不是「OpenShell 接管了这些 agent」，而是「OpenShell 知道这些 agent 的二进制路径、需要的端点和凭证类型，能为它们预制 profile」。其他 agent（自研的、内部 SDK）也可以用 —— 自己写 image、写 profile、声明 endpoint 就行。</p>
+<h3 id="Agent-Skills-双层体系"><a href="#Agent-Skills-双层体系" class="headerlink" title="Agent Skills 双层体系"></a>Agent Skills 双层体系</h3><p>OpenShell 把 skills 分成两层，这是它「agent-first」设计哲学的体现：</p>
+<p><strong>Public skills</strong>（<code>skills/</code> 目录，用户安装）：</p>
+<ul>
+<li><code>openshell-cli</code> — CLI 工作流辅助</li>
+<li><code>debug-openshell-cluster</code> — Gateway 集群排障</li>
+<li><code>debug-inference</code> — 推理端点排障</li>
+<li><code>generate-sandbox-policy</code> — 自动生成沙箱策略</li>
+</ul>
+<p>安装方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx skills add NVIDIA/OpenShell</span><br></pre></td></tr></table></figure>
+
+<p><strong>Contributor &#x2F; Maintainer skills</strong>（<code>.agents/skills/</code> 目录，不随 public skills 分发）：</p>
+<ul>
+<li><code>create-spike</code> → <code>state:accepted</code> → 可选的 <code>agent:*</code> 规划与实现工作流</li>
+<li><code>triage-issue</code> — agent 评估技术有效性和影响，人类决定是否排期</li>
+<li><code>review-security-issue</code> &#x2F; <code>fix-security-issue</code> — 安全评估与修复</li>
+<li><code>sync-agent-infra</code>、<code>update-docs-from-commits</code> — 仓库维护</li>
+</ul>
+<p>OpenShell 的 README 明确说这个项目是 “built agent-first” —— 不仅给用户提供了 agent 工具，它自己的开发工作流也用了 agent。Contributor skills 不面向终端用户，但体现了 NVIDIA 对「agent-driven development」的押注。</p>
 <h3 id="装-agent-的姿势"><a href="#装-agent-的姿势" class="headerlink" title="装 agent 的姿势"></a>装 agent 的姿势</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 默认 image 不带任何 agent CLI（仅 Ubuntu 24.04 基础环境）</span></span><br><span class="line"><span class="comment"># 你要么自己 build image，要么用 --from 指向已有 image</span></span><br><span class="line">openshell sandbox create --from registry.example.com/agents/my-agent:1.0 -- my-agent</span><br></pre></td></tr></table></figure>
 
 <p>「装好 OpenShell」和「让 agent 在 OpenShell 里跑」是两件事 —— OpenShell 提供隔离与策略，你负责把 agent 装进 image。这是个常见的责任划分：runtime 不背 agent 行为不端的锅。</p>
-<h2 id="六、模型自由度-计算后端-GPU"><a href="#六、模型自由度-计算后端-GPU" class="headerlink" title="六、模型自由度 &#x2F; 计算后端 &#x2F; GPU"></a>六、模型自由度 &#x2F; 计算后端 &#x2F; GPU</h2><p>能改什么不能改什么，README 给了清单：</p>
+<h3 id="Terminal-UI"><a href="#Terminal-UI" class="headerlink" title="Terminal UI"></a>Terminal UI</h3><p><code>openshell term</code> 启动一个 k9s 风格的实时终端 dashboard，每 2 秒自动刷新：</p>
+<ul>
+<li><code>Tab</code> 切换面板</li>
+<li><code>j</code>&#x2F;<code>k</code> 上下移动</li>
+<li><code>Enter</code> 选中</li>
+<li><code>:</code> 进入命令模式</li>
+</ul>
+<p>TUI 不是装饰品 —— 它是 Gateway gRPC watch stream 的终端前端，能看到 sandbox 的实时状态、provider 附着情况、策略决策日志（<code>action=allow</code> 绿色 &#x2F; <code>action=deny</code> 红色）。</p>
+<h2 id="六、模型自由度-计算后端-GPU"><a href="#六、模型自由度-计算后端-GPU" class="headerlink" title="六、模型自由度 &#x2F; 计算后端 &#x2F; GPU"></a>六、模型自由度 &#x2F; 计算后端 &#x2F; GPU</h2><h3 id="四种-Compute-Driver-的差异"><a href="#四种-Compute-Driver-的差异" class="headerlink" title="四种 Compute Driver 的差异"></a>四种 Compute Driver 的差异</h3><p>OpenShell 的 compute runtime 不自己做策略评估，只负责「按 Gateway 给的 spec 启停 workload」。但四种 driver 的实现差异很大（<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell/blob/main/architecture/compute-runtimes.md">architecture&#x2F;compute-runtimes.md</a>）：</p>
 <table>
+<thead>
+<tr>
+<th>Driver</th>
+<th>隔离级别</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Docker</td>
+<td>容器</td>
+<td>最省事，单机 demo 首选；supervisor 和 workload 共享 Docker 网络，但 proxy 强制所有 outbound</td>
+</tr>
+<tr>
+<td>Podman</td>
+<td>容器（rootless）</td>
+<td><strong>Paired container 设计</strong>：workload 用 <code>network=none</code>，supervisor 单独 join 配置网络；两者通过 named volume 上的 Unix socket gRPC 通信；都跑在非 root、drop all capabilities</td>
+</tr>
+<tr>
+<td>MicroVM</td>
+<td>虚拟机</td>
+<td>最强隔离（容器逃逸防护）；用 host virtualization 启动，supervisor 在 VM 外；目前只支持早期 MicroVM 实现，Firecracker &#x2F; gVisor 之外的不全</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Pod</td>
+<td>通过 Helm chart 部署 Gateway；<code>supervisor.sandboxRuntime.networkPolicyEnforced=true</code> 启用网络策略；适合已有 k8s 集群的企业</td>
+</tr>
+</tbody></table>
+<p><strong>Podman driver 值得单独展开</strong>。它和 Docker 不一样：Podman 用 libpod API 同时启两个容器 —— 一个是 workload（agent 跑在里面），一个是 supervisor（跑在外面）。workload 的容器完全没有网络（<code>network=none</code>），所有 outbound 必须经过 supervisor 容器的 proxy。两个容器只共享 user namespace（为了 volume 所有权），不共享 PID、mount、network namespace。这种设计让即使 workload 容器被攻破，攻击者也拿不到网络访问 —— 因为 workload 容器根本没有网卡。</p>
+<p><strong>Driver Contract 的 7 条要求</strong>。每个 compute driver 必须实现（摘自架构文档）：</p>
+<ol>
+<li>选择 sandbox image；</li>
+<li>在 workload 创建前解析不可变的非 root sandbox identity；</li>
+<li>为 workload 和 supervisor 分别提供 bootstrap material；</li>
+<li>只把 <code>openshell-sandbox</code> 放进 workload，<code>openshell-supervisor</code> 只给 supervisor；</li>
+<li>提供受保护的 control channel（Unix socket &#x2F; TLS TCP &#x2F; vsock）；</li>
+<li>转发 exact main-process argv 和 TTY mode，不做 shell 重建；</li>
+<li>报告生命周期事件并清理 runtime-owned 资源。</li>
+</ol>
+<h3 id="能改什么不能改什么"><a href="#能改什么不能改什么" class="headerlink" title="能改什么不能改什么"></a>能改什么不能改什么</h3><table>
 <thead>
 <tr>
 <th>维度</th>
@@ -571,12 +675,12 @@
 </thead>
 <tbody><tr>
 <td>Compute backend</td>
-<td>在 Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes 之间切换（README 列了四种 driver）</td>
-<td>暂不支持 Firecracker &#x2F; gVisor 之外的 MicroVM 实现（MicroVM 是早期接入）</td>
+<td>Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes 切换</td>
+<td>暂不支持 Firecracker &#x2F; gVisor 之外的 MicroVM 实现</td>
 </tr>
 <tr>
 <td>Workload image</td>
-<td>自带 image、BYOC（bring-your-own-container）、从 registry 拉</td>
+<td>自带 image、BYOC、从 registry 拉</td>
 <td>image 里必须有 agent —— default Ubuntu image 只有基础环境</td>
 </tr>
 <tr>
@@ -587,7 +691,7 @@
 <tr>
 <td>策略</td>
 <td>网络 &#x2F; Provider 可热更新</td>
-<td>Filesystem &#x2F; Process 一旦创建不能改（这是有意为之 —— 见上节）</td>
+<td>Filesystem &#x2F; Process 一旦创建不能改</td>
 </tr>
 <tr>
 <td>Credential 注入</td>
@@ -596,12 +700,22 @@
 </tr>
 <tr>
 <td>Telemetry</td>
-<td>可以编译时关掉（Docker &#x2F; VM build flags）</td>
+<td>可以编译时关掉</td>
 <td>关掉后 official 支持矩阵里不覆盖</td>
 </tr>
 </tbody></table>
 <p><strong>GPU 直通</strong>值得单独说一句。<code>openshell sandbox create --gpu ...</code> 会尝试 CDI（Container Device Interface），没有就 fallback 到 Docker 的 <code>--gpus all</code>。文档里写得很诚实：「Expect rough edges and breaking changes」—— 是真的实验性，生产别赌。</p>
-<p><strong>计算后端的实际选择</strong>：如果是单机跑 demo &#x2F; 开发，Docker 最省事；如果是 k8s 集群（很多企业部署 agent 服务的形态），用 Kubernetes driver；MicroVM 适合需要更强隔离（容器逃逸防护）的场景；Podman 是「不想跑 Docker daemon」时的替代。</p>
+<h3 id="Telemetry-的编译定制"><a href="#Telemetry-的编译定制" class="headerlink" title="Telemetry 的编译定制"></a>Telemetry 的编译定制</h3><p>Telemetry 不是简单的一个开关，OpenShell 提供了三层控制：</p>
+<p><strong>1. 运行时关闭</strong>（gateway 级别，向下传播到 sandbox）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OPENSHELL_TELEMETRY_ENABLED=<span class="literal">false</span> openshell gateway ...</span><br><span class="line"><span class="comment"># Helm 安装时：</span></span><br><span class="line">helm install openshell ... --<span class="built_in">set</span> server.telemetryEnabled=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2. 编译时剔除</strong>（生成不含任何 telemetry 端点、HTTP client、emission code 的二进制）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features defaults-without-telemetry</span><br></pre></td></tr></table></figure>
+<p>注意：<code>--no-default-features</code> 必须和 <code>defaults-without-telemetry</code> 一起用；单独传 <code>--features defaults-without-telemetry</code> 会失败（Cargo 不支持「减去单个默认 feature」）。</p>
+<p><strong>3. 按 driver 裁剪</strong>。Gateway 的 Cargo feature 还包括 <code>compute-driver-kubernetes</code>、<code>compute-driver-docker</code>、<code>compute-driver-podman</code>、<code>compute-driver-vm</code>、<code>compute-driver-mxc</code>（Windows）。可以只编译需要的 driver：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 只留 Docker driver，带 telemetry</span></span><br><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features telemetry,compute-driver-docker</span><br><span class="line"></span><br><span class="line"><span class="comment"># Docker + VM，无 telemetry</span></span><br><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features compute-driver-docker,compute-driver-vm</span><br></pre></td></tr></table></figure>
+
+<p>Telemetry 收集的数据范围也写得很细：只收集匿名操作类别和计数（sandbox 生命周期结果、provider profile bucket、策略决策计数、网络拒绝类别），<strong>绝不收集</strong> sandbox 名称&#x2F;ID、hostname、文件路径、二进制路径、prompt、凭证、provider 名称、模型名称、用户内容。</p>
 <h2 id="七、边界与风险"><a href="#七、边界与风险" class="headerlink" title="七、边界与风险"></a>七、边界与风险</h2><p>把 OpenShell 推到生产之前，必须知道的几个事实：</p>
 <p><strong>1. 0.1.0 还没发布。</strong> README 第一行 <code>&gt; [!IMPORTANT] OpenShell 0.1.0 is coming soon</code>。当前仓库 alpha，意味着：</p>
 <ul>
@@ -622,6 +736,7 @@
 <p><strong>6. L7 vs TLS &#x2F; 证书。</strong> 策略引擎只校验 method + path，不会校验 TLS 证书链 —— 如果你把根 CA pin 在了 gateway 内部而 agent 自带的 CA store 不一致，可能出现「policy 允许但 TLS 失败」的奇怪组合。这不是 OpenShell 独有的问题，但记一笔。</p>
 <p><strong>7. Rust SDK 暂时 source-only。</strong> crates.io 没发版，写 Rust 集成要跟 git tag，且必须 pin 到和 gateway 同一 release。</p>
 <p><strong>8. OpenShell 不解决「agent prompt injection」。</strong> <a href="../../cve/">SkillSpector</a> 那种「扫 skill 里有没有恶意指令」是另一回事。OpenShell 只管运行时 —— 即便 agent 被注入「把这个文件 exfil 到 evil.com」，策略也会在 outbound 那一步把它拦下。但拦下之后你能否及时发现？这是日志&#x2F;告警问题，不是 OpenShell 的锅。</p>
+<p><strong>9. Telemetry 的隐私边界。</strong> 虽然官方承诺不收集敏感数据，但如果你所在环境对「任何匿名遥测都不能出内网」有硬性要求，需要在编译阶段就用 <code>--no-default-features --features defaults-without-telemetry</code> 把 telemetry 完全剔除。运行时 <code>OPENSHELL_TELEMETRY_ENABLED=false</code> 只是关掉 emission，二进制里仍然保留了 telemetry endpoint 和 client 代码。</p>
 <h2 id="八、上手"><a href="#八、上手" class="headerlink" title="八、上手"></a>八、上手</h2><p>最小可行 demo，三步：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 装 OpenShell（参见 README &quot;Install&quot; 一节，取决于平台 —— macOS 用 brew，Linux 用 curl 一行 installer）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 启一个 demo 沙箱（默认最小出站）</span></span><br><span class="line">openshell sandbox create --name demo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 进沙箱试一下 outbound —— 应该被 403</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line"><span class="comment"># curl: (56) Received HTTP code 403 from proxy after CONNECT</span></span><br></pre></td></tr></table></figure>
 
@@ -638,7 +753,8 @@
 <li><strong>先放最严格的，再慢慢松</strong> —— 比起「先全开再收紧」，「先全关再放白」更容易审计；</li>
 <li><strong>provider profile 拆细</strong> —— 不要做一个「all permissions」的 provider，分成 <code>provider-github-readonly</code> &#x2F; <code>provider-openai-inference</code> &#x2F; <code>provider-aws-s3-write</code> 等；</li>
 <li><strong>接 agent 前先人肉 curl 测一遍</strong> —— 用 curl 验证你写的策略是不是真的拦 &#x2F; 放了你以为的那个请求；</li>
-<li><strong>TLS 根 CA 一致</strong> —— 上面边界章节提了，agent image 和 gateway 的 CA 要对齐。</li>
+<li><strong>TLS 根 CA 一致</strong> —— 上面边界章节提了，agent image 和 gateway 的 CA 要对齐；</li>
+<li><strong>用 <code>openshell provider profile lint</code> 先校验</strong> —— 在 import 之前跑 lint，能 catch 掉 endpoint 格式错误、binaries 路径不存在等常见问题。</li>
 </ol>
 <h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p>OpenShell 不是一个新 agent 工具，是 <strong>「让现有 agent 安全接入生产系统」的一道闸</strong> —— 用四层策略（filesystem &#x2F; network &#x2F; process &#x2F; provider）和 L7 级别网络 + endpoint-bound credential 把 agent 关进一个有边界的世界。NVIDIA 官方背景 + Apache-2.0 + Rust 实现的「<strong>值得记一个结实底子</strong>」，但 0.1.0 还没发意味着这是<strong>给研究 &#x2F; 内网 &#x2F; 受控环境的工具</strong>，生产部署请等 0.1.0 至少一两个小版本再说。开始用的时候建议先 clone 一份 example policy 改出第一份自己的，再开始接 agent —— 不要跳过例子直接生产，否则你会和我一样在 TLS &#x2F; 端点匹配上浪费一小时。</p>
 

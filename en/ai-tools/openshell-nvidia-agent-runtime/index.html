@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790084505083" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790084505083" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790086993961" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790086993961" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790084505083" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790086993961" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -249,7 +249,7 @@
         <span class="i18n-en">Sep 22, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 38 分钟</span><span class="i18n-en">38 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 62 分钟</span><span class="i18n-en">62 min read</span></span>
       
       
       
@@ -397,7 +397,7 @@
 <p>OpenShell is the safe, private runtime for autonomous AI agents. It provides sandboxed execution environments that protect your data, credentials, and infrastructure — governed by declarative YAML policies that prevent unauthorized file access, data exfiltration, and uncontrolled network activity.</p>
 </blockquote>
 <p>Three keywords: <strong>sandboxed execution &#x2F; declarative YAML policies &#x2F; protect data credentials infrastructure</strong>.</p>
-<h2 id="III-Four-protection-layers-×-four-components"><a href="#III-Four-protection-layers-×-four-components" class="headerlink" title="III. Four protection layers × four components"></a>III. Four protection layers × four components</h2><p>OpenShell’s architecture splits cleanly into “<strong>four components</strong> managing <strong>four protection layers</strong>“:</p>
+<h2 id="III-Four-protection-layers-×-four-components"><a href="#III-Four-protection-layers-×-four-components" class="headerlink" title="III. Four protection layers × four components"></a>III. Four protection layers × four components</h2><p>OpenShell’s architecture splits cleanly into “<strong>four components</strong> managing <strong>four protection layers</strong>,” but the interaction sequence and responsibility boundaries matter more than the table itself.</p>
 <p><strong>Four components</strong> (<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell#how-it-works">README</a>):</p>
 <table>
 <thead>
@@ -423,6 +423,20 @@
 <td>Profile-defined endpoints, binary policy, and endpoint-bound credential injection for model APIs and other services</td>
 </tr>
 </tbody></table>
+<p><strong>The Gateway is the control plane, not the policy enforcement point.</strong> The architecture docs are explicit: the Gateway exposes gRPC APIs (lifecycle, provider management, policy updates, logs, watch streams, relay forwarding) and HTTP endpoints (health, WebSocket tunnels, edge-auth), but it <strong>does not make per-request network policy decisions</strong> — those happen inside the sandbox, in the supervisor + proxy. The Gateway only stores and delivers policy; actual enforcement occurs at the kernel layer. This design lets the Gateway scale horizontally without becoming a performance bottleneck, and it avoids the “policy is outside, agent is inside” routing problem.</p>
+<p><strong>Sandbox Readiness state machine.</strong> The Gateway composes driver-reported status with supervisor session state into the externally visible <code>SandboxPhase</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">backend_phase = derive_phase(driver_status)</span><br><span class="line"></span><br><span class="line">public_phase =</span><br><span class="line">  backend_phase in &#123;Error, Deleting&#125;                → pass through (terminal precedence)</span><br><span class="line">  driver_reports_runtime_readiness &amp;&amp; Ready         → Ready</span><br><span class="line">  backend_phase == Ready &amp;&amp; session connected       → Ready</span><br><span class="line">  backend_phase == Ready &amp;&amp; no session              → Provisioning</span><br></pre></td></tr></table></figure>
+
+<p>For supervisor-controlled drivers (Docker, Podman, VM), the driver saying Ready is not enough — the supervisor gRPC session must also be established before the sandbox is Ready. For Kubernetes (a driver-reports-runtime-readiness driver), the driver’s Ready is authoritative. This distinction determines how long you wait after <code>openshell sandbox create</code> before you can <code>connect</code> — local Docker is usually seconds; Kubernetes may wait for Pod scheduling + image pull.</p>
+<p><strong>Policy Engine’s 6-step network decision flow.</strong> All outbound traffic inside the sandbox is forced through the proxy, which decides in this order (<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell/blob/main/architecture/security-policy.md">architecture&#x2F;security-policy.md</a>):</p>
+<ol>
+<li><strong>Force proxy</strong> — namespace + seccomp controls ensure traffic can only go through the proxy;</li>
+<li><strong>Binary identity</strong> — identify the requesting process binary path and compare against the <code>binaries</code> whitelist in policy;</li>
+<li><strong>Hard-block</strong> — reject dangerous internal IP ranges (e.g., 169.254.x.x, 10.x.x.x) unless explicitly allowed;</li>
+<li><strong>Policy match</strong> — match destination + port + binary against network policy blocks;</li>
+<li><strong>L7 rules</strong> — for endpoints with protocol inspection enabled, check HTTP method + path;</li>
+<li><strong>Action</strong> — allow &#x2F; deny &#x2F; audit &#x2F; log. Explicit deny and hardening checks win over allow; no match → deny.</li>
+</ol>
 <p><strong>Four protection layers</strong> (<code>defense in depth</code>):</p>
 <table>
 <thead>
@@ -456,7 +470,7 @@
 <p>Why are Filesystem and Process locked at creation while Network and Providers can hot-reload? Because the first two are hard to walk back once granted (a file may have been copied somewhere else, an escalated process can spawn any child process), while the latter two are more like temporary passes — adding GitHub API to the network whitelist, attaching a new model profile for a different provider — both can be loaded live.</p>
 <h2 id="IV-Network-policy-and-credential-model-L7-endpoint-bound"><a href="#IV-Network-policy-and-credential-model-L7-endpoint-bound" class="headerlink" title="IV. Network policy and credential model (L7 + endpoint-bound)"></a>IV. Network policy and credential model (L7 + endpoint-bound)</h2><p>The two pieces worth expanding on are <strong>network policy</strong> and <strong>credential model</strong>, because these are the biggest gap between OpenShell and “just another Docker sandbox.”</p>
 <h3 id="Network-L7-granularity-minimal-egress-by-default"><a href="#Network-L7-granularity-minimal-egress-by-default" class="headerlink" title="Network: L7 granularity, minimal egress by default"></a>Network: L7 granularity, minimal egress by default</h3><p>The Quickstart in the README shows a full “deny, then allow” cycle:</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Create a sandbox (starts with minimal outbound access)</span></span><br><span class="line">openshell sandbox create</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Inside the sandbox — blocked</span></span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">curl: (56) Received HTTP code 403 from proxy after CONNECT</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Back on the host — apply a read-only GitHub API policy</span></span><br><span class="line">openshell policy <span class="built_in">set</span> demo --policy examples/sandbox-policy-quickstart/policy.yaml --<span class="built_in">wait</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. Reconnect — GET allowed, POST blocked by L7</span></span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">Anything added dilutes everything <span class="keyword">else</span>.</span><br><span class="line"></span><br><span class="line">sandbox$ curl -sS -X POST https://api.github.com/repos/octocat/hello-world/issues -d <span class="string">&#x27;&#123;&quot;title&quot;:&quot;oops&quot;&#125;&#x27;</span></span><br><span class="line">&#123;<span class="string">&quot;error&quot;</span>:<span class="string">&quot;policy_denied&quot;</span>,<span class="string">&quot;detail&quot;</span>:<span class="string">&quot;POST /repos/octocat/hello-world/issues not permitted by policy&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Create a sandbox (starts with minimal outbound access)</span></span><br><span class="line">openshell sandbox create</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Inside the sandbox — blocked</span></span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">curl: (56) Received HTTP code 403 from proxy after CONNECT</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Back on the host — apply a read-only GitHub API policy</span></span><br><span class="line">sandbox$ <span class="built_in">exit</span></span><br><span class="line">openshell policy <span class="built_in">set</span> demo --policy examples/sandbox-policy-quickstart/policy.yaml --<span class="built_in">wait</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. Reconnect — GET allowed, POST blocked by L7</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line">Anything added dilutes everything <span class="keyword">else</span>.</span><br><span class="line"></span><br><span class="line">sandbox$ curl -sS -X POST https://api.github.com/repos/octocat/hello-world/issues -d <span class="string">&#x27;&#123;&quot;title&quot;:&quot;oops&quot;&#125;&#x27;</span></span><br><span class="line">&#123;<span class="string">&quot;error&quot;</span>:<span class="string">&quot;policy_denied&quot;</span>,<span class="string">&quot;detail&quot;</span>:<span class="string">&quot;POST /repos/octocat/hello-world/issues not permitted by policy&quot;</span>&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Three details worth noting:</p>
 <ol>
@@ -464,9 +478,28 @@
 <li><strong>GET is allowed, POST is blocked</strong> — the policy is not a domain allow&#x2F;deny list, it is “GET to <a target="_blank" rel="noopener" href="https://api.github.com/">https://api.github.com</a> is allowed, POST is not.” That is L7 granularity, a big step up from most “egress allowlist” products that stop at L4 (IP + port);</li>
 <li><strong>Hot-reload does not require restarting the sandbox</strong> — the sandbox keeps running while <code>openshell policy set ... --wait</code> applies the new policy.</li>
 </ol>
-<p>L7 policy is written in YAML. OpenShell’s policy engine compiles it into eBPF &#x2F; iptables rules (depending on kernel), and the in-sandbox proxy enforces it. This means even if the agent tries to “switch DNS to get around it,” it can’t — outbound only goes through the proxy, and the proxy follows the policy.</p>
-<h3 id="Credentials-never-touch-disk-bound-to-endpoints"><a href="#Credentials-never-touch-disk-bound-to-endpoints" class="headerlink" title="Credentials: never touch disk, bound to endpoints"></a>Credentials: never touch disk, bound to endpoints</h3><p>OpenShell abstracts all API keys &#x2F; tokens &#x2F; service accounts as <strong>Providers</strong> (named credential bundles):</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># providers/ holds reviewable profile examples</span></span><br><span class="line"><span class="string">provider</span> <span class="string">profile</span> <span class="string">import</span> <span class="string">&lt;path-to-profile.yaml&gt;</span></span><br><span class="line"><span class="comment"># A profile declares: what credentials the provider needs, what endpoints it covers,</span></span><br><span class="line"><span class="comment"># and which client binaries are allowed to use it</span></span><br></pre></td></tr></table></figure>
+<h3 id="Policy-YAML-field-structure"><a href="#Policy-YAML-field-structure" class="headerlink" title="Policy YAML field structure"></a>Policy YAML field structure</h3><p>The full structure of <code>examples/sandbox-policy-quickstart/policy.yaml</code> is the starting point for understanding L7 policy:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="attr">filesystem_policy:</span></span><br><span class="line">  <span class="attr">include_workdir:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">read_only:</span> [<span class="string">/usr</span>, <span class="string">/lib</span>, <span class="string">/proc</span>, <span class="string">/dev/urandom</span>, <span class="string">/app</span>, <span class="string">/etc</span>, <span class="string">/var/log</span>]</span><br><span class="line">  <span class="attr">read_write:</span> [<span class="string">/sandbox</span>, <span class="string">/tmp</span>, <span class="string">/dev/null</span>]</span><br><span class="line"></span><br><span class="line"><span class="attr">landlock:</span></span><br><span class="line">  <span class="attr">compatibility:</span> <span class="string">best_effort</span></span><br><span class="line"></span><br><span class="line"><span class="attr">network_policies:</span></span><br><span class="line">  <span class="attr">github_api:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">github-api-readonly</span></span><br><span class="line">    <span class="attr">endpoints:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.github.com</span></span><br><span class="line">        <span class="attr">port:</span> <span class="number">443</span></span><br><span class="line">        <span class="attr">protocol:</span> <span class="string">rest</span></span><br><span class="line">        <span class="attr">enforcement:</span> <span class="string">enforce</span></span><br><span class="line">        <span class="attr">access:</span> <span class="string">read-only</span></span><br><span class="line">    <span class="attr">binaries:</span></span><br><span class="line">      <span class="bullet">-</span> &#123; <span class="attr">path:</span> <span class="string">/usr/bin/curl</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>Key fields:</p>
+<ul>
+<li><code>version: 1</code> — the only supported version; the parser rejects unknown fields with no permissive parsing mode;</li>
+<li><code>filesystem_policy</code> — static filesystem rules; <code>read_only</code> &#x2F; <code>read_write</code> lists determine what paths the agent can touch;</li>
+<li><code>landlock</code> — Linux Landlock LSM compatibility setting; <code>best_effort</code> means the sandbox starts even if the kernel does not support Landlock (with a warning logged);</li>
+<li><code>network_policies.&lt;key&gt;</code> — named policy blocks, each containing <code>endpoints</code> (target host&#x2F;port&#x2F;protocol&#x2F;access) and <code>binaries</code> (process whitelist).</li>
+</ul>
+<p><strong>Host wildcard rules.</strong> <code>endpoints[].host</code> supports <code>*</code> wildcards, but with two hard constraints: only in the first DNS label, or as an entire middle label. The OPA runtime matches with a <code>.</code> label boundary, so <code>*.github.com</code> matches <code>api.github.com</code>, but <code>api.*.com</code> does not. The validator enforces this boundary at policy load time, preventing silent mismatches at the proxy.</p>
+<h3 id="Landlock-implementation-details"><a href="#Landlock-implementation-details" class="headerlink" title="Landlock implementation details"></a>Landlock implementation details</h3><p>OpenShell uses Linux Landlock LSM for filesystem enforcement, not just <code>chroot</code>:</p>
+<ul>
+<li><strong>Inode-type-distinguished rights.</strong> Landlock rules assign permissions based on the inode type reported by the already-opened path descriptor: directories keep directory + file rights; regular files, device nodes, and sockets keep only file-compatible rights. This lets mixed-path policies (e.g., <code>/dev</code> containing both directories and device nodes) succeed without weakening <code>hard_requirement</code>.</li>
+<li><strong>Baseline path enrichment.</strong> Before applying Landlock, the supervisor auto-supplements baseline paths the runtime needs (e.g., <code>/proc</code>, <code>/dev/urandom</code>). Missing baseline paths are skipped rather than invalidating the entire ruleset.</li>
+<li><strong>GPU special handling.</strong> When GPU is enabled, the supervisor adds existing GPU device nodes as read-write paths and promotes <code>/proc</code> to read-write because CUDA workloads write thread metadata under <code>/proc/&lt;pid&gt;/task/&lt;tid&gt;/comm</code>.</li>
+</ul>
+<h3 id="Credentials-never-touch-disk-bound-to-endpoints"><a href="#Credentials-never-touch-disk-bound-to-endpoints" class="headerlink" title="Credentials: never touch disk, bound to endpoints"></a>Credentials: never touch disk, bound to endpoints</h3><p>OpenShell abstracts all API keys &#x2F; tokens &#x2F; service accounts as <strong>Providers</strong> (named credential bundles). Provider declarations come from <strong>provider profiles</strong>. Here is <code>providers/anthropic.yaml</code>:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">id:</span> <span class="string">anthropic</span></span><br><span class="line"><span class="attr">display_name:</span> <span class="string">Anthropic</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Anthropic</span> <span class="string">inference</span> <span class="string">API</span></span><br><span class="line"><span class="attr">category:</span> <span class="string">inference</span></span><br><span class="line"><span class="attr">inference_capable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">credentials:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">api_key</span></span><br><span class="line">    <span class="attr">description:</span> <span class="string">Anthropic</span> <span class="string">API</span> <span class="string">key</span></span><br><span class="line"></span><br><span class="line"><span class="attr">endpoints:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.anthropic.com</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">443</span></span><br><span class="line">    <span class="attr">protocol:</span> <span class="string">rest</span></span><br><span class="line">    <span class="attr">enforcement:</span> <span class="string">enforce</span></span><br><span class="line">    <span class="attr">access:</span> <span class="string">read-write</span></span><br><span class="line"></span><br><span class="line"><span class="attr">binaries:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/bin/curl</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/local/bin/curl</span></span><br></pre></td></tr></table></figure>
+
+<p>And <code>providers/claude-code.yaml</code>, showing the complexity of an agent-type profile:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">id:</span> <span class="string">claude-code</span></span><br><span class="line"><span class="attr">display_name:</span> <span class="string">Claude</span> <span class="string">Code</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">Claude</span> <span class="string">Code</span> <span class="string">CLI</span></span><br><span class="line"><span class="attr">category:</span> <span class="string">agent</span></span><br><span class="line"><span class="attr">inference_capable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">credentials:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">api_key</span></span><br><span class="line">    <span class="attr">description:</span> <span class="string">ANTHROPIC_API_KEY</span> <span class="string">or</span> <span class="string">CLAUDE_API_KEY</span></span><br><span class="line"></span><br><span class="line"><span class="attr">endpoints:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">api.anthropic.com</span>        <span class="comment"># inference endpoint</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">statsig.anthropic.com</span>    <span class="comment"># CLI telemetry</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">host:</span> <span class="string">sentry.io</span>                <span class="comment"># error reporting</span></span><br><span class="line"></span><br><span class="line"><span class="attr">binaries:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/bin/claude</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">path:</span> <span class="string">/usr/local/bin/claude</span></span><br></pre></td></tr></table></figure>
 
 <p>Key design choices:</p>
 <table>
@@ -492,8 +525,12 @@
 <td>The CLI can auto-discover credentials from your shell environment</td>
 <td>You don’t have to type every key in, but you do need to have already exported them in your shell</td>
 </tr>
+<tr>
+<td><code>binaries</code> is the least-privilege control</td>
+<td>Even if endpoint and credential match, a requesting process whose path is not in the <code>binaries</code> list is rejected</td>
+</tr>
 </tbody></table>
-<p>“Endpoint-bound” is the biggest difference from a regular secret manager: a secret manager hands the agent the full key and lets it go, OpenShell only gives the agent a <strong>temporary</strong> use of the key for the specific request the policy admits, and the moment the request ends, the binding is gone.</p>
+<p>“Endpoint-bound” is the biggest difference from a regular secret manager: a secret manager hands the agent the full key and lets it go, OpenShell only gives the agent a <strong>temporary</strong> use of the key for the specific request the policy admits, and the moment the request ends, the binding is gone. The <code>binaries</code> field adds a second layer: even if the key is read, only specific processes can use it.</p>
 <h2 id="V-SDKs-and-ecosystem"><a href="#V-SDKs-and-ecosystem" class="headerlink" title="V. SDKs and ecosystem"></a>V. SDKs and ecosystem</h2><h3 id="Four-official-SDKs"><a href="#Four-official-SDKs" class="headerlink" title="Four official SDKs"></a>Four official SDKs</h3><table>
 <thead>
 <tr>
@@ -557,11 +594,78 @@
 </tr>
 </tbody></table>
 <p>These are not “OpenShell takes over the agent” — they are “OpenShell knows the agent’s binary paths, required endpoints, and credential types, and ships profiles pre-tuned for them.” Any other agent (custom, in-house SDK) can also run — you write the image, write the profile, declare the endpoint.</p>
+<h3 id="Agent-Skills-dual-layer-system"><a href="#Agent-Skills-dual-layer-system" class="headerlink" title="Agent Skills dual-layer system"></a>Agent Skills dual-layer system</h3><p>OpenShell splits skills into two layers, embodying its “agent-first” design philosophy:</p>
+<p><strong>Public skills</strong> (<code>skills/</code> directory, user-installable):</p>
+<ul>
+<li><code>openshell-cli</code> — CLI workflow assistance</li>
+<li><code>debug-openshell-cluster</code> — Gateway cluster troubleshooting</li>
+<li><code>debug-inference</code> — Inference endpoint troubleshooting</li>
+<li><code>generate-sandbox-policy</code> — Auto-generate sandbox policy</li>
+</ul>
+<p>Install:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx skills add NVIDIA/OpenShell</span><br></pre></td></tr></table></figure>
+
+<p><strong>Contributor &#x2F; Maintainer skills</strong> (<code>.agents/skills/</code> directory, not distributed with public skills):</p>
+<ul>
+<li><code>create-spike</code> → <code>state:accepted</code> → optional <code>agent:*</code> planning and implementation workflow</li>
+<li><code>triage-issue</code> — agent assesses technical validity and impact; humans decide whether to schedule</li>
+<li><code>review-security-issue</code> &#x2F; <code>fix-security-issue</code> — security assessment and remediation</li>
+<li><code>sync-agent-infra</code>, <code>update-docs-from-commits</code> — repository maintenance</li>
+</ul>
+<p>The README states the project is “built agent-first” — not only does it provide agent tools to users, its own development workflow is agent-driven. Contributor skills are not for end users, but they signal NVIDIA’s bet on agent-driven development.</p>
 <h3 id="How-to-put-an-agent-inside"><a href="#How-to-put-an-agent-inside" class="headerlink" title="How to put an agent inside"></a>How to put an agent inside</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># The default image contains only Ubuntu 24.04 — no agent CLI.</span></span><br><span class="line"><span class="comment"># You either build your own image or pull one from a registry:</span></span><br><span class="line">openshell sandbox create --from registry.example.com/agents/my-agent:1.0 -- my-agent</span><br></pre></td></tr></table></figure>
 
 <p>“Installing OpenShell” and “having an agent run inside OpenShell” are two different things. OpenShell provides isolation and policy; you are responsible for putting the agent into the image. That is a deliberate responsibility split: the runtime does not take the blame for an agent that misbehaves.</p>
-<h2 id="VI-Model-freedom-compute-backends-GPU"><a href="#VI-Model-freedom-compute-backends-GPU" class="headerlink" title="VI. Model freedom &#x2F; compute backends &#x2F; GPU"></a>VI. Model freedom &#x2F; compute backends &#x2F; GPU</h2><p>What you can and cannot change, per the README:</p>
+<h3 id="Terminal-UI"><a href="#Terminal-UI" class="headerlink" title="Terminal UI"></a>Terminal UI</h3><p><code>openshell term</code> launches a k9s-style real-time terminal dashboard that auto-refreshes every 2 seconds:</p>
+<ul>
+<li><code>Tab</code> switches panels</li>
+<li><code>j</code>&#x2F;<code>k</code> moves up&#x2F;down</li>
+<li><code>Enter</code> selects</li>
+<li><code>:</code> enters command mode</li>
+</ul>
+<p>The TUI is not cosmetic — it is a terminal frontend for the Gateway gRPC watch stream, showing real-time sandbox status, provider attachments, and policy decision logs (<code>action=allow</code> in green &#x2F; <code>action=deny</code> in red).</p>
+<h2 id="VI-Model-freedom-compute-backends-GPU"><a href="#VI-Model-freedom-compute-backends-GPU" class="headerlink" title="VI. Model freedom &#x2F; compute backends &#x2F; GPU"></a>VI. Model freedom &#x2F; compute backends &#x2F; GPU</h2><h3 id="Four-compute-drivers-compared"><a href="#Four-compute-drivers-compared" class="headerlink" title="Four compute drivers compared"></a>Four compute drivers compared</h3><p>OpenShell’s compute runtimes do not evaluate policy themselves; they only start and stop workloads per the Gateway’s spec. But the four drivers differ significantly (<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/OpenShell/blob/main/architecture/compute-runtimes.md">architecture&#x2F;compute-runtimes.md</a>):</p>
 <table>
+<thead>
+<tr>
+<th>Driver</th>
+<th>Isolation</th>
+<th>Characteristics</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Docker</td>
+<td>Container</td>
+<td>Easiest for local demos; supervisor and workload share Docker network, but the proxy forces all outbound</td>
+</tr>
+<tr>
+<td>Podman</td>
+<td>Container (rootless)</td>
+<td><strong>Paired container design</strong>: workload runs with <code>network=none</code>, supervisor joins the configured network separately; they communicate via gRPC over a Unix socket on a named volume; both run non-root with all capabilities dropped</td>
+</tr>
+<tr>
+<td>MicroVM</td>
+<td>Virtual machine</td>
+<td>Strongest isolation (container-escape protection); uses host virtualization, supervisor outside the VM; early MicroVM implementations only — Firecracker &#x2F; gVisor coverage is incomplete</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Pod</td>
+<td>Deploy Gateway via Helm chart; <code>supervisor.sandboxRuntime.networkPolicyEnforced=true</code> enables network policy; fits existing k8s clusters</td>
+</tr>
+</tbody></table>
+<p><strong>The Podman driver deserves its own paragraph.</strong> Unlike Docker, Podman uses the libpod API to start two containers simultaneously — one workload (the agent runs inside) and one supervisor (runs outside). The workload container has no network at all (<code>network=none</code>); all outbound must go through the supervisor container’s proxy. The two containers share only a user namespace (for volume ownership), not PID, mount, or network namespace. This means even if the workload container is compromised, the attacker has no network access — because the workload container has no network interface.</p>
+<p><strong>The 7 requirements of the Driver Contract</strong> (from the architecture docs):</p>
+<ol>
+<li>Select the sandbox image;</li>
+<li>Resolve an immutable non-root sandbox identity before workload creation;</li>
+<li>Supply separate bootstrap material for workload and supervisor;</li>
+<li>Deliver <code>openshell-sandbox</code> only to the workload, <code>openshell-supervisor</code> only to the supervisor;</li>
+<li>Provide a protected control channel (Unix socket &#x2F; TLS TCP &#x2F; vsock);</li>
+<li>Forward the exact main-process argv and TTY mode without shell reconstruction;</li>
+<li>Report lifecycle events and clean up runtime-owned resources.</li>
+</ol>
+<h3 id="What-you-can-and-cannot-change"><a href="#What-you-can-and-cannot-change" class="headerlink" title="What you can and cannot change"></a>What you can and cannot change</h3><table>
 <thead>
 <tr>
 <th>Dimension</th>
@@ -571,7 +675,7 @@
 </thead>
 <tbody><tr>
 <td>Compute backend</td>
-<td>Switch between Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes (the README lists all four drivers)</td>
+<td>Switch between Docker &#x2F; Podman &#x2F; MicroVM &#x2F; Kubernetes</td>
 <td>No Firecracker &#x2F; gVisor beyond the early MicroVM integration</td>
 </tr>
 <tr>
@@ -587,7 +691,7 @@
 <tr>
 <td>Policy</td>
 <td>Network and Providers can be hot-reloaded</td>
-<td>Filesystem and Process are immutable after creation (this is intentional — see previous section)</td>
+<td>Filesystem and Process are immutable after creation (this is intentional)</td>
 </tr>
 <tr>
 <td>Credential injection</td>
@@ -596,12 +700,22 @@
 </tr>
 <tr>
 <td>Telemetry</td>
-<td>Can be compiled out at build time (Docker &#x2F; VM build flags)</td>
+<td>Can be compiled out at build time</td>
 <td>The official support matrix does not cover builds with telemetry disabled</td>
 </tr>
 </tbody></table>
 <p><strong>GPU passthrough</strong> deserves its own paragraph. <code>openshell sandbox create --gpu ...</code> will attempt CDI (Container Device Interface) first and fall back to Docker’s <code>--gpus all</code> if CDI is not available. The documentation is refreshingly honest: “Expect rough edges and breaking changes.” It is genuinely experimental — do not stake production on it.</p>
-<p><strong>Choosing a compute backend in practice</strong>: Docker is the easiest for single-machine demos and dev. Kubernetes makes sense if you already run agents on a k8s cluster (many enterprise deployments do). MicroVM is the right call when you need stronger isolation than a container provides (e.g. container-escape protection). Podman is the alternative when you do not want a Docker daemon.</p>
+<h3 id="Telemetry-compilation-options"><a href="#Telemetry-compilation-options" class="headerlink" title="Telemetry compilation options"></a>Telemetry compilation options</h3><p>Telemetry is not a single on&#x2F;off switch; OpenShell offers three levels of control:</p>
+<p><strong>1. Runtime disable</strong> (gateway level, propagated to sandboxes):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">OPENSHELL_TELEMETRY_ENABLED=<span class="literal">false</span> openshell gateway ...</span><br><span class="line"><span class="comment"># Helm install:</span></span><br><span class="line">helm install openshell ... --<span class="built_in">set</span> server.telemetryEnabled=<span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2. Compile-time removal</strong> (produces binaries with no telemetry endpoint, HTTP client, or emission code):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features defaults-without-telemetry</span><br></pre></td></tr></table></figure>
+<p>Note: <code>--no-default-features</code> must be paired with <code>defaults-without-telemetry</code>; passing <code>--features defaults-without-telemetry</code> alone fails because Cargo does not support “subtract a single default feature.”</p>
+<p><strong>3. Per-driver trimming.</strong> Gateway Cargo features also include <code>compute-driver-kubernetes</code>, <code>compute-driver-docker</code>, <code>compute-driver-podman</code>, <code>compute-driver-vm</code>, and <code>compute-driver-mxc</code> (Windows). Compile only the drivers you need:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Docker only, with telemetry</span></span><br><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features telemetry,compute-driver-docker</span><br><span class="line"></span><br><span class="line"><span class="comment"># Docker and VM only, telemetry compiled out</span></span><br><span class="line">cargo build --release -p openshell-gateway \</span><br><span class="line">  --no-default-features --features compute-driver-docker,compute-driver-vm</span><br></pre></td></tr></table></figure>
+
+<p>Telemetry data scope is also documented precisely: only anonymous operational categories and counts (sandbox lifecycle outcomes, provider profile buckets, policy decision counts, network denial categories). It <strong>never collects</strong> sandbox names&#x2F;IDs, hostnames, file paths, binary paths, prompts, credentials, provider names, model names, or user content.</p>
 <h2 id="VII-Boundaries-and-risks"><a href="#VII-Boundaries-and-risks" class="headerlink" title="VII. Boundaries and risks"></a>VII. Boundaries and risks</h2><p>Before you push OpenShell toward production, a few facts you need to know:</p>
 <p><strong>1. 0.1.0 has not shipped.</strong> The first line of the README is <code>&gt; [!IMPORTANT] OpenShell 0.1.0 is coming soon</code>. The repo is alpha, which means:</p>
 <ul>
@@ -622,6 +736,7 @@
 <p><strong>6. L7 vs TLS &#x2F; certificates.</strong> The policy engine only checks method + path — it does not validate the TLS certificate chain. If you pin a root CA inside the gateway but the agent’s bundled CA store is different, you can hit “policy allows but TLS fails” combinations. This is not unique to OpenShell, but worth a note.</p>
 <p><strong>7. The Rust SDK is source-only for now.</strong> crates.io has no release; if you write Rust integrations, you have to follow a git tag, and you must pin to the same release as the gateway.</p>
 <p><strong>8. OpenShell does not solve agent prompt injection.</strong> <a href="../../cve/">SkillSpector</a> scans skills for malicious instructions. OpenShell only handles runtime — even if the agent is injected with “exfil this file to evil.com,” the policy will stop it at the outbound gate. Whether you notice the stopped attempt is a logging&#x2F;alerting problem, not OpenShell’s fault.</p>
+<p><strong>9. Telemetry privacy boundary.</strong> Although the project promises not to collect sensitive data, if your environment has a hard requirement that “no anonymous telemetry leaves the internal network,” you need to compile telemetry out entirely with <code>--no-default-features --features defaults-without-telemetry</code>. Runtime <code>OPENSHELL_TELEMETRY_ENABLED=false</code> only stops emission; the telemetry endpoint and client code still exist in the binary.</p>
 <h2 id="VIII-Getting-started"><a href="#VIII-Getting-started" class="headerlink" title="VIII. Getting started"></a>VIII. Getting started</h2><p>Minimum viable demo, three steps:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Install OpenShell (see the README &quot;Install&quot; section — macOS uses brew, Linux uses a one-line curl installer)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Spin up a demo sandbox (minimal egress by default)</span></span><br><span class="line">openshell sandbox create --name demo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Enter it and try an outbound request — should be 403</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line"><span class="comment"># curl: (56) Received HTTP code 403 from proxy after CONNECT</span></span><br></pre></td></tr></table></figure>
 
@@ -638,7 +753,8 @@
 <li><strong>Start strict, loosen carefully</strong> — easier to audit than “start wide, tighten later”;</li>
 <li><strong>Split provider profiles narrowly</strong> — do not make an “all permissions” provider; make <code>provider-github-readonly</code> &#x2F; <code>provider-openai-inference</code> &#x2F; <code>provider-aws-s3-write</code> and so on;</li>
 <li><strong>Test your policy with curl before wiring up the agent</strong> — verify your YAML actually does what you think it does for the request shapes you care about;</li>
-<li><strong>Align TLS root CAs</strong> — the boundaries section flagged this; agent image and gateway CAs must match.</li>
+<li><strong>Align TLS root CAs</strong> — the boundaries section flagged this; agent image and gateway CAs must match;</li>
+<li><strong>Run <code>openshell provider profile lint</code> before importing</strong> — it catches endpoint format errors, missing binaries paths, and other common mistakes before they reach the gateway.</li>
 </ol>
 <h2 id="IX-One-line-takeaway"><a href="#IX-One-line-takeaway" class="headerlink" title="IX. One-line takeaway"></a>IX. One-line takeaway</h2><p>OpenShell is not a new agent tool — it is a <strong>gate that lets existing agents safely touch production systems</strong>. Four policy layers (filesystem &#x2F; network &#x2F; process &#x2F; provider) plus L7 network control plus endpoint-bound credentials place the agent inside a bounded world. NVIDIA’s official backing, Apache-2.0, and a Rust implementation mean this is <strong>worth keeping on the radar as a serious foundation</strong>, but with 0.1.0 unreleased it is <strong>a tool for research &#x2F; internal &#x2F; controlled environments today</strong>. Production deployments should wait for at least a couple of minor releases past 0.1.0. When you start using it, clone an example policy and write your own first before plugging in an agent — skipping that step will cost you an hour on TLS &#x2F; endpoint matching, just like it did me.</p>
 
