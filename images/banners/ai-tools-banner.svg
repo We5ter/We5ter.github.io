@@ -17,6 +17,10 @@
       <stop offset="50%" stop-color="#ffffff" stop-opacity="0.22"/>
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="ai-blade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.66"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.3"/>
+    </linearGradient>
   </defs>
 
   <rect width="1600" height="420" fill="url(#ai-bg)"/>
@@ -31,5 +35,39 @@
   <g stroke="url(#ai-line)" stroke-width="1.2">
     <path d="M0 340 H1600"/>
     <path d="M0 372 H1600"/>
+  </g>
+
+  <!-- 纹章：交叉双剑 + 盾 + 武士兜。
+       cover 裁切后可见的是原图 y≈90~330 这条横带，元素全部落在该带内。 -->
+  <g>
+    <g transform="translate(1300 205) rotate(30)">
+      <path d="M-9 -12 L-9 -140 L0 -165 L9 -140 L9 -12 Z" fill="url(#ai-blade)"/>
+      <rect x="-30" y="-16" width="60" height="10" rx="3" fill="#ffffff" fill-opacity="0.5"/>
+      <rect x="-6" y="-8" width="12" height="60" rx="3" fill="#ffffff" fill-opacity="0.38"/>
+      <circle cx="0" cy="76" r="9" fill="#ffffff" fill-opacity="0.45"/>
+    </g>
+    <g transform="translate(1300 205) rotate(-30)">
+      <path d="M-9 -12 L-9 -140 L0 -165 L9 -140 L9 -12 Z" fill="url(#ai-blade)"/>
+      <rect x="-30" y="-16" width="60" height="10" rx="3" fill="#ffffff" fill-opacity="0.5"/>
+      <rect x="-6" y="-8" width="12" height="60" rx="3" fill="#ffffff" fill-opacity="0.38"/>
+      <circle cx="0" cy="76" r="9" fill="#ffffff" fill-opacity="0.45"/>
+    </g>
+
+    <!-- 盾 -->
+    <path d="M1200 100 H1400 V205 Q1300 330 1200 205 Z"
+          fill="#ffffff" fill-opacity="0.09"
+          stroke="#ffffff" stroke-opacity="0.55" stroke-width="3.5"/>
+
+    <!-- 盾内武士兜（正面）：兜钵 + 錣 + 前立 + 面颊当 -->
+    <g transform="translate(1300 172)"
+       fill="#ffffff" fill-opacity="0.46"
+       stroke="#ffffff" stroke-opacity="0.62" stroke-width="2.4">
+      <path d="M-44 6 C-44 -30 -25 -50 0 -50 C25 -50 44 -30 44 6 Z"/>
+      <path d="M-44 4 C-56 14 -60 30 -56 46 L-38 38 C-42 26 -42 14 -44 4 Z"/>
+      <path d="M44 4 C56 14 60 30 56 46 L38 38 C42 26 42 14 44 4 Z"/>
+      <path d="M-15 -48 L0 -76 L15 -48" fill="none" stroke-width="3"/>
+      <path d="M-30 14 L30 14 L24 52 L-24 52 Z" fill-opacity="0.4"/>
+      <path d="M-19 26 L-7 26 M7 26 L19 26" fill="none" stroke-width="2.6"/>
+    </g>
   </g>
 </svg>
