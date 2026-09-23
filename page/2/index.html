@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790139614199" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790139614199" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790170172103" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790170172103" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790139614199" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790170172103" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -562,6 +562,17 @@
     try { sessionStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
   }
 
+  // 项目简介支持中英双语：有 descriptionEn 就输出 i18n-zh / i18n-en 两个 span，
+  // 显隐交给 screen.css 按 html[data-lang] 控制（和其他 UI 文案同一套机制）；
+  // 没有 descriptionEn 的条目退回单语言 description，老数据不用改。
+  function descHtml(repo) {
+    var zh = repo.description || '';
+    var en = repo.descriptionEn || '';
+    if (!en) return esc(zh);
+    return '<span class="i18n-zh">' + esc(zh) + '</span>' +
+           '<span class="i18n-en">' + esc(en) + '</span>';
+  }
+
   // stars/forks 已经是 shields.io 格式化好的字符串（如 "9.1k"），直接拼进现有排版
   function applyStats(item, stars, forks) {
     var s = item.querySelector('.repo-stars');
@@ -631,7 +642,7 @@
             '</h3>' +
             '<div class="repo-stats">' + statsHtml + '</div>' +
           '</div>' +
-          '<p class="repo-desc">' + esc(repo.description) + '</p>';
+          '<p class="repo-desc">' + descHtml(repo) + '</p>';
 
         list.appendChild(item);
 
