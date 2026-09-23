@@ -15,7 +15,7 @@
     </image>
     <atom:link href="https://we5ter.github.io/atom.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>OpenShell 拆解：NVIDIA 给自主 AI Agent 的沙箱不是审批，也不是容器，是带策略边界的运行时</title>
+      <title>OpenShell 拆解：NVIDIA 给自主 AI Agent 的沙箱——不是审批，不是容器，而是策略边界</title>
       <link>https://we5ter.github.io/ai-tools/openshell-nvidia-agent-runtime/</link>
       <description>
         <![CDATA[<h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。一个来自 NVIDIA 的 Rust 项目，Apache-2.0，8.7k star &#x2F; 1.3k fork（截至 2026-09-22）。把 <a href="../repositories/">agentgate 那种”审批工作流”</a> 和 <a href="../../cve/">SkillSpector 那种”技能审计”</a> 都拿掉之后剩下的那个空白格 —— <strong>给自主]]>
