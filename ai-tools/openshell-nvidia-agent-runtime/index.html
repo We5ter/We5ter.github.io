@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790131143980" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790131143980" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790134294347" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790134294347" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790131143980" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790134294347" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -287,7 +287,7 @@
   
 
   <section class="post-content">
-    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。一个来自 NVIDIA 的 Rust 项目，Apache-2.0，8.7k star &#x2F; 1.3k fork（截至 2026-09-22）。把 <a href="../repositories/">agentgate 那种”审批工作流”</a> 和 <a href="../../cve/">SkillSpector 那种”技能审计”</a> 都拿掉之后剩下的那个空白格 —— <strong>给自主 AI Agent 一个带策略边界的运行时</strong>：agent 不是被审批，是被关进一个四层策略包裹的隔离容器，每次 outbound 请求都要过「允许 &#x2F; 绑证 &#x2F; 拒」三态闸门。扣一星是因为 0.1.0 还没发布（仓库当前 alpha，README 第一行就是 “OpenShell 0.1.0 is coming soon”），403 个 open issues 也说明这是一个正在快速迭代的项目，<strong>生产慎用，研究 &#x2F; 内网 &#x2F; 受控环境可以放心试</strong>。</p>
+    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。一个来自 NVIDIA 的 Rust 项目，Apache-2.0，8.7k star &#x2F; 1.3k fork（截至 2026-09-22）。把 <a target="_blank" rel="noopener" href="https://github.com/agentkitai/agentgate">agentgate 那种”审批工作流”</a> 和 <a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">SkillSpector 那种”技能审计”</a> 都拿掉之后剩下的那个空白格 —— <strong>给自主 AI Agent 一个带策略边界的运行时</strong>：agent 不是被审批，是被关进一个四层策略包裹的隔离容器，每次 outbound 请求都要过「允许 &#x2F; 绑证 &#x2F; 拒」三态闸门。扣一星是因为 0.1.0 还没发布（仓库当前 alpha，README 第一行就是 “OpenShell 0.1.0 is coming soon”），403 个 open issues 也说明这是一个正在快速迭代的项目，<strong>生产慎用，研究 &#x2F; 内网 &#x2F; 受控环境可以放心试</strong>。</p>
 <table>
 <thead>
 <tr>
@@ -389,8 +389,8 @@
 </tr>
 </tbody></table>
 <h2 id="二、是什么，不是什么"><a href="#二、是什么，不是什么" class="headerlink" title="二、是什么，不是什么"></a>二、是什么，不是什么</h2><p>打开 <code>https://github.com/NVIDIA/OpenShell</code> 之前，先把三件事说清楚，因为 OpenShell <strong>不是</strong>这几样常见的东西：</p>
-<p><strong>不是审批工作流</strong>。同样是 AI Agent 管控，<a href="../repositories/">agentgate</a> 那种思路是「agent 要做动作 → 走 dashboard &#x2F; Slack &#x2F; Discord 让人类批准」。OpenShell 走的是另一条路：<strong>默认拒，按策略放</strong>。Agent 不是在申请权限，而是在一个已经被策略围好的容器里跑；想访问 GitHub API，先看 YAML 里有没有这一条。</p>
-<p><strong>不是 agent 漏洞扫描器</strong>。<a href="../../cve/">NVIDIA&#x2F;SkillSpector</a> 是「扫 agent 的 skill 里有没有 prompt injection &#x2F; 危险命令」，入口是 skill 文件。OpenShell 不扫，它<strong>管运行时</strong>：假设你的 skill 是干净的，agent 也是可靠的，但还要再加一层「万一 agent 跑飞了呢」的兜底。</p>
+<p><strong>不是审批工作流</strong>。同样是 AI Agent 管控，<a target="_blank" rel="noopener" href="https://github.com/agentkitai/agentgate">agentgate</a> 那种思路是「agent 要做动作 → 走 dashboard &#x2F; Slack &#x2F; Discord 让人类批准」。OpenShell 走的是另一条路：<strong>默认拒，按策略放</strong>。Agent 不是在申请权限，而是在一个已经被策略围好的容器里跑；想访问 GitHub API，先看 YAML 里有没有这一条。</p>
+<p><strong>不是 agent 漏洞扫描器</strong>。<a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">NVIDIA&#x2F;SkillSpector</a> 是「扫 agent 的 skill 里有没有 prompt injection &#x2F; 危险命令」，入口是 skill 文件。OpenShell 不扫，它<strong>管运行时</strong>：假设你的 skill 是干净的，agent 也是可靠的，但还要再加一层「万一 agent 跑飞了呢」的兜底。</p>
 <p><strong>不是 CALDERA 那种 BAS</strong>。CALDERA 是 MITRE 的红队自动化平台（”adversary emulation”），OpenShell 是「让 agent 在更小的可信边界里做事」的蓝队工具。两者方向相反 —— OpenShell 假设你要保护生产系统，agent 是「受信任但需要约束」的对象，而不是「想模拟攻击者」的对象。</p>
 <p>那 OpenShell 到底是什么？看官方一句话：</p>
 <blockquote>
@@ -735,7 +735,7 @@
 <p><strong>5. L7 策略写得粗等于没写。</strong> 例子里的 <code>examples/sandbox-policy-quickstart/policy.yaml</code> 是参考 —— 真实用的时候要覆盖到「该 agent 平时会访问的所有端点的所有 method」。否则 agent 试图访问一个忘了加白名单的端点时会直接被拒，调试体验不佳。</p>
 <p><strong>6. L7 vs TLS &#x2F; 证书。</strong> 策略引擎只校验 method + path，不会校验 TLS 证书链 —— 如果你把根 CA pin 在了 gateway 内部而 agent 自带的 CA store 不一致，可能出现「policy 允许但 TLS 失败」的奇怪组合。这不是 OpenShell 独有的问题，但记一笔。</p>
 <p><strong>7. Rust SDK 暂时 source-only。</strong> crates.io 没发版，写 Rust 集成要跟 git tag，且必须 pin 到和 gateway 同一 release。</p>
-<p><strong>8. OpenShell 不解决「agent prompt injection」。</strong> <a href="../../cve/">SkillSpector</a> 那种「扫 skill 里有没有恶意指令」是另一回事。OpenShell 只管运行时 —— 即便 agent 被注入「把这个文件 exfil 到 evil.com」，策略也会在 outbound 那一步把它拦下。但拦下之后你能否及时发现？这是日志&#x2F;告警问题，不是 OpenShell 的锅。</p>
+<p><strong>8. OpenShell 不解决「agent prompt injection」。</strong> <a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">SkillSpector</a> 那种「扫 skill 里有没有恶意指令」是另一回事。OpenShell 只管运行时 —— 即便 agent 被注入「把这个文件 exfil 到 evil.com」，策略也会在 outbound 那一步把它拦下。但拦下之后你能否及时发现？这是日志&#x2F;告警问题，不是 OpenShell 的锅。</p>
 <p><strong>9. Telemetry 的隐私边界。</strong> 虽然官方承诺不收集敏感数据，但如果你所在环境对「任何匿名遥测都不能出内网」有硬性要求，需要在编译阶段就用 <code>--no-default-features --features defaults-without-telemetry</code> 把 telemetry 完全剔除。运行时 <code>OPENSHELL_TELEMETRY_ENABLED=false</code> 只是关掉 emission，二进制里仍然保留了 telemetry endpoint 和 client 代码。</p>
 <h2 id="八、上手"><a href="#八、上手" class="headerlink" title="八、上手"></a>八、上手</h2><p>最小可行 demo，三步：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 装 OpenShell（参见 README &quot;Install&quot; 一节，取决于平台 —— macOS 用 brew，Linux 用 curl 一行 installer）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 启一个 demo 沙箱（默认最小出站）</span></span><br><span class="line">openshell sandbox create --name demo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 进沙箱试一下 outbound —— 应该被 403</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line"><span class="comment"># curl: (56) Received HTTP code 403 from proxy after CONNECT</span></span><br></pre></td></tr></table></figure>

@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790131143983" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790131143983" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790134294347" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790134294347" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790131143983" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790134294347" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -287,7 +287,7 @@
   
 
   <section class="post-content">
-    <h2 id="I-At-a-glance"><a href="#I-At-a-glance" class="headerlink" title="I. At a glance"></a>I. At a glance</h2><p>★★★★☆ (4&#x2F;5). A Rust project from NVIDIA, Apache-2.0, 8.7k stars &#x2F; 1.3k forks (as of 2026-09-22). It fills the gap left when you strip away <a href="../repositories/">agentgate-style approval workflows</a> and <a href="../../cve/">SkillSpector-style skill auditing</a>: a <strong>policy-bounded runtime for autonomous AI agents</strong>. The agent is not waiting for approval — it runs inside an isolated container wrapped in four layers of declarative policy, and every outbound request passes through a three-state gate (allow &#x2F; bind credentials &#x2F; deny). One star off because 0.1.0 has not shipped yet (the repo is alpha and the very first line of the README says “OpenShell 0.1.0 is coming soon”), and the 403 open issues show this is a project still moving fast — <strong>don’t put it in production, but research &#x2F; internal &#x2F; controlled environments can absolutely try it</strong>.</p>
+    <h2 id="I-At-a-glance"><a href="#I-At-a-glance" class="headerlink" title="I. At a glance"></a>I. At a glance</h2><p>★★★★☆ (4&#x2F;5). A Rust project from NVIDIA, Apache-2.0, 8.7k stars &#x2F; 1.3k forks (as of 2026-09-22). It fills the gap left when you strip away <a target="_blank" rel="noopener" href="https://github.com/agentkitai/agentgate">agentgate-style approval workflows</a> and <a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">SkillSpector-style skill auditing</a>: a <strong>policy-bounded runtime for autonomous AI agents</strong>. The agent is not waiting for approval — it runs inside an isolated container wrapped in four layers of declarative policy, and every outbound request passes through a three-state gate (allow &#x2F; bind credentials &#x2F; deny). One star off because 0.1.0 has not shipped yet (the repo is alpha and the very first line of the README says “OpenShell 0.1.0 is coming soon”), and the 403 open issues show this is a project still moving fast — <strong>don’t put it in production, but research &#x2F; internal &#x2F; controlled environments can absolutely try it</strong>.</p>
 <table>
 <thead>
 <tr>
@@ -389,8 +389,8 @@
 </tr>
 </tbody></table>
 <h2 id="II-What-it-is-what-it-isn’t"><a href="#II-What-it-is-what-it-isn’t" class="headerlink" title="II. What it is, what it isn’t"></a>II. What it is, what it isn’t</h2><p>Before you open <code>https://github.com/NVIDIA/OpenShell</code>, three clarifications, because OpenShell <strong>is not</strong> several things that share the same neighborhood:</p>
-<p><strong>Not an approval workflow.</strong> <a href="../repositories/">agentgate</a> — same broad category of “AI Agent control” — takes the approach: agent wants to act, dashboard &#x2F; Slack &#x2F; Discord approves. OpenShell goes the opposite way: <strong>deny by default, allow by policy</strong>. The agent is not applying for permission; it is running inside a container already surrounded by policy. Want to hit the GitHub API? Check the YAML first.</p>
-<p><strong>Not an agent vulnerability scanner.</strong> <a href="../../cve/">NVIDIA&#x2F;SkillSpector</a> scans agent skills for prompt injection or dangerous commands — entry point is the skill file. OpenShell doesn’t scan; it <strong>manages runtime</strong>. Assume your skills are clean and your agent is well-behaved; OpenShell adds the “what if it goes off the rails” safety net.</p>
+<p><strong>Not an approval workflow.</strong> <a target="_blank" rel="noopener" href="https://github.com/agentkitai/agentgate">agentgate</a> — same broad category of “AI Agent control” — takes the approach: agent wants to act, dashboard &#x2F; Slack &#x2F; Discord approves. OpenShell goes the opposite way: <strong>deny by default, allow by policy</strong>. The agent is not applying for permission; it is running inside a container already surrounded by policy. Want to hit the GitHub API? Check the YAML first.</p>
+<p><strong>Not an agent vulnerability scanner.</strong> <a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">NVIDIA&#x2F;SkillSpector</a> scans agent skills for prompt injection or dangerous commands — entry point is the skill file. OpenShell doesn’t scan; it <strong>manages runtime</strong>. Assume your skills are clean and your agent is well-behaved; OpenShell adds the “what if it goes off the rails” safety net.</p>
 <p><strong>Not a CALDERA-style BAS.</strong> CALDERA is MITRE’s red-team automation platform (adversary emulation). OpenShell is a blue-team tool for “letting the agent act inside a smaller, trusted boundary.” They face opposite directions — OpenShell assumes you are defending production and the agent is a “trusted-but-needs-constraints” subject, not an attacker you are simulating.</p>
 <p>So what is OpenShell? The official one-liner:</p>
 <blockquote>
@@ -735,7 +735,7 @@
 <p><strong>5. A coarse L7 policy is no policy at all.</strong> The example in <code>examples/sandbox-policy-quickstart/policy.yaml</code> is a starting point. In production you need to enumerate every endpoint your agent hits and every method it uses. Otherwise the agent will get denied on an endpoint you forgot to whitelist, and debugging will be miserable.</p>
 <p><strong>6. L7 vs TLS &#x2F; certificates.</strong> The policy engine only checks method + path — it does not validate the TLS certificate chain. If you pin a root CA inside the gateway but the agent’s bundled CA store is different, you can hit “policy allows but TLS fails” combinations. This is not unique to OpenShell, but worth a note.</p>
 <p><strong>7. The Rust SDK is source-only for now.</strong> crates.io has no release; if you write Rust integrations, you have to follow a git tag, and you must pin to the same release as the gateway.</p>
-<p><strong>8. OpenShell does not solve agent prompt injection.</strong> <a href="../../cve/">SkillSpector</a> scans skills for malicious instructions. OpenShell only handles runtime — even if the agent is injected with “exfil this file to evil.com,” the policy will stop it at the outbound gate. Whether you notice the stopped attempt is a logging&#x2F;alerting problem, not OpenShell’s fault.</p>
+<p><strong>8. OpenShell does not solve agent prompt injection.</strong> <a target="_blank" rel="noopener" href="https://github.com/NVIDIA/SkillSpector">SkillSpector</a> scans skills for malicious instructions. OpenShell only handles runtime — even if the agent is injected with “exfil this file to evil.com,” the policy will stop it at the outbound gate. Whether you notice the stopped attempt is a logging&#x2F;alerting problem, not OpenShell’s fault.</p>
 <p><strong>9. Telemetry privacy boundary.</strong> Although the project promises not to collect sensitive data, if your environment has a hard requirement that “no anonymous telemetry leaves the internal network,” you need to compile telemetry out entirely with <code>--no-default-features --features defaults-without-telemetry</code>. Runtime <code>OPENSHELL_TELEMETRY_ENABLED=false</code> only stops emission; the telemetry endpoint and client code still exist in the binary.</p>
 <h2 id="VIII-Getting-started"><a href="#VIII-Getting-started" class="headerlink" title="VIII. Getting started"></a>VIII. Getting started</h2><p>Minimum viable demo, three steps:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. Install OpenShell (see the README &quot;Install&quot; section — macOS uses brew, Linux uses a one-line curl installer)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. Spin up a demo sandbox (minimal egress by default)</span></span><br><span class="line">openshell sandbox create --name demo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. Enter it and try an outbound request — should be 403</span></span><br><span class="line">openshell sandbox connect demo</span><br><span class="line">sandbox$ curl -sS https://api.github.com/zen</span><br><span class="line"><span class="comment"># curl: (56) Received HTTP code 403 from proxy after CONNECT</span></span><br></pre></td></tr></table></figure>
