@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台";
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790240568134" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790240568134" />
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790240568134" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+<body class="post-template">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        <a class="site-title" href="/"><span class="i18n-zh">Wester的自留地</span><span class="i18n-en">Wester's Space</span></a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+<article class="post post-detail">
+  
+  <header class="article-header">
+    <h1 class="post-title">AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-24">
+        <span class="i18n-zh">2026年9月24日</span>
+        <span class="i18n-en">Sep 24, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 20 分钟</span><span class="i18n-en">20 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/ai-infra-guard/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。腾讯朱雀实验室出品的<strong>全栈 AI 红队平台</strong>，Apache-2.0，6.6k star &#x2F; 615 fork（截至 2026-09-24）。它做的事情不是「又一个 AI 扫描器」，而是把 2025 年之后散落的 AI 攻击面 —— <strong>AI 基础设施 CVE、Agent 失控、MCP 供应链、Agent Skills 后门、越狱评测</strong> —— 收敛进了一个可执行的平台，并且用自研 benchmark 和 Black Hat Europe 演讲给这套方法论做了背书。扣一星有两个明确原因：README 自己写明<strong>没有身份认证机制、不应部署在公网</strong>，以及若干子模块仍处于未完成状态（有 SKILL.md 但没注册、知识库英文不同步、红队断点续跑未实现）。<strong>内网 &#x2F; 受控环境 &#x2F; CI 门禁可以直接用；公网部署必须自己补认证和网络隔离。</strong></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主语言</td>
+<td>Go（后端 trpc-go）+ Python（各子扫描器），前端 Vite + Tailwind</td>
+</tr>
+<tr>
+<td>许可证</td>
+<td>Apache-2.0（由 MIT 迁移而来，保留 NOTICE 署名要求）</td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td>6,600 &#x2F; 615</td>
+</tr>
+<tr>
+<td>Commits &#x2F; Tags</td>
+<td>1,918 &#x2F; 58</td>
+</tr>
+<tr>
+<td>最新版本</td>
+<td>v4.6.2（2026-09-17）</td>
+</tr>
+<tr>
+<td>AI 组件覆盖</td>
+<td>146 个组件 &#x2F; 2,000+ CVE 规则</td>
+</tr>
+<tr>
+<td>Skill 风险分类</td>
+<td>SkillTrustBench T01–T09（9 类）</td>
+</tr>
+<tr>
+<td>MCP 风险分类</td>
+<td>14 大类</td>
+</tr>
+<tr>
+<td>部署要求</td>
+<td>Docker 20.10+ &#x2F; 4GB RAM &#x2F; 10GB 磁盘</td>
+</tr>
+<tr>
+<td>默认端口</td>
+<td>8088</td>
+</tr>
+<tr>
+<td>地址</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/Tencent/AI-Infra-Guard">https://github.com/Tencent/AI-Infra-Guard</a></td>
+</tr>
+</tbody></table>
+<p><strong>适合谁</strong>（按人群打分，5 分制）：</p>
+<table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>企业安全运营 &#x2F; CISO</td>
+<td>5</td>
+<td>现有开源里少有的「能一次性回答『我们内部跑了多少 AI 组件、其中多少个有已知 CVE』」的工具，且能挂进 CI 做 Agent &#x2F; MCP &#x2F; Skill 上线门禁</td>
+</tr>
+<tr>
+<td>AI 安全研究员</td>
+<td>5</td>
+<td>自带 FORGE-Bench &#x2F; RogueHandoff-20 &#x2F; SkillJack 三个自研基准和 19 篇被引论文，既是工具也是研究参照系</td>
+</tr>
+<tr>
+<td>Agent &#x2F; MCP 开发者</td>
+<td>5</td>
+<td><code>aig-skill-scan</code> 一条命令审计自己的 skill，MCP 扫描输出 SARIF 可直接接 CI，不用先读完 OWASP ASI</td>
+</tr>
+<tr>
+<td>红队 &#x2F; 渗透</td>
+<td>4</td>
+<td>攻击面摸底很好用（AI Infra Scan 支持 CIDR 网段批量），但它本质是自查平台不是攻击平台，想做 adversary emulation 还得配别的</td>
+</tr>
+<tr>
+<td>个人学习 &#x2F; 自部署</td>
+<td>3</td>
+<td>Docker 一键起，但 4GB RAM + 10GB 磁盘的门槛、无认证机制、以及 Skill&#x2F;MCP 扫描要接 LLM API（有调用成本），对纯个人折腾不算轻</td>
+</tr>
+</tbody></table>
+<p><strong>二次开发</strong>：Apache-2.0 三档难度（改配置 &#x2F; 改集成 &#x2F; 改内核）：</p>
+<table>
+<thead>
+<tr>
+<th>难度</th>
+<th>能做的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改配置</td>
+<td>四类插件都只需往 <code>data/</code> 下加文件：<code>data/fingerprints/</code> 加组件指纹 YAML、<code>data/vuln/</code> 加 CVE 规则、<code>data/mcp/</code> 加 MCP 安全规则、<code>data/eval/</code> 加越狱数据集 —— 官方 CONTRIBUTING 明确把这四条列为低摩擦贡献路径</td>
+</tr>
+<tr>
+<td>改集成</td>
+<td>把 <code>aig-skill-scan</code>（pip 装）或 <code>mcp-scan</code> 挂进 CI&#x2F;CD 出 SARIF；用 Task API（5 种任务类型）对接内部工单系统；装 OpenClaw 技能 <code>clawhub install aig-scanner</code> 把扫描嵌进 agent 工作流</td>
+</tr>
+<tr>
+<td>改内核</td>
+<td>改 <code>agent-scan</code> 的多 Agent 框架（新增检测技能要同时改 <code>_DETECTION_SKILLS</code> 和 <code>prompt/skills/&lt;name&gt;/SKILL.md</code>）；改扫描引擎与 <code>VulnerabilityExtractor</code>（LLM 输出解析）；改 <code>services/api_checker</code> 的模型指纹与中继审计逻辑</td>
+</tr>
+</tbody></table>
+<h2 id="二、是什么，不是什么"><a href="#二、是什么，不是什么" class="headerlink" title="二、是什么，不是什么"></a>二、是什么，不是什么</h2><p>打开仓库之前先把四件事说清楚，因为 A.I.G <strong>不是</strong>这几样常见的东西：</p>
+<p><strong>不是单个扫描器</strong>。它名字里的 “Infra Guard” 容易让人以为只是扫 AI 框架 CVE 的工具 —— 那是它 2025 年最早的样子。现在的 A.I.G 是<strong>五个能力并列</strong>的平台：Agent Scan、Skill Scan、MCP Scan、AI Infra Scan、Jailbreak Evaluation，外加一个 Model &amp; API Relay Checker。AI 基础设施漏洞扫描只是其中一层。</p>
+<p><strong>不是传统 DAST &#x2F; SAST</strong>。它不替代你已有的 Web 扫描或代码审计。AI Infra Scan 做的是<strong>指纹识别 + CVE 匹配</strong>——连到你运行中的 vLLM &#x2F; Ollama &#x2F; ComfyUI，识别组件和版本，然后匹配已知漏洞库。这是资产盘点和已知漏洞治理，不是挖 0day。</p>
+<p><strong>不是纯规则库</strong>。MCP Scan 和 Skill Scan 这两块本质是<strong>让大模型审代码</strong>——把 MCP Server 或 Skill 的源码交给 LLM，按预定义的风险分类（14 类 &#x2F; T01–T09）输出发现和修复建议。所以它有效果波动和调用成本，这点在第七章展开。</p>
+<p><strong>不是可以放公网的 SaaS</strong>。README 原话：”It currently lacks an authentication mechanism and should not be deployed on public networks.” 定位是<strong>企业或个人内部使用</strong>的红队平台。这条最重要，后面会再提。</p>
+<p>那 A.I.G 到底是什么？看官方一句话：</p>
+<blockquote>
+<p>A full-stack AI Red Teaming platform securing AI ecosystems via Agent Scan, Skills Scan, MCP scan, AI Infra scan and LLM jailbreak evaluation.</p>
+</blockquote>
+<p>三个关键词：<strong>full-stack &#x2F; red teaming &#x2F; AI ecosystems</strong>。</p>
+<h2 id="三、五层能力拆解"><a href="#三、五层能力拆解" class="headerlink" title="三、五层能力拆解"></a>三、五层能力拆解</h2><p>A.I.G 的能力可以拆成五个并列任务类型 —— Web UI 上就是五个按钮，API 上就是五种 Task Type。</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>输入</th>
+<th>输出 &#x2F; 特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>AI Infra Scan</strong></td>
+<td>运行中服务的网络地址（支持 CIDR &#x2F; 范围）</td>
+<td>组件指纹 + 版本 + 匹配 CVE + 修复链接</td>
+</tr>
+<tr>
+<td><strong>Agent Scan</strong></td>
+<td>Agent 工作流（支持 Dify &#x2F; Coze）</td>
+<td>多 Agent 自动化扫描，10 个检测技能，映射 OWASP ASI</td>
+</tr>
+<tr>
+<td><strong>MCP Scan</strong></td>
+<td>MCP Server 源码包或远程 URL</td>
+<td>14 类风险，输出 SARIF，无需运行实例</td>
+</tr>
+<tr>
+<td><strong>Skill Scan</strong></td>
+<td>Agent Skills 目录</td>
+<td>对齐 SkillTrustBench T01–T09，pip 一行命令可用</td>
+</tr>
+<tr>
+<td><strong>Jailbreak Evaluation</strong></td>
+<td>目标 LLM 的 API endpoint</td>
+<td>多轮越狱攻击 + 跨模型对比，基于 DeepTeam</td>
+</tr>
+</tbody></table>
+<p><strong>AI Infra Scan 的一个关键约束值得单独说</strong>：它扫的是<strong>运行中的服务地址</strong>，不是 GitHub URL 也不是本地源码路径。也就是说 <code>http://127.0.0.1:8000</code>（本地 vLLM）、<code>http://192.168.1.100:11434</code>（局域网 Ollama）、<code>192.168.1.0/24</code>（整段 CIDR）都可以，但你不能拿它去扫一个仓库。想扫源码走的是 MCP Scan &#x2F; Skill Scan 那条路。这个区分决定了它在企业里的用法是<strong>内网资产盘点</strong>，而不是开源组件评估。</p>
+<p><strong>MCP Scan 不需要运行实例</strong>这一点很实用 —— 给一个远程 URL 或上传源码包就能扫，不必先把可疑的 MCP Server 跑起来（跑起来本身就有风险）。v4.5.2 还加了<strong>工具白名单机制</strong>防止动态模式下的 RCE，属于「扫恶意代码时先保护自己」的正确设计。</p>
+<p><strong>Skill Scan 覆盖了 9 类风险，分 5 层</strong>，这个分类法本身就有参考价值：</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A · 指令与内存</td>
+<td>T01 Skill 指令劫持、T02 内存投毒</td>
+</tr>
+<tr>
+<td>B · 代码执行</td>
+<td>T03 远程载荷下载执行、T04 内嵌恶意代码</td>
+</tr>
+<tr>
+<td>C · 系统权限</td>
+<td>T05 权限提升与未授权访问、T06 系统持久化</td>
+</tr>
+<tr>
+<td>D · 工具链与依赖</td>
+<td>T07 工具劫持与伪装、T08 不安全依赖</td>
+</tr>
+<tr>
+<td>E · 代码质量</td>
+<td>T09 不安全编码实践</td>
+</tr>
+</tbody></table>
+<h2 id="四、技术架构：插件化-多扫描器"><a href="#四、技术架构：插件化-多扫描器" class="headerlink" title="四、技术架构：插件化 + 多扫描器"></a>四、技术架构：插件化 + 多扫描器</h2><p><strong>架构基石是可扩展插件框架</strong>（README 原话：”The extensible plugin framework serves as A.I.G’s architectural cornerstone”）。</p>
+<p>引擎和规则数据是<strong>分离</strong>的 —— 所有扫描规则集中在 <code>data/</code> 目录下：</p>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data/fingerprints/</code></td>
+<td>组件指纹 YAML</td>
+</tr>
+<tr>
+<td><code>data/vuln/</code> + <code>data/vuln_en/</code></td>
+<td>CVE 规则（中 &#x2F; 英）</td>
+</tr>
+<tr>
+<td><code>data/mcp/</code></td>
+<td>MCP 安全规则</td>
+</tr>
+<tr>
+<td><code>data/eval/</code></td>
+<td>越狱评测数据集</td>
+</tr>
+</tbody></table>
+<p>这个设计带来的直接好处是<strong>贡献门槛极低</strong>：想支持一个新 AI 组件，加一个 YAML；想补一条 CVE 规则，加一个文件。不需要动 Go 代码。</p>
+<p><strong>技术栈是混合的</strong>，这点值得注意：</p>
+<ul>
+<li><strong>后端</strong>：Go + trpc-go 框架，提供 Web 服务和 Task API；<code>cmd/cli/main.go</code> 可编译出统一 CLI 工具 <code>ai-infra-guard</code></li>
+<li><strong>前端</strong>：Vite + Tailwind，一键扫描 + 实时进度</li>
+<li><strong>子扫描器</strong>：<code>agent-scan</code> &#x2F; <code>mcp-scan</code> &#x2F; <code>skill-scan</code> 是独立的 Python 模块，<code>AIG-PromptSecurity</code>（越狱评测）基于 DeepTeam，<code>services/api_checker</code> 也是 Python</li>
+<li><strong>分布式</strong>：webserver + Agent 结构（<code>Dockerfile_Agent</code>），AI 基础设施扫描由 Agent 侧的 <code>AIInfraScanAgent.executeScan</code> 执行；api checker 已嵌入 Agent 运行时</li>
+</ul>
+<p><strong>多语言支持走的是数据层而不是 UI 层</strong>：知识库接口 <code>/api/v1/knowledge/vulnerabilities</code> 读 <code>lang</code> 参数（默认 <code>zh</code>），<code>lang=en</code> 时服务 <code>data/vuln_en</code>。这个设计是对的 —— 但也埋了一个已知的同步问题（见第七章）。</p>
+<h2 id="五、研究与基准：这才是它区别于其他工具的地方"><a href="#五、研究与基准：这才是它区别于其他工具的地方" class="headerlink" title="五、研究与基准：这才是它区别于其他工具的地方"></a>五、研究与基准：这才是它区别于其他工具的地方</h2><p>大多数开源安全工具只有代码，A.I.G 有<strong>自研基准和论文</strong>。这是我认为最值得肯定的部分。</p>
+<p><strong>4 项自研研究</strong>（代码都在 <code>Research/</code> 下）：</p>
+<table>
+<thead>
+<tr>
+<th>研究</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>FORGE-Bench</strong></td>
+<td>Agent 失控的确定性基准，基于 oracle，覆盖 16 个领域、1,800 条轨迹（arXiv:2609.11024）</td>
+</tr>
+<tr>
+<td><strong>RogueHandoff-20</strong></td>
+<td>衡量 Agent 在接触另一个 Agent 的不安全策略后，是否会采用不安全轨迹</td>
+</tr>
+<tr>
+<td><strong>SkillJack</strong></td>
+<td>演示被投毒的轨迹如何向自进化 Agent 的 Skill 系统注入<strong>持久化后门</strong></td>
+</tr>
+<tr>
+<td><strong>DeepSeek Harness 评估</strong></td>
+<td>对 DeepSeek Harness 的授权安全评估，跨 14,560 次 Agent 运行测间接提示注入</td>
+</tr>
+</tbody></table>
+<p>SkillJack 这个研究选题很说明问题 —— 它关注的不是「这一轮提示注入能不能成功」，而是<strong>后门能不能在 Agent 自我进化的过程中沉淀下来</strong>。这是 2026 年 Agent 安全真正的痛点。</p>
+<p><strong>3 篇论文</strong>，其中 2 篇是 Black Hat Europe 2025：</p>
+<ol>
+<li><em>Securing the AI Agent: A Unified Framework for Multi-Layer Agent Red Teaming</em>（多层 Agent 红队统一框架）</li>
+<li><em>AI-Infra-Guard: An AI Red Teaming Platform</em>（Black Hat Europe 2025 Arsenal）</li>
+<li><em>MCP Unchained: Compromising The AI Agent Ecosystem Via Its Universal Connector</em>（Black Hat Europe 2025）</li>
+</ol>
+<p>第三篇的选题尤其尖锐 —— MCP 作为 Agent 生态的「通用连接器」，同时也是<strong>通用攻击入口</strong>。</p>
+<p><strong>被 19 篇学术论文引用</strong>，包括 MCPGuard、MCPSecBench、SkillAttack、TRUSTDESC 等。一个工业界开源工具能被这么多学术论文当作参照系，说明它在 Agent 安全这个新兴领域已经成了事实基准之一。</p>
+<p><strong>Skill-Scan 的效果有量化数据</strong>（基于 SkillTrustBench）：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>F1</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>FPR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude Opus 4.6</td>
+<td>0.9848</td>
+<td>0.9725</td>
+<td>0.9974</td>
+<td>0.0663</td>
+</tr>
+<tr>
+<td>GLM 5.1</td>
+<td>0.9836</td>
+<td>0.9701</td>
+<td>0.9974</td>
+<td>0.0723</td>
+</tr>
+<tr>
+<td>Gemini 3.5 Flash</td>
+<td>0.9792</td>
+<td>0.9947</td>
+<td>0.9641</td>
+<td><strong>0.0120</strong></td>
+</tr>
+<tr>
+<td>Kimi 2.6</td>
+<td>0.9780</td>
+<td>0.9895</td>
+<td>0.9667</td>
+<td>0.0241</td>
+</tr>
+<tr>
+<td>DeepSeek v4 Flash</td>
+<td>0.9740</td>
+<td>0.9868</td>
+<td>0.9615</td>
+<td>0.0301</td>
+</tr>
+</tbody></table>
+<p>愿意公布 <strong>F1 &#x2F; Precision &#x2F; Recall &#x2F; FPR 四维</strong>而不是只报一个准确率，这个态度比较老实。注意 FPR 差异很大（0.012 到 0.072）—— 如果你要把 Skill Scan 挂进 CI 当门禁，<strong>选 Gemini 3.5 Flash 这类低 FPR 的模型比选高 F1 的更重要</strong>，否则误报会淹没流水线。</p>
+<h2 id="六、部署与集成"><a href="#六、部署与集成" class="headerlink" title="六、部署与集成"></a>六、部署与集成</h2><p><strong>Docker 一键部署</strong>（推荐）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/Tencent/AI-Infra-Guard.git</span><br><span class="line"><span class="built_in">cd</span> AI-Infra-Guard</span><br><span class="line">docker-compose -f docker-compose.images.yml up -d</span><br><span class="line"><span class="comment"># 访问 http://localhost:8088</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以一行脚本：<code>curl https://raw.githubusercontent.com/Tencent/AI-Infra-Guard/refs/heads/main/docker.sh | bash</code></p>
+<p><strong>Skill Scan 作为独立 CLI</strong>（最容易接 CI）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install aig-skill-scan</span><br><span class="line"><span class="built_in">export</span> LLM_API_KEY=<span class="string">&quot;your-api-key&quot;</span></span><br><span class="line">aig-skill-scan --repo /path/to/your/skill -m deepseek-v4-flash --language en -o result.json</span><br></pre></td></tr></table></figure>
+
+<p><strong>嵌进 Agent 工作流</strong>（Agent-Ready）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">clawhub install aig-scanner</span><br><span class="line"><span class="comment"># 配置 AIG_BASE_URL 指向运行中的 A.I.G 服务</span></span><br></pre></td></tr></table></figure>
+
+<p>之后可以在 OpenClaw 对话里直接调起扫描。官方把它做成 ClawHub 上的即插即用技能，这个思路对 —— 安全工具的价值一半在于<strong>能不能嵌进开发者已有的工作流</strong>。</p>
+<p><strong>Relay Checker</strong>（模型与 API 中继检查）Docker 部署后 API 在 <code>/api/v1/relay/*</code>，文档在 <code>http://127.0.0.1:8088/api-checker/docs</code>。注意 <strong>checker 的前端是独立部署的</strong>，Docker 只保证 API 可用。</p>
+<h2 id="七、边界与风险"><a href="#七、边界与风险" class="headerlink" title="七、边界与风险"></a>七、边界与风险</h2><p>这章是扣掉那一星的地方，四条都是实打实的约束。</p>
+<p><strong>1. 无身份认证，禁止公网部署（最重要）</strong></p>
+<p>README 明确声明平台缺乏认证机制，不应部署在公共网络。平台自带 Web UI、完整 API（Swagger）、一键扫描 —— 这些能力在没有认证的情况下暴露到公网，等于把内网资产扫描能力送给别人。<strong>企业落地必须自己补齐认证和网络隔离</strong>，这是首要成本项，不要跳过。</p>
+<p><strong>2. MCP &#x2F; Skill Scan 强依赖 LLM</strong></p>
+<p>这两块是「大模型审代码」范式，三个后果：</p>
+<ul>
+<li><strong>效果随模型波动</strong> —— 第五章的 F1 0.98 是 Claude Opus 4.6 的成绩，换弱模型会往下掉</li>
+<li><strong>有调用成本</strong> —— 大规模扫描不便宜，CI 里高频跑要考虑预算</li>
+<li><strong>LLM 不确定性</strong> —— README 和提交记录里记录了模型会自作主张把 <code>&lt;desc&gt;</code> 标签改写成 <code>&lt;description&gt;</code>、往输出里塞 <code>&lt;![CDATA[ ]]&gt;</code>，导致有效发现被校验门丢弃（报告 0 findings）</li>
+</ul>
+<p>项目已经做了健壮性修复（CDATA 剥离 + 同义词回退），但<strong>范式本身的局限不会因为工程修复消失</strong>。用 LLM 做安全判定，你要接受它既会漏也会错。</p>
+<p><strong>3. 若干子模块是「半成品」状态</strong></p>
+<p>从提交记录和代码里能看到：</p>
+<ul>
+<li>4 个 Agent 检测技能（<code>direct-injection-detection</code>、<code>file-path-traversal-detection</code>、<code>hardcoded-secret-detection</code>、<code>memory-poisoning-detection</code>）有 <code>SKILL.md</code> 但<strong>未注册到 <code>_DETECTION_SKILLS</code>，实际从不运行</strong></li>
+<li><code>web-exfiltration-detection</code> 已注册，但在 OWASP ASI 表里没有对应行</li>
+<li>知识库「创建&#x2F;编辑漏洞」端点只写中文 <code>data/vuln</code>，<strong>从不写 <code>data/vuln_en</code></strong> —— 管理员新增的 CVE 没有英文文本</li>
+<li>红队评测的 resume（断点续跑）尚未实现，只做了 JSONL 进度落盘</li>
+<li>Windows 下有进程终止限制</li>
+</ul>
+<p>这些不影响主流程，但说明<strong>平台的完成度高于每个子模块的完成度</strong>。用之前建议先确认你依赖的那个子模块是不是真的在跑。</p>
+<p><strong>4. AI Infra Scan 只覆盖「运行中」的资产</strong></p>
+<p>它连实时服务做指纹识别，扫不到没在跑的组件、扫不到源码仓库。内网盘点够用，但别指望它做开源供应链评估。</p>
+<h2 id="八、上手"><a href="#八、上手" class="headerlink" title="八、上手"></a>八、上手</h2><p><strong>第一步，先把 AI 基础设施扫一遍</strong>（最能立刻看到价值）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 起一个测试用的 vLLM（或指向你已有的服务）</span></span><br><span class="line"><span class="comment"># 浏览器打开 http://localhost:8088 → 点「AI 基础设施安全扫描」</span></span><br><span class="line"><span class="comment"># 输入 http://127.0.0.1:8000 → Start Scan</span></span><br></pre></td></tr></table></figure>
+
+<p>扫 CIDR 网段（<code>192.168.1.0/24</code>）或范围（<code>10.0.0.1-10.0.0.20</code>）可以一次性摸清内网有多少 AI 组件在跑。</p>
+<p><strong>第二步，把 Skill &#x2F; MCP 扫描挂进 CI</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip install aig-skill-scan</span><br><span class="line">aig-skill-scan --repo ./my-skill -m &lt;model&gt; -o result.json</span><br></pre></td></tr></table></figure>
+
+<p>建议先选低 FPR 的模型（见第五章），跑几天观察误报率再决定要不要卡门禁。</p>
+<p><strong>第三步，配置 Jailbreak Evaluation</strong>：在 <code>Settings → Model Config</code> 填目标 LLM 的 base URL + API key，选数据集开跑，可以跨模型对比。</p>
+<p><strong>几个实操建议</strong>（按 README 和已知坑整理的）：</p>
+<ol>
+<li><strong>不要部署在公网</strong> —— 这条再说一遍，它没有任何认证</li>
+<li><strong>CI 里选模型看 FPR 而不是 F1</strong> —— 误报会淹没流水线</li>
+<li><strong>Agent Scan 用之前先确认检测技能真的注册了</strong> —— 有 SKILL.md 不等于会运行</li>
+<li><strong>新增 CVE 记得手动同步 <code>data/vuln_en</code></strong> —— 管理端只写中文</li>
+<li><strong>AI Infra Scan 扫 CIDR 前先确认授权范围</strong> —— 它是主动连接 + 指纹识别，别扫到不该扫的网段</li>
+</ol>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p>A.I.G 不是一个新扫描器，是 <strong>「把散落的 AI 攻击面收敛成一个可执行平台」的那一层</strong> —— 五层能力（基础设施 CVE &#x2F; Agent 失控 &#x2F; MCP 供应链 &#x2F; Skill 后门 &#x2F; 越狱评测）+ 三个自研基准 + Black Hat Europe 背书，腾讯朱雀实验室的工程投入是扎实的（1,918 commits、58 tags、Apache-2.0）。<strong>在「AI 安全红队平台」这个细分里，它是目前开源里完成度最高的之一，值得给高评价。</strong></p>
+<p>扣分项集中在两处：<strong>无认证机制导致的部署约束</strong>，以及<strong>部分子模块仍处于未完成状态</strong>。前者意味着你不能开箱即用放公网，后者意味着用之前要确认你依赖的那块是不是真的在跑 —— 这两点都不难补，但在补之前，落地需要额外投入。</p>
+<p>开始用的时候建议<strong>先扫一遍内网 AI 资产</strong>（最能立刻看到价值），再考虑把 Skill&#x2F;MCP 扫描接进 CI；公网部署请务必先补认证。</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/ai-infra-guard/">https://we5ter.github.io/ai-tools/ai-infra-guard/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/ai-infra-guard/&text=AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/ai-infra-guard/&title=AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/ai-infra-guard/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/ai-infra-guard/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/ai-infra-guard/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/ai-infra-guard/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <a class="post-nav-prev" href="/en/ai-tools/ai-infra-guard/">
+    <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
+    <span class="post-nav-title">AI-Infra-Guard deep dive: Tencent Zhuque Lab turns scattered AI attack surfaces into one red teaming platform</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/openshell-nvidia-agent-runtime/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">OpenShell 拆解：NVIDIA 给自主 AI Agent 的沙箱——不是审批，不是容器，而是策略边界</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      <p>&copy; 2026 Wester</p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

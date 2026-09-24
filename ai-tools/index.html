@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790235989238" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790235989238" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790240568106" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790240568106" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790235989238" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790240568106" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -228,6 +228,59 @@
 
   
 
+  
+    
+    <div class="aitools-day">
+      <h2 class="aitools-date">
+        <span class="aitools-issue">
+          <span class="i18n-zh">第 006 期</span>
+          <span class="i18n-en">No. 6</span>
+        </span>
+        <time datetime="2026-09-24">
+          <span class="i18n-zh">2026.9.24 <span class="aitools-week">周四</span></span>
+          <span class="i18n-en">Sep 24, 2026</span>
+        </time>
+      </h2>
+
+      
+      <article class="aitools-item" id="tool-20260924-ai-infra-guard">
+        <div class="aitools-head">
+          
+          
+          
+          <a class="i18n-zh aitools-name" href="/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
+          <a class="i18n-en aitools-name" href="/en/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
+          
+        </div>
+
+        <p class="aitools-tagline">
+          <span class="i18n-zh">腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测</span>
+          <span class="i18n-en">A full-stack AI red teaming platform from Tencent Zhuque Lab: five capabilities spanning AI infrastructure CVEs, agent loss of control, the MCP supply chain, skill backdoors and jailbreak evaluation</span>
+        </p>
+
+        
+        <div class="aitools-note">
+          <span class="i18n-zh">腾讯朱雀实验室出品的 Apache-2.0 项目，6.6k star / 615 fork / 1918 commits。不是单个扫描器，是五个能力并列的平台：AI Infra Scan 指纹识别 146 个 AI 组件、匹配 2000+ CVE（只扫运行中服务地址，支持 CIDR 网段批量）；Agent Scan 是多 Agent 自动化框架（支持 Dify / Coze，10 个检测技能映射 OWASP ASI）；MCP Scan 覆盖 14 类风险、输出 SARIF、无需运行实例；Skill Scan 对齐 SkillTrustBench T01–T09，Top 模型 F1 约 0.98；Jailbreak Evaluation 基于 DeepTeam，支持 4 种多轮越狱攻击与跨模型对比。另含 Model &amp; API Relay Checker 做模型指纹、Claude 签名验证与 LLM API 投毒检测。自带 FORGE-Bench（16 领域 / 1800 轨迹）、RogueHandoff-20、SkillJack 三个自研基准，3 篇论文（含 2 篇 Black Hat Europe 2025），被 19 篇学术论文引用。两个明确短板：README 自述无身份认证、不应部署公网；部分子模块未完成（4 个检测技能有 SKILL.md 但未注册 _DETECTION_SKILLS，实际从不运行）。</span>
+          <span class="i18n-en">An Apache-2.0 project from Tencent Zhuque Lab with 6.6k stars / 615 forks / 1,918 commits. Not a single scanner but a platform of five peer capabilities: AI Infra Scan fingerprints 146 AI components and matches 2,000+ CVEs (live service addresses only, CIDR ranges supported); Agent Scan is a multi-agent automation framework (Dify / Coze supported, 10 detection skills mapped to OWASP ASI); MCP Scan covers 14 risk classes, emits SARIF, and needs no running instance; Skill Scan aligns to SkillTrustBench T01–T09 with a top-model F1 around 0.98; Jailbreak Evaluation builds on DeepTeam with four multi-turn attack methods and cross-model comparison. A Model &amp; API Relay Checker adds model fingerprinting, Claude signature verification and LLM API poisoning detection. Ships three homegrown benchmarks — FORGE-Bench (16 domains / 1,800 trajectories), RogueHandoff-20 and SkillJack — plus three papers (two from Black Hat Europe 2025), and is cited by 19 academic papers. Two clear caveats: the README states there is no authentication and it should not be deployed on public networks, and several sub-modules are unfinished (four detection skills have a SKILL.md but were never registered in _DETECTION_SKILLS, so they never run).</span>
+        </div>
+        
+
+        <a class="aitools-link" href="https://github.com/Tencent/AI-Infra-Guard" target="_blank" rel="noopener">https://github.com/Tencent/AI-Infra-Guard</a>
+
+        
+        
+        <a class="i18n-zh aitools-more" href="/ai-tools/ai-infra-guard/">
+          <span class="i18n-zh">详细分析</span> →
+        </a>
+        
+        
+        <a class="i18n-en aitools-more" href="/en/ai-tools/ai-infra-guard/">
+          <span class="i18n-en">Deep dive</span> →
+        </a>
+        
+      </article>
+      
+    </div>
   
     
     <div class="aitools-day">
@@ -512,6 +565,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "AI-Infra-Guard",
+        "description": "腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测",
+        "url": "https://github.com/Tencent/AI-Infra-Guard",
+        "datePublished": "2026-09-24",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "NVIDIA OpenShell",
         "description": "面向自主 AI Agent 的安全私有运行时：用声明式 YAML 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点",
         "url": "https://github.com/NVIDIA/OpenShell",
@@ -523,7 +590,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "PentAGI",
@@ -537,7 +604,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Cairn",
@@ -551,7 +618,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 5,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Shannon",
@@ -565,7 +632,7 @@
     
     {
       "@type": "ListItem",
-      "position": 5,
+      "position": 6,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",
