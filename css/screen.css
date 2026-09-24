@@ -98,10 +98,10 @@ th { background: var(--bg-soft); font-weight: 600; }
 .site-title:hover { color: var(--accent); text-decoration: none; }
 /* 站点标题里的 Wester logo：高度用 em 绑当前字号（.site-title 是 1.05rem），
    改字号时 logo 自动跟着变，不用同步改宽度（宽由 SVG viewBox 比例算出）。
-   0.8em 而不是 1em：font-size 含 ascender/descender，1em 高的 logo 会比旁边的字
-   明显大一圈；0.8em 的视觉体量跟粗体字接近。 */
+   height 由 Wester 指定为 1em；如果看着比旁边的粗体字大/小，改这个值即可
+   （font-size 含 ascender/descender，一般 0.8~1em 之间找视觉体量最接近的）。 */
 .site-title-logo {
-  height: .8em;
+  height: 1em;
   width: auto;
   vertical-align: -.06em;   /* 压一点让视觉基线和旁边的字对齐 */
   margin-right: .18em;
