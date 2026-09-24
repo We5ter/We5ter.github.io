@@ -191,16 +191,16 @@ html[data-lang="en"] .i18n-en { display: inline; }
   font-size: 1.15rem;
   font-weight: 700;
 }
-/* 侧栏里的 Wester logo：紧凑版 SVG 比例 3.67:1，宽度别铺满 220px 的栏宽，
+/* 侧栏里的 Wester logo：用户指定 210×66，宽度别铺满 220px 的栏宽，
    留一点呼吸感；height:auto 交给比例算，不写死避免变形。 */
 .author-logo {
   display: block;
   width: 100%;
-  max-width: 185px;
+  max-width: 210px;
   height: auto;
   /* 用 aspect-ratio 锁比例（别用 min-height 兜底，窄栏里会把字压扁）；
      描边动画播完前这块是空白，比例锁住就不会有布局跳动。 */
-  aspect-ratio: 610 / 166;
+  aspect-ratio: 210 / 66;
 }
 .author-bio {
   margin: 0 0 1.25rem;
