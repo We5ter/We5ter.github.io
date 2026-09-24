@@ -1292,3 +1292,62 @@ a.cve-hof:hover {
 .post-source-line + .post-source-line { margin-top: .1rem; }
 .post-source-link { color: var(--accent); word-break: break-all; }
 .post-source-link:hover { text-decoration: underline; }
+
+/* ===== 访问统计（Vercount）=====
+   首页顶部站点数据条 + 文章标题下的本篇阅读量。
+   数字用 tabular-nums 等宽，加载完成前是占位符，数字跳进来时不会抖动布局。 */
+.site-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 2.2rem;
+  padding: .9rem 1.4rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.stat-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .45rem;
+}
+.stat-item + .stat-item {
+  margin-left: 1.7rem;
+  padding-left: 1.7rem;
+  border-left: 1px solid var(--border);
+}
+.stat-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  align-self: center;
+  fill: var(--text-muted);
+  opacity: .7;
+}
+.stat-num {
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-size: .8125rem;
+  color: var(--text-muted);
+}
+
+/* 文章页 meta：阅读量跟日期、时长同一行，沿用 · 分隔，
+   字号跟着 meta 走，但数字加粗一点便于扫读 */
+.article-views { font-variant-numeric: tabular-nums; }
+.article-views .stat-num {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--text);
+}
+.views-label { color: var(--text-muted); }
+
+@media (max-width: 640px) {
+  .site-stats { padding: .8rem 1rem; margin-bottom: 1.6rem; }
+  .stat-item + .stat-item { margin-left: 1.1rem; padding-left: 1.1rem; }
+  .stat-num { font-size: 1.15rem; }
+}
