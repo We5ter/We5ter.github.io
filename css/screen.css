@@ -1469,3 +1469,61 @@ a.cve-hof:hover {
   font-size: .68rem;
   color: var(--text-muted);
 }
+
+/* ========== Contact page ========== */
+.contact-lede {
+  max-width: 64ch;
+  margin: 0 auto 2.2rem;
+  color: var(--text-muted);
+  font-size: .95rem;
+  line-height: 1.6;
+  text-align: center;
+}
+.contact-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 640px;
+  display: grid;
+  gap: 1rem;
+}
+.contact-item {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--border-radius-md);
+  background: var(--accent-soft);
+}
+.contact-label {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: .04em;
+}
+.contact-value {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  width: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.contact-email  { width: min(319px, 100%); height: 32px; }
+.contact-wechat { width: min(199px, 100%); height: 32px; }
+.contact-foot {
+  margin: 2rem auto 0;
+  max-width: 64ch;
+  text-align: center;
+  font-size: .82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+@media (max-width: 560px) {
+  .contact-item {
+    grid-template-columns: 1fr;
+    gap: .55rem;
+  }
+}
