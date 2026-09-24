@@ -1367,11 +1367,10 @@ a.cve-hof:hover {
 }
 
 /* ===== 文章页右侧悬浮公众号二维码 =====
-   硬约束：默认状态绝不能压住正文。
-   内容区 max-width 1100px 居中 → 右侧富余 = (视口宽 - 1100) / 2，据此分三档：
-     ≥1400px   富余 ≥150px → 卡片（130px）常驻，完整落在正文外
-     1200–1400 富余 50–150px → 只留 44px 小按钮，hover / 聚焦才展开
-     <1200px   富余 0 → 整个组件不显示（窄屏正文已占满视口，没有空位）
+   硬约束：默认状态绝不能压住正文，且出现就是完整二维码（不做折叠按钮）。
+   内容区 max-width 1100px 居中 → 右侧富余 = (视口宽 - 1100) / 2：
+     ≥1400px → 富余 ≥150px，卡片（130px + right 12px = 142px）完整落在正文外，直接常驻
+     <1400px → 富余不够，整个组件隐藏（此时正文已基本占满视口，没有可放的空位）
    fixed 定位 + 垂直居中，不随页面滚动跑到正文上面。 */
 .float-qr {
   position: fixed;
@@ -1380,29 +1379,10 @@ a.cve-hof:hover {
   transform: translateY(-50%);
   z-index: 40;
   display: none;                     /* 默认隐藏，由断点打开 */
-  flex-direction: column;
-  align-items: flex-end;
-  gap: .5rem;
 }
-@media (min-width: 1200px) {
-  .float-qr { display: flex; }
+@media (min-width: 1400px) {
+  .float-qr { display: block; }
 }
-.float-qr-btn {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--bg);
-  color: var(--text-muted);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-  transition: color .15s ease, box-shadow .15s ease;
-}
-.float-qr-btn:hover { color: var(--accent); box-shadow: 0 3px 14px rgba(0, 0, 0, .12); }
-.float-qr-btn svg { width: 21px; height: 21px; fill: currentColor; }
 .float-qr-panel {
   width: 130px;
   padding: .5rem;
@@ -1411,7 +1391,6 @@ a.cve-hof:hover {
   background: var(--bg);
   box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
   text-align: center;
-  display: none;                     /* 中屏默认收起，hover 才展开 */
 }
 .float-qr-panel img {
   display: block;
@@ -1432,15 +1411,4 @@ a.cve-hof:hover {
   margin-top: .1rem;
   font-size: .68rem;
   color: var(--text-muted);
-}
-/* 中屏：hover 或键盘聚焦时展开面板。此时面板会临时盖住正文右边缘一点点，
-   但只在用户主动交互时出现，默认状态不遮挡。 */
-@media (min-width: 1200px) and (max-width: 1399.98px) {
-  .float-qr:hover .float-qr-panel,
-  .float-qr:focus-within .float-qr-panel { display: block; }
-}
-/* 大屏：面板常驻（已在正文外），按钮收起——此时不需要它了 */
-@media (min-width: 1400px) {
-  .float-qr-btn { display: none; }
-  .float-qr-panel { display: block; }
 }
