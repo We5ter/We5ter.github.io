@@ -1336,15 +1336,21 @@ a.cve-hof:hover {
   color: var(--text-muted);
 }
 
-/* 文章页 meta：阅读量跟日期、时长同一行，沿用 · 分隔，
-   字号跟着 meta 走，但数字加粗一点便于扫读 */
+/* 文章页 meta：阅读量跟日期、时长同一行，沿用 · 分隔，靠字重区分而不是靠颜色。
+   数字**不能**写死深色 —— meta 在带 banner 的文章里是反白白字（底下压了 .52~.78 的暗层），
+   写死 var(--text) 会把白字覆盖成黑字，在深色 banner 上直接糊掉。
+   所以这里只继承 .article-meta 的字色，banner 页再单独跟 .article-date 对齐。 */
 .article-views { font-variant-numeric: tabular-nums; }
 .article-views .stat-num {
   font-size: inherit;
   font-weight: 600;
-  color: var(--text);
 }
-.views-label { color: var(--text-muted); }
+.article-header--banner .article-meta .article-views .stat-num,
+.article-header--banner .article-meta .views-label,
+.section-heading--banner .article-meta .article-views .stat-num,
+.section-heading--banner .article-meta .views-label {
+  color: rgba(255, 255, 255, .82);
+}
 
 @media (max-width: 640px) {
   .site-stats { padding: .8rem 1rem; margin-bottom: 1.6rem; }
