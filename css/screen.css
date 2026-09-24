@@ -177,14 +177,14 @@ html[data-lang="en"] .i18n-en { display: inline; }
   align-items: start;
 }
 .sidebar { position: sticky; top: 85px; }
-.author-card { text-align: left; }
+.author-card { text-align: center; }
 .author-avatar {
   width: 118px; height: 118px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);
   display: block;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem;
 }
 .author-name {
   margin: 0 0 .25rem;
@@ -213,6 +213,10 @@ html[data-lang="en"] .i18n-en { display: inline; }
   margin: 0;
   padding: 1rem 0 0;
   border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .35rem;
 }
 .author-links li { margin-bottom: .35rem; }
 .author-links a,
@@ -616,11 +620,7 @@ html[data-lang="en"] .i18n-en { display: inline; }
     padding: 1.75rem 1.25rem 3rem;
   }
   .sidebar { position: static; }
-  .author-card { text-align: center; }
-  .author-avatar { margin: 0 auto 1rem; width: 110px; height: 110px; }
-  .author-links {
-    display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem;
-  }
+  .author-avatar { width: 110px; height: 110px; }
   .author-links li { margin-bottom: 0; }
   .author-links a,
   .author-links .wechat-trigger {
