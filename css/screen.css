@@ -1294,46 +1294,43 @@ a.cve-hof:hover {
 .post-source-link:hover { text-decoration: underline; }
 
 /* ===== 访问统计（Vercount）=====
-   首页顶部站点数据条 + 文章标题下的本篇阅读量。
-   数字用 tabular-nums 等宽，加载完成前是占位符，数字跳进来时不会抖动布局。 */
+   侧边栏：站点总访问 / 访客数；文章页 meta：本篇阅读量。
+   侧栏那一版刻意「素」：不上底色、不加边框、不放图标，
+   沿用 .author-links 那条 1px 分隔线的语言，数字走等宽字体 + 深墨色，
+   靠字重和字距做层次 —— 220px 的窄栏里再上主色和图标会显得吵。 */
 .site-stats {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  margin: 0 0 2.2rem;
-  padding: .9rem 1.4rem;
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 .stat-item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .45rem;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  min-width: 0;
 }
 .stat-item + .stat-item {
-  margin-left: 1.7rem;
-  padding-left: 1.7rem;
+  padding-left: 1rem;
   border-left: 1px solid var(--border);
 }
-.stat-icon {
-  width: 15px;
-  height: 15px;
-  flex: 0 0 auto;
-  align-self: center;
-  fill: var(--text-muted);
-  opacity: .7;
-}
 .stat-num {
-  font-size: 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--accent);
+  letter-spacing: -.01em;
   font-variant-numeric: tabular-nums;
+  /* 这里不设 color：文章页 meta 下的数字要继承 .article-meta 的字色，
+     banner 页是反白白字，写死深色会糊在深色背景上。颜色只在侧栏作用域里给。 */
 }
+.site-stats .stat-num { color: var(--text); }
 .stat-label {
-  font-size: .8125rem;
+  font-size: .6875rem;
   color: var(--text-muted);
+  letter-spacing: .06em;
+  white-space: nowrap;
 }
 
 /* 文章页 meta：阅读量跟日期、时长同一行，沿用 · 分隔，靠字重区分而不是靠颜色。
@@ -1353,7 +1350,6 @@ a.cve-hof:hover {
 }
 
 @media (max-width: 640px) {
-  .site-stats { padding: .8rem 1rem; margin-bottom: 1.6rem; }
-  .stat-item + .stat-item { margin-left: 1.1rem; padding-left: 1.1rem; }
-  .stat-num { font-size: 1.15rem; }
+  /* 窄屏下侧边栏掉到正文下方并占满宽度，两列统计照样成立，只需略微收紧间距 */
+  .site-stats { margin-top: .9rem; padding-top: .9rem; }
 }
