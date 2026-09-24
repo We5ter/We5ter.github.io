@@ -1410,10 +1410,16 @@ a.cve-hof:hover {
   text-align: center;
   display: none;                     /* 默认收起 */
 }
-/* 窄屏：点击（JS 加 .is-open）才展开 */
-@media (max-width: 1399.98px) {
-  .float-qr.is-open .float-qr-panel { display: block; }
+/* 展开按设备能力分流，两种都要留：
+   1) 有鼠标的设备（hover: hover）→ 悬停即展开，最顺手；:focus-within 给键盘兜底
+   2) 触摸设备（没有 hover 这个概念）→ 靠 JS 点击 toggle .is-open
+   不能只写 :hover：移动端没有真 hover，iOS 会把它变成「点一下才生效」的 sticky hover，
+   行为不确定，还会连累同一元素上的链接要点两次才跳转。 */
+@media (hover: hover) {
+  .float-qr:hover .float-qr-panel,
+  .float-qr:focus-within .float-qr-panel { display: block; }
 }
+.float-qr.is-open .float-qr-panel { display: block; }
 /* 大屏：面板已在正文外，常驻显示，不需要按钮了 */
 @media (min-width: 1400px) {
   .float-qr-btn { display: none; }
