@@ -195,6 +195,7 @@ html[data-lang="en"] .i18n-en { display: inline; }
    宽度远小于 220px 的栏宽，刻意克制；height:auto 交给比例算，不写死避免变形。 */
 .author-logo {
   display: block;
+  margin: 0 auto;          /* block 元素不响应父级 text-align，必须自居中 */
   width: 100%;
   max-width: 75px;
   height: auto;
