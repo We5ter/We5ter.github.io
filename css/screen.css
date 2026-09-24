@@ -1471,21 +1471,13 @@ a.cve-hof:hover {
 }
 
 /* ========== Contact page ========== */
-.contact-lede {
-  max-width: 64ch;
-  margin: 0 auto 2.2rem;
-  color: var(--text-muted);
-  font-size: .95rem;
-  line-height: 1.6;
-  text-align: center;
-}
 .contact-list {
   list-style: none;
   margin: 0 auto;
   padding: 0;
-  max-width: 640px;
+  max-width: 560px;
   display: grid;
-  gap: 1rem;
+  gap: .9rem;
 }
 .contact-item {
   display: grid;
@@ -1511,16 +1503,8 @@ a.cve-hof:hover {
   user-select: none;
   -webkit-user-select: none;
 }
-.contact-email  { width: min(319px, 100%); height: 32px; }
-.contact-wechat { width: min(199px, 100%); height: 32px; }
-.contact-foot {
-  margin: 2rem auto 0;
-  max-width: 64ch;
-  text-align: center;
-  font-size: .82rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
+.contact-email  { width: min(231px, 100%); height: 26px; }
+.contact-wechat { width: min(145px, 100%); height: 26px; }
 @media (max-width: 560px) {
   .contact-item {
     grid-template-columns: 1fr;
