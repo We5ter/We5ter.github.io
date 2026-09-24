@@ -1367,10 +1367,11 @@ a.cve-hof:hover {
 }
 
 /* ===== 文章页右侧悬浮公众号二维码 =====
-   硬约束：默认状态绝不能压住正文，且出现就是完整二维码（不做折叠按钮）。
+   硬约束：默认状态绝不能压住正文。
    内容区 max-width 1100px 居中 → 右侧富余 = (视口宽 - 1100) / 2：
-     ≥1400px → 富余 ≥150px，卡片（130px + right 12px = 142px）完整落在正文外，直接常驻
-     <1400px → 富余不够，整个组件隐藏（此时正文已基本占满视口，没有可放的空位）
+     ≥1400px → 富余 ≥150px，卡片（130px + right 12px = 142px）完整落在正文外 → 直接常驻，按钮收起
+     <1400px → 没有富余空间 → 只留 44px 图标按钮，**点击**才展开二维码
+               （再点 / 点别处 / Esc 收起；展开是用户主动触发的，可接受临时压住一点正文）
    fixed 定位 + 垂直居中，不随页面滚动跑到正文上面。 */
 .float-qr {
   position: fixed;
@@ -1378,11 +1379,27 @@ a.cve-hof:hover {
   top: 50%;
   transform: translateY(-50%);
   z-index: 40;
-  display: none;                     /* 默认隐藏，由断点打开 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .5rem;
 }
-@media (min-width: 1400px) {
-  .float-qr { display: block; }
+.float-qr-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+  transition: color .15s ease, box-shadow .15s ease;
 }
+.float-qr-btn:hover { color: var(--accent); box-shadow: 0 3px 14px rgba(0, 0, 0, .12); }
+.float-qr-btn svg { width: 21px; height: 21px; fill: currentColor; }
 .float-qr-panel {
   width: 130px;
   padding: .5rem;
@@ -1391,6 +1408,22 @@ a.cve-hof:hover {
   background: var(--bg);
   box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
   text-align: center;
+  display: none;                     /* 默认收起 */
+}
+/* 窄屏：点击（JS 加 .is-open）才展开 */
+@media (max-width: 1399.98px) {
+  .float-qr.is-open .float-qr-panel { display: block; }
+}
+/* 大屏：面板已在正文外，常驻显示，不需要按钮了 */
+@media (min-width: 1400px) {
+  .float-qr-btn { display: none; }
+  .float-qr-panel { display: block; }
+}
+/* 手机：按钮再收一点，贴边更紧 */
+@media (max-width: 640px) {
+  .float-qr { right: 8px; }
+  .float-qr-btn { width: 40px; height: 40px; }
+  .float-qr-btn svg { width: 19px; height: 19px; }
 }
 .float-qr-panel img {
   display: block;
