@@ -1505,7 +1505,7 @@ a.cve-hof:hover {
   user-select: none;
   -webkit-user-select: none;
 }
-.contact-email { width: min(231px, 100%); height: 26px; }
+.contact-email { width: min(186px, 100%); height: 22px; }
 .contact-qr {
   display: flex;
   flex-direction: column;
