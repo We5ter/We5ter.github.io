@@ -1525,6 +1525,13 @@ a.cve-hof:hover {
   text-align: center;
   line-height: 1.3;
 }
+.contact-qr-hint {
+  font-size: .72rem;
+  color: var(--text-muted);
+  opacity: .85;
+  text-align: center;
+  line-height: 1.3;
+}
 @media (max-width: 560px) {
   .contact-list { grid-template-columns: 1fr; }
 }
