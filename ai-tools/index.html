@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790347785850" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790347785850" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790516484250" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790516484250" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790347785850" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790516484250" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -235,6 +235,59 @@
 
   
 
+  
+    
+    <div class="aitools-day">
+      <h2 class="aitools-date">
+        <span class="aitools-issue">
+          <span class="i18n-zh">第 007 期</span>
+          <span class="i18n-en">No. 7</span>
+        </span>
+        <time datetime="2026-09-27">
+          <span class="i18n-zh">2026.9.27 <span class="aitools-week">周日</span></span>
+          <span class="i18n-en">Sep 27, 2026</span>
+        </time>
+      </h2>
+
+      
+      <article class="aitools-item" id="tool-20260927-agentshield">
+        <div class="aitools-head">
+          
+          
+          
+          <a class="i18n-zh aitools-name" href="/ai-tools/agentshield/">AgentShield</a>
+          <a class="i18n-en aitools-name" href="/en/ai-tools/agentshield/">AgentShield</a>
+          
+        </div>
+
+        <p class="aitools-tagline">
+          <span class="i18n-zh">Claude Code 黑客松作品 / Everything Claude Code 生态：把 AI Agent 配置审计做成 0–100 分、可上 CI 的合规工具</span>
+          <span class="i18n-en">A Claude Code Hackathon project from the Everything Claude Code ecosystem: a 0–100 graded audit of AI agent configurations that drops into CI as a compliance gate</span>
+        </p>
+
+        
+        <div class="aitools-note">
+          <span class="i18n-zh">affaan-m 在 2026-02 Claude Code 黑客松（Cerebral Valley × Anthropic）做出的 AI Agent 配置审计器，MIT，1.2k star / 268 fork。268 条规则扫 .claude/ 目录里的硬编码密钥、tool permission、hook 命令注入、MCP server 暴露、agent prompt injection；分级 A–F + 0–100 分；支持 CLI / GitHub Action / GitHub App / MiniClaw HTTP API。亮点是 runtimeConfidence 七档分级（template-example 0.25×、project-local-optional 0.75×、单文件 10 分封顶）和 --fix 的防篡改回滚（修完复扫退化就回滚 + attestation digest）；进阶有 --opus 三智能体对抗（Attacker/Defender/Auditor）、--compliance 映射 SOC2/PCI/ISO、--supply-chain 验证 npm provenance。短板：README 规则数三套口径（268 / 102 / 17+40+49+41）；项目 6 个月历史；--opus/--injection 会把 .claude/ 内容外发到 Anthropic / OrcaRouter API（敏感配置需先脱敏）；harness adapter 只是 marker 证据，Claude Code 最深，其他只是加分项。给 Claude Code 重度用户：直接用；跨 harness 团队当 Claude Code 覆盖层。</span>
+          <span class="i18n-en">An AI agent configuration auditor built by affaan-m at the 2026-02 Claude Code Hackathon (Cerebral Valley × Anthropic), MIT, 1.2k stars / 268 forks. 268 rules scan your .claude/ directory for hardcoded secrets, tool permission issues, hook command injection, MCP server exposure, and agent prompt-injection triggers. Outputs A–F grades plus a 0–100 score, available as CLI, GitHub Action, GitHub App and MiniClaw HTTP API. The standout design choices are runtimeConfidence (7-tier: template-example 0.25×, project-local-optional 0.75×, per-file 10-point cap) and --fix with tamper-evident rollback (re-scans after edits; rolls back on regression and emits an attestation digest). Advanced modes include --opus three-agent adversarial analysis (Attacker/Defender/Auditor), --compliance mapping to SOC 2/PCI/ISO, and --supply-chain for npm provenance. Caveats: the README has three inconsistent rule counts (268 / 102 / 17+40+49+41); only 6 months of history; --opus/--injection send .claude/ contents to the Anthropic or OrcaRouter API (redact before pointing at anything sensitive); harness adapters are marker evidence only, with Claude Code as the deepest supported target. For Claude Code power users: install now. For multi-harness teams: use it as the Claude Code coverage layer.</span>
+        </div>
+        
+
+        <a class="aitools-link" href="https://github.com/affaan-m/agentshield" target="_blank" rel="noopener">https://github.com/affaan-m/agentshield</a>
+
+        
+        
+        <a class="i18n-zh aitools-more" href="/ai-tools/agentshield/">
+          <span class="i18n-zh">详细分析</span> →
+        </a>
+        
+        
+        <a class="i18n-en aitools-more" href="/en/ai-tools/agentshield/">
+          <span class="i18n-en">Deep dive</span> →
+        </a>
+        
+      </article>
+      
+    </div>
   
     
     <div class="aitools-day">
@@ -572,6 +625,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "AgentShield",
+        "description": "Claude Code 黑客松作品 / Everything Claude Code 生态：把 AI Agent 配置审计做成 0–100 分、可上 CI 的合规工具",
+        "url": "https://github.com/affaan-m/agentshield",
+        "datePublished": "2026-09-27",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "AI-Infra-Guard",
         "description": "腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测",
         "url": "https://github.com/Tencent/AI-Infra-Guard",
@@ -583,7 +650,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "NVIDIA OpenShell",
@@ -597,7 +664,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "PentAGI",
@@ -611,7 +678,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 5,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Cairn",
@@ -625,7 +692,7 @@
     
     {
       "@type": "ListItem",
-      "position": 5,
+      "position": 6,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Shannon",
@@ -639,7 +706,7 @@
     
     {
       "@type": "ListItem",
-      "position": 6,
+      "position": 7,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",
