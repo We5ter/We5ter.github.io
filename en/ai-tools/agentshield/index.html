@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790516484251" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790516484251" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790517610622" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790517610622" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790516484251" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790517610622" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -279,7 +279,7 @@
         <span class="i18n-en">Sep 27, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 55 分钟</span><span class="i18n-en">55 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 54 分钟</span><span class="i18n-en">54 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -684,10 +684,6 @@
 <p>Promote <code>policy.json</code> into <code>.agentshield/policy.json</code> and the Action will fail-on-policy automatically.</p>
 <p><strong>First move for new users</strong>: <code>npx scan</code> to see your score. <strong>Don’t</strong> install the Action with strict gating first — you’ll get buried in findings. Learn the tiers, then progressive-roll with baseline + <code>--fix</code>.</p>
 <h2 id="9-One-line-conclusion"><a href="#9-One-line-conclusion" class="headerlink" title="9. One-line conclusion"></a>9. One-line conclusion</h2><p><strong>AgentShield is the only MIT tool that takes “AI agent configuration audit” all the way to a 0–100 score, CI gating, FP tiering, compliance mapping, and active adversarial analysis</strong> — but its rule-count inconsistency, noise-management overhead, <code>.claude/</code> exfiltration to LLMs, and “Claude Code-first” depth mean you have to use it <strong>deliberately</strong>: take a baseline, read the <code>runtimeConfidence</code> tiers, redact before <code>--opus</code>&#x2F;<code>--injection</code>, treat non-Claude-Code adapter coverage as a bonus. For Claude Code power users: just install it, <strong>no other tool is this close to your daily surface</strong>. For multi-harness teams: use it as the Claude Code coverage layer and supplement the other harnesses with separate tools.</p>
-<hr>
-<blockquote>
-<p>Repo: <a target="_blank" rel="noopener" href="https://github.com/affaan-m/agentshield">https://github.com/affaan-m/agentshield</a><br>Maintainer: affaan-m (<a target="_blank" rel="noopener" href="https://github.com/affaan-m/everything-claude-code">Everything Claude Code</a> ecosystem &#x2F; Claude Code Hackathon, Cerebral Valley × Anthropic, Feb 2026)<br>Written 2026-09-27. Data snapshot: 1,229 stars &#x2F; 268 forks, latest push 2026-09-10, README claims 268 rules across 15 modules (see §7.1 for the three conflicting totals).</p>
-</blockquote>
 
   </section>
 

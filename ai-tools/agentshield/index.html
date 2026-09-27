@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790516484251" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790516484251" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790517610621" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790517610621" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790516484251" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790517610621" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -686,10 +686,6 @@
 <p><code>policy.json</code> 推进 <code>.agentshield/policy.json</code> 后，Action 就会 fail-on-policy。</p>
 <p><strong>新手第一动作</strong>：先 <code>npx scan</code> 看分数，<strong>别</strong>直接装 Action + 严格门禁 —— 你会被一堆 finding 噎死。先理解分级，再用 baseline + <code>--fix</code> 渐进接入。</p>
 <h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>AgentShield 是当前唯一把「AI Agent 配置审计」做到 0–100 分、可上 CI、有误报分级、有合规映射、还有主动对抗分析的 MIT 一档选择</strong> —— 但它的规则数、噪音治理、<code>.claude/</code> 内容外发问题、以及「Claude Code 专属」的深度都意味着你要<strong>带着脑子用</strong>：自己跑一次 baseline、看清楚 <code>runtimeConfidence</code> 分级、对 <code>--opus</code>&#x2F;<code>--injection</code> 先脱敏再跑、对别的 harness 适配当加分项看。给 Claude Code 重度用户：直接用，<strong>别家没有这么贴身的</strong>；给跨 harness 团队：作为 Claude Code 这边的覆盖层用，别的 harness 再补别的工具。</p>
-<hr>
-<blockquote>
-<p>项目仓库：<a target="_blank" rel="noopener" href="https://github.com/affaan-m/agentshield">https://github.com/affaan-m/agentshield</a><br>主理人：affaan-m（<a target="_blank" rel="noopener" href="https://github.com/affaan-m/everything-claude-code">Everything Claude Code</a> 生态 &#x2F; Claude Code 黑客松 Cerebral Valley × Anthropic 2026-02）<br>写作日期：2026-09-27，数据快照：<code>1,229 star / 268 fork</code>，最近 push <code>2026-09-10</code>，README 口径 <code>268 rules across 15 modules</code>（详见第七章规则数三套口径）</p>
-</blockquote>
 
   </section>
 
