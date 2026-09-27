@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790517610621" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790517610621" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790519125734" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790519125734" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790517610621" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790519125734" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -447,34 +447,28 @@
 <table>
 <thead>
 <tr>
-<th>模块</th>
-<th>规则数（README 章节口径）</th>
+<th>模块（规则数）</th>
 <th>扫什么</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><strong>Secrets</strong></td>
-<td>10 条规则 &#x2F; 14 patterns</td>
+<td><strong>Secrets</strong>（10 条 &#x2F; 14 patterns）</td>
 <td>硬编码密钥：Anthropic <code>sk-ant-</code>、OpenAI <code>sk-proj-</code>&#x2F;<code>sk-</code>、xAI <code>xai-</code>、AWS <code>AKIA</code>、Google&#x2F;Gemini <code>AIza</code>、Stripe <code>sk_test_</code>&#x2F;<code>sk_live_</code>、GitHub PAT <code>ghp_</code>&#x2F;<code>github_pat_</code>、Linear <code>lin_api_</code>、Cloudflare <code>CF_API_TOKEN=</code>、Slack <code>xox[bprs]-</code>、JWT <code>eyJ...</code>、Bearer tokens、数据库连接串、私钥、env 变量泄漏</td>
 </tr>
 <tr>
-<td><strong>Permissions</strong></td>
-<td>17 条</td>
+<td><strong>Permissions</strong>（17 条）</td>
 <td>通配符 <code>Bash(*)</code>&#x2F;<code>Write(*)</code>&#x2F;<code>Edit(*)</code>、缺失 deny list、<code>--dangerously-skip-permissions</code>、可变工具未限定、破坏性 git 命令、<code>curl *</code>&#x2F;<code>wget</code>&#x2F;<code>ssh *</code> 无限网络</td>
 </tr>
 <tr>
-<td><strong>Hooks</strong></td>
-<td>40 条</td>
+<td><strong>Hooks</strong>（40 条）</td>
 <td>hook 里的命令注入（<code>$&#123;file&#125;</code> 插值）、数据外发（<code>curl -X POST $&#123;...&#125;</code>）、静默错误（<code>2&gt;/dev/null</code>）、缺失 PreToolUse hook、SessionStart 下载执行、全局 npm&#x2F;pip&#x2F;gem&#x2F;cargo 安装、Docker 特权模式、<code>/dev/tcp</code> reverse shell、剪贴板读写、日志清理反取证</td>
 </tr>
 <tr>
-<td><strong>MCP Servers</strong></td>
-<td>49 条</td>
+<td><strong>MCP Servers</strong>（49 条）</td>
 <td>high-risk server type、<code>npx -y</code> 无确认安装、environment 里塞 token、remote URL transport、shell metacharacters in args、缺 version pin、<code>autoApprove</code>、缺失 timeout、<code>0.0.0.0</code> 绑定、敏感文件作参数、supplier chain 验证</td>
 </tr>
 <tr>
-<td><strong>Agents</strong></td>
-<td>41 条</td>
+<td><strong>Agents</strong>（41 条）</td>
 <td>unrestricted tool access、外部内容处理无防御、auto-run 指令（”Always run” &#x2F; “without asking” &#x2F; “automatically install”）、零宽字符 &#x2F; HTML 注释 &#x2F; base64 隐藏指令、URL 执行、时间触发型指令、批量凭据收集、prompt reflection（”ignore previous instructions”）、output manipulation（”always report ok”）</td>
 </tr>
 </tbody></table>
@@ -497,50 +491,14 @@
 </ul>
 <p>也就是<strong>分数只能被真实 findings 降低</strong>。这是合规向 GRC 报告里很重要的一点 —— 分数越高代表「没有发现真实问题」，不是「你写了很多 deny」。</p>
 <h3 id="4-2-runtimeConfidence-七档分级"><a href="#4-2-runtimeConfidence-七档分级" class="headerlink" title="4.2 runtimeConfidence 七档分级"></a>4.2 <code>runtimeConfidence</code> 七档分级</h3><p>这是 AgentShield <strong>最专业的误报治理机制</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>置信度</th>
-<th>含义</th>
-<th>评分权重（非 secret）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>active-runtime</code></td>
-<td>真在跑的配置：<code>.mcp.json</code> &#x2F; <code>mcp.json</code> &#x2F; <code>.claude/mcp.json</code> &#x2F; <code>.claude.json</code> &#x2F; active <code>settings.json</code></td>
-<td>1.0</td>
-</tr>
-<tr>
-<td><code>project-local-optional</code></td>
-<td><code>settings.local.json</code> 这类本地覆盖</td>
-<td>0.75</td>
-</tr>
-<tr>
-<td><code>plugin-cache</code></td>
-<td><code>.claude/plugins/cache/...</code> 已装插件缓存</td>
-<td>0.5</td>
-</tr>
-<tr>
-<td><code>plugin-manifest</code></td>
-<td>声明性 hook manifest 如 <code>hooks/hooks.json</code></td>
-<td>0.5</td>
-</tr>
-<tr>
-<td><code>template-example</code></td>
-<td><code>mcp-configs/</code>、<code>config/mcp/</code> 之类的模板目录</td>
-<td><strong>0.25</strong>（且单文件 10 分封顶）</td>
-</tr>
-<tr>
-<td><code>docs-example</code></td>
-<td><code>docs/guide/settings.json</code>、<code>commands/*.md</code> 等教学&#x2F;示例</td>
-<td>0.25</td>
-</tr>
-<tr>
-<td><code>hook-code</code></td>
-<td>manifest-resolved 非 shell 实现</td>
-<td>1.0（窄规则集）</td>
-</tr>
-</tbody></table>
+<p>七档按「这个配置到底在不在跑」区分，权重直接乘在扣分上：</p>
+<p><strong><code>active-runtime</code>（权重 1.0×）</strong> —— 真在跑的配置：<code>.mcp.json</code>、<code>mcp.json</code>、<code>.claude/mcp.json</code>、<code>.claude.json</code>、active <code>settings.json</code></p>
+<p><strong><code>project-local-optional</code>（0.75×）</strong> —— <code>settings.local.json</code> 这类本地覆盖，只对当前项目生效</p>
+<p><strong><code>plugin-cache</code>（0.5×）</strong> —— 已装插件缓存，如 <code>.claude/plugins/cache/...</code></p>
+<p><strong><code>plugin-manifest</code>（0.5×）</strong> —— 声明性 hook manifest，如 <code>hooks/hooks.json</code></p>
+<p><strong><code>template-example</code>（0.25×，且单文件封顶 10 分）</strong> —— 模板&#x2F;目录型定义，如 <code>mcp-configs/</code>、<code>config/mcp/</code></p>
+<p><strong><code>docs-example</code>（0.25×）</strong> —— 教学&#x2F;示例内容，如 <code>docs/guide/settings.json</code>、<code>commands/*.md</code></p>
+<p><strong><code>hook-code</code>（1.0×，窄规则集）</strong> —— manifest 解析到的非 shell 实现，如 <code>scripts/hooks/session-start.js</code></p>
 <p>实际效果：仓库里 docs 目录有一个 risky MCP server 模板，<strong>不会</strong>像真的启用了一样算 critical；它会被打 <code>template-example</code> 标签，扣 0.25 倍，最多扣 10 分。<strong>这是从「多 false positive」到「分级 triage」的关键转变</strong>。</p>
 <h3 id="4-3-fix-自动修-防篡改"><a href="#4-3-fix-自动修-防篡改" class="headerlink" title="4.3 --fix 自动修 + 防篡改"></a>4.3 <code>--fix</code> 自动修 + 防篡改</h3><p><code>agentshield scan --fix</code> 不是「一把梭」 —— 它的工作流是：</p>
 <ol>

@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790517610622" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790517610622" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790519125735" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790519125735" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790517610622" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790519125735" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -279,7 +279,7 @@
         <span class="i18n-en">Sep 27, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 54 分钟</span><span class="i18n-en">54 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 55 分钟</span><span class="i18n-en">55 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -447,34 +447,28 @@
 <table>
 <thead>
 <tr>
-<th>Module</th>
-<th>Rules (chapter-cited)</th>
+<th>Module (rules)</th>
 <th>What it catches</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><strong>Secrets</strong></td>
-<td>10 rules &#x2F; 14 patterns</td>
+<td><strong>Secrets</strong> (10 rules &#x2F; 14 patterns)</td>
 <td>Hardcoded keys: Anthropic <code>sk-ant-</code>, OpenAI <code>sk-proj-</code>&#x2F;<code>sk-</code>, xAI <code>xai-</code>, AWS <code>AKIA</code>, Google&#x2F;Gemini <code>AIza</code>, Stripe <code>sk_test_</code>&#x2F;<code>sk_live_</code>, GitHub PAT <code>ghp_</code>&#x2F;<code>github_pat_</code>, Linear <code>lin_api_</code>, Cloudflare <code>CF_API_TOKEN=</code>, Slack <code>xox[bprs]-</code>, JWT <code>eyJ...</code>, Bearer tokens, DB connection strings, private keys, env-var leaks</td>
 </tr>
 <tr>
-<td><strong>Permissions</strong></td>
-<td>17</td>
+<td><strong>Permissions</strong> (17)</td>
 <td>Wildcards <code>Bash(*)</code>&#x2F;<code>Write(*)</code>&#x2F;<code>Edit(*)</code>, missing deny list, <code>--dangerously-skip-permissions</code>, mutable tools unscoped, destructive git, unconstrained network (<code>curl *</code>&#x2F;<code>wget</code>&#x2F;<code>ssh *</code>)</td>
 </tr>
 <tr>
-<td><strong>Hooks</strong></td>
-<td>40</td>
+<td><strong>Hooks</strong> (40)</td>
 <td>Command injection (<code>$&#123;file&#125;</code> interpolation), data exfiltration (<code>curl -X POST $&#123;...&#125;</code>), silent errors (<code>2&gt;/dev/null</code>), missing PreToolUse hooks, SessionStart download-execute, global <code>npm/pip/gem/cargo install</code>, Docker privileged mode, <code>/dev/tcp</code> reverse shells, clipboard access, log tampering</td>
 </tr>
 <tr>
-<td><strong>MCP Servers</strong></td>
-<td>49</td>
+<td><strong>MCP Servers</strong> (49)</td>
 <td>High-risk server types, <code>npx -y</code> no-confirm installs, secrets in env, remote URL transport, shell metacharacters in args, missing version pin, <code>autoApprove</code>, missing timeouts, <code>0.0.0.0</code> binding, sensitive files in args, supplier-chain verification</td>
 </tr>
 <tr>
-<td><strong>Agents</strong></td>
-<td>41</td>
+<td><strong>Agents</strong> (41)</td>
 <td>Unrestricted tool access, no defenses on external content, auto-run instructions (“Always run” &#x2F; “without asking” &#x2F; “automatically install”), zero-width &#x2F; HTML-comment &#x2F; base64 hidden instructions, URL execution, time-bomb instructions, bulk credential collection, prompt reflection (“ignore previous instructions”), output manipulation (“always report ok”)</td>
 </tr>
 </tbody></table>
@@ -497,50 +491,14 @@
 </ul>
 <p>The score can only be lowered by real findings. Important for GRC reports: a high score means “no real findings detected”, not “wrote a lot of denies”.</p>
 <h3 id="4-2-runtimeConfidence-7-levels"><a href="#4-2-runtimeConfidence-7-levels" class="headerlink" title="4.2 runtimeConfidence (7 levels)"></a>4.2 <code>runtimeConfidence</code> (7 levels)</h3><p>This is the most sophisticated false-positive mechanism:</p>
-<table>
-<thead>
-<tr>
-<th>Confidence</th>
-<th>Meaning</th>
-<th>Score weight (non-secret)</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>active-runtime</code></td>
-<td>Actually-running config: <code>.mcp.json</code> &#x2F; <code>mcp.json</code> &#x2F; <code>.claude/mcp.json</code> &#x2F; <code>.claude.json</code> &#x2F; active <code>settings.json</code></td>
-<td>1.0</td>
-</tr>
-<tr>
-<td><code>project-local-optional</code></td>
-<td>Local-only overrides like <code>settings.local.json</code></td>
-<td>0.75</td>
-</tr>
-<tr>
-<td><code>plugin-cache</code></td>
-<td>Installed Claude plugin cache at <code>.claude/plugins/cache/...</code></td>
-<td>0.5</td>
-</tr>
-<tr>
-<td><code>plugin-manifest</code></td>
-<td>Declarative hook manifests like <code>hooks/hooks.json</code></td>
-<td>0.5</td>
-</tr>
-<tr>
-<td><code>template-example</code></td>
-<td>Template directories like <code>mcp-configs/</code> or <code>config/mcp/</code></td>
-<td><strong>0.25</strong> (10-point per-file cap)</td>
-</tr>
-<tr>
-<td><code>docs-example</code></td>
-<td>Docs&#x2F;tutorials like <code>docs/guide/settings.json</code> or <code>commands/*.md</code></td>
-<td>0.25</td>
-</tr>
-<tr>
-<td><code>hook-code</code></td>
-<td>Manifest-resolved non-shell implementations</td>
-<td>1.0 (narrow rule set)</td>
-</tr>
-</tbody></table>
+<p>The seven tiers answer “is this config actually running right now?”, and the weight multiplies the deduction directly:</p>
+<p><strong><code>active-runtime</code> (weight 1.0×)</strong> — Actually-running config: <code>.mcp.json</code>, <code>mcp.json</code>, <code>.claude/mcp.json</code>, <code>.claude.json</code>, active <code>settings.json</code></p>
+<p><strong><code>project-local-optional</code> (0.75×)</strong> — Local-only overrides like <code>settings.local.json</code>, scoped to the current project</p>
+<p><strong><code>plugin-cache</code> (0.5×)</strong> — Installed plugin cache, e.g. <code>.claude/plugins/cache/...</code></p>
+<p><strong><code>plugin-manifest</code> (0.5×)</strong> — Declarative hook manifests, e.g. <code>hooks/hooks.json</code></p>
+<p><strong><code>template-example</code> (0.25×, 10-point per-file cap)</strong> — Template&#x2F;catalog definitions, e.g. <code>mcp-configs/</code> or <code>config/mcp/</code></p>
+<p><strong><code>docs-example</code> (0.25×)</strong> — Docs and tutorials, e.g. <code>docs/guide/settings.json</code> or <code>commands/*.md</code></p>
+<p><strong><code>hook-code</code> (1.0×, narrow rule set)</strong> — The non-shell implementation a manifest resolves to, e.g. <code>scripts/hooks/session-start.js</code></p>
 <p>The practical effect: a risky MCP server template in <code>docs/</code> does <strong>not</strong> score like an enabled one. It gets tagged <code>template-example</code>, weighted at 0.25×, capped at 10 points per file. That’s the difference between “many false positives” and “tiered triage”.</p>
 <h3 id="4-3-fix-with-tamper-evident-rollback"><a href="#4-3-fix-with-tamper-evident-rollback" class="headerlink" title="4.3 --fix with tamper-evident rollback"></a>4.3 <code>--fix</code> with tamper-evident rollback</h3><p><code>agentshield scan --fix</code> is not a sledgehammer:</p>
 <ol>
