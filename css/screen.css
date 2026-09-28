@@ -982,13 +982,54 @@ body.layout-ai-tools #main {
 /* 热门工具排行。
    注意：只给排名和一句话，**不显示 star / 热度数字** ——
    那是排序的内部权重，摆出来会把「热门推荐」变成「GitHub star 榜」。 */
+/* 形态两档（跟主题里浮动二维码 float-qr 一个模式），HTML 只有一份，靠 CSS 切：
+     <1500px  右侧只露一个 44px 圆形按钮，点开（有鼠标则悬停）才展开面板。
+              空间实在不够，展开时临时压住正文右上角 —— 用户主动触发，可接受。
+     ≥1500px  面板常驻在正文右侧外面，按钮收起（见下面那个 media）。
+   fixed 定位，不随页面滚动跑掉；top 96px 让开 sticky 的 masthead。 */
 .aitools-hot {
-  margin: 0 0 1.5rem;
-  padding: .9rem 1.1rem 1rem;
-  background: var(--bg-soft);
+  position: fixed;
+  right: 12px;
+  top: 96px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .5rem;
+}
+.aitools-hot-toggle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+  transition: color .15s ease, box-shadow .15s ease;
+}
+.aitools-hot-toggle:hover { color: var(--accent); box-shadow: 0 3px 14px rgba(0, 0, 0, .12); }
+.aitools-hot-toggle svg { width: 21px; height: 21px; }
+.aitools-hot-body {
+  width: 200px;
+  padding: .8rem .85rem .9rem;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
+  display: none;                        /* 默认收起 */
 }
+/* 展开按设备能力分流（同 float-qr）：
+   有鼠标 → 悬停即开，:focus-within 给键盘兜底；
+   触摸设备没有真 hover，靠 JS 点按钮切 .is-open。 */
+@media (hover: hover) {
+  .aitools-hot:hover .aitools-hot-body,
+  .aitools-hot:focus-within .aitools-hot-body { display: block; }
+}
+.aitools-hot.is-open .aitools-hot-body { display: block; }
 .aitools-hot-head {
   display: flex;
   align-items: baseline;
@@ -1050,21 +1091,32 @@ body.layout-ai-tools #main {
      (W - 1100) / 2 ≥ 210  →  W ≥ 1520
    取 1500px 是为了让 1512 的 MacBook Pro 14" 也能用上浮动版
    （差的那几个 px 落在 #main 自己的 1.5rem padding 上，压不到卡片）。
-   <1500px 富余不够，退回工具条下方的静态块（上面那套样式），不去挤正文。
+   <1500px 富余不够，就退回上面那套「按钮 + 点开」的形态。
    ⚠️ 正文宽度（上面 #main 的 max-width）改了，这里的 left 和断点必须同步改。
    left 而不是 right：正文是居中的，用 50% + 半个正文宽算才跟内容对齐，
    写死 right 会在窄一点的屏幕上飘到正文上面。
-   top 96px 是让开 sticky 的 masthead（侧栏那个用的是 85px）。 */
+   这里容器自己就是那张卡片（不再套一层 body），所以把 body 的壳脱掉。 */
 @media (min-width: 1500px) {
   .aitools-hot {
-    position: fixed;
     left: calc(50% + 550px + 20px);
+    right: auto;
     top: 96px;
     width: 190px;
-    margin: 0;
+    display: block;                     /* 取消 flex，容器直接当卡片 */
     padding: .7rem .75rem .8rem;
-    z-index: 30;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
+  }
+  .aitools-hot-toggle { display: none; }
+  .aitools-hot-body {
+    display: block;                     /* 常驻，不再依赖 hover / .is-open */
+    width: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
   }
   /* 190px 的窄栏放不下一句话说明和 tagline，只留排名 + 名字 */
   .aitools-hot-note,
