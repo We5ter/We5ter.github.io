@@ -1072,11 +1072,13 @@ body.layout-ai-tools #main {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-/* 前三名填色，后面留描边款，做出梯度但不吵 */
-.aitools-hot-item:nth-child(-n+3) .aitools-hot-rank {
-  background: var(--accent);
-  color: #fff;
-}
+/* 五个名次五种「多巴胺色」，把榜单立刻活泼起来。
+   这几个色都压得住白字，避开亮黄（黄底白字对比度不够）。 */
+.aitools-hot-item:nth-child(1) .aitools-hot-rank { background: #F72585; color: #fff; }
+.aitools-hot-item:nth-child(2) .aitools-hot-rank { background: #FB5607; color: #fff; }
+.aitools-hot-item:nth-child(3) .aitools-hot-rank { background: #8338EC; color: #fff; }
+.aitools-hot-item:nth-child(4) .aitools-hot-rank { background: #06D6A0; color: #fff; }
+.aitools-hot-item:nth-child(5) .aitools-hot-rank { background: #3A86FF; color: #fff; }
 /* 名字最长能到 "Agent Governance Toolkit" 26 字符，面板 190–200px 放不下。
    flex item 默认 min-width:auto + flex-shrink:0 → 撑破父容器且不折行（这是页面刚
    上线时 Wester 反馈「标题溢出」的根因）。改成可收缩 + 词边界换行，两形态都安全。 */
@@ -1171,7 +1173,9 @@ body.layout-ai-tools #main {
   margin-bottom: .75rem;
   background: var(--bg);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
+  /* 左边框按分类着色（--cat 由 EJS 给 article 行内注入），
+     兜底走主题 accent —— 没配到色或未分类时仍能用。 */
+  border-left: 3px solid var(--cat, var(--accent));
   border-radius: var(--radius);
 }
 .aitools-head {
@@ -1759,10 +1763,13 @@ a.cve-hof:hover {
   cursor: pointer; transition: all .15s;
 }
 .aitools-chip:hover:not(:disabled) {
-  border-color: var(--accent); color: var(--accent); background: var(--accent-soft);
+  /* 跟着 --cat 染色（每个分类的「多巴胺色」）。color-mix 拿 12% 透明度
+     作为 hover 浅背景 —— 不用预先给每个分类算浅色版。 */
+  border-color: var(--cat, var(--accent)); color: var(--cat, var(--accent));
+  background: color-mix(in srgb, var(--cat, var(--accent)) 12%, transparent);
 }
 .aitools-chip.is-active {
-  background: var(--accent); border-color: var(--accent); color: #fff;
+  background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: #fff;
 }
 .aitools-chip.is-active .aitools-chip-n {
   background: rgba(255,255,255,.22); color: #fff;
@@ -1780,8 +1787,10 @@ a.cve-hof:hover {
 
 .aitools-cat {
   padding: .12rem .45rem;
-  font-size: .6875rem; color: var(--accent);
-  background: var(--accent-soft); border-radius: 4px;
+  font-size: .6875rem;
+  color: var(--cat, var(--accent));
+  background: color-mix(in srgb, var(--cat, var(--accent)) 14%, transparent);
+  border-radius: 4px;
   white-space: nowrap;
 }
 
