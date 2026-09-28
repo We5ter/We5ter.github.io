@@ -965,6 +965,94 @@ html[data-lang="en"] .i18n-en { display: inline; }
 }
 
 /* ---- AI 工具专栏页（/ai-tools/） ---- */
+
+/* 这一页隐藏侧边栏：正文是宽卡片列表，220px 的侧栏会把卡片挤窄，
+   而且侧栏里那个「最新 AI 工具推荐」小组件在本页是冗余的（下面就在列）。
+   用 body.layout-ai-tools 限定作用域，其他页面不受影响。
+   单列后把 --content-max 收窄回原来正文的宽度，避免一行过长难读。 */
+body.layout-ai-tools .sidebar { display: none; }
+body.layout-ai-tools #main {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 880px;
+}
+
+/* 热门工具排行。
+   注意：只给排名和一句话，**不显示 star / 热度数字** ——
+   那是排序的内部权重，摆出来会把「热门推荐」变成「GitHub star 榜」。 */
+.aitools-hot {
+  margin: 0 0 1.5rem;
+  padding: .9rem 1.1rem 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.aitools-hot-head {
+  display: flex;
+  align-items: baseline;
+  gap: .55rem;
+  flex-wrap: wrap;
+  margin-bottom: .35rem;
+}
+.aitools-hot-title {
+  margin: 0;
+  font-size: .9375rem;
+  font-weight: 700;
+}
+.aitools-hot-note {
+  margin: 0;
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+.aitools-hot-list { list-style: none; margin: 0; padding: 0; }
+.aitools-hot-item + .aitools-hot-item { border-top: 1px dashed var(--border); }
+.aitools-hot-link {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  padding: .4rem 0;
+  color: var(--text);
+}
+.aitools-hot-link:hover { text-decoration: none; }
+.aitools-hot-link:hover .aitools-hot-name { color: var(--accent); }
+.aitools-hot-rank {
+  flex-shrink: 0;
+  width: 1.3rem;
+  height: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+/* 前三名填色，后面留描边款，做出梯度但不吵 */
+.aitools-hot-item:nth-child(-n+3) .aitools-hot-rank {
+  background: var(--accent);
+  color: #fff;
+}
+.aitools-hot-name { font-weight: 600; flex-shrink: 0; }
+.aitools-hot-line {
+  min-width: 0;
+  font-size: .8125rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .aitools-hot-line { display: none; }
+}
+
+/* 从榜单点进来时闪一下，告诉用户「就是这条」 */
+.aitools-item.is-hot-target { animation: aitools-flash 1.8s ease-out; }
+@keyframes aitools-flash {
+  0%, 35% { background: var(--accent-soft); }
+  100%    { background: var(--bg); }
+}
+
 .aitools-day { margin-bottom: 1.5rem; }
 .aitools-date {
   display: flex;
