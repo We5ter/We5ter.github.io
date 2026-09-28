@@ -1042,6 +1042,38 @@ body.layout-ai-tools #main {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* 宽屏：正文右侧富余出空间后，整个榜单浮到侧边常驻。
+   断点取 1400px，跟主题里浮动二维码的推理一致：
+     (1400 - 880) / 2 = 260px 富余，挂件 210px + 28px 间距 = 238px，完整落在正文外，
+     不会压住工具卡片。
+   <1400px 富余不够，就退回工具条下方的静态块（上面那套样式），不去挤正文。
+   left 而不是 right：正文是居中的，用 50% + 半个正文宽算才跟内容对齐，
+   写死 right 会在窄一点的屏幕上飘到正文上面。
+   top 96px 是让开 sticky 的 masthead（侧栏那个用的是 85px）。 */
+@media (min-width: 1400px) {
+  .aitools-hot {
+    position: fixed;
+    left: calc(50% + 440px + 28px);
+    top: 96px;
+    width: 210px;
+    margin: 0;
+    padding: .7rem .8rem .8rem;
+    z-index: 30;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
+  }
+  /* 210px 的窄栏放不下一句话说明和 tagline，只留排名 + 名字 */
+  .aitools-hot-note,
+  .aitools-hot-line { display: none; }
+  .aitools-hot-head { margin-bottom: .45rem; }
+  .aitools-hot-name {
+    flex-shrink: 1;              /* 覆盖上面的 0，窄栏里允许被压短 */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 640px) {
   .aitools-hot-line { display: none; }
 }
