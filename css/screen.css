@@ -971,9 +971,12 @@ html[data-lang="en"] .i18n-en { display: inline; }
    用 body.layout-ai-tools 限定作用域，其他页面不受影响。
    单列后把 --content-max 收窄回原来正文的宽度，避免一行过长难读。 */
 body.layout-ai-tools .sidebar { display: none; }
+/* 侧栏让出来的 220px 还给正文，回到站点统一的 --content-max（1100px）。
+   卡片是列表型内容、note 也只有一两句，宽一点不伤阅读，反而少滚动。
+   注意这个值会牵动下面热门榜的浮动断点 —— 改它必须同步改那里。 */
 body.layout-ai-tools #main {
   grid-template-columns: minmax(0, 1fr);
-  max-width: 880px;
+  max-width: 1100px;
 }
 
 /* 热门工具排行。
@@ -1043,34 +1046,37 @@ body.layout-ai-tools #main {
   white-space: nowrap;
 }
 /* 宽屏：正文右侧富余出空间后，整个榜单浮到侧边常驻。
-   断点取 1400px，跟主题里浮动二维码的推理一致：
-     (1400 - 880) / 2 = 260px 富余，挂件 210px + 28px 间距 = 238px，完整落在正文外，
-     不会压住工具卡片。
-   <1400px 富余不够，就退回工具条下方的静态块（上面那套样式），不去挤正文。
+   断点按「正文 1100px + 挂件 190px + 20px 间距」反推：
+     (W - 1100) / 2 ≥ 210  →  W ≥ 1520
+   取 1500px 是为了让 1512 的 MacBook Pro 14" 也能用上浮动版
+   （差的那几个 px 落在 #main 自己的 1.5rem padding 上，压不到卡片）。
+   <1500px 富余不够，退回工具条下方的静态块（上面那套样式），不去挤正文。
+   ⚠️ 正文宽度（上面 #main 的 max-width）改了，这里的 left 和断点必须同步改。
    left 而不是 right：正文是居中的，用 50% + 半个正文宽算才跟内容对齐，
    写死 right 会在窄一点的屏幕上飘到正文上面。
    top 96px 是让开 sticky 的 masthead（侧栏那个用的是 85px）。 */
-@media (min-width: 1400px) {
+@media (min-width: 1500px) {
   .aitools-hot {
     position: fixed;
-    left: calc(50% + 440px + 28px);
+    left: calc(50% + 550px + 20px);
     top: 96px;
-    width: 210px;
+    width: 190px;
     margin: 0;
-    padding: .7rem .8rem .8rem;
+    padding: .7rem .75rem .8rem;
     z-index: 30;
     box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
   }
-  /* 210px 的窄栏放不下一句话说明和 tagline，只留排名 + 名字 */
+  /* 190px 的窄栏放不下一句话说明和 tagline，只留排名 + 名字 */
   .aitools-hot-note,
   .aitools-hot-line { display: none; }
   .aitools-hot-head { margin-bottom: .45rem; }
+  /* 名字不截断（截断成 "Agent Gover…" 就没信息量了），让它折到两行 */
+  .aitools-hot-link { align-items: flex-start; }
   .aitools-hot-name {
-    flex-shrink: 1;              /* 覆盖上面的 0，窄栏里允许被压短 */
+    flex-shrink: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: normal;
+    line-height: 1.35;
   }
 }
 
