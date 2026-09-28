@@ -1077,7 +1077,17 @@ body.layout-ai-tools #main {
   background: var(--accent);
   color: #fff;
 }
-.aitools-hot-name { font-weight: 600; flex-shrink: 0; }
+/* 名字最长能到 "Agent Governance Toolkit" 26 字符，面板 190–200px 放不下。
+   flex item 默认 min-width:auto + flex-shrink:0 → 撑破父容器且不折行（这是页面刚
+   上线时 Wester 反馈「标题溢出」的根因）。改成可收缩 + 词边界换行，两形态都安全。 */
+.aitools-hot-link { align-items: flex-start; }
+.aitools-hot-name {
+  font-weight: 600;
+  flex-shrink: 1;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.35;
+}
 .aitools-hot-line {
   min-width: 0;
   font-size: .8125rem;
@@ -1122,14 +1132,8 @@ body.layout-ai-tools #main {
   .aitools-hot-note,
   .aitools-hot-line { display: none; }
   .aitools-hot-head { margin-bottom: .45rem; }
-  /* 名字不截断（截断成 "Agent Gover…" 就没信息量了），让它折到两行 */
-  .aitools-hot-link { align-items: flex-start; }
-  .aitools-hot-name {
-    flex-shrink: 1;
-    min-width: 0;
-    white-space: normal;
-    line-height: 1.35;
-  }
+  /* 名字折行规则已在基础样式里设置（flex-shrink:1 + min-width:0 + white-space:normal），
+     这里就不重复了。 */
 }
 
 @media (max-width: 640px) {
