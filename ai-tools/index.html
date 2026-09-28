@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790584306281" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790584306281" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790585867197" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790585867197" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790584306281" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790585867197" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -234,6 +234,67 @@
   </p>
 
   
+  <div class="aitools-toolbar" id="aitools-toolbar">
+    <div class="aitools-search">
+      <svg class="aitools-search-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+      </svg>
+      <input type="search" id="aitools-q" class="aitools-search-input" autocomplete="off"
+             placeholder="搜索工具名、简介、关键词…" aria-label="Search tools">
+      <button type="button" class="aitools-search-clear" id="aitools-clear" aria-label="Clear" hidden>&times;</button>
+    </div>
+
+    <div class="aitools-filters" role="group" aria-label="Filter by category">
+      <button type="button" class="aitools-chip is-active" data-cat="">
+        <span class="i18n-zh">全部</span><span class="i18n-en">All</span>
+        <span class="aitools-chip-n">8</span>
+      </button>
+      
+        
+        <button type="button" class="aitools-chip" data-cat="AI Autonomous Cybersecurity Agents">
+          <span class="i18n-zh">AI 自主网络安全智能体</span><span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <span class="aitools-chip-n">4</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip is-empty" data-cat="LLM-Powered Vulnerability Scanners" disabled>
+          <span class="i18n-zh">LLM 驱动的漏洞扫描器</span><span class="i18n-en">LLM-Powered Vulnerability Scanners</span>
+          <span class="aitools-chip-n">0</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip" data-cat="Security Auditing for AI Agents &amp; Apps">
+          <span class="i18n-zh">AI 智能体与应用安全审计</span><span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+          <span class="aitools-chip-n">2</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip" data-cat="AI Agent Runtime Controls">
+          <span class="i18n-zh">AI 智能体运行时管控</span><span class="i18n-en">AI Agent Runtime Controls</span>
+          <span class="aitools-chip-n">2</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip is-empty" data-cat="Security Auditing for Agent Skills" disabled>
+          <span class="i18n-zh">Agent Skills 安全审计</span><span class="i18n-en">Security Auditing for Agent Skills</span>
+          <span class="aitools-chip-n">0</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip is-empty" data-cat="Autonomous Vulnerability Discovery and Remediation Skills" disabled>
+          <span class="i18n-zh">自主漏洞发现与修复技能</span><span class="i18n-en">Autonomous Vulnerability Discovery and Remediation Skills</span>
+          <span class="aitools-chip-n">0</span>
+        </button>
+      
+      
+    </div>
+
+    <p class="aitools-status" id="aitools-status" role="status" aria-live="polite"></p>
+  </div>
+  
+
+  
 
   
     
@@ -250,13 +311,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260928-agent-governance-toolkit">
+      
+      <article class="aitools-item" id="tool-20260928-agent-governance-toolkit"
+               data-cat="AI Agent Runtime Controls" data-search="agent governance toolkit 微软开源的 ai agent 运行时管控套件：把「请 ai 守规矩」换成「让 ai 没法不守规矩」 microsoft&#39;s runtime governance suite for ai agents: from &#34;asking ai to behave&#34; to &#34;making it structurally incapable of misbehaving&#34; 微软 2026-03 开源的 ai agent 运行时管控套件，mit，6,351 star / 1,132 fork / 2,751 次提交，python 为主另发 typescript / .net / rust / go sdk。不扫代码不评配置，而是在每次工具调用、消息、委派前插一道确定性闸门：govern(my_tool, policy=&#34;policy.yaml&#34;) 两行包住任意函数，之后每次调用被策略求值 + 写防篡改审计链 + 违规抛 governancedenied。立意是「提示词层安全不是控制面，只是对随机系统的礼貌请求」，让被拒动作变成结构上不可能而非不太可能。四层能力：策略执行（acs，rust 核心，无状态确定性 fail-closed，verdict 四态 allow/deny/transform/require_approval）、零信任身份（agent mesh，spiffe/did/mtls，ed25519，信任评分，委托链）、执行沙箱（agent runtime，四层特权环）、可靠性工程（agent sre，kill switch / slo / error budget / chaos / 断路器）。横切能力里 mcp security gateway（工具投毒、漂移、typosquatting、隐藏指令）和 shadow ai discovery（扫未注册 agent）最有即时价值。合规是护城河：owasp agentic top 10 / nist ai rmf 1.0 / eu ai act / soc 2 / aarm r1–r9 / atf 五要素全部可导出证据，agt verify --evidence --strict 能卡 ci；992 条一致性测试、10 份 rfc 2119 规范、29 份 adr。扣分项具体：public preview 仅 7 个月历史，v4.1.0 刚把 45 个包砍成 5 个发行版（api 仍在漂移）；官方 limitations.md 自曝 13 条边界，最要命的是策略没加载时默认 allow 会静默失效（源自外部红队 periculo 的 15 个绕过向量）；kill switch 在 go sdk 里不杀进程只是合作式断路器，python 失败后回调被无条件移除需重新注册；另加动作治理管不了推理（dai et al. 跨会话 80–95% asr）、知识流和凭证持久化三个实质空白。给企业安全 / 平台团队：立刻做 poc，从最小路径 agentcontrol.from_path + strict 模式起步；给个人项目：为企业治理设计，别上。 microsoft&#39;s runtime governance suite for ai agents, open-sourced 2026-03, mit, 6,351 stars / 1,132 forks / 2,751 commits. python-first with typescript, .net, rust and go sdks. it does not scan code or grade configuration — it puts a deterministic gate in front of every tool call, message and delegation. two lines wrap any function: govern(my_tool, policy=&#34;policy.yaml&#34;). every call is evaluated against policy, written to a tamper-evident audit trail, and raises governancedenied when blocked. the thesis: prompt-level safety is not a control surface, just a polite request to a stochastic system — denied actions become structurally impossible rather than unlikely. four layers: policy enforcement (acs, rust core, stateless and deterministic, fail-closed, four verdicts allow/deny/transform/require_approval), zero-trust identity (agent mesh, spiffe/did/mtls, ed25519, trust scoring, delegation chains), execution sandboxing (agent runtime, four privilege rings) and reliability engineering (agent sre, kill switch / slos / error budgets / chaos / circuit breakers). among cross-cutting capabilities, the mcp security gateway (tool poisoning, drift, typosquatting, hidden instructions) and shadow ai discovery (finding unregistered agents) carry the most immediate value. compliance is the moat: owasp agentic top 10, nist ai rmf 1.0, eu ai act, soc 2, aarm r1–r9 and all five atf elements produce exportable evidence, and agt verify --evidence --strict gates ci; 992 conformance tests, 10 rfc 2119 specs, 29 adrs. the deductions are specific: public preview with only seven months of history, and v4.1.0 just collapsed 45 packages into 5 distributions (the api is still drifting); limitations.md self-reports 13 boundaries, the nastiest being that the default is allow when no policies are loaded, so governance fails silently (sourced from periculo&#39;s external red team, 15 bypass vectors); the kill switch does not kill processes in the go sdk — it is a cooperative circuit breaker — and in python the callback registration is removed unconditionally after a failed kill, so you must re-register before retrying. add three material blanks: actions are governed, but not reasoning (dai et al. report 80–95% cross-session asr), knowledge flow, or credential persistence. for enterprise security and platform teams: run a poc now, starting from the minimal agentcontrol.from_path path in strict mode. for personal projects: built for enterprise governance — skip it.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/agent-governance-toolkit/">Agent Governance Toolkit</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/agent-governance-toolkit/">Agent Governance Toolkit</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 智能体运行时管控</span>
+            <span class="i18n-en">AI Agent Runtime Controls</span>
+          </span>
+          
           
         </div>
 
@@ -303,13 +372,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260927-agentshield">
+      
+      <article class="aitools-item" id="tool-20260927-agentshield"
+               data-cat="Security Auditing for AI Agents &amp; Apps" data-search="agentshield claude code 黑客松作品 / everything claude code 生态：把 ai agent 配置审计做成 0–100 分、可上 ci 的合规工具 a claude code hackathon project from the everything claude code ecosystem: a 0–100 graded audit of ai agent configurations that drops into ci as a compliance gate affaan-m 在 2026-02 claude code 黑客松（cerebral valley × anthropic）做出的 ai agent 配置审计器，mit，1.2k star / 268 fork。268 条规则扫 .claude/ 目录里的硬编码密钥、tool permission、hook 命令注入、mcp server 暴露、agent prompt injection；分级 a–f + 0–100 分；支持 cli / github action / github app / miniclaw http api。亮点是 runtimeconfidence 七档分级（template-example 0.25×、project-local-optional 0.75×、单文件 10 分封顶）和 --fix 的防篡改回滚（修完复扫退化就回滚 + attestation digest）；进阶有 --opus 三智能体对抗（attacker/defender/auditor）、--compliance 映射 soc2/pci/iso、--supply-chain 验证 npm provenance。短板：readme 规则数三套口径（268 / 102 / 17+40+49+41）；项目 6 个月历史；--opus/--injection 会把 .claude/ 内容外发到 anthropic / orcarouter api（敏感配置需先脱敏）；harness adapter 只是 marker 证据，claude code 最深，其他只是加分项。给 claude code 重度用户：直接用；跨 harness 团队当 claude code 覆盖层。 an ai agent configuration auditor built by affaan-m at the 2026-02 claude code hackathon (cerebral valley × anthropic), mit, 1.2k stars / 268 forks. 268 rules scan your .claude/ directory for hardcoded secrets, tool permission issues, hook command injection, mcp server exposure, and agent prompt-injection triggers. outputs a–f grades plus a 0–100 score, available as cli, github action, github app and miniclaw http api. the standout design choices are runtimeconfidence (7-tier: template-example 0.25×, project-local-optional 0.75×, per-file 10-point cap) and --fix with tamper-evident rollback (re-scans after edits; rolls back on regression and emits an attestation digest). advanced modes include --opus three-agent adversarial analysis (attacker/defender/auditor), --compliance mapping to soc 2/pci/iso, and --supply-chain for npm provenance. caveats: the readme has three inconsistent rule counts (268 / 102 / 17+40+49+41); only 6 months of history; --opus/--injection send .claude/ contents to the anthropic or orcarouter api (redact before pointing at anything sensitive); harness adapters are marker evidence only, with claude code as the deepest supported target. for claude code power users: install now. for multi-harness teams: use it as the claude code coverage layer.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/agentshield/">AgentShield</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/agentshield/">AgentShield</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 智能体与应用安全审计</span>
+            <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+          </span>
+          
           
         </div>
 
@@ -356,13 +433,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260924-ai-infra-guard">
+      
+      <article class="aitools-item" id="tool-20260924-ai-infra-guard"
+               data-cat="Security Auditing for AI Agents &amp; Apps" data-search="ai-infra-guard 腾讯朱雀实验室的全栈 ai 红队平台：五层能力覆盖 ai 基础设施 cve、agent 失控、mcp 供应链、skill 后门与越狱评测 a full-stack ai red teaming platform from tencent zhuque lab: five capabilities spanning ai infrastructure cves, agent loss of control, the mcp supply chain, skill backdoors and jailbreak evaluation 腾讯朱雀实验室出品的 apache-2.0 项目，6.6k star / 615 fork / 1918 commits。不是单个扫描器，是五个能力并列的平台：ai infra scan 指纹识别 146 个 ai 组件、匹配 2000+ cve（只扫运行中服务地址，支持 cidr 网段批量）；agent scan 是多 agent 自动化框架（支持 dify / coze，10 个检测技能映射 owasp asi）；mcp scan 覆盖 14 类风险、输出 sarif、无需运行实例；skill scan 对齐 skilltrustbench t01–t09，top 模型 f1 约 0.98；jailbreak evaluation 基于 deepteam，支持 4 种多轮越狱攻击与跨模型对比。另含 model &amp; api relay checker 做模型指纹、claude 签名验证与 llm api 投毒检测。自带 forge-bench（16 领域 / 1800 轨迹）、roguehandoff-20、skilljack 三个自研基准，3 篇论文（含 2 篇 black hat europe 2025），被 19 篇学术论文引用。两个明确短板：readme 自述无身份认证、不应部署公网；部分子模块未完成（4 个检测技能有 skill.md 但未注册 _detection_skills，实际从不运行）。 an apache-2.0 project from tencent zhuque lab with 6.6k stars / 615 forks / 1,918 commits. not a single scanner but a platform of five peer capabilities: ai infra scan fingerprints 146 ai components and matches 2,000+ cves (live service addresses only, cidr ranges supported); agent scan is a multi-agent automation framework (dify / coze supported, 10 detection skills mapped to owasp asi); mcp scan covers 14 risk classes, emits sarif, and needs no running instance; skill scan aligns to skilltrustbench t01–t09 with a top-model f1 around 0.98; jailbreak evaluation builds on deepteam with four multi-turn attack methods and cross-model comparison. a model &amp; api relay checker adds model fingerprinting, claude signature verification and llm api poisoning detection. ships three homegrown benchmarks — forge-bench (16 domains / 1,800 trajectories), roguehandoff-20 and skilljack — plus three papers (two from black hat europe 2025), and is cited by 19 academic papers. two clear caveats: the readme states there is no authentication and it should not be deployed on public networks, and several sub-modules are unfinished (four detection skills have a skill.md but were never registered in _detection_skills, so they never run).">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 智能体与应用安全审计</span>
+            <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+          </span>
+          
           
         </div>
 
@@ -409,13 +494,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260922-nvidia-openshell">
+      
+      <article class="aitools-item" id="tool-20260922-nvidia-openshell"
+               data-cat="AI Agent Runtime Controls" data-search="nvidia openshell 面向自主 ai agent 的安全私有运行时：用声明式 yaml 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点 a safe, private runtime for autonomous ai agents: declarative yaml policies enforce boundaries across filesystem, network, process and provider access, and credentials only flow into policy-admitted endpoints rust 编写的 8.7k star 项目，apache-2.0。定位是 autonomous ai agents 的运行时管控：把 agent 关进一个被策略包围的隔离容器，默认最小出站，按 &#34;允许 / 凭 / 拒&#34; 三态拦截每一次 outbound。四个保护层：filesystem 与 process 在沙箱创建时锁定，network 与 providers 可运行时热更新。provider 模型把凭证绑在端点上，凭证从不落盘，运行时以环境变量注入被策略放行的端点，网络策略细到 http method 与 path（l7）。支持 docker / podman / microvm / kubernetes 四种算力后端，sdk 覆盖 python / typescript / go / rust，可托管 claude code / codex / opencode / copilot cli。nvidia 官方出品（docs.nvidia.com/openshell），目前 alpha（0.1.0 即将发布），403 个 open issues。 an 8.7k-star rust project under apache-2.0. positioned as runtime control for autonomous ai agents: the agent runs in an isolated container wrapped in declarative policy, every outbound request goes through a three-state gate (allow / bind credentials / deny). four protection layers: filesystem and process are locked at sandbox creation, network and providers are hot-reloadable at runtime. the provider model binds credentials to authorized endpoints — keys never touch the sandbox filesystem, they are injected as environment variables at runtime only into requests the policy admits, with the network policy enforced at http method and path granularity (l7). four compute backends (docker, podman, microvm, kubernetes), sdks for python, typescript, go and rust, and a curated set of supported agents (claude code, codex, opencode, copilot cli). officially from nvidia (docs.nvidia.com/openshell), currently in alpha with 0.1.0 imminent and 403 open issues.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/openshell-nvidia-agent-runtime/">NVIDIA OpenShell</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/openshell-nvidia-agent-runtime/">NVIDIA OpenShell</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 智能体运行时管控</span>
+            <span class="i18n-en">AI Agent Runtime Controls</span>
+          </span>
+          
           
         </div>
 
@@ -462,13 +555,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260921-pentagi">
+      
+      <article class="aitools-item" id="tool-20260921-pentagi"
+               data-cat="AI Autonomous Cybersecurity Agents" data-search="pentagi 全自主渗透平台：docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞 a fully autonomous pentesting platform: 20+ tools in a docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs go 写的 24.8k star 项目，mit。五层平台结构：核心服务（react ui + go rest/graphql api + postgresql/pgvector）、可选知识图谱（graphiti + neo4j）、监控栈（grafana / victoriametrics / jaeger / loki）、分析（langfuse + clickhouse）、安全工具（沙箱内 20+ 工具 + 隔离浏览器）。13 个 agent 角色分通用与受限两档，四道监管：工具调用硬上限（100 / 20，常开）、reflector（连续 3 次生成不出工具调用就介入，常开）、execution monitoring（beta，mentor 盯循环）、task planning（beta，先拆 3-7 步再动手）。官方维护了一份 vllm + qwen3.5-27b-fp8 气隙部署指南，国产模型是一等公民。 a 24.8k-star go project under mit. five platform layers: core services (react ui, go rest/graphql api, postgresql with pgvector), optional knowledge graph (graphiti plus neo4j), monitoring (grafana, victoriametrics, jaeger, loki), analytics (langfuse plus clickhouse), and sandboxed security tooling (20+ tools and an isolated scraper browser). thirteen agent roles split into general and limited tiers, supervised by four gates: hard tool-call caps (100 / 20, always on), a reflector that steps in after three failed tool calls (always on), execution monitoring (beta, a mentor agent watching for loops), and task planning (beta, decomposing the goal into 3-7 steps first). the authors maintain an official vllm plus qwen3.5-27b-fp8 guide for fully air-gapped deployment.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/pentagi-autonomous-pentest-platform/">PentAGI</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/pentagi-autonomous-pentest-platform/">PentAGI</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 自主网络安全智能体</span>
+            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          </span>
+          
           
         </div>
 
@@ -515,13 +616,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260920-cairn">
+      
+      <article class="aitools-item" id="tool-20260920-cairn"
+               data-cat="AI Autonomous Cybersecurity Agents" data-search="cairn 通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 agent 在黑板上自己搜路 a general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard python 写的 2.8k star 项目。黑板架构 + 事实/意图图，只有 fact / intent / hint 三个原语；worker 跑 ooda 循环，靠 stigmergy 间接协作，彼此不通信。bootstrap / reason / explore 三类任务由同一个 worker 执行，角色在运行时长出来而非写死。腾讯云黑客松 ai 渗透挑战赛第二届，610 支队伍里唯一 ak（54/54）。agpl-3.0。 a 2.8k-star python project built on a blackboard architecture with an explicit fact-intent graph: just three primitives — fact, intent, hint. workers run an ooda loop and coordinate purely through stigmergy, with no direct agent-to-agent messaging. bootstrap / reason / explore are all executed by the same worker, so roles emerge at runtime instead of being hardcoded. at the tencent cloud hackathon ai pentesting challenge (2nd edition) it was the only team out of 610 to ak, solving 54/54. agpl-3.0.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/cairn-state-space-search/">Cairn</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/cairn-state-space-search/">Cairn</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 自主网络安全智能体</span>
+            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          </span>
+          
           
         </div>
 
@@ -568,13 +677,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260919-shannon">
+      
+      <article class="aitools-item" id="tool-20260919-shannon"
+               data-cat="AI Autonomous Cybersecurity Agents" data-search="shannon ai 渗透测试 agent：读源码找攻击面，再真打一遍验证，只有跑通 poc 的漏洞才进报告 an ai pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no poc, no report. typescript 写的 48k star 项目，六段流水线：侦察 + 代码分析双流候选 → 归并去重 → 利用 agent 真打 → 打不穿就丢弃 → pdf/markdown/sarif 报告。原生接 github actions，只有 exploited 的发现才卡流水线。agpl-3.0，会改目标状态，只打 staging。 a 48k-star typescript project with a six-stage pipeline: recon + code analysis produce candidates, they get merged and deduped, exploitation agents attack the live app, anything undemonstrated is discarded, and survivors become pdf / markdown / sarif. native github actions support, and only exploited findings gate the pipeline. agpl-3.0, mutates target state, staging only.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/shannon-ai-pentester/">Shannon</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/shannon-ai-pentester/">Shannon</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 自主网络安全智能体</span>
+            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          </span>
+          
           
         </div>
 
@@ -621,13 +738,21 @@
       </h2>
 
       
-      <article class="aitools-item" id="tool-20260918-cyberstrikeai">
+      
+      <article class="aitools-item" id="tool-20260918-cyberstrikeai"
+               data-cat="AI Autonomous Cybersecurity Agents" data-search="cyberstrikeai ai 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆 an ai-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory. go + eino 编排，100+ yaml 工具配方与 mcp 接入，内置审批、调用前正则拦截、rbac 和审计日志。它的差异不在能调多少工具，而在于敢不敢让 agent 真的动手。 go + eino orchestration, 100+ yaml tool recipes with mcp, plus first-class approval, pre-call regex intercept, rbac, and audit logs. its edge isn&#39;t how many tools it can call — it&#39;s whether it dares to let the agent really act.">
         <div class="aitools-head">
           
           
           
           <a class="i18n-zh aitools-name" href="/ai-tools/cyberstrikeai-ai-native-security-hub/">CyberStrikeAI</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/cyberstrikeai-ai-native-security-hub/">CyberStrikeAI</a>
+          
+          <span class="aitools-cat">
+            <span class="i18n-zh">AI 自主网络安全智能体</span>
+            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          </span>
+          
           
         </div>
 
@@ -660,6 +785,21 @@
       
     </div>
   
+
+  <div class="aitools-noresult" id="aitools-noresult" hidden>
+    <p class="aitools-noresult-title">
+      <span class="i18n-zh">没有匹配的工具</span>
+      <span class="i18n-en">No matching tools</span>
+    </p>
+    <p class="aitools-noresult-hint">
+      <span class="i18n-zh">换个关键词，或点「全部」清空筛选。</span>
+      <span class="i18n-en">Try another keyword, or click “All” to reset.</span>
+    </p>
+    <button type="button" class="aitools-reset" id="aitools-reset">
+      <span class="i18n-zh">重置筛选</span>
+      <span class="i18n-en">Reset</span>
+    </button>
+  </div>
 
   <p class="aitools-foot">
     <span class="i18n-zh">同步更新于知乎专栏「Wester的AI安全札记」与微信公众号。</span>
@@ -787,6 +927,101 @@
     
   ]
 }
+  </script>
+
+  <script>
+  (function () {
+    var root   = document.getElementById('ai-tools');
+    if (!root) return;
+    var input  = document.getElementById('aitools-q');
+    var clear  = document.getElementById('aitools-clear');
+    var chips  = Array.prototype.slice.call(root.querySelectorAll('.aitools-chip'));
+    var items  = Array.prototype.slice.call(root.querySelectorAll('.aitools-item'));
+    var days   = Array.prototype.slice.call(root.querySelectorAll('.aitools-day'));
+    var status = document.getElementById('aitools-status');
+    var nores  = document.getElementById('aitools-noresult');
+    var reset  = document.getElementById('aitools-reset');
+    if (!input || !items.length) return;
+
+    var cat = '';
+
+    function apply() {
+      // 关键词按空白拆成多个词，全部命中才算匹配（AND 语义，比整串包含更准）
+      var q = (input.value || '').trim().toLowerCase();
+      var words = q ? q.split(/\s+/) : [];
+      var shown = 0;
+
+      items.forEach(function (el) {
+        var okCat = !cat || el.getAttribute('data-cat') === cat ||
+                    (cat === '__none__' && !el.getAttribute('data-cat'));
+        var hay = el.getAttribute('data-search') || '';
+        var okQ = !words.length || words.every(function (w) { return hay.indexOf(w) !== -1; });
+        var ok = okCat && okQ;
+        el.hidden = !ok;
+        if (ok) shown++;
+      });
+
+      // 整组（某一天）没有可见条目时，连日期标题一起隐藏
+      days.forEach(function (d) {
+        var any = Array.prototype.slice.call(d.querySelectorAll('.aitools-item'))
+          .some(function (el) { return !el.hidden; });
+        d.hidden = !any;
+      });
+
+      // 分类计数随关键词联动：改成显示「当前关键词下该类还有几个」
+      chips.forEach(function (c) {
+        var k = c.getAttribute('data-cat');
+        var n = items.filter(function (el) {
+          var okCat = !k || el.getAttribute('data-cat') === k ||
+                      (k === '__none__' && !el.getAttribute('data-cat'));
+          var hay = el.getAttribute('data-search') || '';
+          var okQ = !words.length || words.every(function (w) { return hay.indexOf(w) !== -1; });
+          return okCat && okQ;
+        }).length;
+        var badge = c.querySelector('.aitools-chip-n');
+        if (badge) badge.textContent = n;
+        // 关键词把某类清空时置灰，避免点了出空结果
+        if (!q && !n) { c.disabled = true; }
+        else if (!q) { c.disabled = false; }
+        else { c.disabled = n === 0; }
+      });
+
+      if (status) {
+        status.textContent = q || cat
+          ? shown + ' / ' + items.length
+          : items.length + ' 个工具';
+        status.hidden = false;
+      }
+      if (nores) nores.hidden = shown !== 0;
+      if (clear) clear.hidden = !q;
+    }
+
+    function setCat(c, el) {
+      cat = c;
+      chips.forEach(function (x) { x.classList.toggle('is-active', x === el); });
+      apply();
+    }
+
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        if (c.disabled) return;
+        setCat(c.getAttribute('data-cat'), c);
+      });
+    });
+
+    if (input) {
+      var t;
+      input.addEventListener('input', function () { clearTimeout(t); t = setTimeout(apply, 120); });
+    }
+    if (clear) clear.addEventListener('click', function () {
+      input.value = ''; input.focus(); apply();
+    });
+    if (reset) reset.addEventListener('click', function () {
+      input.value = ''; setCat('', chips[0]);
+    });
+
+    apply();
+  })();
   </script>
 </section>
 
