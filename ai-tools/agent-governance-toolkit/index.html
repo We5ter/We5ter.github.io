@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790583261525" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790583261525" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790583872725" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790583872725" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790583261525" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790583872725" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -323,7 +323,15 @@
   
 
   <section class="post-content">
-    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。微软 2026-03 开源的 <strong>AI Agent 运行时管控套件</strong>，MIT，<strong>6,351 star &#x2F; 1,132 fork &#x2F; 2,751 次提交 &#x2F; 82 个 open issue</strong>（截至 2026-09-28），Python 为主，另发 TypeScript &#x2F; .NET &#x2F; Rust &#x2F; Go 四套 SDK。它不扫你的代码、不评你的配置，而是<strong>在 agent 的每一次工具调用、每一条消息、每一次委派前面插一道确定性闸门</strong>：<code>govern(my_tool, policy=&quot;policy.yaml&quot;)</code> 两行包住任意函数，之后每次调用都会被策略求值、写进防篡改审计链，违规就抛 <code>GovernanceDenied</code>。README 里那句话是全篇的立意所在 —— <em>“Prompt-level safety is not a control surface. It is a polite request to a stochastic system.”</em>（提示词层的安全不是控制面，只是对一个随机系统的礼貌请求）。它不打算在提示词里赢下越狱攻防，而是让被拒绝的动作变成<strong>结构上不可能</strong>，而不是「不太可能发生」。扣一星的原因同样具体：<strong>Public Preview，7 个月历史，v4.1.0 刚把 45 个包砍成 5 个发行版</strong>（这种量级的重构意味着 API 还在剧烈漂移）；官方 <code>LIMITATIONS.md</code> 自曝 <strong>13 条边界</strong>，其中最要命的一条是 —— <strong>策略没加载时默认动作是 <code>allow</code>，治理层会静默失效</strong>；以及 <code>kill switch</code> 在 Go SDK 里根本不杀进程，只是一个「合作式断路器」。<strong>给企业安全 &#x2F; 平台团队：这是目前开源里合规映射最完整的一套，值得立刻做 PoC；给个人玩具项目：杀鸡用牛刀，别上。</strong></p>
+    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。微软开源的 <strong>AI Agent 运行时管控套件</strong> —— 在每次工具调用前插一道<strong>确定性闸门</strong>，让被拒绝的动作变成<strong>结构上不可能</strong>，而不是「不太可能发生」。</p>
+<p><strong>它不做什么</strong>：不扫代码、不评配置、也不打算在提示词里赢下越狱攻防。README 的立意原话是 —— <em>“Prompt-level safety is not a control surface. It is a polite request to a stochastic system.”</em>（提示词层的安全不是控制面，只是对一个随机系统的礼貌请求。）</p>
+<p><strong>扣的那一星在哪</strong>（详见第七章）：</p>
+<ul>
+<li><strong>Public Preview，仅 7 个月历史</strong> —— v4.1.0 刚把 45 个包砍成 5 个发行版，API 仍在漂移</li>
+<li><strong>策略没加载时默认 <code>allow</code></strong> —— 治理层会静默失效，仪表盘照样显示 “governed”</li>
+<li><strong><code>kill switch</code> 在 Go SDK 里不杀进程</strong> —— 只是合作式断路器，跨 SDK 语义还不一致</li>
+</ul>
+<p><strong>结论</strong>：企业安全 &#x2F; 平台团队 —— 目前开源里合规映射最完整的一套，立刻做 PoC；个人项目 —— 为「企业治理」设计，别上。</p>
 <table>
 <thead>
 <tr>

@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790583261520" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790583261520" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790583872724" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790583872724" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790583261520" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790583872724" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -279,7 +279,7 @@
         <span class="i18n-en">Sep 28, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 49 分钟</span><span class="i18n-en">49 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 48 分钟</span><span class="i18n-en">48 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -323,7 +323,15 @@
   
 
   <section class="post-content">
-    <h2 id="1-At-a-Glance"><a href="#1-At-a-Glance" class="headerlink" title="1. At a Glance"></a>1. At a Glance</h2><p>★★★★☆ (4&#x2F;5). Microsoft’s <strong>runtime governance suite for AI agents</strong>, open-sourced 2026-03, MIT, <strong>6,351 stars &#x2F; 1,132 forks &#x2F; 2,751 commits &#x2F; 82 open issues</strong> (as of 2026-09-28). Python-first, with TypeScript, .NET, Rust and Go SDKs. It does not scan your code and it does not grade your configuration — it puts a <strong>deterministic gate in front of every tool call, every message and every delegation</strong>. Two lines wrap any function: <code>govern(my_tool, policy=&quot;policy.yaml&quot;)</code>. Every call is then evaluated against policy, written to a tamper-evident audit trail, and raises <code>GovernanceDenied</code> when blocked. The README states the thesis outright: <em>“Prompt-level safety is not a control surface. It is a polite request to a stochastic system.”</em> AGT does not try to win the jailbreak fight inside the prompt. It makes denied actions <strong>structurally impossible</strong> rather than merely unlikely. The missing star is equally specific: <strong>Public Preview with only seven months of history, and v4.1.0 just collapsed 45 packages into 5 distributions</strong> — that magnitude of refactor means the API is still drifting; <code>LIMITATIONS.md</code> self-reports <strong>13 boundaries</strong>, the nastiest being that <strong>the default action is <code>allow</code> when no policies are loaded, so the governance layer can fail silently</strong>; and the <code>kill switch</code> in the Go SDK does not kill anything — it is a cooperative circuit breaker. <strong>For enterprise security and platform teams: the most complete compliance mapping in open source today, worth a PoC immediately. For personal side projects: this was built for enterprise governance. Don’t.</strong></p>
+    <h2 id="1-At-a-Glance"><a href="#1-At-a-Glance" class="headerlink" title="1. At a Glance"></a>1. At a Glance</h2><p>★★★★☆ (4&#x2F;5). Microsoft’s <strong>runtime governance suite for AI agents</strong> — a <strong>deterministic gate</strong> in front of every tool call, making denied actions <strong>structurally impossible</strong> rather than merely unlikely.</p>
+<p><strong>What it doesn’t do:</strong> it does not scan your code, does not grade your configuration, and does not try to win the jailbreak fight inside the prompt. The README states the thesis outright: <em>“Prompt-level safety is not a control surface. It is a polite request to a stochastic system.”</em></p>
+<p><strong>Where the missing star goes</strong> (section 7 has the full list):</p>
+<ul>
+<li><strong>Public Preview with only seven months of history</strong> — v4.1.0 just collapsed 45 packages into 5 distributions, so the API is still drifting</li>
+<li><strong>The default is <code>allow</code> when no policies are loaded</strong> — governance fails silently while the dashboard still reports “governed”</li>
+<li><strong>The <code>kill switch</code> doesn’t kill processes in the Go SDK</strong> — it is a cooperative circuit breaker, and its semantics differ across SDKs</li>
+</ul>
+<p><strong>Verdict:</strong> enterprise security and platform teams — the most complete compliance mapping in open source today, run a PoC now. Personal projects — built for enterprise governance; don’t.</p>
 <table>
 <thead>
 <tr>
