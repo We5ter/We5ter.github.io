@@ -1089,11 +1089,13 @@ body.layout-ai-tools #main {
 .aitools-link:hover { color: var(--accent); }
 /* star / 机构徽章，贴在卡片标题后面。
    ⚠️ .aitools-head 是 flex + align-items:baseline，flex item 上写 vertical-align 没用，
-   必须用 align-self: center 才能让 20px 高的图和标题垂直居中。
+   必须用 align-self: center 才能和标题垂直居中。
+   高度 16px：shields.io 出图是 20px，比 17px 的标题字还高、压得住整行；缩到 16px
+   才退回到「标注」的位置（SVG 是矢量，缩放不糊）。
    只锁 height、width 交给 auto：机构徽章宽度随名字长短变，写死会拉变形。 */
 .aitools-badge {
   align-self: center;
-  height: 20px;
+  height: 16px;
   width: auto;
 }
 .aitools-foot { margin-top: 1.5rem; font-size: .8125rem; color: var(--text-muted); }
