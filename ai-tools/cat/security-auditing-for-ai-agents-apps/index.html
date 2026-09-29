@@ -43,7 +43,7 @@
         en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = ;
+      var pageTitle = "AI 智能体与应用安全审计";
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -55,7 +55,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <title>AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808363" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808363" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808425" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808425" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808363" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808425" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -96,7 +96,7 @@
 </head>
 
 
-<body class="home-template">
+<body class="post-template">
 
   <!-- ============ Masthead (top nav) ============ -->
   <div class="masthead">
@@ -223,56 +223,153 @@
 
     <div class="page-content">
       
-  <header class="site-head site-head-tag">
-    <div class="inner">
-      <div class="tag-hero-icon">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-          <line x1="7" y1="7" x2="7.01" y2="7"/>
-        </svg>
-      </div>
+
+<section id="ai-tools-cat" class="home-section aitools">
+  <p class="aitools-catpage-crumb">
+    <a href="/ai-tools/">
+      <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+      <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+    </a>
+    <span aria-hidden="true"> / </span>
+  </p>
+
+  <h1 class="aitools-catpage-title" style="--cat: #06D6A0">
+    <span class="i18n-zh">AI 智能体与应用安全审计</span>
+    <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+  </h1>
+  <p class="section-sub">
+    <span class="i18n-zh">共 2 个工具 · 专栏每天 14:00（北京）更新一期</span>
+    <span class="i18n-en">2 tools · one new issue daily at 14:00 GMT+8</span>
+  </p>
+
+  
+  
+  <article class="aitools-item" style="--cat: #06D6A0">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/agentshield/">AgentShield</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/agentshield/">AgentShield</a>
       
-      <h1 class="blog-title">#Browser Security</h1>
-      <p class="tag-description">
-        <span class="i18n-zh">标签「<em>Browser Security</em>」下的全部文章</span>
-        <span class="i18n-en">All posts tagged <em>Browser Security</em></span>
-      </p>
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/affaan-m/agentshield?style=flat-square&label=stars&cacheSeconds=3600&color=06D6A0" alt="AgentShield GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
       
-      <span class="tag-post-count"><span class="i18n-zh">共 2 篇</span><span class="i18n-en">2 posts</span></span>
-      <a class="tag-back-home" href="/">&larr; <span class="i18n-zh">返回首页</span><span class="i18n-en">Back to home</span></a>
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 007 期 · 2026.9.27</span>
+        <span class="i18n-en">No. 7 · Sep 27, 2026</span>
+      </span>
     </div>
-  </header>
 
-  <main class="content inner" role="main">
-    
-    <article class="post">
-      <div class="post-header-row">
-        <time class="post-date-badge">2024-08-08</time>
-        <h2 class="post-title">
-          <a href="/blogs/CVE-2020-16040/">CVE-2020-16040:Analysis of Chromium V8 engine integer overflow vulnerability</a>
-        </h2>
-      </div>
-      <section class="post-excerpt">
-        <p></p>
-      </section>
-    </article>
-    
-    <article class="post">
-      <div class="post-header-row">
-        <time class="post-date-badge">2017-02-25</time>
-        <h2 class="post-title">
-          <a href="/blogs/cve-2017-2500/">(CVE-2017-2500)Address bar spoofing on macOS Safari</a>
-        </h2>
-      </div>
-      <section class="post-excerpt">
-        <p></p>
-      </section>
-    </article>
-    
+    <p class="aitools-tagline">
+      <span class="i18n-zh">Claude Code 黑客松作品 / Everything Claude Code 生态：把 AI Agent 配置审计做成 0–100 分、可上 CI 的合规工具</span>
+      <span class="i18n-en">A Claude Code Hackathon project from the Everything Claude Code ecosystem: a 0–100 graded audit of AI agent configurations that drops into CI as a compliance gate</span>
+    </p>
 
     
-  </main>
+    <div class="aitools-note">
+      <span class="i18n-zh">Claude Code 配置审计器，268 条规则扫 .claude/ 里的密钥、tool permission、hook 注入与 prompt injection，输出 A–F 分级 + 0–100 分。亮点是 --fix 防篡改回滚，短板是 --opus 会把 .claude/ 内容外发到 Anthropic API。</span>
+      <span class="i18n-en">Claude Code configuration auditor: 268 rules scan .claude/ for hardcoded secrets, tool permissions, hook injection and prompt-injection triggers, with A–F grades and a 0–100 score. Standouts are --fix with tamper-evident rollback; the catch is that --opus sends .claude/ contents to the Anthropic API.</span>
+    </div>
+    
 
+    <a class="aitools-link" href="https://github.com/affaan-m/agentshield" target="_blank" rel="noopener">https://github.com/affaan-m/agentshield</a>
+  </article>
+  
+  
+  <article class="aitools-item" style="--cat: #06D6A0">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/ai-infra-guard/">AI-Infra-Guard</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/Tencent/AI-Infra-Guard?style=flat-square&label=stars&cacheSeconds=3600&color=06D6A0" alt="AI-Infra-Guard GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 006 期 · 2026.9.24</span>
+        <span class="i18n-en">No. 6 · Sep 24, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测</span>
+      <span class="i18n-en">A full-stack AI red teaming platform from Tencent Zhuque Lab: five capabilities spanning AI infrastructure CVEs, agent loss of control, the MCP supply chain, skill backdoors and jailbreak evaluation</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">五能力并列的 AI 红队平台：AI Infra CVE 指纹、Agent 失控、MCP 供应链、Skill 后门、越狱评测。自带 FORGE-Bench / RogueHandoff-20 / SkillJack 三个自研基准与 3 篇论文（含 Black Hat Europe 2025）。短板：无认证不应上公网，4 个检测技能未完成。</span>
+      <span class="i18n-en">Full-stack AI red-team platform with five parallel capabilities: AI infra CVE matching, agent loss-of-control, MCP supply chain, skill backdoors and jailbreak evaluation. Ships FORGE-Bench, RogueHandoff-20 and SkillJack benchmarks, plus three papers (two from Black Hat Europe 2025). Caveat: no authentication, and several sub-modules are unfinished.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/Tencent/AI-Infra-Guard" target="_blank" rel="noopener">https://github.com/Tencent/AI-Infra-Guard</a>
+  </article>
+  
+
+  
+  <div class="aitools-catpage-cats">
+    <p class="aitools-catpage-cats-title">
+      <span class="i18n-zh">其他分类</span><span class="i18n-en">Other categories</span>
+    </p>
+    
+      
+      <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style=&#34;--cat: #F72585&#34;>
+        <span class="i18n-zh">AI 自主网络安全智能体</span><span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+      </a>
+    
+      
+      <a class="aitools-cat" href="/ai-tools/cat/ai-agent-runtime-controls/" style=&#34;--cat: #FB5607&#34;>
+        <span class="i18n-zh">AI 智能体运行时管控</span><span class="i18n-en">AI Agent Runtime Controls</span>
+      </a>
+    
+      
+  </div>
+  
+
+  <p class="aitools-catpage-back">
+    <a href="/ai-tools/">
+      <span class="i18n-zh">← 回专栏看全部期号</span>
+      <span class="i18n-en">← Back to all issues</span>
+    </a>
+  </p>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Scanners-Box 每日 AI 工具推荐 · AI 智能体与应用安全审计",
+  "itemListElement": [
+    
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "AgentShield",
+        "description": "Claude Code 黑客松作品 / Everything Claude Code 生态：把 AI Agent 配置审计做成 0–100 分、可上 CI 的合规工具",
+        "url": "https://github.com/affaan-m/agentshield",
+        "datePublished": "2026-09-27",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "AI-Infra-Guard",
+        "description": "腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测",
+        "url": "https://github.com/Tencent/AI-Infra-Guard",
+        "datePublished": "2026-09-24",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    }
+    
+  ]
+}
+  </script>
+</section>
 
     </div>
   </div>

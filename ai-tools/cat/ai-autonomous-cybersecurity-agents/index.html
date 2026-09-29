@@ -43,7 +43,7 @@
         en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = ;
+      var pageTitle = "AI 自主网络安全智能体";
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -55,7 +55,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <title>AI 自主网络安全智能体 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808363" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808363" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808403" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808403" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808363" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808403" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -96,7 +96,7 @@
 </head>
 
 
-<body class="home-template">
+<body class="post-template">
 
   <!-- ============ Masthead (top nav) ============ -->
   <div class="masthead">
@@ -223,56 +223,285 @@
 
     <div class="page-content">
       
-  <header class="site-head site-head-tag">
-    <div class="inner">
-      <div class="tag-hero-icon">
-        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-          <line x1="7" y1="7" x2="7.01" y2="7"/>
-        </svg>
-      </div>
+
+<section id="ai-tools-cat" class="home-section aitools">
+  <p class="aitools-catpage-crumb">
+    <a href="/ai-tools/">
+      <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+      <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+    </a>
+    <span aria-hidden="true"> / </span>
+  </p>
+
+  <h1 class="aitools-catpage-title" style="--cat: #F72585">
+    <span class="i18n-zh">AI 自主网络安全智能体</span>
+    <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+  </h1>
+  <p class="section-sub">
+    <span class="i18n-zh">共 5 个工具 · 专栏每天 14:00（北京）更新一期</span>
+    <span class="i18n-en">5 tools · one new issue daily at 14:00 GMT+8</span>
+  </p>
+
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/luan1ao-agent/">LuaN1ao</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/luan1ao-agent/">LuaN1ao</a>
       
-      <h1 class="blog-title">#Browser Security</h1>
-      <p class="tag-description">
-        <span class="i18n-zh">标签「<em>Browser Security</em>」下的全部文章</span>
-        <span class="i18n-en">All posts tagged <em>Browser Security</em></span>
-      </p>
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/SanMuzZzZz/LuaN1aoAgent?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="LuaN1ao GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
       
-      <span class="tag-post-count"><span class="i18n-zh">共 2 篇</span><span class="i18n-en">2 posts</span></span>
-      <a class="tag-back-home" href="/">&larr; <span class="i18n-zh">返回首页</span><span class="i18n-en">Back to home</span></a>
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 009 期 · 2026.9.29</span>
+        <span class="i18n-en">No. 9 · Sep 29, 2026</span>
+      </span>
     </div>
-  </header>
 
-  <main class="content inner" role="main">
-    
-    <article class="post">
-      <div class="post-header-row">
-        <time class="post-date-badge">2024-08-08</time>
-        <h2 class="post-title">
-          <a href="/blogs/CVE-2020-16040/">CVE-2020-16040:Analysis of Chromium V8 engine integer overflow vulnerability</a>
-        </h2>
-      </div>
-      <section class="post-excerpt">
-        <p></p>
-      </section>
-    </article>
-    
-    <article class="post">
-      <div class="post-header-row">
-        <time class="post-date-badge">2017-02-25</time>
-        <h2 class="post-title">
-          <a href="/blogs/cve-2017-2500/">(CVE-2017-2500)Address bar spoofing on macOS Safari</a>
-        </h2>
-      </div>
-      <section class="post-excerpt">
-        <p></p>
-      </section>
-    </article>
-    
+    <p class="aitools-tagline">
+      <span class="i18n-zh">把每条渗透结论钉回证据链：P-E-O 三角色 + 三图分离 + Evidence→Hypothesis→Vulnerability→Exploit 因果链</span>
+      <span class="i18n-en">Pinning every pentest finding to evidence: Planner-Executor-Observer roles + three graph separations + an enforced Evidence → Hypothesis → Vulnerability → Exploit chain</span>
+    </p>
 
     
-  </main>
+    <div class="aitools-note">
+      <span class="i18n-zh">TypeScript + Pi SDK 重写的 v2 自主渗透 Agent：证据引用是 schema 层面的硬约束（没有 evidence 引用就写不进 Vulnerability / Exploit 节点）。Docker 出网收口在内核态，scope 校验确定性拒绝臆造网段。短板：AGPL-3.0、Node.js 25+、v2 benchmark 还没发、高危动作没有审批闸门。</span>
+      <span class="i18n-en">v2 autonomous pentest agent rewritten in TypeScript on the Pi SDK — evidence references are an enforced schema constraint (no Vulnerability / Exploit node without evidence). Docker-based egress gating at the kernel layer, and deterministic scope checks reject any fabricated CIDR. Caveats: AGPL-3.0, Node.js 25+ required, no v2 benchmark published yet, and no human approval gate on high-risk actions.</span>
+    </div>
+    
 
+    <a class="aitools-link" href="https://github.com/SanMuzZzZz/LuaN1aoAgent" target="_blank" rel="noopener">https://github.com/SanMuzZzZz/LuaN1aoAgent</a>
+  </article>
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/pentagi-autonomous-pentest-platform/">PentAGI</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/pentagi-autonomous-pentest-platform/">PentAGI</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/vxcontrol/pentagi?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="PentAGI GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 004 期 · 2026.9.21</span>
+        <span class="i18n-en">No. 4 · Sep 21, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">全自主渗透平台：Docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞</span>
+      <span class="i18n-en">A fully autonomous pentesting platform: 20+ tools in a Docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">Go 写的全自主渗透平台，五层结构（核心 / 知识图谱 / 监控 / 沙箱工具 / 分析），13 个 agent 角色由四道闸门（调用上限 / Reflector / 执行监控 / 任务规划）监管。官方维护 vLLM + Qwen3.5-27B-FP8 气隙部署指南。</span>
+      <span class="i18n-en">Autonomous pentesting platform in Go with five layers (core / knowledge graph / monitoring / sandbox tools / analytics), 13 agent roles supervised by four gates (call caps / Reflector / execution monitoring / task planning). Ships an official vLLM + Qwen3.5-27B-FP8 air-gapped deployment guide.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/vxcontrol/pentagi" target="_blank" rel="noopener">https://github.com/vxcontrol/pentagi</a>
+  </article>
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/cairn-state-space-search/">Cairn</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/cairn-state-space-search/">Cairn</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/oritera/Cairn?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="Cairn GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 003 期 · 2026.9.20</span>
+        <span class="i18n-en">No. 3 · Sep 20, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 Agent 在黑板上自己搜路</span>
+      <span class="i18n-en">A general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">黑板架构 + 事实/意图图，只有 Fact / Intent / Hint 三个原语；Worker 跑 OODA 循环，靠 Stigmergy 间接协作，角色在运行时涌现而非写死。腾讯云黑客松 AI 渗透挑战赛 610 队里唯一 AK（54/54）。</span>
+      <span class="i18n-en">State-space search engine built on a blackboard + fact-intent graph with three primitives (Fact, Intent, Hint). Workers run OODA loops and coordinate via stigmergy; roles emerge at runtime. The only team to AK (54/54) at the Tencent Cloud AI Pentesting Hackathon out of 610.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/oritera/Cairn" target="_blank" rel="noopener">https://github.com/oritera/Cairn</a>
+  </article>
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/shannon-ai-pentester/">Shannon</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/shannon-ai-pentester/">Shannon</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/KeygraphHQ/shannon?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="Shannon GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 002 期 · 2026.9.19</span>
+        <span class="i18n-en">No. 2 · Sep 19, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">AI 渗透测试 Agent：读源码找攻击面，再真打一遍验证，只有跑通 PoC 的漏洞才进报告</span>
+      <span class="i18n-en">An AI pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no PoC, no report.</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">六段流水线：侦察 + 代码分析双流候选 → 归并去重 → 利用 Agent 真打 → 打不穿就丢 → PDF/Markdown/SARIF 报告。原生接 GitHub Actions，只有 exploited 的发现才卡流水线。AGPL-3.0，会改目标状态，只打 staging。</span>
+      <span class="i18n-en">Six-stage pipeline: recon and code analysis produce candidates, dedup, exploitation agents attack the live app, undemonstrated findings get discarded, and survivors become PDF / Markdown / SARIF. Native GitHub Actions; only exploited findings gate the pipeline. AGPL-3.0, staging only.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/KeygraphHQ/shannon" target="_blank" rel="noopener">https://github.com/KeygraphHQ/shannon</a>
+  </article>
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/cyberstrikeai-ai-native-security-hub/">CyberStrikeAI</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/cyberstrikeai-ai-native-security-hub/">CyberStrikeAI</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/AIPentest/CyberStrikeAI?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="CyberStrikeAI GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 001 期 · 2026.9.18</span>
+        <span class="i18n-en">No. 1 · Sep 18, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">AI 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆</span>
+      <span class="i18n-en">An AI-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory.</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">Go + Eino 编排，100+ YAML 工具配方 + MCP，内置审批、调用前正则拦截、RBAC 与审计日志。它的差异不在能调多少工具，而在于敢不敢让 Agent 真的动手。</span>
+      <span class="i18n-en">Go + Eino orchestration with 100+ YAML tool recipes plus MCP, plus first-class approval, pre-call regex intercept, RBAC and audit logs. Its edge isn&#39;t how many tools it can call — it&#39;s whether it dares to let the agent really act.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/AIPentest/CyberStrikeAI" target="_blank" rel="noopener">https://github.com/AIPentest/CyberStrikeAI</a>
+  </article>
+  
+
+  
+  <div class="aitools-catpage-cats">
+    <p class="aitools-catpage-cats-title">
+      <span class="i18n-zh">其他分类</span><span class="i18n-en">Other categories</span>
+    </p>
+    
+      
+      
+      <a class="aitools-cat" href="/ai-tools/cat/ai-agent-runtime-controls/" style=&#34;--cat: #FB5607&#34;>
+        <span class="i18n-zh">AI 智能体运行时管控</span><span class="i18n-en">AI Agent Runtime Controls</span>
+      </a>
+    
+      
+      <a class="aitools-cat" href="/ai-tools/cat/security-auditing-for-ai-agents-apps/" style=&#34;--cat: #06D6A0&#34;>
+        <span class="i18n-zh">AI 智能体与应用安全审计</span><span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+      </a>
+    
+  </div>
+  
+
+  <p class="aitools-catpage-back">
+    <a href="/ai-tools/">
+      <span class="i18n-zh">← 回专栏看全部期号</span>
+      <span class="i18n-en">← Back to all issues</span>
+    </a>
+  </p>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Scanners-Box 每日 AI 工具推荐 · AI 自主网络安全智能体",
+  "itemListElement": [
+    
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "LuaN1ao",
+        "description": "把每条渗透结论钉回证据链：P-E-O 三角色 + 三图分离 + Evidence→Hypothesis→Vulnerability→Exploit 因果链",
+        "url": "https://github.com/SanMuzZzZz/LuaN1aoAgent",
+        "datePublished": "2026-09-29",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "PentAGI",
+        "description": "全自主渗透平台：Docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞",
+        "url": "https://github.com/vxcontrol/pentagi",
+        "datePublished": "2026-09-21",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "Cairn",
+        "description": "通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 Agent 在黑板上自己搜路",
+        "url": "https://github.com/oritera/Cairn",
+        "datePublished": "2026-09-20",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "Shannon",
+        "description": "AI 渗透测试 Agent：读源码找攻击面，再真打一遍验证，只有跑通 PoC 的漏洞才进报告",
+        "url": "https://github.com/KeygraphHQ/shannon",
+        "datePublished": "2026-09-19",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "CyberStrikeAI",
+        "description": "AI 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆",
+        "url": "https://github.com/AIPentest/CyberStrikeAI",
+        "datePublished": "2026-09-18",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    }
+    
+  ]
+}
+  </script>
+</section>
 
     </div>
   </div>

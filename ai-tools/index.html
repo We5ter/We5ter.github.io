@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790697880755" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790697880755" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808235" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808235" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790697880755" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808235" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -287,6 +287,8 @@
              data-placeholder-en="Search by tool name, intro, or keyword…"
              data-aria-zh="搜索工具"
              data-aria-en="Search tools">
+      
+      <kbd class="aitools-kbd" id="aitools-kbd" aria-hidden="true">/</kbd>
       <button type="button" class="aitools-search-clear" id="aitools-clear"
               data-aria-label-zh="清空搜索"
               data-aria-label-en="Clear search" hidden>&times;</button>
@@ -307,6 +309,35 @@
         <option value="star" data-zh="按 GitHub star"   data-en="GitHub stars">按 GitHub star</option>
         <option value="name" data-zh="按首字母"         data-en="Name (A–Z)">按首字母</option>
       </select>
+    </div>
+
+    
+    <div class="aitools-views" role="group"
+         data-aria-label-zh="视图模式" data-aria-label-en="View mode">
+      <button type="button" class="aitools-view-btn is-active" data-view="timeline"
+              data-aria-label-zh="时间线视图" data-aria-label-en="Timeline view">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <span class="i18n-zh">时间线</span><span class="i18n-en">Timeline</span>
+      </button>
+      <button type="button" class="aitools-view-btn" data-view="grid"
+              data-aria-label-zh="网格视图" data-aria-label-en="Grid view">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <rect x="4" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"></rect>
+          <rect x="13" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"></rect>
+          <rect x="4" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"></rect>
+          <rect x="13" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"></rect>
+        </svg>
+        <span class="i18n-zh">网格</span><span class="i18n-en">Grid</span>
+      </button>
+      <button type="button" class="aitools-view-btn" data-view="board"
+              data-aria-label-zh="星榜视图" data-aria-label-en="Leaderboard view">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path d="M6 20V12M12 20V5M18 20v-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"></path>
+        </svg>
+        <span class="i18n-zh">星榜</span><span class="i18n-en">Top stars</span>
+      </button>
     </div>
 
     <div class="aitools-filters" role="group" aria-label="Filter by category">
@@ -378,7 +409,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260929-luan1ao"
+      <article class="aitools-item aitools-item--link" id="tool-20260929-luan1ao"
                data-cat="AI Autonomous Cybersecurity Agents" data-search="luan1ao 把每条渗透结论钉回证据链：p-e-o 三角色 + 三图分离 + evidence→hypothesis→vulnerability→exploit 因果链 pinning every pentest finding to evidence: planner-executor-observer roles + three graph separations + an enforced evidence → hypothesis → vulnerability → exploit chain typescript + pi sdk 重写的 v2 自主渗透 agent：证据引用是 schema 层面的硬约束（没有 evidence 引用就写不进 vulnerability / exploit 节点）。docker 出网收口在内核态，scope 校验确定性拒绝臆造网段。短板：agpl-3.0、node.js 25+、v2 benchmark 还没发、高危动作没有审批闸门。 v2 autonomous pentest agent rewritten in typescript on the pi sdk — evidence references are an enforced schema constraint (no vulnerability / exploit node without evidence). docker-based egress gating at the kernel layer, and deterministic scope checks reject any fabricated cidr. caveats: agpl-3.0, node.js 25+ required, no v2 benchmark published yet, and no human approval gate on high-risk actions."
                data-hot="370.96" data-srank="8"
                data-name="luan1ao"
@@ -397,10 +428,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #F72585">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
             <span class="i18n-zh">AI 自主网络安全智能体</span>
             <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          </span>
+          </a>
           
           
         </div>
@@ -450,7 +482,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260928-agent-governance-toolkit"
+      <article class="aitools-item aitools-item--link" id="tool-20260928-agent-governance-toolkit"
                data-cat="AI Agent Runtime Controls" data-search="agent governance toolkit 微软开源的 ai agent 运行时管控套件：把「请 ai 守规矩」换成「让 ai 没法不守规矩」 microsoft&#39;s runtime governance suite for ai agents: from &#34;asking ai to behave&#34; to &#34;making it structurally incapable of misbehaving&#34; 微软 2026-03 开源，mit。每次工具调用前插确定性策略闸门，违规抛 governancedenied；附带零信任身份与 kill switch，可上 ci 卡 owasp/nist/eu ai act 合规。最大短板：策略未加载时默认 allow 静默失效。 mit, open-sourced 2026-03. inserts a deterministic policy gate before every tool call, message and delegation — violations raise governancedenied. adds spiffe/did identity and a kill switch; ci can gate owasp/nist/eu ai act compliance. the catch: fails open when no policies are loaded."
                data-hot="438.30" data-srank="6"
                data-name="agent governance toolkit"
@@ -474,10 +506,11 @@
                onerror="this.style.display='none'">
           
           
-          <span class="aitools-cat" style="--cat: #FB5607">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-agent-runtime-controls/" style="--cat: #FB5607">
             <span class="i18n-zh">AI 智能体运行时管控</span>
             <span class="i18n-en">AI Agent Runtime Controls</span>
-          </span>
+          </a>
           
           
         </div>
@@ -527,7 +560,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260927-agentshield"
+      <article class="aitools-item aitools-item--link" id="tool-20260927-agentshield"
                data-cat="Security Auditing for AI Agents &amp; Apps" data-search="agentshield claude code 黑客松作品 / everything claude code 生态：把 ai agent 配置审计做成 0–100 分、可上 ci 的合规工具 a claude code hackathon project from the everything claude code ecosystem: a 0–100 graded audit of ai agent configurations that drops into ci as a compliance gate claude code 配置审计器，268 条规则扫 .claude/ 里的密钥、tool permission、hook 注入与 prompt injection，输出 a–f 分级 + 0–100 分。亮点是 --fix 防篡改回滚，短板是 --opus 会把 .claude/ 内容外发到 anthropic api。 claude code configuration auditor: 268 rules scan .claude/ for hardcoded secrets, tool permissions, hook injection and prompt-injection triggers, with a–f grades and a 0–100 score. standouts are --fix with tamper-evident rollback; the catch is that --opus sends .claude/ contents to the anthropic api."
                data-hot="366.10" data-srank="9"
                data-name="agentshield"
@@ -546,10 +579,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #06D6A0">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/security-auditing-for-ai-agents-apps/" style="--cat: #06D6A0">
             <span class="i18n-zh">AI 智能体与应用安全审计</span>
             <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
-          </span>
+          </a>
           
           
         </div>
@@ -599,7 +633,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260924-ai-infra-guard"
+      <article class="aitools-item aitools-item--link" id="tool-20260924-ai-infra-guard"
                data-cat="Security Auditing for AI Agents &amp; Apps" data-search="ai-infra-guard 腾讯朱雀实验室的全栈 ai 红队平台：五层能力覆盖 ai 基础设施 cve、agent 失控、mcp 供应链、skill 后门与越狱评测 a full-stack ai red teaming platform from tencent zhuque lab: five capabilities spanning ai infrastructure cves, agent loss of control, the mcp supply chain, skill backdoors and jailbreak evaluation 五能力并列的 ai 红队平台：ai infra cve 指纹、agent 失控、mcp 供应链、skill 后门、越狱评测。自带 forge-bench / roguehandoff-20 / skilljack 三个自研基准与 3 篇论文（含 black hat europe 2025）。短板：无认证不应上公网，4 个检测技能未完成。 full-stack ai red-team platform with five parallel capabilities: ai infra cve matching, agent loss-of-control, mcp supply chain, skill backdoors and jailbreak evaluation. ships forge-bench, roguehandoff-20 and skilljack benchmarks, plus three papers (two from black hat europe 2025). caveat: no authentication, and several sub-modules are unfinished."
                data-hot="436.11" data-srank="5"
                data-name="ai-infra-guard"
@@ -618,10 +652,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #06D6A0">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/security-auditing-for-ai-agents-apps/" style="--cat: #06D6A0">
             <span class="i18n-zh">AI 智能体与应用安全审计</span>
             <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
-          </span>
+          </a>
           
           
         </div>
@@ -671,7 +706,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260922-nvidia-openshell"
+      <article class="aitools-item aitools-item--link" id="tool-20260922-nvidia-openshell"
                data-cat="AI Agent Runtime Controls" data-search="nvidia openshell 面向自主 ai agent 的安全私有运行时：用声明式 yaml 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点 a safe, private runtime for autonomous ai agents: declarative yaml policies enforce boundaries across filesystem, network, process and provider access, and credentials only flow into policy-admitted endpoints rust 写的 ai agent 安全运行时，声明式 yaml 策略在文件 / 网络 / 进程 / 凭证四维度设界，三态拦截（允许 / 绑凭证 / 拒）；凭证从不落盘，只在策略放行后注入端点。nvidia 官方出品，目前 alpha，0.1.0 即将发布。 ai-agent secure runtime in rust: declarative yaml policies gate filesystem, network, process and provider access with a three-state outbound filter (allow / bind credentials / deny). credentials never touch disk and are injected only into policy-admitted endpoints. officially from nvidia, currently in alpha."
                data-hot="447.85" data-srank="3"
                data-name="nvidia openshell"
@@ -695,10 +730,11 @@
                onerror="this.style.display='none'">
           
           
-          <span class="aitools-cat" style="--cat: #FB5607">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-agent-runtime-controls/" style="--cat: #FB5607">
             <span class="i18n-zh">AI 智能体运行时管控</span>
             <span class="i18n-en">AI Agent Runtime Controls</span>
-          </span>
+          </a>
           
           
         </div>
@@ -748,7 +784,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260921-pentagi"
+      <article class="aitools-item aitools-item--link" id="tool-20260921-pentagi"
                data-cat="AI Autonomous Cybersecurity Agents" data-search="pentagi 全自主渗透平台：docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞 a fully autonomous pentesting platform: 20+ tools in a docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs go 写的全自主渗透平台，五层结构（核心 / 知识图谱 / 监控 / 沙箱工具 / 分析），13 个 agent 角色由四道闸门（调用上限 / reflector / 执行监控 / 任务规划）监管。官方维护 vllm + qwen3.5-27b-fp8 气隙部署指南。 autonomous pentesting platform in go with five layers (core / knowledge graph / monitoring / sandbox tools / analytics), 13 agent roles supervised by four gates (call caps / reflector / execution monitoring / task planning). ships an official vllm + qwen3.5-27b-fp8 air-gapped deployment guide."
                data-hot="490.92" data-srank="2"
                data-name="pentagi"
@@ -767,10 +803,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #F72585">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
             <span class="i18n-zh">AI 自主网络安全智能体</span>
             <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          </span>
+          </a>
           
           
         </div>
@@ -820,7 +857,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260920-cairn"
+      <article class="aitools-item aitools-item--link" id="tool-20260920-cairn"
                data-cat="AI Autonomous Cybersecurity Agents" data-search="cairn 通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 agent 在黑板上自己搜路 a general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard 黑板架构 + 事实/意图图，只有 fact / intent / hint 三个原语；worker 跑 ooda 循环，靠 stigmergy 间接协作，角色在运行时涌现而非写死。腾讯云黑客松 ai 渗透挑战赛 610 队里唯一 ak（54/54）。 state-space search engine built on a blackboard + fact-intent graph with three primitives (fact, intent, hint). workers run ooda loops and coordinate via stigmergy; roles emerge at runtime. the only team to ak (54/54) at the tencent cloud ai pentesting hackathon out of 610."
                data-hot="399.49" data-srank="7"
                data-name="cairn"
@@ -839,10 +876,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #F72585">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
             <span class="i18n-zh">AI 自主网络安全智能体</span>
             <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          </span>
+          </a>
           
           
         </div>
@@ -892,7 +930,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260919-shannon"
+      <article class="aitools-item aitools-item--link" id="tool-20260919-shannon"
                data-cat="AI Autonomous Cybersecurity Agents" data-search="shannon ai 渗透测试 agent：读源码找攻击面，再真打一遍验证，只有跑通 poc 的漏洞才进报告 an ai pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no poc, no report. 六段流水线：侦察 + 代码分析双流候选 → 归并去重 → 利用 agent 真打 → 打不穿就丢 → pdf/markdown/sarif 报告。原生接 github actions，只有 exploited 的发现才卡流水线。agpl-3.0，会改目标状态，只打 staging。 six-stage pipeline: recon and code analysis produce candidates, dedup, exploitation agents attack the live app, undemonstrated findings get discarded, and survivors become pdf / markdown / sarif. native github actions; only exploited findings gate the pipeline. agpl-3.0, staging only."
                data-hot="517.53" data-srank="1"
                data-name="shannon"
@@ -911,10 +949,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #F72585">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
             <span class="i18n-zh">AI 自主网络安全智能体</span>
             <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          </span>
+          </a>
           
           
         </div>
@@ -964,7 +1003,7 @@
       
       
       
-      <article class="aitools-item" id="tool-20260918-cyberstrikeai"
+      <article class="aitools-item aitools-item--link" id="tool-20260918-cyberstrikeai"
                data-cat="AI Autonomous Cybersecurity Agents" data-search="cyberstrikeai ai 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆 an ai-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory. go + eino 编排，100+ yaml 工具配方 + mcp，内置审批、调用前正则拦截、rbac 与审计日志。它的差异不在能调多少工具，而在于敢不敢让 agent 真的动手。 go + eino orchestration with 100+ yaml tool recipes plus mcp, plus first-class approval, pre-call regex intercept, rbac and audit logs. its edge isn&#39;t how many tools it can call — it&#39;s whether it dares to let the agent really act."
                data-hot="432.97" data-srank="4"
                data-name="cyberstrikeai"
@@ -983,10 +1022,11 @@
           
           
           
-          <span class="aitools-cat" style="--cat: #F72585">
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
             <span class="i18n-zh">AI 自主网络安全智能体</span>
             <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          </span>
+          </a>
           
           
         </div>
@@ -1063,6 +1103,16 @@
       <button type="button" class="aitools-drawer-btn" id="aitools-drawer-copy">
         <span class="i18n-zh">复制链接</span><span class="i18n-en">Copy link</span>
       </button>
+      
+      <button type="button" class="aitools-drawer-btn" id="aitools-drawer-share" hidden>
+        <span class="i18n-zh">分享…</span><span class="i18n-en">Share…</span>
+      </button>
+      <a class="aitools-drawer-btn" id="aitools-drawer-x" href="#" target="_blank" rel="noopener"
+         data-aria-label-zh="分享到 X" data-aria-label-en="Post on X">
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+          <path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+        </svg>
+      </a>
     </footer>
     <nav class="aitools-drawer-nav" aria-label="Issue navigation">
       <button type="button" class="aitools-drawer-step" id="aitools-drawer-prev">
@@ -1074,6 +1124,48 @@
     </nav>
   </aside>
   <p class="aitools-toast" id="aitools-toast" role="status" aria-live="polite" hidden></p>
+
+  
+  
+  <div class="aitools-subscribe">
+    <div class="aitools-subscribe-txt">
+      <p class="aitools-subscribe-title">
+        <span class="i18n-zh">别错过明天那期</span><span class="i18n-en">Never miss an issue</span>
+      </p>
+      <p class="aitools-subscribe-sub">
+        <span class="i18n-zh">每天 14:00 一个工具。订 RSS 或关注专栏，知乎 / 微信公众号同步更新。</span>
+        <span class="i18n-en">One tool every day at 14:00 GMT+8 — via RSS, Zhihu or WeChat.</span>
+      </p>
+      <div class="aitools-subscribe-actions">
+        
+        <a class="aitools-subscribe-btn" href="/atom.xml" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+          RSS
+        </a>
+        
+        
+        <a class="aitools-subscribe-btn" href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+          <span class="i18n-zh">知乎专栏</span><span class="i18n-en">Zhihu column</span>
+        </a>
+        
+        
+        <button type="button" class="aitools-subscribe-btn" id="aitools-qr-toggle" aria-expanded="false" aria-controls="aitools-qr">
+          <span class="i18n-zh">公众号二维码</span><span class="i18n-en">WeChat QR code</span>
+        </button>
+        
+      </div>
+      
+      <div class="aitools-qr" id="aitools-qr" hidden>
+        <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="132" height="132" loading="lazy" decoding="async">
+        <span class="aitools-qr-name">
+          <span class="i18n-zh">Wester的AI安全札记</span>
+          <span class="i18n-en">Wester的AI安全札记</span>
+        </span>
+      </div>
+      
+    </div>
+  </div>
+  
 
   <p class="aitools-foot">
     <span class="i18n-zh">同步更新于知乎专栏「Wester的AI安全札记」与微信公众号。</span>
@@ -1223,6 +1315,7 @@
     if (!root) return;
     var input  = document.getElementById('aitools-q');
     var clear  = document.getElementById('aitools-clear');
+    var kbd    = document.getElementById('aitools-kbd');
     var chips  = Array.prototype.slice.call(root.querySelectorAll('.aitools-chip'));
     var items  = Array.prototype.slice.call(root.querySelectorAll('.aitools-item'));
     var days   = Array.prototype.slice.call(root.querySelectorAll('.aitools-day'));
@@ -1231,9 +1324,19 @@
     var reset  = document.getElementById('aitools-reset');
     var sortSel = document.getElementById('aitools-sort');
     var flat    = document.getElementById('aitools-flat');
+    var viewBtns = Array.prototype.slice.call(root.querySelectorAll('.aitools-view-btn'));
     if (!input || !items.length) return;
 
     var cat = '';
+
+    // 视图模式。timeline = 按天分组的时间线（SSR 默认）；grid / board 把卡片搬进
+    // flat 容器换排版。board 强制按 star 排 —— 「星榜」不按 star 排就不叫星榜。
+    var VIEW_KEY = 'aitools-view';
+    var view = 'timeline';
+    try {
+      var saved = localStorage.getItem(VIEW_KEY);
+      if (saved === 'grid' || saved === 'board') view = saved;
+    } catch (e) { /* 隐私模式等场景拿不到 localStorage，退回默认视图 */ }
 
     // 排序模式（date = 按天分组不动；其余把卡片搬到 flat 容器平铺）
     var sortMode = sortSel ? sortSel.value : 'date';
@@ -1272,6 +1375,43 @@
       arr.forEach(function (el) { flat.appendChild(el); });
     }
 
+    // 网格视图 + 按日期：也要平铺（网格没法容纳「按天分组」），
+    // 但顺序保持时间序 —— 直接按 days 的原顺序搬卡片，不走排序比较。
+    function flattenDateOrder() {
+      if (!flat) return;
+      flat.hidden = false;
+      days.forEach(function (d) {
+        d._items.forEach(function (el) { flat.appendChild(el); });
+      });
+    }
+
+    // 视图 × 排序的组合出口。改排序下拉、切视图、重置都走这里，
+    // 保证「星榜永远按 star、网格永远平铺、时间线永远分组」三条不变式。
+    function resort() {
+      var m = sortSel ? sortSel.value : 'date';
+      if (view === 'board') applySort('star');
+      else if (view === 'grid') { if (m === 'date') flattenDateOrder(); else applySort(m); }
+      else applySort(m);
+      apply();
+    }
+
+    function applyView(v) {
+      view = v;
+      root.classList.toggle('aitools-view-grid', v === 'grid');
+      root.classList.toggle('aitools-view-board', v === 'board');
+      viewBtns.forEach(function (b) {
+        var on = b.getAttribute('data-view') === v;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      // 进星榜时把排序下拉同步成 star，避免「下拉写热度、实际按 star」的错位；
+      // 回时间线同理重置成 date —— 时间线的语义就是按天分组
+      if (v === 'board' && sortSel) sortSel.value = 'star';
+      if (v === 'timeline' && sortSel) sortSel.value = 'date';
+      try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* 同读取，失败就算了 */ }
+      resort();
+    }
+
     // 同步搜索框 placeholder / aria-label / 状态栏后缀。
     // placeholder 是 HTML 属性，.i18n-zh/.i18n-en span 塞不进来，
     // 只能在 JS 里按当前语言切。同步时机：1) 初次进入 2) 语言切换按钮点击。
@@ -1292,6 +1432,12 @@
         var caen = clear.getAttribute('data-aria-label-en');
         if (cazh && caen) clear.setAttribute('aria-label', lang === 'en' ? caen : cazh);
       }
+      // 视图切换等控件的 aria-label 同 placeholder 一个道理：属性里塞不了双语 span
+      Array.prototype.forEach.call(root.querySelectorAll('[data-aria-label-zh][data-aria-label-en]'), function (el) {
+        el.setAttribute('aria-label', lang === 'en'
+          ? el.getAttribute('data-aria-label-en')
+          : el.getAttribute('data-aria-label-zh'));
+      });
       // 排序下拉的 option 文本：option 里放不了 .i18n-zh/.i18n-en 的 span
       // （option 只接受纯文本），只能按语言回写 textContent。
       if (sortSel) {
@@ -1356,6 +1502,16 @@
       }
       if (nores) nores.hidden = shown !== 0;
       if (clear) clear.hidden = !q;
+      // 输入框里有词时把「/」提示位让给清空按钮，两个右浮元素不叠在一起
+      if (kbd) kbd.hidden = !!q;
+      // 星榜前三名盖个标记（名次数字本身由 CSS counter 画，这里只负责 top3 高亮）
+      if (view === 'board' && flat) {
+        var r = 0;
+        Array.prototype.forEach.call(flat.children, function (el) {
+          el.classList.remove('is-rank-top');
+          if (!el.hidden && ++r <= 3) el.classList.add('is-rank-top');
+        });
+      }
     }
 
     function setCat(c, el) {
@@ -1387,14 +1543,38 @@
       input.value = ''; input.focus(); apply();
     });
     if (sortSel) sortSel.addEventListener('change', function () {
-      applySort(sortSel.value);
-      apply();                 // 排序后要重跑一遍筛选，否则当前关键词/分类没应用到新顺序上
+      resort();                // 排序后要重跑一遍筛选，否则当前关键词/分类没应用到新顺序上
     });
     if (reset) reset.addEventListener('click', function () {
       input.value = '';
       if (sortSel) sortSel.value = 'date';
-      applySort('date');
+      resort();
       setCat('', chips[0]);
+    });
+    viewBtns.forEach(function (b) {
+      b.addEventListener('click', function () { applyView(b.getAttribute('data-view')); });
+    });
+
+    // 「/」聚焦搜索：大流量站的标配肌肉记忆。已经在输入框里或带修饰键时不抢。
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      var t = e.target;
+      var tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      // 抽屉开着时「/」留给抽屉里的操作，别把焦点拽到背后的搜索框
+      if (document.body.classList.contains('aitools-drawer-open')) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+    });
+
+    // 公众号二维码：点击展开/收起，比侧边栏的 hover 弹窗在手机上可用
+    var qr = document.getElementById('aitools-qr');
+    var qrBtn = document.getElementById('aitools-qr-toggle');
+    if (qr && qrBtn) qrBtn.addEventListener('click', function () {
+      var open = qr.hidden;
+      qr.hidden = !open;
+      qrBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
     // 语言切换：after_all.ejs #lang-toggle 改 html[data-lang]，这里同步 placeholder
@@ -1410,8 +1590,7 @@
     }
 
     syncLangAttrs();
-    applySort(sortMode);
-    apply();
+    applyView(view);
   })();
   </script>
 
@@ -1433,6 +1612,8 @@
     var dPost   = document.getElementById('aitools-drawer-post');
     var dRepo   = document.getElementById('aitools-drawer-repo');
     var dCopy   = document.getElementById('aitools-drawer-copy');
+    var dShare  = document.getElementById('aitools-drawer-share');
+    var dX      = document.getElementById('aitools-drawer-x');
     var dClose  = document.getElementById('aitools-drawer-close');
     var dPrev   = document.getElementById('aitools-drawer-prev');
     var dNext   = document.getElementById('aitools-drawer-next');
@@ -1526,6 +1707,15 @@
       if (hasPost) dPost.setAttribute('href', post);
       dRepo.hidden = !url;
       if (url) dRepo.setAttribute('href', url);
+
+      // X intent：工具名 + 期号 + 卡片锚点链接。文案压短，避免超 280 字被截
+      if (dX) {
+        var shareUrl = location.href.split('#')[0] + '#' + card.id;
+        var shareTxt = (nameEl ? nameEl.textContent : '') +
+                       ' · Scanners-Box Daily AI Tool Picks No.' + pad;
+        dX.setAttribute('href', 'https://twitter.com/intent/tweet?text=' +
+          encodeURIComponent(shareTxt) + '&url=' + encodeURIComponent(shareUrl));
+      }
 
       var p = neighbor(i, -1), n = neighbor(i, 1);
       dPrev.disabled = p < 0;
@@ -1623,6 +1813,17 @@
     if (dClose) dClose.addEventListener('click', close);
     scrim.addEventListener('click', close);
     if (dCopy) dCopy.addEventListener('click', copyLink);
+    if (dShare) {
+      // 桌面 Chrome 长期没有 navigator.share，不支持就整颗隐藏（markup 里默认 hidden）
+      dShare.hidden = typeof navigator.share !== 'function';
+      dShare.addEventListener('click', function () {
+        if (cur < 0 || !order[cur] || typeof navigator.share !== 'function') return;
+        navigator.share({
+          title: dName.textContent,
+          url: location.href.split('#')[0] + '#' + order[cur].id
+        }).catch(function () { /* 用户在分享面板里取消是正常操作，不报错 */ });
+      });
+    }
     if (dPrev) dPrev.addEventListener('click', function () { go(-1); });
     if (dNext) dNext.addEventListener('click', function () { go(1); });
 
