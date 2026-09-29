@@ -972,177 +972,15 @@ html[data-lang="en"] .i18n-en { display: inline; }
    单列后把 --content-max 收窄回原来正文的宽度，避免一行过长难读。 */
 body.layout-ai-tools .sidebar { display: none; }
 /* 侧栏让出来的 220px 还给正文，回到站点统一的 --content-max（1100px）。
-   卡片是列表型内容、note 也只有一两句，宽一点不伤阅读，反而少滚动。
-   注意这个值会牵动下面热门榜的浮动断点 —— 改它必须同步改那里。 */
+   卡片是列表型内容、note 也只有一两句，宽一点不伤阅读，反而少滚动。 */
 body.layout-ai-tools #main {
   grid-template-columns: minmax(0, 1fr);
   max-width: 1100px;
 }
 
-/* 热门工具排行。
-   注意：只给排名和一句话，**不显示 star / 热度数字** ——
-   那是排序的内部权重，摆出来会把「热门推荐」变成「GitHub star 榜」。 */
-/* 形态两档（跟主题里浮动二维码 float-qr 一个模式），HTML 只有一份，靠 CSS 切：
-     <1500px  右侧只露一个 44px 圆形按钮，点开（有鼠标则悬停）才展开面板。
-              空间实在不够，展开时临时压住正文右上角 —— 用户主动触发，可接受。
-     ≥1500px  面板常驻在正文右侧外面，按钮收起（见下面那个 media）。
-   fixed 定位，不随页面滚动跑掉；top 96px 让开 sticky 的 masthead。 */
-.aitools-hot {
-  position: fixed;
-  right: 12px;
-  top: 96px;
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: .5rem;
-}
-/* 图标 + 文字的胶囊，品牌色实底。
-   之前是 44px 纯图标圆钮（三条横线），Wester 反馈「看到都不知道这是一个什么按钮」——
-   纯图标在没有约定俗成的语义时就是猜谜，排行榜图标尤其没人认得。 */
-.aitools-hot-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  height: 42px;
-  padding: 0 .9rem;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font: inherit;
-  font-size: .8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 35%, transparent);
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.aitools-hot-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 16px color-mix(in srgb, var(--accent) 45%, transparent);
-}
-.aitools-hot-toggle svg { width: 17px; height: 17px; flex-shrink: 0; }
-.aitools-hot-toggle-label { white-space: nowrap; }
-.aitools-hot-body {
-  width: 200px;
-  padding: .8rem .85rem .9rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
-  display: none;                        /* 默认收起 */
-}
-/* 展开按设备能力分流（同 float-qr）：
-   有鼠标 → 悬停即开，:focus-within 给键盘兜底；
-   触摸设备没有真 hover，靠 JS 点按钮切 .is-open。 */
-@media (hover: hover) {
-  .aitools-hot:hover .aitools-hot-body,
-  .aitools-hot:focus-within .aitools-hot-body { display: block; }
-}
-.aitools-hot.is-open .aitools-hot-body { display: block; }
-.aitools-hot-head {
-  display: flex;
-  align-items: baseline;
-  gap: .55rem;
-  flex-wrap: wrap;
-  margin-bottom: .35rem;
-}
-.aitools-hot-title {
-  margin: 0;
-  font-size: .9375rem;
-  font-weight: 700;
-}
-.aitools-hot-note {
-  margin: 0;
-  font-size: .75rem;
-  color: var(--text-muted);
-}
-.aitools-hot-list { list-style: none; margin: 0; padding: 0; }
-.aitools-hot-item + .aitools-hot-item { border-top: 1px dashed var(--border); }
-.aitools-hot-link {
-  display: flex;
-  align-items: baseline;
-  gap: .6rem;
-  padding: .4rem 0;
-  color: var(--text);
-}
-.aitools-hot-link:hover { text-decoration: none; }
-.aitools-hot-link:hover .aitools-hot-name { color: var(--accent); }
-.aitools-hot-rank {
-  flex-shrink: 0;
-  width: 1.3rem;
-  height: 1.3rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 3px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  font-size: .75rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-/* 五个名次五种「多巴胺色」，把榜单立刻活泼起来。
-   这几个色都压得住白字，避开亮黄（黄底白字对比度不够）。 */
-.aitools-hot-item:nth-child(1) .aitools-hot-rank { background: #F72585; color: #fff; }
-.aitools-hot-item:nth-child(2) .aitools-hot-rank { background: #FB5607; color: #fff; }
-.aitools-hot-item:nth-child(3) .aitools-hot-rank { background: #8338EC; color: #fff; }
-.aitools-hot-item:nth-child(4) .aitools-hot-rank { background: #06D6A0; color: #fff; }
-.aitools-hot-item:nth-child(5) .aitools-hot-rank { background: #3A86FF; color: #fff; }
-/* 名字最长能到 "Agent Governance Toolkit" 26 字符，面板 190–200px 放不下。
-   flex item 默认 min-width:auto + flex-shrink:0 → 撑破父容器且不折行（这是页面刚
-   上线时 Wester 反馈「标题溢出」的根因）。改成可收缩 + 词边界换行，两形态都安全。 */
-.aitools-hot-link { align-items: flex-start; }
-.aitools-hot-name {
-  font-weight: 600;
-  flex-shrink: 1;
-  min-width: 0;
-  white-space: normal;
-  line-height: 1.35;
-}
-/* 宽屏：正文右侧富余出空间后，整个榜单浮到侧边常驻。
-   断点按「正文 1100px + 挂件 190px + 20px 间距」反推：
-     (W - 1100) / 2 ≥ 210  →  W ≥ 1520
-   取 1500px 是为了让 1512 的 MacBook Pro 14" 也能用上浮动版
-   （差的那几个 px 落在 #main 自己的 1.5rem padding 上，压不到卡片）。
-   <1500px 富余不够，就退回上面那套「按钮 + 点开」的形态。
-   ⚠️ 正文宽度（上面 #main 的 max-width）改了，这里的 left 和断点必须同步改。
-   left 而不是 right：正文是居中的，用 50% + 半个正文宽算才跟内容对齐，
-   写死 right 会在窄一点的屏幕上飘到正文上面。
-   这里容器自己就是那张卡片（不再套一层 body），所以把 body 的壳脱掉。 */
-@media (min-width: 1500px) {
-  .aitools-hot {
-    left: calc(50% + 550px + 20px);
-    right: auto;
-    top: 96px;
-    width: 190px;
-    display: block;                     /* 取消 flex，容器直接当卡片 */
-    padding: .7rem .75rem .8rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
-  }
-  .aitools-hot-toggle { display: none; }
-  .aitools-hot-body {
-    display: block;                     /* 常驻，不再依赖 hover / .is-open */
-    width: auto;
-    padding: 0;
-    border: 0;
-    background: none;
-    box-shadow: none;
-  }
-  /* 190px 的窄栏放不下那句排序说明，只留标题 + 排名 + 名字 */
-  .aitools-hot-note { display: none; }
-  .aitools-hot-head { margin-bottom: .45rem; }
-  /* 名字折行规则已在基础样式里设置（flex-shrink:1 + min-width:0 + white-space:normal），
-     这里就不重复了。 */
-}
-
 @media (max-width: 640px) {
   /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
      收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
-  .aitools-hot-body { width: min(200px, calc(100vw - 24px)); }
   /* 时间线缩进同步收窄，别在小屏上白占 1.1rem */
   .aitools-day { padding-left: .85rem; }
 }
@@ -1154,18 +992,11 @@ body.layout-ai-tools #main {
   .aitools-chip,
   .aitools-search-input,
   .aitools-search-icon,
-  .aitools-hot-toggle { transition: none; }
   .aitools-item:hover { transform: none; }
   .aitools-chip.is-pulse,
   .aitools-item.is-hot-target { animation: none; }
 }
 
-/* 从榜单点进来时闪一下，告诉用户「就是这条」 */
-.aitools-item.is-hot-target { animation: aitools-flash 1.8s ease-out; }
-@keyframes aitools-flash {
-  0%, 35% { background: var(--accent-soft); }
-  100%    { background: var(--bg); }
-}
 
 /* 非「按日期」排序时的平铺容器。卡片本身有 margin-bottom，这里不用再加间距。 */
 .aitools-flat { margin-bottom: 1rem; }
@@ -1256,11 +1087,14 @@ body.layout-ai-tools #main {
 .aitools-note { margin: 0 0 .5rem; font-size: .9375rem; color: var(--text-muted); }
 .aitools-link { font-size: .8125rem; color: var(--text-muted); word-break: break-all; }
 .aitools-link:hover { color: var(--accent); }
-/* star 徽章（shields.io）。跟在仓库链接后面，vertical-align 对齐文字基线，
-   不要 baseline —— 徽章是 20px 高的图，用 baseline 会往下沉。 */
+/* star / 机构徽章，贴在卡片标题后面。
+   ⚠️ .aitools-head 是 flex + align-items:baseline，flex item 上写 vertical-align 没用，
+   必须用 align-self: center 才能让 20px 高的图和标题垂直居中。
+   只锁 height、width 交给 auto：机构徽章宽度随名字长短变，写死会拉变形。 */
 .aitools-badge {
-  margin-left: .4rem;
-  vertical-align: middle;
+  align-self: center;
+  height: 20px;
+  width: auto;
 }
 .aitools-foot { margin-top: 1.5rem; font-size: .8125rem; color: var(--text-muted); }
 .aitools-empty { color: var(--text-muted); }
