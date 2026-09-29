@@ -978,52 +978,32 @@ body.layout-ai-tools #main {
   max-width: 1100px;
 }
 
-/* 双语标语：副标题下面的一条分隔带，一句话说清这页是「什么量级的东西」。
-   短渐变横杠 + 大字 + 弱化的第二行，靠留白撑出「定位句」的分量。
-   故意不做底色卡片 —— 加了底色它就读起来像一条提示，而不是一句定位。
-   中英各一份，由 .i18n-* 按语言互斥显示（不并列，否则一行放不下）。 */
-.aitools-slogan {
-  margin: 0 0 1.15rem;
-  padding-bottom: .9rem;
-  border-bottom: 1px solid var(--border);
-}
-.aitools-slogan::before {
-  content: "";
-  display: block;
-  width: 42px;
-  height: 2px;
-  margin-bottom: .5rem;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent), #8338EC);
-}
-.aitools-slogan-text { margin: 0; }
-/* .i18n-en 默认 display:none，这里把「当前语言那条」提升成 block 独占一行；
-   另一条仍由 .i18n-* 的规则隐藏，两条不会同时出现。 */
-html[data-lang="en"] .aitools-slogan-en,
-html[data-lang="zh"] .aitools-slogan-zh { display: block; }
-.aitools-slogan-en {
+/* 双语标语：作为 <h1> 里标题下面的一行小字，和标题同属一个视觉块。
+   挂在 banner 上时是白字 —— banner 自带压暗层（rgba(8,20,28,.52→.78)），白字托得住。
+   这里绝不能用主题色或渐变文字：深色图上会糊掉，也压不住背景纹理。
+   选择器一律带 body.layout-ai-tools 前缀（0,3,1），用来压过文件更后面的
+   「.section-heading--banner .i18n-* { color:#fff }」—— 同特异性时后者会反过来盖掉我们。 */
+body.layout-ai-tools .section-heading .aitools-slogan {
+  display: none;          /* 由下面两条按语言放开，避免中英两条同时出现 */
+  margin-top: .45rem;
   font-size: .9375rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.55;
-  letter-spacing: .012em;
-  color: var(--accent);
+  letter-spacing: .02em;
+  color: rgba(255, 255, 255, .9);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
 }
-/* 渐变文字只在支持 background-clip:text 的浏览器上生效；
-   不支持时退回上面的纯色 —— 绝不能让文字变透明看不见。 */
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .aitools-slogan-en {
-    background: linear-gradient(92deg, var(--accent) 0%, #8338EC 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-  }
+/* 只放开「当前语言」那一条，并提升成 block 让它独占一行。
+   特异性 (0,4,1) 高于上面 (0,3,1)，也高于 i18n 的 display 规则 (0,2,1)。 */
+html[data-lang="zh"] body.layout-ai-tools .section-heading .aitools-slogan.i18n-zh,
+html[data-lang="en"] body.layout-ai-tools .section-heading .aitools-slogan.i18n-en {
+  display: block;
 }
-.aitools-slogan-zh {
-  font-size: .875rem;
-  line-height: 1.6;
-  letter-spacing: .03em;
+/* 没配 banner 时标题是浅色背景，白字会隐形 —— 退回弱化正文色。
+   与上面那条选择器互斥（:not），不存在互相覆盖的问题。 */
+body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slogan {
   color: var(--text-muted);
+  text-shadow: none;
 }
 
 @media (max-width: 640px) {
@@ -1032,8 +1012,7 @@ html[data-lang="zh"] .aitools-slogan-zh { display: block; }
   /* 时间线缩进同步收窄，别在小屏上白占 1.1rem */
   .aitools-day { padding-left: .85rem; }
   /* 标语在窄屏会折成三四行，字号收一档，别抢标题的注意力 */
-  .aitools-slogan-en { font-size: .875rem; }
-  .aitools-slogan-zh { font-size: .8125rem; }
+  body.layout-ai-tools .section-heading .aitools-slogan { font-size: .8125rem; }
 }
 
 /* 尊重系统的「减少动态效果」：抬升、脉冲、闪烁定位全部关掉，
