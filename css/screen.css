@@ -1256,6 +1256,12 @@ body.layout-ai-tools #main {
 .aitools-note { margin: 0 0 .5rem; font-size: .9375rem; color: var(--text-muted); }
 .aitools-link { font-size: .8125rem; color: var(--text-muted); word-break: break-all; }
 .aitools-link:hover { color: var(--accent); }
+/* star 徽章（shields.io）。跟在仓库链接后面，vertical-align 对齐文字基线，
+   不要 baseline —— 徽章是 20px 高的图，用 baseline 会往下沉。 */
+.aitools-badge {
+  margin-left: .4rem;
+  vertical-align: middle;
+}
 .aitools-foot { margin-top: 1.5rem; font-size: .8125rem; color: var(--text-muted); }
 .aitools-empty { color: var(--text-muted); }
 
