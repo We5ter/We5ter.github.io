@@ -1537,6 +1537,14 @@ body.aitools-drawer-open { overflow: hidden; }
   border: 1px solid #d6e9ef;
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
+  /* 锚点跳过来时别被吸顶导航盖住上沿 */
+  scroll-margin-top: 4.5rem;
+}
+/* 工具条订阅按钮跳转过来的落位提示：一圈扩散光，1.6s 后自己消失 */
+.aitools-subscribe.is-flash { animation: aitools-sub-flash 1.5s ease; }
+@keyframes aitools-sub-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(47, 125, 149, .45); }
+  100% { box-shadow: 0 0 0 16px rgba(47, 125, 149, 0); }
 }
 .aitools-subscribe-title { margin: 0 0 .25rem; font-size: 1.0625rem; font-weight: 700; }
 .aitools-subscribe-sub { margin: 0 0 .7rem; font-size: .875rem; color: var(--text-muted); }
@@ -1651,6 +1659,7 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 
 @media (prefers-reduced-motion: reduce) {
   .aitools-live.is-on .aitools-live-dot { animation: none; }
+  .aitools-subscribe.is-flash { animation: none; }
   .aitools-drawer,
   .aitools-scrim,
   .aitools-toast { transition: none; }
@@ -2248,6 +2257,26 @@ a.cve-hof:hover {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(47, 125, 149, .12);
 }
+
+/* 工具条排序行右端的订阅入口：margin-left:auto 把它顶到行尾。
+   列表太长，底部订阅带多数人滚不到，这里给一颗随时能点的锚点。 */
+.aitools-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-left: auto;
+  padding: .3rem .7rem;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-jump:hover { background: var(--accent); color: #fff; text-decoration: none; }
 
 .aitools-filters { display: flex; flex-wrap: wrap; gap: .45rem; }
 .aitools-chip {

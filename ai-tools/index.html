@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790699808235" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790699808235" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790700641567" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790700641567" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790699808235" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790700641567" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -309,6 +309,16 @@
         <option value="star" data-zh="按 GitHub star"   data-en="GitHub stars">按 GitHub star</option>
         <option value="name" data-zh="按首字母"         data-en="Name (A–Z)">按首字母</option>
       </select>
+      
+      
+      <a class="aitools-jump" id="aitools-sub-jump" href="#aitools-subscribe">
+        <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
+          <path d="M18 10a6 6 0 1 0-12 0c0 4-1.5 5.5-1.5 5.5h15S18 14 18 10M10.5 19a1.8 1.8 0 0 0 3 0"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="i18n-zh">订阅</span><span class="i18n-en">Subscribe</span>
+      </a>
+      
     </div>
 
     
@@ -1127,7 +1137,7 @@
 
   
   
-  <div class="aitools-subscribe">
+  <div class="aitools-subscribe" id="aitools-subscribe">
     <div class="aitools-subscribe-txt">
       <p class="aitools-subscribe-title">
         <span class="i18n-zh">别错过明天那期</span><span class="i18n-en">Never miss an issue</span>
@@ -1575,6 +1585,20 @@
       var open = qr.hidden;
       qr.hidden = !open;
       qrBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // 工具条订阅按钮 → 滚到底部订阅带。无 JS 时它就是普通锚点，
+    // 这里只负责升级成平滑滚动 + 到点后闪一下，帮眼睛落位。
+    var subJump = document.getElementById('aitools-sub-jump');
+    var subBand = document.getElementById('aitools-subscribe');
+    if (subJump && subBand) subJump.addEventListener('click', function (e) {
+      e.preventDefault();
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      subBand.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      subBand.classList.remove('is-flash');
+      void subBand.offsetWidth;
+      subBand.classList.add('is-flash');
+      setTimeout(function () { subBand.classList.remove('is-flash'); }, 1600);
     });
 
     // 语言切换：after_all.ejs #lang-toggle 改 html[data-lang]，这里同步 placeholder
