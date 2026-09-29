@@ -978,11 +978,62 @@ body.layout-ai-tools #main {
   max-width: 1100px;
 }
 
+/* 双语标语：副标题下面的一条分隔带，一句话说清这页是「什么量级的东西」。
+   短渐变横杠 + 大字 + 弱化的第二行，靠留白撑出「定位句」的分量。
+   故意不做底色卡片 —— 加了底色它就读起来像一条提示，而不是一句定位。
+   中英各一份，由 .i18n-* 按语言互斥显示（不并列，否则一行放不下）。 */
+.aitools-slogan {
+  margin: 0 0 1.15rem;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid var(--border);
+}
+.aitools-slogan::before {
+  content: "";
+  display: block;
+  width: 42px;
+  height: 2px;
+  margin-bottom: .5rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), #8338EC);
+}
+.aitools-slogan-text { margin: 0; }
+/* .i18n-en 默认 display:none，这里把「当前语言那条」提升成 block 独占一行；
+   另一条仍由 .i18n-* 的规则隐藏，两条不会同时出现。 */
+html[data-lang="en"] .aitools-slogan-en,
+html[data-lang="zh"] .aitools-slogan-zh { display: block; }
+.aitools-slogan-en {
+  font-size: .9375rem;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: .012em;
+  color: var(--accent);
+}
+/* 渐变文字只在支持 background-clip:text 的浏览器上生效；
+   不支持时退回上面的纯色 —— 绝不能让文字变透明看不见。 */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .aitools-slogan-en {
+    background: linear-gradient(92deg, var(--accent) 0%, #8338EC 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.aitools-slogan-zh {
+  font-size: .875rem;
+  line-height: 1.6;
+  letter-spacing: .03em;
+  color: var(--text-muted);
+}
+
 @media (max-width: 640px) {
   /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
      收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
   /* 时间线缩进同步收窄，别在小屏上白占 1.1rem */
   .aitools-day { padding-left: .85rem; }
+  /* 标语在窄屏会折成三四行，字号收一档，别抢标题的注意力 */
+  .aitools-slogan-en { font-size: .875rem; }
+  .aitools-slogan-zh { font-size: .8125rem; }
 }
 
 /* 尊重系统的「减少动态效果」：抬升、脉冲、闪烁定位全部关掉，
