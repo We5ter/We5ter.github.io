@@ -997,22 +997,32 @@ body.layout-ai-tools #main {
   align-items: flex-end;
   gap: .5rem;
 }
+/* 图标 + 文字的胶囊，品牌色实底。
+   之前是 44px 纯图标圆钮（三条横线），Wester 反馈「看到都不知道这是一个什么按钮」——
+   纯图标在没有约定俗成的语义时就是猜谜，排行榜图标尤其没人认得。 */
 .aitools-hot-toggle {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--bg);
-  color: var(--text-muted);
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  height: 42px;
+  padding: 0 .9rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: .8125rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-  transition: color .15s ease, box-shadow .15s ease;
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: transform .15s ease, box-shadow .15s ease;
 }
-.aitools-hot-toggle:hover { color: var(--accent); box-shadow: 0 3px 14px rgba(0, 0, 0, .12); }
-.aitools-hot-toggle svg { width: 21px; height: 21px; }
+.aitools-hot-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.aitools-hot-toggle svg { width: 17px; height: 17px; flex-shrink: 0; }
+.aitools-hot-toggle-label { white-space: nowrap; }
 .aitools-hot-body {
   width: 200px;
   padding: .8rem .85rem .9rem;
@@ -1090,14 +1100,6 @@ body.layout-ai-tools #main {
   white-space: normal;
   line-height: 1.35;
 }
-.aitools-hot-line {
-  min-width: 0;
-  font-size: .8125rem;
-  color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 /* 宽屏：正文右侧富余出空间后，整个榜单浮到侧边常驻。
    断点按「正文 1100px + 挂件 190px + 20px 间距」反推：
      (W - 1100) / 2 ≥ 210  →  W ≥ 1520
@@ -1130,16 +1132,14 @@ body.layout-ai-tools #main {
     background: none;
     box-shadow: none;
   }
-  /* 190px 的窄栏放不下一句话说明和 tagline，只留排名 + 名字 */
-  .aitools-hot-note,
-  .aitools-hot-line { display: none; }
+  /* 190px 的窄栏放不下那句排序说明，只留标题 + 排名 + 名字 */
+  .aitools-hot-note { display: none; }
   .aitools-hot-head { margin-bottom: .45rem; }
   /* 名字折行规则已在基础样式里设置（flex-shrink:1 + min-width:0 + white-space:normal），
      这里就不重复了。 */
 }
 
 @media (max-width: 640px) {
-  .aitools-hot-line { display: none; }
   /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
      收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
   .aitools-hot-body { width: min(200px, calc(100vw - 24px)); }
@@ -1166,6 +1166,9 @@ body.layout-ai-tools #main {
   0%, 35% { background: var(--accent-soft); }
   100%    { background: var(--bg); }
 }
+
+/* 非「按日期」排序时的平铺容器。卡片本身有 margin-bottom，这里不用再加间距。 */
+.aitools-flat { margin-bottom: 1rem; }
 
 /* 每一期做成一条时间线：左侧小圆点 + 向下渐隐的竖线。
    纯文字的日期标题在长列表里很容易被扫过去，加了轴之后「一天 = 一段」的层次才立得住。
@@ -1811,6 +1814,39 @@ a.cve-hof:hover {
   background: none; border: 0; border-radius: 50%; cursor: pointer;
 }
 .aitools-search-clear:hover { background: var(--border); color: var(--text); }
+
+/* 排序控件。放在搜索框下面、分类 chip 上面 —— 排序和筛选是两类操作，
+   挤在一行会让人以为是同一组按钮。 */
+.aitools-sort {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-bottom: .7rem;
+}
+.aitools-sort-icon { color: var(--text-muted); flex-shrink: 0; }
+.aitools-sort-label {
+  font-size: .8125rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.aitools-sort-select {
+  font: inherit;
+  font-size: .8125rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .3rem .5rem;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.aitools-sort-select:hover { border-color: var(--accent); }
+.aitools-sort-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47, 125, 149, .12);
+}
 
 .aitools-filters { display: flex; flex-wrap: wrap; gap: .45rem; }
 .aitools-chip {
