@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里";
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790690690924" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790690690924" />
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790690690924" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="公众号二维码">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="公众号二维码">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="公众号二维码" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/luan1ao-agent-banner.png)">
+    <h1 class="post-title">LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-29">
+        <span class="i18n-zh">2026年9月29日</span>
+        <span class="i18n-en">Sep 29, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 23 分钟</span><span class="i18n-en">23 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/luan1ao-agent/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <blockquote>
+<p>1.3k star 的自主渗透智能体 v2：Planner-Executor-Observer 三角色 + 任务&#x2F;推理&#x2F;操作三张图，把 Evidence → Hypothesis → Vulnerability → Exploit 变成可追溯的结构化链路。TypeScript + Pi SDK 完全重写，AGPL-3.0。</p>
+</blockquote>
+<blockquote>
+<p><strong>免责声明</strong></p>
+<ul>
+<li>本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</li>
+<li>文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</li>
+<li>本文仅从技术角度做分析与推荐，不构成任何操作建议。</li>
+</ul>
+</blockquote>
+<h2 id="一、速览：值不值得你花时间"><a href="#一、速览：值不值得你花时间" class="headerlink" title="一、速览：值不值得你花时间"></a>一、速览：值不值得你花时间</h2><p><strong>推荐指数：★★★★☆（4 &#x2F; 5）</strong></p>
+<p>给到这个分数的理由：它是我见过的<strong>对「Agent 到底凭什么下结论」这件事最较真</strong>的开源渗透项目。绝大多数自主渗透工具的推理过程只存在于模型的上下文里 —— 跑完你就拿到一份报告，中间那一步「为什么认为这里有洞」是黑盒，不可复核、不可回放。LuaN1ao v2 反过来，它要求<strong>每一条被确认的 Vulnerability 节点和每一条成功的 Exploit 节点，都必须携带 evidence 引用，否则不许写入</strong>。它把「证据」从一句口号变成了 schema 层面的硬约束。</p>
+<p>再往下看，它还做对了一件更难的事：<strong>规划不是线性清单，而是一张依赖图</strong>。新证据进来时不是推翻重排整个计划，而是 patch 受影响的那几个节点和边。这让长任务不会因为中途一个新发现就全局洗牌。</p>
+<p>扣掉的一颗星在四个地方，而且都不轻：<strong>AGPL-3.0</strong>（传染性很强，企业法务会卡）；<strong>Node.js 25+</strong>（因为它用了内置 <code>node:sqlite</code>，这个门槛把大部分现成环境挡在门外）；<strong>v2 的 benchmark 还没发布</strong> —— README 明确写了 v1 的成绩不自动归给 v2，而 v1 正是拿过腾讯比赛名次的那版，所以目前你看到的战绩属于旧实现；以及 <strong>human approval gates（高危动作人工审批）还挂在 Roadmap 里没做</strong>，也就是说现阶段它真的会自己往下打。</p>
+<h3 id="关键数据（截至-2026-09-29）"><a href="#关键数据（截至-2026-09-29）" class="headerlink" title="关键数据（截至 2026-09-29）"></a>关键数据（截至 2026-09-29）</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>语言</td>
+<td><strong>TypeScript</strong>（Pi SDK 运行时）</td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td><strong>1,316</strong> &#x2F; 187</td>
+</tr>
+<tr>
+<td>提交 &#x2F; Open Issues</td>
+<td>151 &#x2F; <strong>4</strong></td>
+</tr>
+<tr>
+<td>许可证</td>
+<td><strong>AGPL-3.0</strong></td>
+</tr>
+<tr>
+<td>首次提交</td>
+<td>2025-12-04（约 10 个月）</td>
+</tr>
+<tr>
+<td>最近提交</td>
+<td>2026-09-15（14 天前）</td>
+</tr>
+<tr>
+<td>运行时要求</td>
+<td><strong>Node.js 25+</strong>（依赖内置 <code>node:sqlite</code>）、Docker 推荐</td>
+</tr>
+<tr>
+<td>模型接入</td>
+<td>OpenAI-compatible（Chat Completions 默认，Responses API 可选）</td>
+</tr>
+<tr>
+<td>官方标签</td>
+<td>agents、autonomous-agents、causal-graphs、penetration-testing、pi-sdk、plan-execute-reflect</td>
+</tr>
+</tbody></table>
+<h3 id="适合谁"><a href="#适合谁" class="headerlink" title="适合谁"></a>适合谁</h3><table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>红队 &#x2F; 渗透测试工程师</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>证据链可回放、scope 强约束、Docker 出网收口都很对味；报告能直接拿去复核</td>
+</tr>
+<tr>
+<td>安全研究员（做 Agent 架构）</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>P-E-O 职责边界 + 三图分离是目前少见的清晰设计，值得抄</td>
+</tr>
+<tr>
+<td>企业安全运营</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td>能力够，但 AGPL-3.0 和无审批闸门这两条，短期内进不了生产流程</td>
+</tr>
+<tr>
+<td>开发者（想接 CI）</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td><code>--jsonl</code> 有输出，但定位是交互式长任务，不是流水线门禁</td>
+</tr>
+<tr>
+<td>个人 &#x2F; 学习者</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>Node 25 + Docker + 镜像构建三道门槛，外加执行器能跑 shell，环境风险不小</td>
+</tr>
+</tbody></table>
+<h3 id="二次开发"><a href="#二次开发" class="headerlink" title="二次开发"></a>二次开发</h3><table>
+<thead>
+<tr>
+<th>难度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改配置</td>
+<td><strong>低</strong> —— <code>.env</code> 配 <code>LLM_API_KEY</code> &#x2F; <code>LLM_API_BASE_URL</code> &#x2F; <code>LLM_DEFAULT_MODEL</code>，CLI 传 <code>--goal</code> <code>--scope</code> <code>--max-cycles</code> 即可</td>
+</tr>
+<tr>
+<td>改集成</td>
+<td><strong>中</strong> —— 有 <code>--jsonl</code> 事件流（最后一条 <code>type: &quot;result&quot;</code>）、<code>web-server.ts</code>、<code>React</code> Web workbench，接外部系统有抓手</td>
+</tr>
+<tr>
+<td>改内核</td>
+<td><strong>高</strong> —— 三图持久化 + P-E-O 契约 + 8 条 Runtime invariants 互相咬合，动一处要顾全局</td>
+</tr>
+</tbody></table>
+<h2 id="二、它是什么，不是什么"><a href="#二、它是什么，不是什么" class="headerlink" title="二、它是什么，不是什么"></a>二、它是什么，不是什么</h2><p>先把边界划清楚，不然很容易把它当成错的东西期待：</p>
+<ul>
+<li><strong>不是</strong>一个漏洞扫描器。它不套 CVE 规则库去匹配版本，也没有「扫描→出列表」这种固定流水线。</li>
+<li><strong>不是</strong>一个报告生成器。报告是推理图的投影结果，不是目标本身。</li>
+<li><strong>不是</strong> v1 的原地重构。README 用 IMPORTANT 明确标了：v2 是<strong>新实现</strong>，配置、持久化、Agent 生命周期、可观测性契约全都换了。Python v1 还留在 <code>v1</code> 分支和 <code>v1.0.0</code> release 上。</li>
+<li><strong>不是</strong>一个「给你一个 Agent 让它自由发挥」的框架。它恰恰是把自由圈进边界里 —— 谁改任务图、谁选工具、谁投影事实，写死在 Runtime invariants 里。</li>
+</ul>
+<p>它的自我定位在 Introduction 里写得很直白（意译）：<strong>每一条重要结论都必须能追溯到持久化的 event、artifact 和 graph evidence</strong>。整篇 README 其实都在论证这一句。</p>
+<p>提炼三个关键词：<strong>graph-based cognitive reasoning</strong>（图驱动的认知推理）、<strong>explicit agent boundaries</strong>（显式 Agent 边界）、<strong>evidence-backed memory</strong>（有证据支撑的记忆）。</p>
+<h2 id="三、P-E-O：三个角色，各管一段，谁也不越界"><a href="#三、P-E-O：三个角色，各管一段，谁也不越界" class="headerlink" title="三、P-E-O：三个角色，各管一段，谁也不越界"></a>三、P-E-O：三个角色，各管一段，谁也不越界</h2><p>v2 把 v1 的 P-E-R（Planner &#x2F; Executor &#x2F; Reflector）换成了 <strong>P-E-O</strong>，最关键的差别是 <strong>Reflector 那个「共享历史的反思循环」被拆成了两个独立模式</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>管什么</th>
+<th>提交方式</th>
+<th>明确不管什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Planner</strong></td>
+<td>目标、scope、依赖、任务预算、图级调度</td>
+<td><code>planner_submit</code></td>
+<td>不规定具体动作</td>
+</tr>
+<tr>
+<td><strong>Executor</strong></td>
+<td>在一个 <code>TaskEnvelope</code> 边界内自主决定工具策略</td>
+<td><code>task_result_submit</code></td>
+<td>不改任务拓扑</td>
+</tr>
+<tr>
+<td><strong>Observer · Supervisor</strong></td>
+<td>热路径控制：继续 &#x2F; 检查点 &#x2F; 停止 &#x2F; 交回 Planner</td>
+<td><code>control_submit</code></td>
+<td>不投影语义图事实</td>
+</tr>
+<tr>
+<td><strong>Observer · Projector</strong></td>
+<td>异步把观测转成推理图 &#x2F; 操作图的 delta</td>
+<td><code>graph_delta_submit</code></td>
+<td>不改任务节点</td>
+</tr>
+</tbody></table>
+<p>几个我很欣赏的设计细节：</p>
+<p><strong>1）每个 Agent 调用都有显式的终止工具契约。</strong> Planner 必须以 <code>planner_submit</code> 结束，Executor 以 <code>task_result_submit</code> 结束。这把「Agent 跑到一半不知道该输出什么」这类不确定性变成了 schema 校验问题。</p>
+<p><strong>2）Observer 的两种模式各自用全新的 Pi session，不共享隐藏的模型历史。</strong> 这一条很关键 —— 监督者如果和执行者共享上下文，它就会「理解」执行者的思路，从而更容易放过错误。切断历史让它只能基于<strong>规范化后的观测</strong>做判断。</p>
+<p><strong>3）Planner 不等待整个并行波次结束再调度。</strong> 它读的是紧凑的 task &#x2F; reasoning &#x2F; operation 图视图，图一变就 reconcile ready tasks 和可用容量。这让并发调度是<strong>增量</strong>的而不是批量的。</p>
+<p><strong>4）大输出不进模型上下文，落成内容寻址的 artifact。</strong> Executor 把超过阈值的工具输出写成不可变 artifact，只把引用和预览传给模型。这直接缓解了长任务里 context 爆炸的问题。</p>
+<h3 id="Plan-on-Graph：改计划是-patch，不是-regenerate"><a href="#Plan-on-Graph：改计划是-patch，不是-regenerate" class="headerlink" title="Plan-on-Graph：改计划是 patch，不是 regenerate"></a>Plan-on-Graph：改计划是 patch，不是 regenerate</h3><p>这是我觉得最值得单独拎出来讲的一点。对比表（README 原文）：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>线性任务清单</th>
+<th>LuaN1ao 的 PoG</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>计划结构</td>
+<td>有序步骤</td>
+<td>依赖图</td>
+</tr>
+<tr>
+<td>适应方式</td>
+<td>重新生成整个计划</td>
+<td>patch 受影响的节点和边</td>
+</tr>
+<tr>
+<td>调度</td>
+<td>手工排序</td>
+<td>依赖感知的 admitted waves</td>
+</tr>
+<tr>
+<td>可追溯性</td>
+<td>自然语言历史</td>
+<td>结构化命令 + 持久化事件</td>
+</tr>
+</tbody></table>
+<p>Planner 的「规划语言」是五个结构化图操作：<code>create_tasks</code>、<code>patch_task</code>、<code>replace_dependencies</code>、<code>set_task_status</code>、<code>set_node_status</code>。每条 Planner 命令都要带 reason，并且可以引用它所依据的图节点或事件。</p>
+<p><strong>任务和动作是分离的</strong>：目标、任务、里程碑、blocker、scope 活在 Task Graph 里；底层的工具动作留在 append-only 的 ExecutionLog 里。这个分层让「计划」和「执行痕迹」不会互相污染。</p>
+<h2 id="四、三图架构与因果推理链"><a href="#四、三图架构与因果推理链" class="headerlink" title="四、三图架构与因果推理链"></a>四、三图架构与因果推理链</h2><p>v2 持久化的是<strong>三张图</strong>，外加一条 append-only 事件账本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">flowchart LR</span><br><span class="line">    Evidence[Evidence] --&gt;|supports / contradicts| Hypothesis[Hypothesis]</span><br><span class="line">    Hypothesis --&gt;|confirms| Vulnerability[Vulnerability]</span><br><span class="line">    Vulnerability --&gt;|exploited by| Exploit[Exploit]</span><br><span class="line">    Evidence -. observed on .-&gt; Endpoint[WebEndpoint / Service]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Task Graph</strong>：目标、任务、依赖、里程碑、blocker、scope。Planner 的地盘。</li>
+<li><strong>Reasoning Graph</strong>：Evidence &#x2F; Hypothesis &#x2F; Vulnerability &#x2F; Exploit 的因果链。Projector 的地盘。</li>
+<li><strong>Operation Graph</strong>：WebEndpoint、Service 这类具体实体。推理图通过 cross-graph context 链接到它。</li>
+<li><strong>ExecutionLog</strong>：append-only 的执行事件账本，是上述一切的输入源。</li>
+</ul>
+<p>因果链的四个约束（这是本文开头说的「硬约束」的具体化）：</p>
+<ol>
+<li><strong>Evidence first</strong> —— 推理节点和边必须保留支撑它的事件引用。</li>
+<li><strong>Explicit uncertainty</strong> —— hypothesis 和 confirmed vulnerability、successful exploit 是<strong>不同的节点类型</strong>，不允许混为一谈。</li>
+<li><strong>Enforced provenance</strong> —— 确认的 Vulnerability 节点和成功的 Exploit 节点<strong>没有 evidence 引用就写不进去</strong>。</li>
+<li><strong>Asynchronous projection</strong> —— Projector 用有界的 observation batch 异步转图，<strong>不阻塞 Executor 的循环</strong>。</li>
+</ol>
+<p>第 3 条是整个项目的立意所在。绝大多数「AI 渗透工具」的问题不是模型不够聪明，而是<strong>它说有洞的时候你没法验证它为什么说有洞</strong>。当 schema 强制要求 evidence 引用时，你就把「幻觉成漏洞」这条路径在数据结构层面堵掉了一大半 —— 剩下的那一半，靠的是复核者愿意不愿意去看那条 evidence。</p>
+<h3 id="Runtime-invariants（8-条，改代码前先读）"><a href="#Runtime-invariants（8-条，改代码前先读）" class="headerlink" title="Runtime invariants（8 条，改代码前先读）"></a>Runtime invariants（8 条，改代码前先读）</h3><p>README 把这 8 条单独列出来，我认为是作者最想让人看见的部分：</p>
+<ul>
+<li>Planner 独占任务图决策；Executor 绝不改任务拓扑</li>
+<li>Executor 在 <code>TaskEnvelope</code> 边界内独占底层动作选择</li>
+<li>Supervisor 只管是否继续，不投影语义图事实</li>
+<li>Projector 只写推理图 &#x2F; 操作图，不改任务节点</li>
+<li>每次 Agent 调用都有显式终止工具契约</li>
+<li>Projector 的 desired &#x2F; committed watermark 单调</li>
+<li>图变更与已提交的投影 watermark 是原子的</li>
+<li>持久化的 event 与 artifact 是可观测性的唯一真相来源</li>
+</ul>
+<h2 id="五、沙箱与出网收口"><a href="#五、沙箱与出网收口" class="headerlink" title="五、沙箱与出网收口"></a>五、沙箱与出网收口</h2><p>这一节是它和「玩具项目」的分水岭。</p>
+<p><strong>Docker 是每个 Task 一个 Executor，跑在私有内部网络上。</strong> Executor 和它的 Gateway 处在<strong>不同的 network namespace</strong>，而 Gateway 是该任务网络的<strong>唯一出口</strong>。HTTP&#x2F;HTTPS 在任何 TCP 端口上被透明捕获，其他 TCP 原样中继。</p>
+<p>权限上做得也干净：</p>
+<ul>
+<li>Executor 容器以 <strong>UID 1000、零 capability、只读根文件系统</strong>运行，<code>/tmp</code> 限大小，只有 <code>/workspace</code> 持久且主机可见。</li>
+<li>Gateway 容器先 drop 所有 capability，再只加 <code>NET_ADMIN</code> &#x2F; <code>SETUID</code> &#x2F; <code>SETGID</code>；PID 1 配好 TUN 和策略路由后启动 Go Gateway 进程，<strong>该进程随后清空自己的 capability bounding set</strong>。</li>
+<li>没有 Docker 时，macOS 走 Seatbelt、Linux 走 Bubblewrap，<code>workspace</code> 是显式的开发兜底。</li>
+<li><strong>Executor workspace 之外的主机路径在强制沙箱模式下 fail closed。</strong></li>
+</ul>
+<p><strong>Scope 是网络授权根，不是提示词。</strong> <code>--scope</code> 接受逗号分隔的 IPv4 &#x2F; CIDR &#x2F; 精确域名 &#x2F; 前导通配域名。裸 IP 归一成 <code>/32</code>。省略 <code>--scope</code> 时 Planner 只从 <code>--goal</code> 里抽取<strong>明确出现</strong>的 IPv4 和 CIDR，<strong>确定性校验会拒绝臆造或放宽的网段</strong>；域名 scope 必须显式给。如果 goal 里没有任何显式 IPv4 目标，启动直接失败并要求你补 <code>--scope</code>。</p>
+<p>这一点我认为比其他同类项目都严谨：<strong>scope 不是写在 system prompt 里求模型别越界，而是写进 Gateway 的策略里，越界在内核态就被拒。</strong> 域名 scope 还有一层：Gateway 会过滤 DNS 查询，把返回的 IPv4 加进该任务本地、会过期的 kernel set 再放行响应；域-derived 的 UDP&#x2F;ICMP 只能访问经由该 Gateway 受控 DNS 学到的地址。</p>
+<h3 id="会话目录结构"><a href="#会话目录结构" class="headerlink" title="会话目录结构"></a>会话目录结构</h3><p>每次 CLI 调用都会建一个隔离 session（<code>.agent-runtime/sessions/&lt;session&gt;/</code>）：</p>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>state.sqlite</code></td>
+<td>三图、执行事件、projector watermark、artifact、运行时状态</td>
+</tr>
+<tr>
+<td><code>execution.jsonl</code></td>
+<td>规范化执行事件的 append-only 审计镜像</td>
+</tr>
+<tr>
+<td><code>graph-deltas.jsonl</code></td>
+<td>可回放的图 delta 镜像</td>
+</tr>
+<tr>
+<td><code>artifacts/</code></td>
+<td>大输出与跨任务持久产物</td>
+</tr>
+<tr>
+<td><code>sandboxes/</code></td>
+<td>每个 Task 的持久 workspace + host-only Pi session 根</td>
+</tr>
+<tr>
+<td><code>executor-sessions/</code></td>
+<td>同一 Task 跨 epoch 的 Pi session lineage</td>
+</tr>
+<tr>
+<td><code>traffic/</code></td>
+<td>分段的 <code>.mitm</code> 流量、<code>.net.jsonl</code> 遥测、公开 CA、route&#x2F;index 元数据</td>
+</tr>
+<tr>
+<td><code>web-auth.sqlite</code></td>
+<td>Web workbench 的本地用户与会话</td>
+</tr>
+</tbody></table>
+<h2 id="六、部署与上手"><a href="#六、部署与上手" class="headerlink" title="六、部署与上手"></a>六、部署与上手</h2><h3 id="环境硬门槛"><a href="#环境硬门槛" class="headerlink" title="环境硬门槛"></a>环境硬门槛</h3><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>要求</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>操作系统</td>
+<td>macOS 或 Linux</td>
+<td><strong>Windows 未作为 v2 发布目标验证</strong></td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td><strong>25+</strong></td>
+<td>必须支持内置 <code>node:sqlite</code></td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>推荐</td>
+<td>Linux 上当前用户要能连 daemon（rootless Docker 或 <code>sudo usermod -aG docker $USER</code> 后重登录），否则回退到宿主机原生后端</td>
+</tr>
+<tr>
+<td>LLM API</td>
+<td>OpenAI-compatible</td>
+<td>Chat Completions 默认</td>
+</tr>
+<tr>
+<td>终端</td>
+<td>支持 ANSI 的 TTY</td>
+<td>交互式 timeline 需要</td>
+</tr>
+<tr>
+<td>浏览器</td>
+<td>当前 Chromium &#x2F; Firefox &#x2F; Safari</td>
+<td>带认证的 Web workbench 需要</td>
+</tr>
+</tbody></table>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/SanMuzZzZz/LuaN1aoAgent.git</span><br><span class="line"><span class="built_in">cd</span> LuaN1aoAgent</span><br><span class="line">npm ci</span><br><span class="line">npm run build</span><br><span class="line"></span><br><span class="line"><span class="comment"># Docker 后端需要这两个镜像；./install.sh 会自动构建</span></span><br><span class="line">npm run build:executor-image</span><br><span class="line">npm run build:network-image</span><br></pre></td></tr></table></figure>
+
+<p>配置 <code>.env</code>（该文件被 Git 忽略，<strong>切勿提交</strong>）：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">LLM_API_KEY</span>=your-api-key</span><br><span class="line"><span class="attr">LLM_API_BASE_URL</span>=https://api.openai.com/v1</span><br><span class="line"><span class="attr">LLM_DEFAULT_MODEL</span>=your-model-id</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选：openai-completions 或 openai-responses</span></span><br><span class="line"><span class="attr">LLM_API_TYPE</span>=openai-completions</span><br></pre></td></tr></table></figure>
+
+<h3 id="跑一次"><a href="#跑一次" class="headerlink" title="跑一次"></a>跑一次</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">npm start -- \</span><br><span class="line">  --goal <span class="string">&quot;评估授权目标 10.0.0.10&quot;</span> \</span><br><span class="line">  --scope <span class="string">&quot;10.0.0.0/24,11.0.0.0/24&quot;</span> \</span><br><span class="line">  --max-cycles 8 \</span><br><span class="line">  --max-parallel-tasks 2</span><br></pre></td></tr></table></figure>
+
+<p>主要 CLI 参数：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">--goal &lt;text&gt;                Agent 目标</span><br><span class="line">--scope &lt;entries&gt;            授权的 IPv4 / CIDR / 域名（如 baidu.com,*.baidu.com）</span><br><span class="line">--proxy &lt;socks5-url&gt;         把 scope 内的 Agent TCP 透明走 SOCKS5</span><br><span class="line">--runtime-dir &lt;path&gt;         新运行时的空目录</span><br><span class="line">--resume &lt;session&gt;           恢复某个 runtime（自动带出 Goal 和 Scope）</span><br><span class="line">--max-cycles &lt;number&gt;        无进展时 Planner 的最大连续轮次</span><br><span class="line">--max-parallel-tasks &lt;n&gt;     最大并发任务数</span><br><span class="line">--max-run-time-ms &lt;number&gt;   全局运行超时（毫秒）</span><br><span class="line">--json                       关闭 TUI，最后打印 JSON</span><br><span class="line">--jsonl                      以 JSON Lines 流式输出持久事件</span><br><span class="line">--no-tui                     关闭交互式 TUI</span><br></pre></td></tr></table></figure>
+
+<p><strong><code>--resume</code> 不要带 <code>--goal</code> 或 <code>--scope</code></strong> —— 它会恢复原会话的 Goal 和 Scope，重复传反而会覆盖授权范围，这是个容易踩的安全坑。</p>
+<p><strong>机器可读输出</strong>：最后一条 JSONL 记录是 <code>type: &quot;result&quot;</code>，之前全是 <code>type: &quot;event&quot;</code>。接外部系统用这个。</p>
+<p><strong>LLM 之外的两个可选 key</strong>：<code>BRAVE_SEARCH_API_KEY</code>（<code>web_search</code>，没 key 时退化为 HTML 搜索兜底）、<code>NVD_API_KEY</code>（<code>vulnerability_search</code> 提速率，非必需）。</p>
+<h2 id="七、边界与风险（必须诚实说的部分）"><a href="#七、边界与风险（必须诚实说的部分）" class="headerlink" title="七、边界与风险（必须诚实说的部分）"></a>七、边界与风险（必须诚实说的部分）</h2><p><strong>1）AGPL-3.0 是最现实的一道坎。</strong> 不是 MIT &#x2F; Apache 那种「拿去用」，网络服务化部署也触发源码披露义务。企业里真要用，法务这一关大概率过不去。个人研究、教学、授权红队自用没问题。</p>
+<p><strong>2）v2 的 benchmark 还没有。</strong> README 用 NOTE 明确写了：v1 报告的成绩<strong>不自动归给 v2</strong>，v2 的成绩要等「在冻结 release 上可复现重跑」之后才发布。而你在 README 顶部看到的腾讯比赛 badge 属于 v1 时代。<strong>现阶段没有公开的 v2 横向评测数据</strong>，想评估效果只能自己搭环境跑。</p>
+<p><strong>3）高危动作没有人工审批闸门。</strong> Roadmap 里 <code>Human approval gates for high-risk actions</code> 还是未勾选状态。也就是说当前版本下，Executor 在 scope 内决定打就打了。<strong>实践建议：只在完全隔离的靶场 &#x2F; 一次性 VM 里跑，别接任何生产流量的网络。</strong></p>
+<p><strong>4）Node.js 25+ 的门槛比看起来高。</strong> 因为它依赖内置 <code>node:sqlite</code>，这不是「装个新版本」就行 —— 很多团队的 CI 镜像、内网镜像源根本没 25.x。而且 v2 是 2025-12 才起步的新实现，<strong>生产环境验证样本很少</strong>。</p>
+<p><strong>5）Docker 在 Linux 上的权限是个隐性风险。</strong> 文档建议 <code>sudo usermod -aG docker $USER</code>，而 docker 组等价于 root。如果你的机器上有别的东西，这一步的副作用要自己评估；不装就只能用 Seatbelt &#x2F; Bubblewrap 兜底，出网收口能力会打折。</p>
+<p><strong>6）Roadmap 未完成项还有几个关键的</strong>：稳定的 v2 扩展 API、打包好的容器运行时与部署 profile、可复现的公开 benchmark、跨运行的能力记忆。<strong>扩展工具目前没有稳定 API</strong>，想加自己的工具要等或自己啃内部接口。</p>
+<p><strong>7）Open Issues 只有 4 个，这未必是「很稳定」。</strong> 项目 10 个月、v2 是重写、用户基数还小，issue 少更可能反映的是<strong>用的人还不够多</strong>，而不是质量已经收敛。</p>
+<h2 id="八、上手建议（按这个顺序来）"><a href="#八、上手建议（按这个顺序来）" class="headerlink" title="八、上手建议（按这个顺序来）"></a>八、上手建议（按这个顺序来）</h2><ol>
+<li><strong>先在一次性 VM 或容器里装。</strong> 执行器能跑 shell 命令，README 自己的 WARNING 就写了要用隔离主机。别在你的日常开发机上跑第一次。</li>
+<li><strong>先把 Docker 后端跑通再谈别的。</strong> <code>npm run build:executor-image</code> + <code>npm run build:network-image</code> 这两个镜像是出网收口和沙箱的基础，跳过它等于把最重要的安全机制关掉。</li>
+<li><strong>第一次跑把 scope 收到最小。</strong> 用 <code>/32</code> 单 IP 而不是 <code>/24</code>，确认 Gateway 确实拦住了越界访问（看 <code>traffic/</code> 下的 <code>.net.jsonl</code> 遥测）再放大。</li>
+<li><strong>用 <code>--max-cycles 3 --max-parallel-tasks 1</code> 起步。</strong> 先看清 Planner 怎么建图、Executor 怎么用工具、Projector 怎么投影，再谈并发。交互式 TUI 的 <code>Tab</code> &#x2F; <code>Shift+Tab</code> 可以在「全部任务」和「单任务」之间切换，看得很清楚。</li>
+<li><strong>重点看 Reasoning Graph，不看最终报告。</strong> 这个项目的价值在过程而不在产物。Web workbench 里把 Evidence → Hypothesis → Vulnerability → Exploit 这条链走一遍，你会立刻明白它和别的工具差在哪。</li>
+<li><strong>想接自动化就走 <code>--jsonl</code></strong>，最后一条 <code>type: &quot;result&quot;</code> 是终态。但别指望它当 CI 门禁 —— 定位和耗时都是长任务那一类。</li>
+<li><strong>评估「能不能用」之前先确认你要的是 v1 还是 v2。</strong> 要现成战绩看 <code>v1</code> 分支；要新架构看 <code>main</code>。别混。</li>
+</ol>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>如果你关心的是「AI 下的每一个渗透结论能不能被复核」，LuaN1ao v2 是开源里把这件事做到 schema 层面的少数作品，值得认真读一遍它的 Runtime invariants；但如果你要的是「今天装上去、明天出报告」，它还差 v2 benchmark、审批闸门和一条不那么劝退的许可证。</strong></p>
+<p>给红队和研究者的第一动作：<strong>在隔离 VM 里跑通 Docker 后端，用 &#x2F;32 单 IP scope 做一次 <code>--max-cycles 3</code> 的短跑，然后去 Web workbench 里把那条因果链从头走到尾。</strong> 那一步看完，你就知道它对你的价值有多大了。</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/luan1ao-agent/">https://we5ter.github.io/ai-tools/luan1ao-agent/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/luan1ao-agent/&text=LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/luan1ao-agent/&title=LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/luan1ao-agent/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/luan1ao-agent/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/luan1ao-agent/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/luan1ao-agent/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <span class="post-nav-placeholder"></span>
+  
+  
+  <a class="post-nav-next" href="/en/ai-tools/luan1ao-agent/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
