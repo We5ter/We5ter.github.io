@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790694074853" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790694074853" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790694632275" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790694632275" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790694074853" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790694632275" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -280,7 +280,7 @@
         <span class="i18n-en">Sep 29, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 44 分钟</span><span class="i18n-en">44 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 43 分钟</span><span class="i18n-en">43 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -326,14 +326,6 @@
   <section class="post-content">
     <blockquote>
 <p>The v2 of a 1.3k-star autonomous pentest agent: Planner-Executor-Observer roles + task &#x2F; reasoning &#x2F; operation graphs, turning Evidence → Hypothesis → Vulnerability → Exploit into a traceable structured chain. Rewritten entirely in TypeScript on the Pi SDK. AGPL-3.0.</p>
-</blockquote>
-<blockquote>
-<p><strong>Disclaimer</strong></p>
-<ul>
-<li>This article is AI-generated; the content may be wrong or outdated — verify against official sources.</li>
-<li>The tools and techniques discussed may only be used on your own systems or in security tests with explicit authorization. Do not use them for unauthorized or illegal testing.</li>
-<li>This is a technical analysis and recommendation only, not operational advice.</li>
-</ul>
 </blockquote>
 <h2 id="1-At-a-Glance-Is-It-Worth-Your-Time"><a href="#1-At-a-Glance-Is-It-Worth-Your-Time" class="headerlink" title="1. At a Glance: Is It Worth Your Time"></a>1. At a Glance: Is It Worth Your Time</h2><p><strong>Rating: ★★★★☆ (4 &#x2F; 5)</strong></p>
 <p>Why this score: it is the open-source pentest project I have seen that takes <strong>“what exactly entitles an agent to a conclusion”</strong> the most seriously. In most autonomous pentest tools, the reasoning lives only in the model’s context — the run ends, you get a report, and the step “why is there a hole here” remains a black box that cannot be reviewed or replayed. LuaN1ao v2 inverts that: <strong>every confirmed Vulnerability node and every successful Exploit node must carry an evidence reference, or it cannot be written at all</strong>. It turns “evidence” from a slogan into a schema-level hard constraint.</p>
