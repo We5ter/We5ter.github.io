@@ -1131,6 +1131,322 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
 .aitools-foot { margin-top: 1.5rem; font-size: .8125rem; color: var(--text-muted); }
 .aitools-empty { color: var(--text-muted); }
 
+/* ---- 首屏数字带 ----
+   期数 / star 总量 / 分类数 / 更新节奏，一眼交代这个专栏的积累。
+   刻意不用渐变大字：全站是浅色学术风，数字带只做「密度」不做「炫技」，
+   否则会跟下面的正文卡片割裂。左边框沿用 accent，和卡片语言一致。 */
+.aitools-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 1.25rem;
+  padding: .7rem .4rem .7rem 1rem;
+  background: linear-gradient(180deg, #fcfdfe 0%, var(--bg-soft) 100%);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.aitools-stat {
+  display: flex;
+  flex-direction: column;
+  gap: .05rem;
+  padding: 0 1.15rem;
+  border-left: 1px solid var(--border);
+}
+.aitools-stat:first-child { padding-left: 0; border-left: 0; }
+.aitools-stat-v {
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.aitools-stat-k { font-size: .75rem; line-height: 1.4; color: var(--text-muted); }
+/* 「今日已更新 / 今晚 21:30 更新」指示灯。靠右，跟数字之间留 auto 间距。 */
+.aitools-live {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-left: auto;
+  padding: .25rem .7rem;
+  background: var(--accent-soft);
+  border: 1px solid #d6e9ef;
+  border-radius: 999px;
+  font-size: .75rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.aitools-live-dot {
+  width: .4rem;
+  height: .4rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+/* 今天已经发过了才亮绿 + 呼吸；还没到点就是静态蓝，不制造「在动」的错觉 */
+.aitools-live.is-on {
+  background: #e8f8f2;
+  border-color: #c3ecdf;
+  color: #0a7d61;
+}
+.aitools-live.is-on .aitools-live-dot {
+  background: #06d6a0;
+  animation: aitools-live-pulse 2.4s ease-out infinite;
+}
+@keyframes aitools-live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(6, 214, 160, .55); }
+  70%  { box-shadow: 0 0 0 .45rem rgba(6, 214, 160, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
+}
+
+/* ---- 卡片：整张可点开抽屉 ---- */
+.aitools-item {
+  position: relative;
+  /* 右侧留出箭头位，避免 chevron 压到徽章/分类标签上；常驻留白，hover 不产生位移抖动 */
+  padding-right: 2.1rem;
+  cursor: pointer;
+}
+.aitools-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* hover / 键盘聚焦时才露出右向箭头：卡片能点开这件事要有暗示，
+   但常驻会跟「详细分析 →」打架，所以只在交互态出现。 */
+.aitools-item::after {
+  content: '';
+  position: absolute;
+  top: 1.1rem;
+  right: .85rem;
+  width: .42rem;
+  height: .42rem;
+  border-top: 1.5px solid var(--text-muted);
+  border-right: 1.5px solid var(--text-muted);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.aitools-item:hover::after,
+.aitools-item:focus-visible::after { opacity: .6; }
+/* 卡片上的 note 收到 3 行，长列表才扫得动；全文在抽屉里（那里放开截断） */
+.aitools-item .aitools-note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* ---- 详情抽屉 ----
+   右侧滑出，内容从卡片克隆（见 ai-tools.ejs）。
+   z-index 要盖过 masthead（100），所以从 200 起。
+   顶边按分类色描一条，跟卡片左边框同源。 */
+.aitools-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(8, 20, 28, .42);
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+.aitools-scrim.is-open { opacity: 1; }
+.aitools-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100vw);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  border-top: 3px solid var(--cat, var(--accent));
+  box-shadow: -18px 0 48px rgba(0, 0, 0, .16);
+  transform: translateX(102%);
+  transition: transform .24s cubic-bezier(.22, .61, .36, 1);
+}
+.aitools-drawer.is-open { transform: none; }
+/* display 是作者样式，会盖掉 [hidden] 的 UA 规则，必须显式补回来 */
+.aitools-drawer[hidden],
+.aitools-scrim[hidden],
+.aitools-toast[hidden],
+.aitools-drawer-btn[hidden] { display: none; }
+
+.aitools-drawer-head {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: 1rem 1.1rem .85rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.aitools-drawer-headtxt { min-width: 0; flex: 1 1 auto; }
+.aitools-drawer-meta {
+  display: block;
+  margin-bottom: .25rem;
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+/* 克隆过来的分类徽章在 meta 行里是 inline，转成 inline-block 底色才铺得满 */
+.aitools-drawer-meta .aitools-cat { display: inline-block; vertical-align: baseline; }
+.aitools-drawer-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.aitools-drawer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-top: .5rem;
+}
+.aitools-drawer-badges:empty { display: none; }
+.aitools-drawer-badges .aitools-badge { align-self: center; }
+.aitools-drawer-close {
+  flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-drawer-close:hover { background: var(--border); color: var(--text); }
+.aitools-drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1rem 1.1rem 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+.aitools-drawer-body .aitools-tagline {
+  margin: 0 0 .9rem;
+  font-size: 1rem;
+}
+/* 抽屉里放开卡片上的 3 行截断，这里才是看全文的地方 */
+.aitools-drawer-body .aitools-note {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+  margin: 0;
+  font-size: .9375rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+.aitools-drawer-sub {
+  margin: 0 0 .4rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cat, var(--accent));
+}
+.aitools-drawer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  padding: .8rem 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.aitools-drawer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .4rem .8rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.aitools-drawer-btn:hover {
+  background: #d6e6ea;
+  border-color: var(--cat, var(--accent));
+  color: var(--accent);
+  text-decoration: none;
+}
+.aitools-drawer-btn-main {
+  background: var(--cat, var(--accent));
+  border-color: var(--cat, var(--accent));
+  color: #fff;
+  font-weight: 600;
+}
+.aitools-drawer-btn-main:hover { background: var(--cat, var(--accent)); color: #fff; filter: brightness(1.08); }
+.aitools-drawer-nav {
+  display: flex;
+  gap: .45rem;
+  padding: 0 1.1rem .9rem;
+  flex-shrink: 0;
+}
+.aitools-drawer-step {
+  flex: 1 1 0;
+  padding: .4rem .5rem;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
+}
+.aitools-drawer-step:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); border-style: solid; }
+.aitools-drawer-step:disabled { opacity: .35; cursor: default; }
+body.aitools-drawer-open { overflow: hidden; }
+
+/* 复制反馈。role=status + aria-live 让读屏也念得出来。 */
+.aitools-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 210;
+  margin: 0;
+  padding: .45rem .95rem;
+  background: #22252a;
+  border-radius: 999px;
+  font-size: .8125rem;
+  color: #fff;
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+}
+.aitools-toast.is-on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 640px) {
+  /* 四格数字带在窄屏改成两列网格，指示灯独占一行靠右 */
+  .aitools-stats { padding: .7rem .9rem; }
+  .aitools-stat {
+    flex: 1 1 40%;
+    padding: .35rem 0 .35rem .9rem;
+    border-left: 1px solid var(--border);
+  }
+  .aitools-stat:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .aitools-stat-v { font-size: 1.125rem; }
+  /* 指示灯换行后靠右，不拉成整条 —— 整条绿底在手机上太抢眼 */
+  .aitools-live { margin: .55rem 0 0 auto; }
+  .aitools-item::after { right: .7rem; }
+  .aitools-drawer { width: 100vw; border-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aitools-live.is-on .aitools-live-dot { animation: none; }
+  .aitools-drawer,
+  .aitools-scrim,
+  .aitools-toast { transition: none; }
+  .aitools-item::after { transition: none; }
+}
+
 /* ---- 侧边栏小组件：最新 AI 工具推荐 ----
    做成有底色有边框的卡片，跟下面素净的社交链接拉开层次，一眼能看到。
    分隔线用 accent 的浅色版（#d6e9ef），不能用 --border（灰线压在浅蓝底上发脏）。 */
@@ -1176,7 +1492,9 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
 }
 .sw-more { font-size: .8125rem; }
 @media (max-width: 640px) {
-  .aitools-item { padding: .75rem .8rem; }
+  /* 右侧 1.7rem 留给抽屉箭头的常驻位（这条 shorthand 在文件里更靠后，
+     会把上面 .aitools-item 的 padding-right 一起盖掉，所以四个方向都写全） */
+  .aitools-item { padding: .75rem 1.7rem .75rem .8rem; }
   .aitools-head { gap: .35rem; }
 }
 
