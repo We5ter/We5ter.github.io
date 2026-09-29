@@ -1,73 +1,81 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMid slice">
   <defs>
     <linearGradient id="ai-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#123c4a"/>
-      <stop offset="48%" stop-color="#2f7d95"/>
-      <stop offset="100%" stop-color="#5aa9c0"/>
+      <stop offset="0%" stop-color="#0a1e28"/>
+      <stop offset="55%" stop-color="#123c4a"/>
+      <stop offset="100%" stop-color="#0d2f3c"/>
     </linearGradient>
-    <radialGradient id="ai-glow" cx="76%" cy="16%" r="62%">
-      <stop offset="0%" stop-color="#a8e6f5" stop-opacity="0.38"/>
-      <stop offset="100%" stop-color="#a8e6f5" stop-opacity="0"/>
+    <radialGradient id="ai-core" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a8e6f5" stop-opacity="0.5"/>
+      <stop offset="45%" stop-color="#59c2d8" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#59c2d8" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="ai-dots" width="30" height="30" patternUnits="userSpaceOnUse">
-      <circle cx="1.6" cy="1.6" r="1.6" fill="#ffffff" fill-opacity="0.11"/>
+    <!-- 字符雨：每列自上而下渐亮，列尾「头字符」最亮 -->
+    <linearGradient id="ai-rain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8ff2ff" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#8ff2ff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e8fdff" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="ai-horizon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#59c2d8" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#8ff2ff" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#59c2d8" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="ai-scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="1" fill="#8ff2ff" fill-opacity="0.05"/>
     </pattern>
-    <linearGradient id="ai-line" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
-      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="ai-blade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.66"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.3"/>
-    </linearGradient>
   </defs>
 
   <rect width="1600" height="420" fill="url(#ai-bg)"/>
-  <rect width="1600" height="420" fill="url(#ai-dots)"/>
-  <rect width="1600" height="420" fill="url(#ai-glow)"/>
+  <rect width="1600" height="420" fill="url(#ai-scan)"/>
 
-  <g fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="1.4">
-    <circle cx="1320" cy="300" r="120"/>
-    <circle cx="1320" cy="300" r="196"/>
-    <circle cx="1320" cy="300" r="272"/>
+  <!-- 透视网格：消失点 (1180,300)，竖线向它收敛、横线间距向下放大 -->
+  <g stroke="#59c2d8" stroke-opacity="0.16" stroke-width="1.2" fill="none">
+    <path d="M1180 300 L-420 420"/>
+    <path d="M1180 300 L-120 420"/>
+    <path d="M1180 300 L180 420"/>
+    <path d="M1180 300 L480 420"/>
+    <path d="M1180 300 L780 420"/>
+    <path d="M1180 300 L1000 420"/>
+    <path d="M1180 300 L1360 420"/>
+    <path d="M1180 300 L1580 420"/>
+    <path d="M1180 300 L1880 420"/>
+    <path d="M1180 300 L2180 420"/>
+    <path d="M0 308 H1600"/>
+    <path d="M0 320 H1600"/>
+    <path d="M0 338 H1600"/>
+    <path d="M0 362 H1600"/>
+    <path d="M0 394 H1600"/>
   </g>
-  <g stroke="url(#ai-line)" stroke-width="1.2">
-    <path d="M0 340 H1600"/>
-    <path d="M0 372 H1600"/>
+  <rect x="0" y="299" width="1600" height="2" fill="url(#ai-horizon)"/>
+
+  <!-- 能量核：光晕 + 同心环 + 断弧，HUD 感 -->
+  <circle cx="1180" cy="232" r="150" fill="url(#ai-core)"/>
+  <g fill="none" stroke="#8ff2ff">
+    <circle cx="1180" cy="232" r="46" stroke-width="1.6" stroke-opacity="0.4"/>
+    <circle cx="1180" cy="232" r="78" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="30 14"/>
+    <circle cx="1180" cy="232" r="112" stroke-width="1.2" stroke-opacity="0.12" stroke-dasharray="6 10"/>
+    <path d="M1180 154 A78 78 0 0 1 1258 232" stroke-width="2.4" stroke-opacity="0.55"/>
+  </g>
+  <circle cx="1180" cy="232" r="5" fill="#e8fdff" fill-opacity="0.9"/>
+
+  <!-- 矩阵字符雨：等宽字形逐列下落，左半留白给标题文字。
+       tspan 用兄弟结构（各自带 x/dy），嵌套写法容易数错闭合标签。 -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17"
+     fill="url(#ai-rain)" text-anchor="middle">
+    <text x="952" y="96"><tspan x="952">0</tspan><tspan x="952" dy="24">1</tspan><tspan x="952" dy="24">ア</tspan><tspan x="952" dy="24">7</tspan><tspan x="952" dy="24">0</tspan><tspan x="952" dy="24">F</tspan><tspan x="952" dy="24">1</tspan></text>
+    <text x="1022" y="60"><tspan x="1022">1</tspan><tspan x="1022" dy="24">サ</tspan><tspan x="1022" dy="24">0</tspan><tspan x="1022" dy="24">0</tspan><tspan x="1022" dy="24">C</tspan><tspan x="1022" dy="24">1</tspan><tspan x="1022" dy="24">4</tspan><tspan x="1022" dy="24">0</tspan></text>
+    <text x="1092" y="120"><tspan x="1092">F</tspan><tspan x="1092" dy="24">0</tspan><tspan x="1092" dy="24">1</tspan><tspan x="1092" dy="24">カ</tspan><tspan x="1092" dy="24">0</tspan><tspan x="1092" dy="24">1</tspan></text>
+    <text x="1300" y="72"><tspan x="1300">0</tspan><tspan x="1300" dy="24">1</tspan><tspan x="1300" dy="24">テ</tspan><tspan x="1300" dy="24">0</tspan><tspan x="1300" dy="24">9</tspan><tspan x="1300" dy="24">1</tspan><tspan x="1300" dy="24">0</tspan></text>
+    <text x="1372" y="108"><tspan x="1372">1</tspan><tspan x="1372" dy="24">0</tspan><tspan x="1372" dy="24">ナ</tspan><tspan x="1372" dy="24">F</tspan><tspan x="1372" dy="24">0</tspan><tspan x="1372" dy="24">1</tspan></text>
+    <text x="1444" y="56"><tspan x="1444">0</tspan><tspan x="1444" dy="24">E</tspan><tspan x="1444" dy="24">1</tspan><tspan x="1444" dy="24">0</tspan><tspan x="1444" dy="24">シ</tspan><tspan x="1444" dy="24">1</tspan><tspan x="1444" dy="24">0</tspan><tspan x="1444" dy="24">7</tspan></text>
+    <text x="1516" y="96"><tspan x="1516">1</tspan><tspan x="1516" dy="24">0</tspan><tspan x="1516" dy="24">0</tspan><tspan x="1516" dy="24">ハ</tspan><tspan x="1516" dy="24">1</tspan><tspan x="1516" dy="24">0</tspan></text>
   </g>
 
-  <!-- 纹章：交叉双剑 + 盾 + 武士兜。
-       cover 裁切后可见的是原图 y≈90~330 这条横带，元素全部落在该带内。 -->
-  <g>
-    <g transform="translate(1300 205) rotate(30)">
-      <path d="M-9 -12 L-9 -140 L0 -165 L9 -140 L9 -12 Z" fill="url(#ai-blade)"/>
-      <rect x="-30" y="-16" width="60" height="10" rx="3" fill="#ffffff" fill-opacity="0.5"/>
-      <rect x="-6" y="-8" width="12" height="60" rx="3" fill="#ffffff" fill-opacity="0.38"/>
-      <circle cx="0" cy="76" r="9" fill="#ffffff" fill-opacity="0.45"/>
-    </g>
-    <g transform="translate(1300 205) rotate(-30)">
-      <path d="M-9 -12 L-9 -140 L0 -165 L9 -140 L9 -12 Z" fill="url(#ai-blade)"/>
-      <rect x="-30" y="-16" width="60" height="10" rx="3" fill="#ffffff" fill-opacity="0.5"/>
-      <rect x="-6" y="-8" width="12" height="60" rx="3" fill="#ffffff" fill-opacity="0.38"/>
-      <circle cx="0" cy="76" r="9" fill="#ffffff" fill-opacity="0.45"/>
-    </g>
-
-    <!-- 盾 -->
-    <path d="M1200 100 H1400 V205 Q1300 330 1200 205 Z"
-          fill="#ffffff" fill-opacity="0.09"
-          stroke="#ffffff" stroke-opacity="0.55" stroke-width="3.5"/>
-
-    <!-- 盾内武士兜（正面）：兜钵 + 錣 + 前立 + 面颊当 -->
-    <g transform="translate(1300 172)"
-       fill="#ffffff" fill-opacity="0.46"
-       stroke="#ffffff" stroke-opacity="0.62" stroke-width="2.4">
-      <path d="M-44 6 C-44 -30 -25 -50 0 -50 C25 -50 44 -30 44 6 Z"/>
-      <path d="M-44 4 C-56 14 -60 30 -56 46 L-38 38 C-42 26 -42 14 -44 4 Z"/>
-      <path d="M44 4 C56 14 60 30 56 46 L38 38 C42 26 42 14 44 4 Z"/>
-      <path d="M-15 -48 L0 -76 L15 -48" fill="none" stroke-width="3"/>
-      <path d="M-30 14 L30 14 L24 52 L-24 52 Z" fill-opacity="0.4"/>
-      <path d="M-19 26 L-7 26 M7 26 L19 26" fill="none" stroke-width="2.6"/>
-    </g>
+  <!-- HUD 十字标记，点缀空旷处 -->
+  <g stroke="#8ff2ff" stroke-opacity="0.35" stroke-width="1.4">
+    <path d="M880 150 h14 M887 143 v14"/>
+    <path d="M1540 210 h14 M1547 203 v14"/>
+    <path d="M1240 90 h12 M1246 84 v12"/>
   </g>
 </svg>
