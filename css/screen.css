@@ -1140,6 +1140,24 @@ body.layout-ai-tools #main {
 
 @media (max-width: 640px) {
   .aitools-hot-line { display: none; }
+  /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
+     收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
+  .aitools-hot-body { width: min(200px, calc(100vw - 24px)); }
+  /* 时间线缩进同步收窄，别在小屏上白占 1.1rem */
+  .aitools-day { padding-left: .85rem; }
+}
+
+/* 尊重系统的「减少动态效果」：抬升、脉冲、闪烁定位全部关掉，
+   只保留颜色变化 —— 这些动画对前庭敏感的人是负担。 */
+@media (prefers-reduced-motion: reduce) {
+  .aitools-item,
+  .aitools-chip,
+  .aitools-search-input,
+  .aitools-search-icon,
+  .aitools-hot-toggle { transition: none; }
+  .aitools-item:hover { transform: none; }
+  .aitools-chip.is-pulse,
+  .aitools-item.is-hot-target { animation: none; }
 }
 
 /* 从榜单点进来时闪一下，告诉用户「就是这条」 */
@@ -1149,7 +1167,36 @@ body.layout-ai-tools #main {
   100%    { background: var(--bg); }
 }
 
-.aitools-day { margin-bottom: 1.5rem; }
+/* 每一期做成一条时间线：左侧小圆点 + 向下渐隐的竖线。
+   纯文字的日期标题在长列表里很容易被扫过去，加了轴之后「一天 = 一段」的层次才立得住。
+   渐变收尾（而不是实线到底）避免相邻两期之间出现断头线。 */
+.aitools-day {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1.1rem;
+}
+.aitools-day::before {
+  content: '';
+  position: absolute;
+  left: .18rem;
+  top: .6rem;
+  bottom: .25rem;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--border) 45%, transparent 100%);
+}
+.aitools-day::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .42rem;
+  width: .44rem;
+  height: .44rem;
+  border-radius: 50%;
+  background: var(--accent);
+  /* 描一圈底色，让圆点在竖线上「挖空」，视觉上更像节点而不是贴片 */
+  box-shadow: 0 0 0 3px var(--bg);
+}
 .aitools-date {
   display: flex;
   align-items: baseline;
@@ -1177,6 +1224,14 @@ body.layout-ai-tools #main {
      兜底走主题 accent —— 没配到色或未分类时仍能用。 */
   border-left: 3px solid var(--cat, var(--accent));
   border-radius: var(--radius);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+/* hover：轻微抬起 + 投影，边框跟分类色亮起来。
+   位移只给 2px —— 这是列表不是卡片画廊，抬多了会晃。 */
+.aitools-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .09);
+  border-color: var(--cat, var(--accent));
 }
 .aitools-head {
   display: flex;
@@ -1733,7 +1788,11 @@ a.cve-hof:hover {
 }
 .aitools-search-icon {
   position: absolute; left: .7rem; color: var(--text-muted); pointer-events: none;
+  transition: color .15s ease;
 }
+/* 聚焦时放大镜也跟着变品牌色 —— 输入框本身已经有 ring，
+   图标不变色的话聚焦态看着是「半个」。 */
+.aitools-search:focus-within .aitools-search-icon { color: var(--accent); }
 .aitools-search-input {
   width: 100%; padding: .55rem 2.2rem .55rem 2.2rem;
   font: inherit; font-size: .9375rem; color: var(--text);
@@ -1771,6 +1830,16 @@ a.cve-hof:hover {
 .aitools-chip.is-active {
   background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: #fff;
 }
+/* 点中分类时弹一下 + 扩散一圈分类色的光晕。
+   筛选是「点一下整页就变了」的操作，没有这个反馈容易以为没点中
+   （尤其是当前类本来就只有一两条、页面几乎没变化的时候）。
+   .is-pulse 由 JS 在点击时加、动画结束摘掉，重复点同一类也能重播。 */
+@keyframes aitools-chip-pop {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cat, var(--accent)) 65%, transparent); }
+  45%  { transform: scale(1.07); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 12px transparent; }
+}
+.aitools-chip.is-pulse { animation: aitools-chip-pop .45s ease-out; }
 .aitools-chip.is-active .aitools-chip-n {
   background: rgba(255,255,255,.22); color: #fff;
 }

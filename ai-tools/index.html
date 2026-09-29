@@ -64,8 +64,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790620098243" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790620098243" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790644870846" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790644870846" />
 
   
   
@@ -76,7 +76,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790620098243" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790644870846" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -1135,6 +1135,14 @@
     function setCat(c, el) {
       cat = c;
       chips.forEach(function (x) { x.classList.toggle('is-active', x === el); });
+      // 点中的分类弹一下，给「筛选生效了」一个明确反馈。
+      // 先摘类 + 强制重排，这样连点同一个分类动画也会重播。
+      if (el) {
+        el.classList.remove('is-pulse');
+        void el.offsetWidth;
+        el.classList.add('is-pulse');
+        setTimeout(function () { el.classList.remove('is-pulse'); }, 500);
+      }
       apply();
     }
 
