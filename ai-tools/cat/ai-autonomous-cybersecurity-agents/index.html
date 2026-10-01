@@ -44,6 +44,11 @@
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       var pageTitle = "AI 自主网络安全智能体";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -64,8 +69,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790703796798" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790703796798" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790824646121" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790824646121" />
 
   
   
@@ -76,7 +81,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790703796798" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790824646121" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -238,10 +243,40 @@
     <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
   </h1>
   <p class="section-sub">
-    <span class="i18n-zh">共 5 个工具 · 专栏每天 14:00（北京）更新一期</span>
-    <span class="i18n-en">5 tools · one new issue daily at 14:00 GMT+8</span>
+    <span class="i18n-zh">共 6 个工具 · 专栏每天 14:00（北京）更新一期</span>
+    <span class="i18n-en">6 tools · one new issue daily at 14:00 GMT+8</span>
   </p>
 
+  
+  
+  <article class="aitools-item" style="--cat: #F72585">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/dark-moon/">Dark-Moon</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/dark-moon/">Dark-Moon</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/ASCIT31/Dark-Moon?style=flat-square&label=stars&cacheSeconds=3600&color=F72585" alt="Dark-Moon GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 010 期 · 2026.9.30</span>
+        <span class="i18n-en">No. 10 · Sep 30, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">把真实 IP / 主机 / URL / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台</span>
+      <span class="i18n-en">Real IPs, hosts, URLs and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">Privacy Gateway 的可逆本地 tokenization 在主流程里而非插件位，占位符确定性所以模型仍能做关联推理；Docker Compose 全栈、可全本地模型跑。短板：GPL-3.0、Pro 版存在感过强、57 漏洞 benchmark 是云端 Claude 跑的、社区样本小。</span>
+      <span class="i18n-en">The Privacy Gateway&#39;s reversible local tokenization sits in the main flow rather than a plugin slot, and deterministic placeholders let the model still correlate. Docker Compose full stack, runs fully on local models. Caveats: GPL-3.0, heavy Pro-tier presence, the 57-vuln benchmark was run on cloud Claude, small community sample.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/ASCIT31/Dark-Moon" target="_blank" rel="noopener">https://github.com/ASCIT31/Dark-Moon</a>
+  </article>
   
   
   <article class="aitools-item" style="--cat: #F72585">
@@ -433,6 +468,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "Dark-Moon",
+        "description": "把真实 IP / 主机 / URL / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台",
+        "url": "https://github.com/ASCIT31/Dark-Moon",
+        "datePublished": "2026-09-30",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "LuaN1ao",
         "description": "把每条渗透结论钉回证据链：P-E-O 三角色 + 三图分离 + Evidence→Hypothesis→Vulnerability→Exploit 因果链",
         "url": "https://github.com/SanMuzZzZz/LuaN1aoAgent",
@@ -444,7 +493,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "PentAGI",
@@ -458,7 +507,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Cairn",
@@ -472,7 +521,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 5,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Shannon",
@@ -486,7 +535,7 @@
     
     {
       "@type": "ListItem",
-      "position": 5,
+      "position": 6,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",

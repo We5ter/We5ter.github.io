@@ -44,6 +44,15 @@
         zh: { title: "西风微雨 - Wester's blog", desc: "Scanners-Box 每日 AI 工具推荐：收录 AI 自主安全智能体、LLM 驱动漏洞扫描器、AI 智能体运行时管控、Agent Skills 安全审计等开源安全工具，支持分类筛选、按日期/热度/GitHub star 排序与全文搜索。", kw: "AI工具搜索, AI安全工具搜索, AI安全工具矩阵, AI安全工具目录, AI安全工具推荐, AI安全工具导航, AI安全开源工具, 开源网络安全工具导航, AI渗透测试工具, AI红队工具, LLM安全工具, 大模型安全工具, AI智能体安全, Agent安全工具, AI漏洞扫描器, AI代码审计工具, 自动化渗透测试, 自主安全智能体, 网络安全工具大全, AI安全工具排行榜, Scanners-Box, 每日AI工具推荐" }
       };
       var pageTitle = "Scanners-Box 每日 AI 工具推荐";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      pageTitle = '';
+      SEO.en.title = "Scanners-Box Daily AI Tool Picks｜The Ultimate Open-Source Security Arsenal for Hackers, Enterprises, and AI Agents";
+      SEO.zh.title = "Scanners-Box 每日 AI 工具推荐 | 面向极客、企业与 AI 智能体的全域开源网络安全工具矩阵";
+      
       var cur = SEO[lang];
       document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
       var metaDesc = document.querySelector('meta[name="description"]');
@@ -55,7 +64,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>Scanners-Box 每日 AI 工具推荐 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <title>Scanners-Box Daily AI Tool Picks｜The Ultimate Open-Source Security Arsenal for Hackers, Enterprises, and AI Agents</title>
   <meta name="description" content="Scanners-Box daily AI tool picks: a curated directory of open-source AI security tools — autonomous security agents, LLM-powered vulnerability scanners, AI agent runtime controls and agent-skill auditing. Filter by category, sort by date, trending or GitHub stars." />
   <meta name="keywords" content="AI tools directory, AI security tools, AI security tools directory, AI security tools matrix, AI tools search, open source security tools, security tools arsenal, AI pentesting tools, AI red team tools, LLM security tools, AI agent security, agent security tools, autonomous security agents, AI vulnerability scanner, AI code audit tools, automated penetration testing, bug bounty AI tools, cyber security tools list, AI security tool ranking, Scanners-Box, daily AI tool picks" />
   <meta name="HandheldFriendly" content="True" />
@@ -64,8 +73,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790703796654" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790703796654" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790824645845" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790824645845" />
 
   
   
@@ -76,7 +85,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790703796654" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790824645845" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -241,14 +250,14 @@
   
   <div class="aitools-stats">
     <div class="aitools-stat">
-      <span class="aitools-stat-v">009</span>
+      <span class="aitools-stat-v">010</span>
       <span class="aitools-stat-k">
         <span class="i18n-zh">累计期数</span><span class="i18n-en">Issues</span>
       </span>
     </div>
     <div class="aitools-stat">
       <span class="aitools-stat-v">
-        <span class="i18n-zh">10.8万</span><span class="i18n-en">108.3k</span>
+        <span class="i18n-zh">10.9万</span><span class="i18n-en">109.3k</span>
       </span>
       <span class="aitools-stat-k">
         <span class="i18n-zh">收录项目 star 总量</span><span class="i18n-en">Total GitHub stars</span>
@@ -269,7 +278,7 @@
     
     <span class="aitools-live">
       <span class="aitools-live-dot" aria-hidden="true"></span>
-      <span class="i18n-zh">今日 14:00 更新第 010 期</span><span class="i18n-en">No. 10 drops at 14:00 GMT+8</span>
+      <span class="i18n-zh">今日 14:00 更新第 011 期</span><span class="i18n-en">No. 11 drops at 14:00 GMT+8</span>
     </span>
     
   </div>
@@ -339,13 +348,13 @@
     <div class="aitools-filters" role="group" aria-label="Filter by category">
       <button type="button" class="aitools-chip is-active" data-cat="" style="--cat: var(--accent)">
         <span class="i18n-zh">全部</span><span class="i18n-en">All</span>
-        <span class="aitools-chip-n">9</span>
+        <span class="aitools-chip-n">10</span>
       </button>
       
         
         <button type="button" class="aitools-chip" data-cat="AI Autonomous Cybersecurity Agents" style="--cat: #F72585">
           <span class="i18n-zh">AI 自主网络安全智能体</span><span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
-          <span class="aitools-chip-n">5</span>
+          <span class="aitools-chip-n">6</span>
         </button>
       
         
@@ -388,6 +397,78 @@
 
   
 
+  
+    
+    <div class="aitools-day">
+      <h2 class="aitools-date">
+        <span class="aitools-issue">
+          <span class="i18n-zh">第 010 期</span>
+          <span class="i18n-en">No. 10</span>
+        </span>
+        <time datetime="2026-09-30">
+          <span class="i18n-zh">2026.9.30 <span class="aitools-week">周三</span></span>
+          <span class="i18n-en">Sep 30, 2026</span>
+        </time>
+      </h2>
+
+      
+      
+      
+      <article class="aitools-item aitools-item--link" id="tool-20260930-dark-moon"
+               data-cat="AI Autonomous Cybersecurity Agents" data-search="dark-moon 把真实 ip / 主机 / url / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台 real ips, hosts, urls and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools privacy gateway 的可逆本地 tokenization 在主流程里而非插件位，占位符确定性所以模型仍能做关联推理；docker compose 全栈、可全本地模型跑。短板：gpl-3.0、pro 版存在感过强、57 漏洞 benchmark 是云端 claude 跑的、社区样本小。 the privacy gateway&#39;s reversible local tokenization sits in the main flow rather than a plugin slot, and deterministic placeholders let the model still correlate. docker compose full stack, runs fully on local models. caveats: gpl-3.0, heavy pro-tier presence, the 57-vuln benchmark was run on cloud claude, small community sample."
+               data-srank="10"
+               data-issue="10" data-date="2026-09-30"
+               data-url="https://github.com/ASCIT31/Dark-Moon"
+               data-post-zh="/ai-tools/dark-moon/" data-post-en="/en/ai-tools/dark-moon/" style="--cat: #F72585">
+        <div class="aitools-head">
+          <a class="i18n-zh aitools-name" href="/ai-tools/dark-moon/">Dark-Moon</a>
+          <a class="i18n-en aitools-name" href="/en/ai-tools/dark-moon/">Dark-Moon</a>
+          
+          
+          <img class="aitools-badge" src="https://img.shields.io/github/stars/ASCIT31/Dark-Moon?style=flat-square&label=stars&cacheSeconds=3600&color=F72585"
+               alt="Dark-Moon GitHub stars"
+               height="16" loading="lazy" decoding="async"
+               onerror="this.style.display='none'">
+          
+          
+          
+          
+          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 自主网络安全智能体</span>
+            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          </a>
+          
+          
+        </div>
+
+        <p class="aitools-tagline">
+          <span class="i18n-zh">把真实 IP / 主机 / URL / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台</span>
+          <span class="i18n-en">Real IPs, hosts, URLs and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools</span>
+        </p>
+
+        
+        <div class="aitools-note">
+          <span class="i18n-zh">Privacy Gateway 的可逆本地 tokenization 在主流程里而非插件位，占位符确定性所以模型仍能做关联推理；Docker Compose 全栈、可全本地模型跑。短板：GPL-3.0、Pro 版存在感过强、57 漏洞 benchmark 是云端 Claude 跑的、社区样本小。</span>
+          <span class="i18n-en">The Privacy Gateway&#39;s reversible local tokenization sits in the main flow rather than a plugin slot, and deterministic placeholders let the model still correlate. Docker Compose full stack, runs fully on local models. Caveats: GPL-3.0, heavy Pro-tier presence, the 57-vuln benchmark was run on cloud Claude, small community sample.</span>
+        </div>
+        
+
+        <a class="aitools-link" href="https://github.com/ASCIT31/Dark-Moon" target="_blank" rel="noopener">https://github.com/ASCIT31/Dark-Moon</a>
+
+        
+        
+        <a class="i18n-zh aitools-more" href="/ai-tools/dark-moon/">
+          <span class="i18n-zh">详细分析</span> →
+        </a>
+        
+        
+        <a class="i18n-en aitools-more" href="/en/ai-tools/dark-moon/">
+          <span class="i18n-en">Deep dive</span> →
+        </a>
+        
+      </article>
+      
+    </div>
   
     
     <div class="aitools-day">
@@ -1171,6 +1252,20 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
+        "name": "Dark-Moon",
+        "description": "把真实 IP / 主机 / URL / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台",
+        "url": "https://github.com/ASCIT31/Dark-Moon",
+        "datePublished": "2026-09-30",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "SoftwareApplication",
         "name": "LuaN1ao",
         "description": "把每条渗透结论钉回证据链：P-E-O 三角色 + 三图分离 + Evidence→Hypothesis→Vulnerability→Exploit 因果链",
         "url": "https://github.com/SanMuzZzZz/LuaN1aoAgent",
@@ -1182,7 +1277,7 @@
     
     {
       "@type": "ListItem",
-      "position": 2,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Agent Governance Toolkit",
@@ -1196,7 +1291,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "AgentShield",
@@ -1210,7 +1305,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 5,
       "item": {
         "@type": "SoftwareApplication",
         "name": "AI-Infra-Guard",
@@ -1224,7 +1319,7 @@
     
     {
       "@type": "ListItem",
-      "position": 5,
+      "position": 6,
       "item": {
         "@type": "SoftwareApplication",
         "name": "NVIDIA OpenShell",
@@ -1238,7 +1333,7 @@
     
     {
       "@type": "ListItem",
-      "position": 6,
+      "position": 7,
       "item": {
         "@type": "SoftwareApplication",
         "name": "PentAGI",
@@ -1252,7 +1347,7 @@
     
     {
       "@type": "ListItem",
-      "position": 7,
+      "position": 8,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Cairn",
@@ -1266,7 +1361,7 @@
     
     {
       "@type": "ListItem",
-      "position": 8,
+      "position": 9,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Shannon",
@@ -1280,7 +1375,7 @@
     
     {
       "@type": "ListItem",
-      "position": 9,
+      "position": 10,
       "item": {
         "@type": "SoftwareApplication",
         "name": "CyberStrikeAI",
