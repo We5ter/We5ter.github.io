@@ -1,0 +1,33 @@
+# Scanners-Box 每日 AI 工具推荐 (Scanners-Box Daily AI Tool Picks)
+
+> 面向极客、企业与 AI 智能体的全域开源网络安全工具矩阵：每天精选一个开源 AI 安全工具，附中英文深度点评、能力短板与适用边界。
+> The Ultimate Open-Source Security Arsenal for Hackers, Enterprises, and AI Agents: one curated open-source AI security tool per day, with in-depth bilingual notes, honest caveats and fitness boundaries.
+
+本文件为 AI/LLM 爬虫提供站点结构摘要。完整站点地图见 https://we5ter.github.io/sitemap.xml。
+This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https://we5ter.github.io/sitemap.xml.
+
+## 工具目录 / Directory
+
+- [每日 AI 工具推荐总览 / Daily AI Tool Picks index](https://we5ter.github.io/ai-tools/): 全部已发布期号，支持分类筛选、按日期/热度/GitHub star 排序与全文搜索。All published issues with category filters, date/trending/star sorting and full-text search.
+
+## 每日推荐 / Daily Picks
+
+- [011 deepsec](https://we5ter.github.io/ai-tools/deepsec/) (EN: https://we5ter.github.io/en/ai-tools/deepsec/): Vercel Labs 的 agent 驱动漏洞扫描器：不扫 diff、不扫增量，对存量大型仓库做一次全量深挖 · Vercel Labs' agent-driven vulnerability scanner: no diffs, no increments — one full-depth audit of an existing large codebase · 分类/Category: LLM-Powered Vulnerability Scanners · GitHub: https://github.com/vercel-labs/deepsec (8044 stars)
+- [010 Dark-Moon](https://we5ter.github.io/ai-tools/dark-moon/) (EN: https://we5ter.github.io/en/ai-tools/dark-moon/): 把真实 IP / 主机 / URL / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台 · Real IPs, hosts, URLs and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/ASCIT31/Dark-Moon (975 stars)
+- [009 LuaN1ao](https://we5ter.github.io/ai-tools/luan1ao-agent/) (EN: https://we5ter.github.io/en/ai-tools/luan1ao-agent/): 把每条渗透结论钉回证据链：P-E-O 三角色 + 三图分离 + Evidence→Hypothesis→Vulnerability→Exploit 因果链 · Pinning every pentest finding to evidence: Planner-Executor-Observer roles + three graph separations + an enforced Evidence → Hypothesis → Vulnerability → Exploit chain · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/SanMuzZzZz/LuaN1aoAgent (1316 stars)
+- [008 Agent Governance Toolkit](https://we5ter.github.io/ai-tools/agent-governance-toolkit/) (EN: https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/): 微软开源的 AI Agent 运行时管控套件：把「请 AI 守规矩」换成「让 AI 没法不守规矩」 · Microsoft's runtime governance suite for AI agents: from "asking AI to behave" to "making it structurally incapable of misbehaving" · 分类/Category: AI Agent Runtime Controls · GitHub: https://github.com/microsoft/agent-governance-toolkit (6352 stars)
+- [007 AgentShield](https://we5ter.github.io/ai-tools/agentshield/) (EN: https://we5ter.github.io/en/ai-tools/agentshield/): Claude Code 黑客松作品 / Everything Claude Code 生态：把 AI Agent 配置审计做成 0–100 分、可上 CI 的合规工具 · A Claude Code Hackathon project from the Everything Claude Code ecosystem: a 0–100 graded audit of AI agent configurations that drops into CI as a compliance gate · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/affaan-m/agentshield (1232 stars)
+- [006 AI-Infra-Guard](https://we5ter.github.io/ai-tools/ai-infra-guard/) (EN: https://we5ter.github.io/en/ai-tools/ai-infra-guard/): 腾讯朱雀实验室的全栈 AI 红队平台：五层能力覆盖 AI 基础设施 CVE、Agent 失控、MCP 供应链、Skill 后门与越狱评测 · A full-stack AI red teaming platform from Tencent Zhuque Lab: five capabilities spanning AI infrastructure CVEs, agent loss of control, the MCP supply chain, skill backdoors and jailbreak evaluation · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/Tencent/AI-Infra-Guard (6623 stars)
+- [005 NVIDIA OpenShell](https://we5ter.github.io/ai-tools/openshell-nvidia-agent-runtime/) (EN: https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/): 面向自主 AI Agent 的安全私有运行时：用声明式 YAML 策略在文件系统、网络、进程、凭证四个维度设界，凭证只在策略放行后注入授权端点 · A safe, private runtime for autonomous AI agents: declarative YAML policies enforce boundaries across filesystem, network, process and provider access, and credentials only flow into policy-admitted endpoints · 分类/Category: AI Agent Runtime Controls · GitHub: https://github.com/NVIDIA/OpenShell (9087 stars)
+- [004 PentAGI](https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/) (EN: https://we5ter.github.io/en/ai-tools/pentagi-autonomous-pentest-platform/): 全自主渗透平台：Docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞 · A fully autonomous pentesting platform: 20+ tools in a Docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/vxcontrol/pentagi (25071 stars)
+- [003 Cairn](https://we5ter.github.io/ai-tools/cairn-state-space-search/) (EN: https://we5ter.github.io/en/ai-tools/cairn-state-space-search/): 通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 Agent 在黑板上自己搜路 · A general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/oritera/Cairn (3124 stars)
+- [002 Shannon](https://we5ter.github.io/ai-tools/shannon-ai-pentester/) (EN: https://we5ter.github.io/en/ai-tools/shannon-ai-pentester/): AI 渗透测试 Agent：读源码找攻击面，再真打一遍验证，只有跑通 PoC 的漏洞才进报告 · An AI pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no PoC, no report. · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/KeygraphHQ/shannon (48455 stars)
+- [001 CyberStrikeAI](https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/) (EN: https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/): AI 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆 · An AI-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory. · 分类/Category: AI Autonomous Cybersecurity Agents · GitHub: https://github.com/AIPentest/CyberStrikeAI (7074 stars)
+
+## 分类归档 / Categories
+
+- [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
+- [AI Autonomous Cybersecurity Agents](https://we5ter.github.io/ai-tools/cat/ai-autonomous-cybersecurity-agents/)
+- [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
+- [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
+
