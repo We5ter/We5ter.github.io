@@ -69,8 +69,48 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790864382027" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790864382027" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790864931895" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790864931895" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/ai-tools/cairn-state-space-search/" />
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/cairn-state-space-search/" />
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/cairn-state-space-search/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/ai-tools/cairn-state-space-search/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Cairn 拆解：不定义角色、不写工作流，让 Agent 自己在状态空间里搜路 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="2.8k star 的通用状态空间搜索引擎：黑板架构 + 事实/意图图，零角色零工作流，在腾讯云黑客松 610 支队伍里唯一 AK（54/54）。AGPL-3.0。" />
+  <meta property="og:url" content="https://we5ter.github.io/ai-tools/cairn-state-space-search/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/cairn-banner.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cairn 拆解：不定义角色、不写工作流，让 Agent 自己在状态空间里搜路 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="2.8k star 的通用状态空间搜索引擎：黑板架构 + 事实/意图图，零角色零工作流，在腾讯云黑客松 610 支队伍里唯一 AK（54/54）。AGPL-3.0。" />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/cairn-banner.png" />
+  
+  <meta property="article:published_time" content="2026-09-20T03:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-09-20T03:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
 
   
   
@@ -81,7 +121,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790864382027" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790864931895" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -97,6 +137,9 @@
     
   </script>
   
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/cairn-state-space-search/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/cairn-state-space-search/"},"headline":"Cairn 拆解：不定义角色、不写工作流，让 Agent 自己在状态空间里搜路","name":"Cairn 拆解：不定义角色、不写工作流，让 Agent 自己在状态空间里搜路","description":"2.8k star 的通用状态空间搜索引擎：黑板架构 + 事实/意图图，零角色零工作流，在腾讯云黑客松 610 支队伍里唯一 AK（54/54）。AGPL-3.0。","image":"https://we5ter.github.io/images/banners/cairn-banner.png","inLanguage":"zh-CN","datePublished":"2026-09-20T03:00:00.000Z","dateModified":"2026-09-20T03:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
