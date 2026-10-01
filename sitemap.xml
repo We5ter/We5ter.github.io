@@ -24,13 +24,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
+    <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -102,26 +102,20 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/en/ai-tools/luan1ao-agent/</loc>
     <lastmod>2026-09-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/luan1ao-agent/</loc>
-    <lastmod>2026-09-29</lastmod>
+    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/luan1ao-agent/</loc>
+    <lastmod>2026-09-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -144,14 +138,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -170,6 +164,12 @@
   <url>
     <loc>https://we5ter.github.io/ai-tools/shannon-ai-pentester/</loc>
     <lastmod>2026-09-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
