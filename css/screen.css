@@ -1455,7 +1455,6 @@ body.aitools-drawer-open { overflow: hidden; }
 .aitools-views {
   display: inline-flex;
   vertical-align: middle;
-  margin-left: .5rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
@@ -1651,8 +1650,7 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   .aitools-item--link { padding-right: 1.7rem; }
   .aitools-item--link::after { right: .7rem; }
   .aitools-drawer { width: 100vw; border-left: 0; }
-  /* 视图控件换到排序下面独占一行，网格在手机上退化成单列 */
-  .aitools-views { margin: .5rem 0 0; }
+  /* 网格在手机上退化成单列 */
   .aitools-view-grid #aitools-flat { grid-template-columns: 1fr; }
   .aitools-view-board #aitools-flat .aitools-item { padding: .55rem .7rem; }
 }
@@ -2225,41 +2223,17 @@ a.cve-hof:hover {
 }
 .aitools-search-clear:hover { background: var(--border); color: var(--text); }
 
-/* 排序控件。放在搜索框下面、分类 chip 上面 —— 排序和筛选是两类操作，
-   挤在一行会让人以为是同一组按钮。 */
-.aitools-sort {
+/* 视图行：分段控件在左、订阅锚点被 margin-left:auto 顶到行尾 */
+.aitools-viewrow {
   display: flex;
   align-items: center;
-  gap: .4rem;
+  flex-wrap: wrap;
+  gap: .5rem;
   margin-bottom: .7rem;
 }
-.aitools-sort-icon { color: var(--text-muted); flex-shrink: 0; }
-.aitools-sort-label {
-  font-size: .8125rem;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.aitools-sort-select {
-  font: inherit;
-  font-size: .8125rem;
-  color: var(--text);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .3rem .5rem;
-  cursor: pointer;
-  transition: border-color .15s ease, box-shadow .15s ease;
-}
-.aitools-sort-select:hover { border-color: var(--accent); }
-.aitools-sort-select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(47, 125, 149, .12);
-}
 
-/* 工具条排序行右端的订阅入口：margin-left:auto 把它顶到行尾。
-   列表太长，底部订阅带多数人滚不到，这里给一颗随时能点的锚点。 */
+/* 视图行右端的订阅入口：列表太长，底部订阅带多数人滚不到，
+   这里给一颗随时能点的锚点。 */
 .aitools-jump {
   display: inline-flex;
   align-items: center;
