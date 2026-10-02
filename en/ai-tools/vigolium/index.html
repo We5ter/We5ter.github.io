@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1790922845438" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1790922845438" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/vigolium/" />
+  
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/vigolium/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/vigolium/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/en/ai-tools/vigolium/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host." />
+  <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/vigolium/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/vigolium-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/vigolium-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-10-02T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-02T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1790922845438" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/vigolium/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/vigolium/"},"headline":"Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on T","name":"Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top","description":"A 1k-star vulnerability scanner with two engines: **Native Scan** (208 active + 117 passive modules, OAST, value-aware mutation, multi-session IDOR/BOLA) as the foundation, **Agentic Scan** (built-in Go olium runtime, Autopilot / Swarm modes) on top. Its own SECURITY section admits it: agent mode runs with **no sandbox** — the LLM has full shell / file / network access on the host.","image":"https://we5ter.github.io/images/banners/vigolium-banner.jpg","inLanguage":"en","datePublished":"2026-10-02T06:00:00.000Z","dateModified":"2026-10-02T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="WeChat QR code">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="WeChat QR code">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="WeChat QR code" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/vigolium-banner.jpg)">
+    <h1 class="post-title">Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-10-02">
+        <span class="i18n-zh">2026年10月2日</span>
+        <span class="i18n-en">Oct 2, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 34 分钟</span><span class="i18n-en">34 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/vigolium/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="1-At-a-Glance-Is-It-Worth-Your-Time"><a href="#1-At-a-Glance-Is-It-Worth-Your-Time" class="headerlink" title="1. At a Glance: Is It Worth Your Time"></a>1. At a Glance: Is It Worth Your Time</h2><p><strong>Rating: ★★★☆☆ (3.5 &#x2F; 5)</strong></p>
+<p>Why it is worth a look first: among this batch of tools, it is <strong>the only one where both layers — “solid traditional scanner foundation + AI layer on top” — are actually built out</strong>. Many AI security tools start from an agent built from scratch with a thin capability layer underneath; Vigolium does the reverse — it first wrote a complete DAST engine in Go (324 modules, OAST out-of-band detection, value-aware parameter mutation, multi-stage pipeline, multi-session authentication), and then bolted AI on top. That gives the AI layer something real to drive, instead of just something to chat about.</p>
+<p>A few technical points I think are done well:</p>
+<ul>
+<li><strong>Value-aware mutation</strong>: instead of blindly stuffing payloads, it first classifies parameters by semantic type (integer &#x2F; UUID &#x2F; JWT &#x2F; email), then mutates according to intent. This directly raises the hit rate.</li>
+<li><strong>Automated OAST correlation</strong>: blind XSS &#x2F; SSRF &#x2F; command injection go through interactsh callbacks, with payloads correlated automatically.</li>
+<li><strong>Swarm mode writes its own JS attack extensions</strong>: master agent analyzes the input → selects modules → <strong>generates custom JS attack extensions</strong> → runs code audit and SAST → executes the scan → triages findings. This closed loop is rare in open source.</li>
+<li><strong>The agent runtime is a self-built Go package, <code>pkg/olium</code>, running in-process</strong> — no subprocess SDK pool.</li>
+</ul>
+<p>But the score is held down to 3.5 because several things are hard blockers: <strong>agent mode explicitly has no sandbox</strong> (the LLM has full shell &#x2F; file &#x2F; network access on the host — the project says so itself); <strong>extensions can run arbitrary commands</strong>; <strong>the license status is inconsistent</strong> (README says MIT, GitHub API detects NOASSERTION); and <strong>the author is @j3ssie with a project only 7 months old</strong>, so maturity still needs time to prove out.</p>
+<h3 id="Key-Data-as-of-2026-10-02"><a href="#Key-Data-as-of-2026-10-02" class="headerlink" title="Key Data (as of 2026-10-02)"></a>Key Data (as of 2026-10-02)</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Language</td>
+<td><strong>Go</strong></td>
+</tr>
+<tr>
+<td>Stars &#x2F; Forks</td>
+<td><strong>1,085</strong> &#x2F; 157</td>
+</tr>
+<tr>
+<td>Commits &#x2F; Open Issues</td>
+<td>118 &#x2F; <strong>4</strong></td>
+</tr>
+<tr>
+<td>License</td>
+<td>README claims <strong>MIT</strong>, but the GitHub API detects <strong>NOASSERTION</strong> (see Section 7)</td>
+</tr>
+<tr>
+<td>First commit</td>
+<td>2026-03-08 (~<strong>7 months</strong>)</td>
+</tr>
+<tr>
+<td>Last commit</td>
+<td>2026-09-24 (8 days ago)</td>
+</tr>
+<tr>
+<td>Scan modules</td>
+<td><strong>324</strong> (208 active fuzzing + 117 passive matching)</td>
+</tr>
+<tr>
+<td>Install options</td>
+<td>quick script &#x2F; npm (<code>@vigolium/vigolium</code>) &#x2F; Windows &#x2F; Docker &#x2F; source</td>
+</tr>
+<tr>
+<td>Author</td>
+<td><a target="_blank" rel="noopener" href="https://x.com/j3ssie">@j3ssie</a>; <a target="_blank" rel="noopener" href="https://github.com/theblackturtle">@theblackturtle</a> is an early core contributor</td>
+</tr>
+<tr>
+<td>Official site</td>
+<td><a target="_blank" rel="noopener" href="https://www.vigolium.com/">https://www.vigolium.com/</a></td>
+</tr>
+</tbody></table>
+<h3 id="Who-It’s-For"><a href="#Who-It’s-For" class="headerlink" title="Who It’s For"></a>Who It’s For</h3><table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Score</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Red team &#x2F; pentest engineers</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>324 modules + OAST + multi-session IDOR make a genuinely useful foundation; Burp &#x2F; Caido bridging available</td>
+</tr>
+<tr>
+<td>Bug bounty hunters</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>Rich input sources (URL &#x2F; OpenAPI &#x2F; Postman &#x2F; Burp &#x2F; cURL &#x2F; Nuclei JSONL), well suited to batch work</td>
+</tr>
+<tr>
+<td>Enterprise security operations</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>The “no sandbox for agents” fact keeps it out of production workflows for now</td>
+</tr>
+<tr>
+<td>DevSecOps engineers</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td>There is a server mode and a REST API, but CI gating is not its main scenario</td>
+</tr>
+<tr>
+<td>Individuals &#x2F; learners</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>Powerful but with a large risk surface, and the docs site is commercially oriented</td>
+</tr>
+</tbody></table>
+<h3 id="Building-on-It"><a href="#Building-on-It" class="headerlink" title="Building on It"></a>Building on It</h3><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Difficulty</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Configuration</td>
+<td><strong>Low</strong> — CLI flag coverage is thorough (<code>-m</code> to pick modules, <code>--strategy</code> presets, <code>--auth-file</code> login flows)</td>
+<td></td>
+</tr>
+<tr>
+<td>Integration</td>
+<td><strong>Low</strong> — server mode has a REST API + SSE + an OpenAI-compatible chat endpoint; official Burp &#x2F; Caido plugins</td>
+<td></td>
+</tr>
+<tr>
+<td>Kernel</td>
+<td><strong>Medium</strong> — the <strong>embedded JS engine</strong> lets you write custom modules and hooks <strong>without recompiling</strong>; full <code>make</code> dev commands and a HACKING.md exist</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-What-It-Is-What-It-Isn’t"><a href="#2-What-It-Is-What-It-Isn’t" class="headerlink" title="2. What It Is, What It Isn’t"></a>2. What It Is, What It Isn’t</h2><ul>
+<li><strong>Not</strong> a pure AI agent. Its base is a complete Go DAST engine; the AI is optional (Agentic Scan).</li>
+<li><strong>Not</strong> a Nuclei replacement. Nuclei is template-driven PoC matching; Vigolium has active fuzzing and a mutation engine.</li>
+<li><strong>Not</strong> SAST. It has <code>agent audit</code> for source-code auditing, but that is an add-on capability of the agentic layer — its main business is DAST.</li>
+<li><strong>Not</strong> a cloud SaaS (the open-source part, that is). The Cloud Console is a separate paid upgrade.</li>
+</ul>
+<p>Three keywords: <strong>dual-engine</strong> (native + agentic), <strong>value-aware mutation</strong>, <strong>in-process agent runtime</strong>.</p>
+<h2 id="3-Native-Scan-324-Modules-as-the-Foundation"><a href="#3-Native-Scan-324-Modules-as-the-Foundation" class="headerlink" title="3. Native Scan: 324 Modules as the Foundation"></a>3. Native Scan: 324 Modules as the Foundation</h2><p>This is where its value sits.</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>324 scan modules</strong></td>
+<td>208 active (fuzzing) + 117 passive (pattern matching), covering the OWASP Top 10 and beyond</td>
+</tr>
+<tr>
+<td><strong>OAST out-of-band detection</strong></td>
+<td>Blind XSS &#x2F; SSRF &#x2F; command injection via interactsh callbacks, with <strong>automatic payload correlation</strong></td>
+</tr>
+<tr>
+<td><strong>Value-aware mutation</strong></td>
+<td>Classifies parameters by semantic type (integer &#x2F; UUID &#x2F; JWT &#x2F; email), then mutates by intent</td>
+</tr>
+<tr>
+<td><strong>Multi-stage pipeline</strong></td>
+<td>External harvesting → content discovery (Deparos) → browser &#x2F; SPA crawling (Spitolas) → audit</td>
+</tr>
+<tr>
+<td><strong>Input sources</strong></td>
+<td>URL, OpenAPI&#x2F;Swagger, Postman, Burp Suite, cURL, Nuclei JSONL</td>
+</tr>
+<tr>
+<td><strong>Multi-session authentication</strong></td>
+<td>Inline sessions &#x2F; session files &#x2F; full auth configs (login flow + token extraction), <strong>used for IDOR&#x2F;BOLA and privilege-escalation checks</strong></td>
+</tr>
+<tr>
+<td><strong>JS extensions</strong></td>
+<td>Embedded JS engine for custom modules and hooks, with a session-aware HTTP API</td>
+</tr>
+<tr>
+<td><strong>Concurrency &amp; reporting</strong></td>
+<td>Worker pool + per-host rate limiting, mixed memory&#x2F;disk&#x2F;Redis queues, self-contained HTML reports</td>
+</tr>
+</tbody></table>
+<h3 id="Pipeline-Layers"><a href="#Pipeline-Layers" class="headerlink" title="Pipeline Layers"></a>Pipeline Layers</h3><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Content Discovery (Deparos)</strong></td>
+<td>Adaptive directory &#x2F; file enumeration with fingerprint-based soft-404 detection</td>
+</tr>
+<tr>
+<td><strong>Browser Spider (Spitolas)</strong></td>
+<td>Chromium-driven state-machine crawler, capturing traffic over CDP</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>Active &#x2F; passive vulnerability scanning, injection-point extraction + the DiffScan framework</td>
+</tr>
+<tr>
+<td><strong>Scanner Modules</strong></td>
+<td>208 active + 117 passive modules</td>
+</tr>
+</tbody></table>
+<p>The soft-404 detection deserves its own mention — the biggest noise source in directory brute-forcing is applications that “return 200 for everything”, and fingerprint-based soft-404 detection cuts false positives significantly.</p>
+<h3 id="Getting-Started-Commands"><a href="#Getting-Started-Commands" class="headerlink" title="Getting-Started Commands"></a>Getting-Started Commands</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># single target (default balanced strategy)</span></span><br><span class="line">vigolium scan -t https://example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># pick a strategy preset</span></span><br><span class="line">vigolium scan -t https://example.com --strategy deep</span><br><span class="line"></span><br><span class="line"><span class="comment"># run only selected modules</span></span><br><span class="line">vigolium scan -t https://example.com -m xss-reflected,sqli-error</span><br><span class="line"></span><br><span class="line"><span class="comment"># scan from an OpenAPI spec</span></span><br><span class="line">vigolium scan -T openapi.yaml -I openapi</span><br><span class="line"></span><br><span class="line"><span class="comment"># pipe URLs from stdin</span></span><br><span class="line"><span class="built_in">cat</span> urls.txt | vigolium scan</span><br><span class="line"></span><br><span class="line"><span class="comment"># run a single stage</span></span><br><span class="line">vigolium run discovery -t https://example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># produce an HTML report</span></span><br><span class="line">vigolium scan -t https://example.com --only discovery --format html -o report.html</span><br></pre></td></tr></table></figure>
+
+<h3 id="Authenticated-Scanning-the-Key-to-IDOR-BOLA"><a href="#Authenticated-Scanning-the-Key-to-IDOR-BOLA" class="headerlink" title="Authenticated Scanning (the Key to IDOR&#x2F;BOLA)"></a>Authenticated Scanning (the Key to IDOR&#x2F;BOLA)</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># inline multi-session (name:Header:value)</span></span><br><span class="line">vigolium scan -t https://example.com \</span><br><span class="line">  --auth <span class="string">&quot;admin:Cookie:session_id=abc123&quot;</span> \</span><br><span class="line">  --auth <span class="string">&quot;user:Cookie:session_id=xyz789&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># load sessions from a file</span></span><br><span class="line">vigolium scan -t https://example.com --auth-file ./admin-session.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment"># with an automated login flow + token extraction</span></span><br><span class="line">vigolium scan -t https://example.com --auth-file ./login-flow.yaml</span><br><span class="line"></span><br><span class="line"><span class="comment"># custom header</span></span><br><span class="line">vigolium scan -t https://example.com -H <span class="string">&quot;Authorization: Bearer token123&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Multiple sessions are the prerequisite for IDOR&#x2F;BOLA and broken-access-control checks</strong> — you request the same resource with two sessions of different privilege levels to tell whether an escalation exists. This capability is missing from many scanners.</p>
+<blockquote>
+<p>Note: <code>--auth</code> &#x2F; <code>--auth-file</code> used to be called <code>--session</code> &#x2F; <code>--session-file</code>; the old names still work as deprecated aliases.</p>
+</blockquote>
+<h2 id="4-Agentic-Scan-Two-Modes-One-Self-Built-Runtime"><a href="#4-Agentic-Scan-Two-Modes-One-Self-Built-Runtime" class="headerlink" title="4. Agentic Scan: Two Modes, One Self-Built Runtime"></a>4. Agentic Scan: Two Modes, One Self-Built Runtime</h2><p>All agent modes run on the <strong>native Go <code>pkg/olium</code> engine</strong>: a turn-based loop, a built-in tool registry, skills support, pluggable provider drivers — <strong>no subprocess SDK pool</strong>. That choice gives it better performance and controllability than “shelling out to an external CLI”.</p>
+<h3 id="Autopilot-vs-Swarm"><a href="#Autopilot-vs-Swarm" class="headerlink" title="Autopilot vs Swarm"></a>Autopilot vs Swarm</h3><table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Autopilot</strong></td>
+<td>The agent autonomously discovers endpoints, runs scans, and triages findings; optional multi-expert pipeline + session resumption</td>
+</tr>
+<tr>
+<td><strong>Swarm</strong></td>
+<td>Master agent analyzes the input → <strong>selects modules</strong> → <strong>generates custom JS attack extensions</strong> → runs code audit + SAST → executes the scan → triages results</td>
+</tr>
+<tr>
+<td><strong>Audit</strong></td>
+<td>Source-code audit with a unified dispatcher, running the embedded <code>vigolium-audit</code> (claude&#x2F;codex) and&#x2F;or <code>piolium</code> (Pi native)</td>
+</tr>
+<tr>
+<td><strong>Query</strong></td>
+<td>One-shot prompts for code review &#x2F; endpoint discovery &#x2F; sensitive-data detection</td>
+</tr>
+</tbody></table>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Autopilot</span></span><br><span class="line">vigolium agent autopilot -t https://example.com</span><br><span class="line">vigolium agent autopilot -t https://example.com --<span class="built_in">source</span> ./src --prompt <span class="string">&quot;focus on auth bypass&quot;</span></span><br><span class="line">vigolium agent autopilot -t https://example.com --diff main...feature/auth   <span class="comment"># diff only</span></span><br><span class="line">vigolium agent autopilot -t https://example.com --intensity deep</span><br><span class="line"></span><br><span class="line"><span class="comment"># Swarm</span></span><br><span class="line">vigolium agent swarm -t https://example.com/api/users --vuln-type sqli</span><br><span class="line">vigolium agent swarm -t https://example.com --discover                       <span class="comment"># full scope</span></span><br><span class="line">vigolium agent swarm --input <span class="string">&quot;curl -X POST https://example.com/api/login -d &#x27;&#123;\&quot;user\&quot;:\&quot;admin\&quot;&#125;&#x27;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># source-code audit</span></span><br><span class="line">vigolium agent audit --<span class="built_in">source</span> ./src                                  <span class="comment"># default auto</span></span><br><span class="line">vigolium agent audit --<span class="built_in">source</span> ./src --driver audit --mode deep       <span class="comment"># vigolium-audit only</span></span><br><span class="line">vigolium agent audit --<span class="built_in">source</span> ./src --driver piolium --mode balanced <span class="comment"># piolium only</span></span><br><span class="line">vigolium agent audit --<span class="built_in">source</span> ./src --driver both                    <span class="comment"># both, in sequence</span></span><br><span class="line">vigolium agent audit --<span class="built_in">source</span> ./src -S --output-dir ./audit-out      <span class="comment"># one-shot DB + HTML report</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># use olium directly (TUI or headless)</span></span><br><span class="line">vigolium ol                        <span class="comment"># start the TUI</span></span><br><span class="line">vigolium ol --prompt <span class="string">&quot;...&quot;</span>         <span class="comment"># one-shot (-p implies headless)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>The fact that Swarm generates custom JS attack extensions</strong> is its most distinctive trait — instead of picking from a fixed module library, it has the agent write attack code on the spot for the current target. That is both the highlight and the risk (see Section 7).</p>
+<h3 id="Provider-Support-10"><a href="#Provider-Support-10" class="headerlink" title="Provider Support (10)"></a>Provider Support (10)</h3><p><code>openai-compatible</code> (default), <code>openai-codex-oauth</code>, <code>openai-api-key</code>, <code>openai-responses</code>, <code>anthropic-api-key</code>, <code>anthropic-oauth</code>, <code>anthropic-cli</code>, <code>anthropic-compatible</code>, <code>anthropic-vertex</code>, <code>google-vertex</code>.</p>
+<p>The same modes are exposed over the REST API, with <strong>SSE streaming</strong> and an <strong>OpenAI-compatible chat endpoint</strong>.</p>
+<h2 id="5-Server-Mode-and-Proxy-Bridging"><a href="#5-Server-Mode-and-Proxy-Bridging" class="headerlink" title="5. Server Mode and Proxy Bridging"></a>5. Server Mode and Proxy Bridging</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># start the API server with authentication</span></span><br><span class="line">vigolium server -k my-secret-key</span><br><span class="line"></span><br><span class="line"><span class="comment"># open a transparent HTTP proxy to record traffic</span></span><br><span class="line">vigolium server -k my-key --ingest-proxy-port 9003</span><br><span class="line"></span><br><span class="line"><span class="comment"># auto-scan traffic as it arrives</span></span><br><span class="line">vigolium server -k my-key --scan-on-receive</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># feed traffic into a running server</span></span><br><span class="line"><span class="built_in">cat</span> urls.txt | vigolium ingest -s http://localhost:9002</span><br><span class="line">vigolium ingest -s http://localhost:9002 -i api.yaml -I openapi</span><br></pre></td></tr></table></figure>
+
+<p><strong>Proxy integration</strong>: there are official <a target="_blank" rel="noopener" href="https://github.com/vigolium/burp-vigolium">burp-vigolium</a> (Burp Suite extension) and <a target="_blank" rel="noopener" href="https://github.com/vigolium/caido-vigolium">caido-vigolium</a> (Caido plugin) projects; both use the same bridge protocol (<code>-B/--burp-bridge-url</code>, alias <code>--caido-bridge-url</code>), and ingested traffic is tagged with the source proxy.</p>
+<p><strong>This one is very practical in the field</strong>: browse the application manually once, then feed the Burp traffic straight into Vigolium to scan — far more efficient than assembling URL lists by hand.</p>
+<h2 id="6-Benchmarks"><a href="#6-Benchmarks" class="headerlink" title="6. Benchmarks"></a>6. Benchmarks</h2><p>The project states it continuously benchmarks against deliberately vulnerable applications, and stress-tests on real targets via bug bounties and responsible disclosure:</p>
+<ul>
+<li><strong>Self-hosted (Docker)</strong>: DVWA, OWASP Juice Shop, VAmPI, crAPI, Vulnerable Java App, Vulnerable Nginx, OopsSec Store (a custom Next.js app)</li>
+<li><strong>External (hosted)</strong>: Acunetix TestPHP, Gin &amp; Juice Shop, Testfire</li>
+<li><strong>XSS &amp; multi-vuln</strong>: BruteLogic XSS, XBOW (XSS, SQLi, SSTI, LFI, SSRF, XXE, command injection)</li>
+</ul>
+<p>How to run: <code>make test-canary</code> (Docker apps) or <code>make test-integration</code> (XSS).</p>
+<p><strong>But note</strong>: the README lists the target ranges, <strong>without giving quantified detection &#x2F; false-positive rates</strong>. To assess effectiveness you have to run <code>make test-canary</code> yourself. Compared with Dark-Moon’s explicit “57 vulnerabilities” figure, this is a notch less transparent.</p>
+<h2 id="7-Boundaries-and-Risks-the-part-that-must-be-said-honestly"><a href="#7-Boundaries-and-Risks-the-part-that-must-be-said-honestly" class="headerlink" title="7. Boundaries and Risks (the part that must be said honestly)"></a>7. Boundaries and Risks (the part that must be said honestly)</h2><p><strong>1) Agent mode has no sandbox — this is the heaviest item.</strong> Verbatim from the official SECURITY section:</p>
+<blockquote>
+<p>Vigolium is an offensive security tool, and two parts of it are intentionally permissive: <strong>agent mode runs with no sandbox</strong> (the LLM has full shell, file, and network access on the host) and <strong>extensions can run arbitrary commands</strong>. Run agent mode in a disposable container&#x2F;VM scoped to the engagement, and treat untrusted extensions like untrusted code.</p>
+</blockquote>
+<p>In plain terms: <strong>when agent mode runs, the LLM has full shell, file, and network access on your host.</strong> The project itself offers mitigations — use a disposable container &#x2F; VM, and treat untrusted extensions like untrusted code. <strong>Please actually follow that advice; do not run agent mode on your development machine or any machine holding production credentials.</strong></p>
+<p>For comparison: LuaN1ao runs one Docker sandbox per task with a Gateway as the sole egress; Dark-Moon never lets the AI execute commands directly — everything goes through MCP. On this axis Vigolium is <strong>clearly behind</strong>, and it admits so itself.</p>
+<p><strong>2) Extensions can run arbitrary commands.</strong> Same story — JS extensions are not sandboxed. Installing a third-party extension &#x3D; installing arbitrary code execution.</p>
+<p><strong>3) The license status is inconsistent.</strong> The README says <strong>MIT License</strong>, but the GitHub API classifies the repo as <strong>NOASSERTION</strong>. This kind of mismatch usually means the LICENSE file contains non-standard clauses, or detection failed. <strong>Before enterprise use, have a human read the LICENSE file itself</strong> — do not rely on the README or the API field alone.</p>
+<p><strong>4) The Cloud Console is the paid upgrade; the README calls it the “upgraded, fully-featured version”.</strong> That implies the open-source edition may hold features back. How much is not stated — verify for yourself during evaluation.</p>
+<p><strong>5) The project is only 7 months old with 118 commits.</strong> For an engine of 324 modules, that volume means <strong>many modules may not be battle-tested</strong>. The 4 open issues more likely reflect a still-small community than an absence of problems.</p>
+<p><strong>6) The benchmark has no quantified numbers.</strong> See Section 6 — there is a target list, but no detection-rate data.</p>
+<p><strong>7) The <code>platform/</code> directory is not part of the core scanner.</strong> The README says it holds the external toolchain and the UI Dashboard, and that “No changes should be made to it”. Do not let it distract you when reading the code.</p>
+<h2 id="8-Getting-Started-in-This-Order"><a href="#8-Getting-Started-in-This-Order" class="headerlink" title="8. Getting Started (in This Order)"></a>8. Getting Started (in This Order)</h2><ol>
+<li><strong>Start with Native Scan; do not jump straight to agents.</strong> <code>vigolium scan -t &lt;target&gt; --strategy deep</code> is the zero-risk entry point, and it lets you fully absorb what the 324 modules are worth first.</li>
+<li><strong>The Docker install is the least effort</strong> — and it isolates you as a bonus. Do not install the binary directly on your dev machine.</li>
+<li><strong>Set up <code>--auth-file</code> for your first run.</strong> Multi-session authentication is the prerequisite for its IDOR&#x2F;BOLA work; without sessions you give up that capability entirely. Ready-made examples live under <code>public/presets/sessions/</code>.</li>
+<li><strong>Hook up the Burp &#x2F; Caido bridge.</strong> Browse the app manually and then feed the traffic in — far more efficient than URL lists, and a real field advantage over comparable tools.</li>
+<li><strong>If you want agent mode, prepare a disposable VM first.</strong> To repeat: <strong>agent mode has no sandbox; the LLM has full host privileges.</strong> Use a disposable container &#x2F; VM and throw it away afterwards.</li>
+<li><strong>Do not install third-party JS extensions of unknown provenance.</strong> Extensions can run arbitrary commands — that is equivalent to installing arbitrary code.</li>
+<li><strong>Want to verify effectiveness? Run the benchmark yourself</strong>: <code>make test-canary</code>. Trust no claim without numbers, including the official ones.</li>
+<li><strong>For enterprise use, have a human read the LICENSE first</strong> (the README’s MIT and the API’s NOASSERTION do not match).</li>
+</ol>
+<h2 id="9-The-One-Line-Verdict"><a href="#9-The-One-Line-Verdict" class="headerlink" title="9. The One-Line Verdict"></a>9. The One-Line Verdict</h2><p><strong>If what you want is a Go DAST with solid modules, rich input sources, and Burp integration, Vigolium’s Native Scan is worth a try; but touch the Agentic Scan layer only inside a disposable VM — it is the project I have seen recently whose own docs state “no sandbox + full host privileges” most bluntly.</strong></p>
+<p>First move for red teamers: <strong>spin it up in Docker → <code>vigolium scan -t &lt;your range&gt; --strategy deep</code> → configure <code>--auth-file</code> with two sessions and run the IDOR checks → hook up the Burp bridge and feed in real traffic.</strong> After those four steps you will know exactly what its 324 modules are worth to you. Leave agent mode alone for now.</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/vigolium/">https://we5ter.github.io/en/ai-tools/vigolium/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/vigolium/&text=Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/vigolium/&title=Vigolium Breakdown: 324 Native Go Scan Modules Underneath, an AI Swarm That Writes Its Own Attack Plugins on Top"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/vigolium/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/vigolium/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/vigolium/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/vigolium/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <span class="post-nav-placeholder"></span>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/vigolium/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">Vigolium 拆解：Go 原生 324 个扫描模块，外挂一个会自己写攻击插件的 AI swarm</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
