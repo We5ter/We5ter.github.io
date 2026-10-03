@@ -24,6 +24,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
@@ -38,12 +44,6 @@
   <url>
     <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
-    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
