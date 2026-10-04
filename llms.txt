@@ -12,6 +12,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 每日推荐 / Daily Picks
 
+- [014 Rebuff](https://we5ter.github.io/ai-tools/rebuff/) (EN: https://we5ter.github.io/en/ai-tools/rebuff/): prompt injection 防御史上的绕不开的一章：canary token 检测 + 向量库自我加固的四层防线（仓库已归档，按史料读） · An unavoidable chapter in prompt-injection defense history: canary-token detection plus vector-store self-hardening across four layers (archived — read it as history) · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/protectai/rebuff (1522 stars)
 - [013 garak](https://we5ter.github.io/ai-tools/garak/) (EN: https://we5ter.github.io/en/ai-tools/garak/): NVIDIA 的 LLM 漏洞扫描器：懂 nmap / Metasploit 的话，garak 对 LLM 干的是差不多的事 · NVIDIA's LLM vulnerability scanner: if you know nmap / Metasploit, garak does roughly the same thing to LLMs · 分类/Category: LLM-Powered Vulnerability Scanners · GitHub: https://github.com/NVIDIA/garak (9373 stars)
 - [012 Vigolium](https://we5ter.github.io/ai-tools/vigolium/) (EN: https://we5ter.github.io/en/ai-tools/vigolium/): 双引擎漏洞扫描器：208 主动 + 117 被动 Native 模块打底，Go 版 agentic 运行时（Autopilot / Swarm）在上 · A dual-engine vulnerability scanner: 208 active + 117 passive native modules underneath, a Go agentic runtime (Autopilot / Swarm) on top · 分类/Category: LLM-Powered Vulnerability Scanners · GitHub: https://github.com/vigolium/vigolium (1085 stars)
 - [011 deepsec](https://we5ter.github.io/ai-tools/deepsec/) (EN: https://we5ter.github.io/en/ai-tools/deepsec/): Vercel Labs 的 agent 驱动漏洞扫描器：不扫 diff、不扫增量，对存量大型仓库做一次全量深挖 · Vercel Labs' agent-driven vulnerability scanner: no diffs, no increments — one full-depth audit of an existing large codebase · 分类/Category: LLM-Powered Vulnerability Scanners · GitHub: https://github.com/vercel-labs/deepsec (8044 stars)
@@ -28,8 +29,8 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 分类归档 / Categories
 
+- [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
 - [AI Autonomous Cybersecurity Agents](https://we5ter.github.io/ai-tools/cat/ai-autonomous-cybersecurity-agents/)
 - [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
-- [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 
