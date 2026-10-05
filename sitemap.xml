@@ -7,7 +7,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/CVE-2020-16040/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -61,7 +61,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -115,7 +115,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -145,7 +145,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/peekaboo-cve-2018-1149-camera-malware/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -163,7 +163,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -181,7 +181,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/roundcube-122-command-execution-via-email/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -198,8 +198,20 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/skillspector/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/skillspector/</loc>
+    <lastmod>2026-10-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -217,7 +229,7 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/</loc>
-    <lastmod>2026-10-04</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -245,6 +257,11 @@
     <loc>https://we5ter.github.io/ai-tools/</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/</loc>

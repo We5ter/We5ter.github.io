@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**" />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791181764542" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791181764542" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/skillspector/" />
+  
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/skillspector/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/skillspector/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/en/ai-tools/skillspector/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**" />
+  <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/skillspector/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/skillspector-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**" />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/skillspector-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-10-05T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-05T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791181764542" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/skillspector/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/skillspector/"},"headline":"SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Mali","name":"SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious","description":"18.5k stars, built by NVIDIA, Apache-2.0. It answers one question: **is this skill safe to install?** 71 vulnerability patterns across 17 categories, two-stage static + optional LLM semantic analysis, SARIF output that drops straight into CI. But the research data behind it is the real headline: **of the 31,132 skills analyzed, 26.1% contain vulnerabilities and 5.2% show likely malicious intent.**","image":"https://we5ter.github.io/images/banners/skillspector-banner.jpg","inLanguage":"en","datePublished":"2026-10-05T06:00:00.000Z","dateModified":"2026-10-05T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="WeChat QR code">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="WeChat QR code">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="WeChat QR code" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/skillspector-banner.jpg)">
+    <h1 class="post-title">SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-10-05">
+        <span class="i18n-zh">2026年10月5日</span>
+        <span class="i18n-en">Oct 5, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 36 分钟</span><span class="i18n-en">36 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/skillspector/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="1-At-a-Glance-Is-It-Worth-Your-Time"><a href="#1-At-a-Glance-Is-It-Worth-Your-Time" class="headerlink" title="1. At a Glance: Is It Worth Your Time"></a>1. At a Glance: Is It Worth Your Time</h2><p><strong>Rating: ★★★★☆ (4 &#x2F; 5)</strong></p>
+<p>Let me start with why this tool deserves its own article. <strong>Agent Skills are the most underestimated attack surface of 2026.</strong></p>
+<p>Think about what a skill is: a <code>SKILL.md</code> (natural-language instructions) plus some scripts, and <strong>once installed, the agent executes it with implicit trust</strong>. It has no lockfile and audit ecosystem like npm packages, and no scanning infrastructure like Docker images — it sits between “document” and “code,” and neither side’s security habits have landed on it.</p>
+<p>The numbers SkillSpector gives in its Overview are blunt:</p>
+<blockquote>
+<p>In the <strong>31,132-skill analyzed subset</strong> of the research dataset, <strong>26.1% of skills contain vulnerabilities</strong> and <strong>5.2% show likely malicious intent</strong>.</p>
+</blockquote>
+<p>One in four skills has a vulnerability; one in twenty looks malicious. At those odds, <strong>“casually installing a skill” is itself a high-risk action</strong>.</p>
+<p>Now the tool itself. It is no toy: 71 patterns across 17 categories, covering everything from prompt injection to behavioral AST analysis to taint tracking to YARA malware signatures — <strong>including MCP least privilege and tool poisoning</strong>. And it is <strong>part of the NVIDIA Verified Skills pipeline</strong> — NVIDIA itself scans, evaluates, and signs skills with it before publishing its skills catalog. There is a real production pipeline behind the badge.</p>
+<p>The missing star goes to three things: <strong>the project is only 6 months old</strong> (created 2026-03-21) with 144 open issues; <strong>static-analysis false positives are real</strong> (the maintainers built a dedicated baseline &#x2F; fingerprint suppression mechanism, which in itself says FP is a pain point); and <strong>the risk score is additive and saturates</strong> — a pile of MEDIUM findings can push the total into DO_NOT_INSTALL, so you need to tune the policy yourself.</p>
+<h3 id="Key-Data-as-of-2026-10-05"><a href="#Key-Data-as-of-2026-10-05" class="headerlink" title="Key Data (as of 2026-10-05)"></a>Key Data (as of 2026-10-05)</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Built by</td>
+<td><strong>NVIDIA</strong> (part of the NVIDIA Verified Skills pipeline)</td>
+</tr>
+<tr>
+<td>Language</td>
+<td><strong>Python</strong></td>
+</tr>
+<tr>
+<td>Stars &#x2F; Forks</td>
+<td><strong>18,488</strong> &#x2F; 1,612</td>
+</tr>
+<tr>
+<td>Commits &#x2F; Open Issues</td>
+<td>548 &#x2F; <strong>144</strong></td>
+</tr>
+<tr>
+<td>License</td>
+<td><strong>Apache-2.0</strong></td>
+</tr>
+<tr>
+<td>First commit</td>
+<td>2026-03-21 (~<strong>6 months</strong>)</td>
+</tr>
+<tr>
+<td>Last commit</td>
+<td><strong>2026-09-28</strong> (yesterday — very active)</td>
+</tr>
+<tr>
+<td>Detection scale</td>
+<td><strong>71 vulnerability patterns &#x2F; 17 categories</strong></td>
+</tr>
+<tr>
+<td>Research data</td>
+<td>31,132 skills analyzed: <strong>26.1% contain vulnerabilities, 5.2% likely malicious</strong></td>
+</tr>
+<tr>
+<td>Output formats</td>
+<td>Terminal &#x2F; JSON &#x2F; Markdown &#x2F; <strong>SARIF 2.1.0</strong></td>
+</tr>
+<tr>
+<td>Multilingual</td>
+<td>detection supports <strong>zh &#x2F; ja &#x2F; ko</strong></td>
+</tr>
+</tbody></table>
+<h3 id="Who-It’s-For"><a href="#Who-It’s-For" class="headerlink" title="Who It’s For"></a>Who It’s For</h3><table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Score</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Developers using Claude Code &#x2F; Codex daily</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>A pre-install checkup — the most directly usable tool of its kind right now</td>
+</tr>
+<tr>
+<td>Platform &#x2F; toolchain teams (setting install gates)</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>The full trio: exit code + SARIF + gate mapping</td>
+</tr>
+<tr>
+<td>Enterprise security operations</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>NVIDIA backing and SARIF, but a 6-month history is young</td>
+</tr>
+<tr>
+<td>Security researchers</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>The 17-category taxonomy is itself a solid agent-skill threat-model checklist</td>
+</tr>
+<tr>
+<td>Individuals &#x2F; learners</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>One <code>uv tool install</code> line to run; <code>--no-llm</code> costs nothing</td>
+</tr>
+</tbody></table>
+<h3 id="Building-on-It"><a href="#Building-on-It" class="headerlink" title="Building on It"></a>Building on It</h3><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Difficulty</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Configuration</td>
+<td><strong>Low</strong> — full CLI-flag coverage; baseline files to suppress false positives</td>
+<td></td>
+</tr>
+<tr>
+<td>Integration</td>
+<td><strong>Low</strong> — the exit code is a stable contract; JSON &#x2F; SARIF formats; two gate switches, <code>--fail-on-findings</code> &#x2F; <code>--fail-on-incomplete</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Kernel</td>
+<td><strong>Medium</strong> — <code>docs/DEVELOPMENT.md</code> explains how to extend the analyzer pipeline; three extension forms: MCP server &#x2F; Pi &#x2F; OpenCode</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-What-It-Is-What-It-Isn’t"><a href="#2-What-It-Is-What-It-Isn’t" class="headerlink" title="2. What It Is, What It Isn’t"></a>2. What It Is, What It Isn’t</h2><ul>
+<li><strong>Not</strong> antivirus. It does no sandboxed dynamic execution — it is primarily <strong>static analysis plus optional LLM semantic evaluation</strong>.</li>
+<li><strong>Not</strong> a runtime guardrail. It answers “is this skill safe <strong>before you install it</strong>,” not “can I block it once it’s running.”</li>
+<li><strong>Not</strong> limited to local directories. Git repos, URLs, zips, directories, and a single <code>SKILL.md</code> can all be fed in.</li>
+<li><strong>Not</strong> pure regex matching. It has two real layers — <strong>Behavioral AST</strong> (9 patterns) and <strong>Taint Tracking</strong> (5 patterns) — doing genuine data-flow &#x2F; syntax-tree analysis.</li>
+</ul>
+<p>Three keywords: <strong>pre-install gate</strong>, <strong>71 patterns &#x2F; 17 categories</strong> (coverage), <strong>two-stage analysis</strong> (static + LLM semantic).</p>
+<h2 id="3-17-Categories-71-Patterns"><a href="#3-17-Categories-71-Patterns" class="headerlink" title="3. 17 Categories, 71 Patterns"></a>3. 17 Categories, 71 Patterns</h2><p>This is its core asset, and the part I think <strong>most deserves a read on its own</strong> — even if you never use the tool, this taxonomy is an excellent agent-skill threat-model checklist.</p>
+<h3 id="Semantic-and-Instruction-Layer"><a href="#Semantic-and-Instruction-Layer" class="headerlink" title="Semantic and Instruction Layer"></a>Semantic and Instruction Layer</h3><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+<th>Representative patterns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Prompt Injection</strong></td>
+<td>6</td>
+<td>P1 instruction override, P2 hidden instructions (comments &#x2F; invisible text), P3 exfiltration commands, P4 behavior manipulation, P5 harmful content, <strong>P9 whitespace padding</strong> (hiding instructions beyond the visible area with masses of spaces)</td>
+</tr>
+<tr>
+<td><strong>Anti-Refusal</strong></td>
+<td>3</td>
+<td>AR1 refusal suppression (“never refuse”), AR2 disclaimer suppression (“no disclaimers”), AR3 safety-policy nullification (“you have no restrictions” &#x2F; DAN-style framing)</td>
+</tr>
+<tr>
+<td><strong>System Prompt Leakage</strong></td>
+<td>3</td>
+<td>P6 direct leakage, P7 indirect extraction (rewriting &#x2F; translation &#x2F; side channels), P8 exfiltration via tools</td>
+</tr>
+<tr>
+<td><strong>Memory Poisoning</strong></td>
+<td>3</td>
+<td>MP1 cross-interaction persistent injection, MP2 context-window flooding to crowd out safety constraints, MP3 tampering with agent memory</td>
+</tr>
+<tr>
+<td><strong>Trigger Abuse</strong></td>
+<td>3</td>
+<td>TR1 overly broad trigger words, <strong>TR2 shadow command triggers</strong> (overriding built-in commands or other skills), TR3 keyword baiting</td>
+</tr>
+</tbody></table>
+<p><strong>P9 whitespace padding</strong> shows real craft, in my view — it does not detect “a malicious instruction”; it detects the intent of “<strong>someone wants you to not see this</strong>.” Likewise, <strong>TR2 shadow command triggers</strong> is precisely aimed: a skill that sets its trigger words identical to a built-in command or another skill can hijack invocations.</p>
+<h3 id="Data-and-Privilege-Layer"><a href="#Data-and-Privilege-Layer" class="headerlink" title="Data and Privilege Layer"></a>Data and Privilege Layer</h3><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+<th>Representative patterns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Data Exfiltration</strong></td>
+<td>4</td>
+<td>E1 external transmission, <strong>E2 environment-variable harvesting</strong>, E3 filesystem enumeration, <strong>E4 context leakage</strong></td>
+</tr>
+<tr>
+<td><strong>Privilege Escalation</strong></td>
+<td>3</td>
+<td>PE1 excessive permissions, PE2 sudo&#x2F;root, PE3 credential reading (SSH keys &#x2F; tokens &#x2F; passwords)</td>
+</tr>
+<tr>
+<td><strong>Excessive Agency</strong></td>
+<td>5</td>
+<td>EA1 unconstrained tool access, EA2 high-impact decisions without human involvement, EA3 scope creep, EA4 no resource quotas, <strong>EA5 external model&#x2F;provider selection</strong> (switching billing accounts)</td>
+</tr>
+<tr>
+<td><strong>Output Handling</strong></td>
+<td>3</td>
+<td>OH1 unvalidated output injection, OH2 output crossing trust boundaries, OH3 no output limits</td>
+</tr>
+<tr>
+<td><strong>Tool Misuse</strong></td>
+<td>3</td>
+<td>TM1 argument abuse (<code>shell=True</code>, <code>--force</code>), TM2 chained bypasses, TM3 insecure defaults (TLS disabled, no authentication)</td>
+</tr>
+<tr>
+<td><strong>Rogue Agent</strong></td>
+<td>2</td>
+<td><strong>RA1 runtime self-modification (CRITICAL)</strong>, RA2 unauthorized persistence (cron &#x2F; startup scripts)</td>
+</tr>
+</tbody></table>
+<p><strong>EA5 external model&#x2F;provider selection</strong> deserves special attention — it catches a skill steering your requests to a model &#x2F; provider on someone else’s billing account. This is not a “security vulnerability” so much as a <strong>cost and data-flow problem</strong>, but for enterprises it is real money at risk.</p>
+<h3 id="Supply-Chain-and-Code-Layer"><a href="#Supply-Chain-and-Code-Layer" class="headerlink" title="Supply Chain and Code Layer"></a>Supply Chain and Code Layer</h3><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+<th>Representative patterns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Supply Chain</strong></td>
+<td>10+</td>
+<td>SC1 unpinned dependency versions, <strong>SC2 external script fetching (curl | bash)</strong>, SC3 obfuscated code, <strong>SC4 known-CVE dependencies (live lookup on OSV.dev)</strong>, SC5 deprecated dependencies, <strong>SC6 typosquatting</strong>, SC8 bundled Python bytecode, SC9 stashed executable artifacts, SC10 dependency-source redirection</td>
+</tr>
+<tr>
+<td><strong>Behavioral AST</strong></td>
+<td>9</td>
+<td>AST1 <code>exec()</code>, <strong>AST8 dangerous execution chains</strong> (exec&#x2F;eval + dynamic sources), <strong>AST9 reflective getattr sinks</strong> (<code>getattr(os,&#39;system&#39;)</code> bypassing AST1&#x2F;AST5)</td>
+</tr>
+<tr>
+<td><strong>Taint Tracking</strong></td>
+<td>5</td>
+<td><strong>TT3 credential exfiltration chains (CRITICAL)</strong>, TT4 file read → network exfiltration, <strong>TT5 external input → code execution (CRITICAL)</strong></td>
+</tr>
+<tr>
+<td><strong>YARA Signatures</strong></td>
+<td>4</td>
+<td>YR1 malware, YR2 webshells, YR3 miners, YR4 hacker tools &#x2F; exploits</td>
+</tr>
+</tbody></table>
+<p><strong>SC4 queries OSV.dev live</strong> for CVE data, with an offline fallback — strictly better than “a bundled CVE database that goes stale.”</p>
+<p><strong>AST9 reflective getattr</strong> shows the authors understand adversarial thinking: an attacker using <code>getattr(os, &#39;system&#39;)</code> bypasses AST1&#x2F;AST5, which detect the literal <code>os.system</code>. Dedicating a pattern to exactly this case leaves the fingerprints of real-world experience.</p>
+<p><strong>TT5 external input → code execution</strong> is the most valuable taint-tracking pattern: network or user input flowing directly into <code>exec</code>&#x2F;<code>eval</code>&#x2F;<code>subprocess</code> is the classic RCE chain.</p>
+<h3 id="MCP-Specials-2-categories-8-patterns"><a href="#MCP-Specials-2-categories-8-patterns" class="headerlink" title="MCP Specials (2 categories, 8 patterns)"></a>MCP Specials (2 categories, 8 patterns)</h3><table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Patterns</th>
+<th>Representative patterns</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>MCP Least Privilege</strong></td>
+<td>4</td>
+<td><strong>LP1 undeclared capabilities</strong> (code uses capabilities the manifest never declares), LP2 wildcard permissions, LP3 no permission declarations despite detectable capabilities, LP4 over-declaration</td>
+</tr>
+<tr>
+<td><strong>MCP Tool Poisoning</strong></td>
+<td>4</td>
+<td>TP1 hidden instructions in metadata (HTML comments, zero-width characters, base64, data URIs), <strong>TP2 Unicode spoofing</strong> (homoglyphs, RTL overrides, mixed-script identifiers), TP3 parameter-description injection, <strong>TP4 description-behavior mismatch (LLM-powered)</strong></td>
+</tr>
+</tbody></table>
+<p><strong>LP1 “undeclared capabilities” is, in my view, the single most important detection in the MCP scenario</strong> — declared permissions not matching what the code actually uses is the most direct violation of the least-privilege principle.</p>
+<p><strong>TP4 description-behavior mismatch needs an LLM</strong> — it will not fire under <code>--no-llm</code>.</p>
+<h2 id="4-How-the-Risk-Score-Is-Computed-read-this-before-the-report"><a href="#4-How-the-Risk-Score-Is-Computed-read-this-before-the-report" class="headerlink" title="4. How the Risk Score Is Computed (read this before the report)"></a>4. How the Risk Score Is Computed (read this before the report)</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">CRITICAL  +50</span><br><span class="line">HIGH      +25</span><br><span class="line">MEDIUM    +10</span><br><span class="line">LOW       +5</span><br><span class="line">executable scripts  ×1.3 multiplier</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Score</th>
+<th>Severity</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0–20</td>
+<td>LOW</td>
+<td><strong>SAFE</strong></td>
+</tr>
+<tr>
+<td>21–50</td>
+<td>MEDIUM</td>
+<td><strong>CAUTION</strong></td>
+</tr>
+<tr>
+<td>51–80</td>
+<td>HIGH</td>
+<td><strong>DO NOT INSTALL</strong></td>
+</tr>
+<tr>
+<td>81–100</td>
+<td>CRITICAL</td>
+<td><strong>DO NOT INSTALL</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Two properties of this algorithm you must know</strong>:</p>
+<ol>
+<li><strong>It accumulates without a cap, truncated only by the bands.</strong> 20 MEDIUM findings (200 points) and 2 CRITICAL findings (100 points) both land in the CRITICAL band. That means <strong>a large number of low-severity findings gets scored as “do not install.”</strong> Fine for a clean, small skill; possibly too strict for a content-heavy one.</li>
+<li><strong>Executable scripts get ×1.3.</strong> This is a heuristic multiplier — skills with scripts genuinely are riskier, but the 1.3 coefficient is a judgment call.</li>
+</ol>
+<p>The official gate mapping:</p>
+<table>
+<thead>
+<tr>
+<th><code>recommendation</code></th>
+<th>Suggested action</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SAFE</code></td>
+<td>allow</td>
+</tr>
+<tr>
+<td><code>CAUTION</code></td>
+<td><strong>prompt &#x2F; warn the user</strong></td>
+</tr>
+<tr>
+<td><code>DO_NOT_INSTALL</code></td>
+<td><strong>block</strong></td>
+</tr>
+</tbody></table>
+<h2 id="5-Wiring-It-into-CI-The-Exit-Code-Is-a-Stable-Contract"><a href="#5-Wiring-It-into-CI-The-Exit-Code-Is-a-Stable-Contract" class="headerlink" title="5. Wiring It into CI: The Exit Code Is a Stable Contract"></a>5. Wiring It into CI: The Exit Code Is a Stable Contract</h2><p>Exit codes of <code>skillspector scan</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>0</code></td>
+<td>scan completed, <code>risk_score</code> ≤ 50 (SAFE or CAUTION), and no enabled strict gate triggered</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>findings with <code>risk_score</code> &gt; 50, or <code>--fail-on-findings</code> hit, or <code>--fail-on-incomplete</code> found the analysis incomplete</td>
+</tr>
+<tr>
+<td><code>2</code></td>
+<td>error (bad input, unreadable source, internal failure)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>By default, both SAFE and CAUTION collapse into <code>0</code>.</strong> To also gate on CAUTION in CI, you must explicitly add <code>--fail-on-findings</code>.</p>
+</blockquote>
+<p>The default makes sense (CAUTION means “warn the user,” not “forbid”), but <strong>it is an easy trap when wiring CI</strong> — you think it is blocking, while it has been returning 0 all along.</p>
+<h3 id="Output"><a href="#Output" class="headerlink" title="Output"></a>Output</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">skillspector scan ./my-skill/                                  <span class="comment"># terminal (default)</span></span><br><span class="line">skillspector scan ./my-skill/ --format json --output report.json</span><br><span class="line">skillspector scan ./my-skill/ --format markdown --output report.md</span><br><span class="line">skillspector scan ./my-skill/ --format sarif --output report.sarif   <span class="comment"># SARIF 2.1.0</span></span><br></pre></td></tr></table></figure>
+
+<p>Top-level JSON structure: <code>skill</code> &#x2F; <code>risk_assessment</code> &#x2F; <code>components</code> &#x2F; <code>issues</code> &#x2F; <code>metadata</code>.</p>
+<ul>
+<li><code>risk_assessment.recommendation</code> ∈ <code>SAFE | CAUTION | DO_NOT_INSTALL</code></li>
+<li><code>metadata.llm_requested</code> &#x2F; <code>llm_available</code> tell you whether the LLM ran this time</li>
+<li><strong><code>metadata.inference_usage</code></strong> records the token count of every LLM call (when the provider exposes it), and <strong>never estimates missing tokens</strong>. That transparency deserves praise.</li>
+</ul>
+<h3 id="Batch-scanning"><a href="#Batch-scanning" class="headerlink" title="Batch scanning"></a>Batch scanning</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python -m contrib.batch_scan.batch_scan ./my-skills/ --no-llm</span><br><span class="line">python -m contrib.batch_scan.batch_scan ./my-skills/ --workers 20 -f json -o report.json</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-Installation-and-First-Scan"><a href="#6-Installation-and-First-Scan" class="headerlink" title="6. Installation and First Scan"></a>6. Installation and First Scan</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># install the CLI with uv</span></span><br><span class="line">uv tool install git+https://github.com/NVIDIA/skillspector.git</span><br><span class="line"><span class="comment"># update later: uv tool update skillspector</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># for the MCP server, install the mcp extra</span></span><br><span class="line">uv tool install <span class="string">&#x27;skillspector[mcp] @ git+https://github.com/NVIDIA/skillspector.git&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>If you would rather not install Python, use Docker (the image is based on <code>python:3.12-slim-bookworm</code>):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">make docker-build                                    <span class="comment"># or: docker build -t skillspector .</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># scan a local directory (mounted at /scan in the container)</span></span><br><span class="line">docker run --<span class="built_in">rm</span> -v <span class="string">&quot;<span class="variable">$PWD</span>:/scan&quot;</span> skillspector scan ./my-skill/ --no-llm</span><br><span class="line"></span><br><span class="line"><span class="comment"># with LLM analysis (via .env)</span></span><br><span class="line"><span class="built_in">cat</span> &gt; .<span class="built_in">env</span> &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">SKILLSPECTOR_PROVIDER=anthropic</span><br><span class="line">ANTHROPIC_API_KEY=sk-ant-...</span><br><span class="line">EOF</span><br><span class="line">docker run --<span class="built_in">rm</span> -v <span class="string">&quot;<span class="variable">$PWD</span>:/scan&quot;</span> --env-file .<span class="built_in">env</span> skillspector scan ./my-skill/</span><br><span class="line"></span><br><span class="line"><span class="comment"># write the report back to the host</span></span><br><span class="line">docker run --<span class="built_in">rm</span> -v <span class="string">&quot;<span class="variable">$PWD</span>:/scan&quot;</span> skillspector scan ./my-skill/ --no-llm --format json --output report.json</span><br></pre></td></tr></table></figure>
+
+<h3 id="Input-forms"><a href="#Input-forms" class="headerlink" title="Input forms"></a>Input forms</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">skillspector scan ./my-skill/                        <span class="comment"># local directory</span></span><br><span class="line">skillspector scan ./SKILL.md                         <span class="comment"># single file</span></span><br><span class="line">skillspector scan https://github.com/user/my-skill   <span class="comment"># Git repository</span></span><br><span class="line">skillspector scan ./my-skill.zip                     <span class="comment"># zip</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Size-limits-zip-bomb-protection"><a href="#Size-limits-zip-bomb-protection" class="headerlink" title="Size limits (zip-bomb protection)"></a>Size limits (zip-bomb protection)</h3><table>
+<thead>
+<tr>
+<th>Limit</th>
+<th>Value</th>
+<th>Applies to</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>INGEST_MAX_BYTES</code></td>
+<td><strong>100 MiB</strong></td>
+<td>streamed URL downloads, total unzipped size, disk usage after Git clone</td>
+</tr>
+<tr>
+<td><code>INGEST_MAX_ZIP_MEMBERS</code></td>
+<td><strong>10,000</strong></td>
+<td>entries in a single zip</td>
+</tr>
+<tr>
+<td><code>MAX_FILE_BYTES</code></td>
+<td><strong>1 MB</strong></td>
+<td>per-file read limit for analyzers (downstream constraint)</td>
+</tr>
+</tbody></table>
+<p>Breaching any ingest limit <strong>fails closed</strong> with <code>IngestLimitExceededError</code>. This is the right design — when scanning untrusted input, close the DoS surface first.</p>
+<h3 id="Extension-forms"><a href="#Extension-forms" class="headerlink" title="Extension forms"></a>Extension forms</h3><ul>
+<li><strong>MCP server</strong>: <code>skillspector mcp</code> (requires the <code>[mcp]</code> extra)</li>
+<li><strong>Pi extension</strong>: install as a Pi tool to scan directly inside agent sessions</li>
+<li><strong>OpenCode extension</strong>: install as an OpenCode tool and <code>/skillspector</code> command</li>
+</ul>
+<p>The last two are very practical — they let the agent scan a skill before installing it.</p>
+<h2 id="7-Boundaries-and-Risks-the-part-that-must-be-said-honestly"><a href="#7-Boundaries-and-Risks-the-part-that-must-be-said-honestly" class="headerlink" title="7. Boundaries and Risks (the part that must be said honestly)"></a>7. Boundaries and Risks (the part that must be said honestly)</h2><p><strong>1) The project is 6 months old with 144 open issues.</strong> Created 2026-03-21. Commits are very active (still pushing yesterday), but for a tool meant to serve as an “install gate,” maturity takes time.</p>
+<p><strong>2) Static analysis has false positives, and the maintainers built a suppression mechanism themselves.</strong> The README has a dedicated <code>Suppressing False Positives (baseline)</code> section with glob rules and fingerprint baselines. <strong>The existence of this feature says FP is a real pain point</strong> — expect to spend time tuning baselines on first adoption.</p>
+<p><strong>3) The additive risk score saturates and can be too strict.</strong> See Section 4. A content-rich skill can easily be pushed to DO_NOT_INSTALL by a pile of MEDIUMs. <strong>Read the <code>issues</code> array yourself instead of trusting <code>recommendation</code> alone.</strong></p>
+<p><strong>4) The default exit code returns 0 for CAUTION.</strong> When wiring CI you must explicitly add <code>--fail-on-findings</code>, or the gate is decorative.</p>
+<p><strong>5) <code>--no-llm</code> misses the semantic patterns.</strong> For example, <strong>TP4 description-behavior mismatch</strong> is explicitly LLM-powered. Without an LLM configured, coverage is discounted.</p>
+<p><strong>6) The 1 MB per-file limit means large files are only partially seen.</strong> An engineering trade-off — but it also means <strong>a payload hidden past the 1 MB mark will not be scanned</strong>.</p>
+<p><strong>7) It can only catch the 71 patterns it knows.</strong> The taxonomy is comprehensive, but novel techniques will still slip through. <strong>Do not read SAFE as “guaranteed safe” — it only means “none of the 71 patterns fired.”</strong></p>
+<p><strong>8) It scans the skill itself, not the runtime behavior of the dependencies it installs.</strong> Static analysis cannot see what actually happens at execution time.</p>
+<h2 id="8-Getting-Started-in-This-Order"><a href="#8-Getting-Started-in-This-Order" class="headerlink" title="8. Getting Started (in This Order)"></a>8. Getting Started (in This Order)</h2><ol>
+<li><strong>Start with <code>uv tool install</code> + a <code>--no-llm</code> run.</strong> Zero cost — first see what the output looks like.</li>
+<li><strong>Your first real job: scan the skills you already installed.</strong> Batch-run <code>contrib/batch_scan</code> over <code>./my-skills/</code>; you will very likely find surprises — remember the 26.1% base rate.</li>
+<li><strong>Do not just read <code>recommendation</code> — read the <code>issues</code> array.</strong> The score saturates; which specific patterns fired is what you need to judge.</li>
+<li><strong>Build a baseline early.</strong> Save confirmed false positives into a fingerprint baseline, or every rescan will drown you in the same FPs.</li>
+<li><strong>Always add <code>--fail-on-findings</code> in CI.</strong> The default returns 0 for CAUTION — the gate does nothing.</li>
+<li><strong>Configure LLM analysis for important skills.</strong> <code>--no-llm</code> is fast and free, but misses semantic patterns like TP4. For high-value skills, the spend is worth it.</li>
+<li><strong>Prioritize these categories</strong>: <code>TT3</code> &#x2F; <code>TT5</code> (the CRITICAL taint-tracking chains), <code>AST8</code> &#x2F; <code>AST9</code> (dangerous execution chains and reflective bypasses), <code>SC2</code> (curl | bash), <code>RA1</code> (runtime self-modification), <code>LP1</code> (MCP undeclared capabilities). A hit on any of these is basically a straight “do not install.”</li>
+<li><strong>Install the Pi &#x2F; OpenCode extensions.</strong> Having the agent scan a skill before installing it beats any after-the-fact audit.</li>
+</ol>
+<h2 id="9-The-One-Line-Verdict"><a href="#9-The-One-Line-Verdict" class="headerlink" title="9. The One-Line Verdict"></a>9. The One-Line Verdict</h2><p><strong>If you use Claude Code &#x2F; Codex and install third-party skills, SkillSpector should be a default step in your workflow — with 26.1% of 31k skills vulnerable and 5.2% likely malicious, “scan before install” is not fastidiousness; it is basic hygiene.</strong></p>
+<p>First move for developers: <strong><code>uv tool install git+https://github.com/NVIDIA/skillspector.git</code> → batch-scan your entire existing skills directory with <code>contrib/batch_scan</code> (<code>--no-llm</code>, free) → manually eyeball every CRITICAL and HIGH finding.</strong> The whole step takes under ten minutes, and you may well discover that a skill you use every day has been reading your environment variables.</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/skillspector/">https://we5ter.github.io/en/ai-tools/skillspector/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/skillspector/&text=SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/skillspector/&title=SkillSpector Breakdown: NVIDIA Scanned 31k Agent Skills — 26.1% Contain Vulnerabilities, 5.2% Look Likely Malicious"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/skillspector/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/skillspector/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/skillspector/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/skillspector/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <span class="post-nav-placeholder"></span>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/skillspector/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">SkillSpector 拆解：NVIDIA 扫了 3.1 万个 agent skill，26.1% 有漏洞、5.2% 疑似恶意</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
