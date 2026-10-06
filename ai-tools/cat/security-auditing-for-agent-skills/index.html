@@ -69,8 +69,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791210432603" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791210432603" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791270333243" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791270333243" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/" />
@@ -100,7 +100,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791210432603" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791270333243" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -118,7 +118,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"CollectionPage","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#collection","url":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/","name":"Agent Skills 安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","image":"https://we5ter.github.io/images/static/avatar.png","inLanguage":["en","zh-CN"],"isPartOf":{"@id":"https://we5ter.github.io/#website"},"mainEntity":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#tool-list"}},{"@type":"ItemList","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#tool-list","name":"Agent Skills 安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","numberOfItems":1,"isPartOf":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#collection"},"itemListElement":[{"@type":"ListItem","position":1,"url":"https://we5ter.github.io/ai-tools/skillspector/","name":"15. NVIDIA SkillSpector","description":"Answers \"is this skill safe to install?\": 71 vulnerability patterns across 17 categories, static plus optional LLM semantic analysis, SARIF straight into CI"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"CollectionPage","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#collection","url":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/","name":"Agent Skills 安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","image":"https://we5ter.github.io/images/static/avatar.png","inLanguage":["en","zh-CN"],"isPartOf":{"@id":"https://we5ter.github.io/#website"},"mainEntity":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#tool-list"}},{"@type":"ItemList","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#tool-list","name":"Agent Skills 安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","numberOfItems":2,"isPartOf":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/#collection"},"itemListElement":[{"@type":"ListItem","position":1,"url":"https://we5ter.github.io/ai-tools/cisco-skill-scanner/","name":"16. Cisco Skill Scanner","description":"Cisco AI Defense's skill scanner: nine analysis engines over a typed cel-go decision layer, brave enough to publish a 7.75% recall in its README"},{"@type":"ListItem","position":2,"url":"https://we5ter.github.io/ai-tools/skillspector/","name":"15. NVIDIA SkillSpector","description":"Answers \"is this skill safe to install?\": 71 vulnerability patterns across 17 categories, static plus optional LLM semantic analysis, SARIF straight into CI"}]}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -265,10 +265,40 @@
     <span class="i18n-en">Security Auditing for Agent Skills</span>
   </h1>
   <p class="section-sub">
-    <span class="i18n-zh">共 1 个工具 · 专栏每天 14:00（北京）更新一期</span>
-    <span class="i18n-en">1 tools · one new issue daily at 14:00 GMT+8</span>
+    <span class="i18n-zh">共 2 个工具 · 专栏每天 14:00（北京）更新一期</span>
+    <span class="i18n-en">2 tools · one new issue daily at 14:00 GMT+8</span>
   </p>
 
+  
+  
+  <article class="aitools-item" style="--cat: #3A86FF">
+    <div class="aitools-head">
+      <a class="i18n-zh aitools-name" href="/ai-tools/cisco-skill-scanner/">Cisco Skill Scanner</a>
+      <a class="i18n-en aitools-name" href="/en/ai-tools/cisco-skill-scanner/">Cisco Skill Scanner</a>
+      
+      <img class="aitools-badge" src="https://img.shields.io/github/stars/cisco-ai-defense/skill-scanner?style=flat-square&label=stars&cacheSeconds=3600&color=3A86FF" alt="Cisco Skill Scanner GitHub stars"
+           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
+      
+      <span class="aitools-catpage-issue">
+        <span class="i18n-zh">第 016 期 · 2026.10.6</span>
+        <span class="i18n-en">No. 16 · Oct 6, 2026</span>
+      </span>
+    </div>
+
+    <p class="aitools-tagline">
+      <span class="i18n-zh">Cisco AI Defense 的 skill 扫描器：9 个分析引擎 + cel-go 类型化决策层，敢把 7.75% 召回率原样写进 README</span>
+      <span class="i18n-en">Cisco AI Defense&#39;s skill scanner: nine analysis engines over a typed cel-go decision layer, brave enough to publish a 7.75% recall in its README</span>
+    </p>
+
+    
+    <div class="aitools-note">
+      <span class="i18n-zh">静态 / 字节码 / 管道污点 / 关联 / AST 数据流 / LLM / Meta 误报过滤 / VirusTotal / AI Defense 云九引擎并联。短板：held-out 集召回率 7.75%（漏掉 92% 恶意 skill）、所有 CEL 规则还在 shadow 模式、Meta-analyzer 准确性验证官方标注 remains pending、许可证标识不一致。</span>
+      <span class="i18n-en">Nine engines in parallel: static, bytecode, pipeline taint, correlation, AST dataflow, LLM, meta false-positive filtering, VirusTotal and the AI Defense cloud. Caveats: 7.75% recall on the held-out set (92% of malicious skills missed), every CEL rule still in shadow mode, meta-analyzer accuracy verification officially &#34;remains pending&#34;, and inconsistent license metadata.</span>
+    </div>
+    
+
+    <a class="aitools-link" href="https://github.com/cisco-ai-defense/skill-scanner" target="_blank" rel="noopener">https://github.com/cisco-ai-defense/skill-scanner</a>
+  </article>
   
   
   <article class="aitools-item" style="--cat: #3A86FF">
@@ -348,6 +378,20 @@
     {
       "@type": "ListItem",
       "position": 1,
+      "item": {
+        "@type": "SoftwareApplication",
+        "name": "Cisco Skill Scanner",
+        "description": "Cisco AI Defense 的 skill 扫描器：9 个分析引擎 + cel-go 类型化决策层，敢把 7.75% 召回率原样写进 README",
+        "url": "https://github.com/cisco-ai-defense/skill-scanner",
+        "datePublished": "2026-10-06",
+        "applicationCategory": "SecurityApplication",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    },
+    
+    {
+      "@type": "ListItem",
+      "position": 2,
       "item": {
         "@type": "SoftwareApplication",
         "name": "NVIDIA SkillSpector",
