@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**" />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791355627594" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791355627594" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/" />
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/" />
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**" />
+  <meta property="og:url" content="https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/cloudflare-security-audit-skill-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**" />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/cloudflare-security-audit-skill-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-10-07T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-07T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791355627594" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/"},"headline":"Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个","name":"Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个","description":"Cloudflare 官方出品的 coding-agent skill，6 阶段编排：侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告。**它最反常识的两条设计：查 findings 的 agent 永远不是发现它的那个 agent；「单次运行只找到重复运行能找到的漏洞的一半」是官方自己写进 README 的。**","image":"https://we5ter.github.io/images/banners/cloudflare-security-audit-skill-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-07T06:00:00.000Z","dateModified":"2026-10-07T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="公众号二维码">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="公众号二维码">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="公众号二维码" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/cloudflare-security-audit-skill-banner.jpg)">
+    <h1 class="post-title">Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-10-07">
+        <span class="i18n-zh">2026年10月7日</span>
+        <span class="i18n-en">Oct 7, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 25 分钟</span><span class="i18n-en">25 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/cloudflare-security-audit-skill/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="一、速览：值不值得你花时间"><a href="#一、速览：值不值得你花时间" class="headerlink" title="一、速览：值不值得你花时间"></a>一、速览：值不值得你花时间</h2><p><strong>推荐指数：★★★★☆（4 &#x2F; 5）</strong></p>
+<p>先说这个项目的<strong>第一个反常点：22,616 star，只有 14 次提交。</strong></p>
+<p>我扒了一下提交历史，14 个 commit 里真正的重构只有两次（2026-09-10 的 “Rework the audit workflow, findings contract, and validators end to end”，和 2026-07-06 的 “Bring the whole skill into one coherent house style”）。仓库总共 21 个文件，其中 <strong>14 个是 Markdown 提示词文档</strong>，真正能执行的只有 4 个 <code>.cjs</code>（两个校验器 + 两个测试）和 1 个 JSON schema。</p>
+<p><strong>所以这不是一个”软件”，是一套”审计方法论的机器可读版本”。</strong> star 数主要来自 Cloudflare 的品牌和那篇 <a target="_blank" rel="noopener" href="https://blog.cloudflare.com/build-your-own-vulnerability-harness">Build your own vulnerability harness</a> 博客 —— README 明说这个 skill 是那套 harness 的「single-repo starting point」，harness 后来长成了 fleet-wide 的多阶段系统。</p>
+<p>那为什么还值 4 分？<strong>因为它解决的是 AI 审计领域最真实的那个痛点：agent 会说谎。</strong></p>
+<p>让 coding agent 审代码，你会得到一堆”发现 SQL 注入”的结论，然后你点进去看，发现它引的函数根本不存在，或者它说的那个入口点压根没被外部触达。原因很简单：agent 在生成结论时的”热情”和生成证据时的”严谨”不是一套机制。Cloudflare 这套流程的解法很朴素 —— <strong>拆成不同的人干</strong>：</p>
+<ul>
+<li>找漏洞的 agent（hunter）<strong>不许</strong>自己确认漏洞；</li>
+<li>每个候选交给一个 <strong>fresh verifier</strong>，它的任务不是”验证”，是<strong>证伪</strong>；</li>
+<li>最后还有一轮 <strong>record verification</strong>，再换一批 fresh agent 去核对”这条 finding 引用的源码到底是不是这么写的”；</li>
+<li>如果这一步发生了<strong>实质性替换</strong>，还要再找一个独立验证者复核这次替换。</li>
+</ul>
+<p><strong>一个结论要活到 REPORT.md 里，得穿过三批互不知情的 agent。</strong> 这在提示词工程里是相当大的一件事。</p>
+<p>第二条反常识是它敢写这句设计原则：</p>
+<blockquote>
+<p><strong>Multiple runs improve coverage.</strong> In our test runs, a single run found roughly half of the vulnerabilities that repeated runs found in total.</p>
+</blockquote>
+<p><strong>“一次跑只找到反复跑能找到的一半”</strong> —— 官方明说单次运行漏掉约 50%。这和 Cisco Skill Scanner 那篇（第 016 期，敢写召回率 7.75%）是同一种诚实。我在这个赛道里反复看到的现象是：所有人都在卷”我发现了多少”，没人说”我漏了多少”。Cloudflare 至少给了个量级。</p>
+<p>扣分项也很明确：<strong>14 次提交 &#x2F; 3 个月历史</strong>，工程成熟度远配不上 star 数；<strong>没有任何量化评测</strong>，不像 Cisco 那样给混淆矩阵，”一半”这个数字出自一句设计原则而非基准测试；<strong>沙箱要求非常硬</strong>，没有 OS 级强制沙箱它会主动把所有 lead 降级成 <code>needs_validation</code> 而不执行目标代码 —— 很多人跑完会发现”什么都没确认”；以及<strong>成本</strong>，6 阶段 × 多 hunter × 官方建议多次运行，一次全量审计的 token 消耗不是小数。</p>
+<h3 id="关键数据（截至-2026-10-07）"><a href="#关键数据（截至-2026-10-07）" class="headerlink" title="关键数据（截至 2026-10-07）"></a>关键数据（截至 2026-10-07）</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>出品方</td>
+<td><strong>Cloudflare</strong>（<a href="mailto:&#115;&#101;&#x63;&#x75;&#x72;&#x69;&#x74;&#x79;&#x2d;&#97;&#105;&#x2d;&#x72;&#101;&#115;&#x65;&#x61;&#x72;&#x63;&#x68;&#64;&#x63;&#108;&#111;&#117;&#x64;&#102;&#108;&#x61;&#114;&#x65;&#x2e;&#99;&#111;&#x6d;">security-ai-research@cloudflare.com</a>）</td>
+</tr>
+<tr>
+<td>类型</td>
+<td><strong>Coding-agent skill</strong>（提示词编排，非独立软件）</td>
+</tr>
+<tr>
+<td>语言</td>
+<td><strong>JavaScript</strong>（仅 4 个零依赖 <code>.cjs</code> 校验器）</td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td><strong>22,616</strong> &#x2F; 1,315</td>
+</tr>
+<tr>
+<td>提交 &#x2F; Open Issues</td>
+<td><strong>14</strong> &#x2F; 51</td>
+</tr>
+<tr>
+<td>许可证</td>
+<td><strong>MIT</strong></td>
+</tr>
+<tr>
+<td>首次提交</td>
+<td>2026-06-18（约 <strong>3 个月</strong>）</td>
+</tr>
+<tr>
+<td>最近提交</td>
+<td>2026-09-14（15 天前）</td>
+</tr>
+<tr>
+<td>文件构成</td>
+<td>21 个文件：<strong>14 个 md 提示词</strong> + 4 个 <code>.cjs</code> + 2 个 test + 1 个 schema</td>
+</tr>
+<tr>
+<td>攻击类文档</td>
+<td><strong>12 个</strong>（Core &#x2F; Memory-safety &#x2F; AI-LLM &#x2F; Web-protocol &#x2F; Client-side &#x2F; Supply-chain &#x2F; Cloud &#x2F; RPC &#x2F; Resource &#x2F; Data-isolation &#x2F; Desktop-mobile）</td>
+</tr>
+<tr>
+<td>裁决类型</td>
+<td><code>confirmed</code> &#x2F; <code>needs_validation</code> &#x2F; <code>rejected</code></td>
+</tr>
+<tr>
+<td>安装</td>
+<td><code>npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit</code></td>
+</tr>
+</tbody></table>
+<h3 id="适合谁"><a href="#适合谁" class="headerlink" title="适合谁"></a>适合谁</h3><table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>有 coding agent 的开发者</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>一条 <code>security audit this codebase</code> 就能跑，零配置，方法论直接白拿</td>
+</tr>
+<tr>
+<td>安全团队 &#x2F; 红队</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>12 个攻击类文档本身就是极好的 checklist，可拆出来单独用</td>
+</tr>
+<tr>
+<td>研究 AI 审计方法的人</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>罕见的、把”如何防止 agent 自我欺骗”写成可执行流程的公开材料</td>
+</tr>
+<tr>
+<td>要合规交付物的团队</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>输出是 <code>findings.json</code> + 三个 md，不是 SARIF，进不了现有漏洞管理平台</td>
+</tr>
+<tr>
+<td>CI 里跑门禁</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>多 agent 长流程 + 高成本 + 无稳定基线，不适合每次 commit 触发</td>
+</tr>
+<tr>
+<td>想拿它当”漏洞扫描器”的人</td>
+<td><strong>1 &#x2F; 5</strong></td>
+<td>它是审计编排，不是扫描器；你会失望</td>
+</tr>
+</tbody></table>
+<h3 id="二次开发"><a href="#二次开发" class="headerlink" title="二次开发"></a>二次开发</h3><table>
+<thead>
+<tr>
+<th>难度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改攻击类 &#x2F; 加领域</td>
+<td><strong>★☆☆☆☆</strong></td>
+</tr>
+<tr>
+<td>复用校验器</td>
+<td><strong>★☆☆☆☆</strong></td>
+</tr>
+<tr>
+<td>接自己的报告系统</td>
+<td><strong>★★★☆☆</strong></td>
+</tr>
+<tr>
+<td>改流程编排</td>
+<td><strong>★★★★☆</strong></td>
+</tr>
+</tbody></table>
+<h2 id="二、它是什么，不是什么"><a href="#二、它是什么，不是什么" class="headerlink" title="二、它是什么，不是什么"></a>二、它是什么，不是什么</h2><p><strong>是：</strong></p>
+<ul>
+<li>一套 <strong>Markdown 写的 agent 编排规范</strong>，让你的 coding agent 按 6 个阶段做安全审计</li>
+<li>一个 <strong>attack-class 知识库</strong>（12 个文档，覆盖从内存安全到 LLM 提示注入）</li>
+<li>两个 <strong>零依赖校验器</strong>，用来卡住 <code>findings.json</code> 和 <code>coverage-ledger.json</code> 的结构</li>
+<li>Cloudflare 内部漏洞发现 harness 的<strong>公开简化版</strong></li>
+</ul>
+<p><strong>不是：</strong></p>
+<ul>
+<li><strong>不是扫描器。</strong> 它不 grep、不跑 SAST、不做污点分析。它<strong>指挥你的 agent 去做这些事</strong>。你要的是能出 SARIF 的扫描器，看第 012 期 Vigolium（Go 原生 324 个模块）或第 016 期 Cisco Skill Scanner。</li>
+<li><strong>不是漏洞数据库。</strong> 它产出的是你这一次审计的记录，不是 CVE 库。</li>
+<li><strong>不是确定性工具。</strong> 同样的仓库跑两次，结果会不一样。这是设计使然（它靠多轮运行叠加覆盖率），也意味着<strong>它不能做 CI 门禁</strong>。</li>
+<li><strong>不保证你找全。</strong> 官方原话：单次运行约找到一半。</li>
+</ul>
+<p>有一个容易误解的点要单独讲：<strong>它扫的不是”skill”，是”任意代码库”。</strong> 名字里带 skill 是因为它本身是个 agent skill —— 和第 015 期 SkillSpector（NVIDIA 扫 3.1 万个 skill）、第 016 期 Cisco Skill Scanner 是<strong>完全不同的品类</strong>。那两个是扫别人写的 skill 有没有恶意，这个是给你自己的仓库做安全审计。</p>
+<h2 id="三、核心能力"><a href="#三、核心能力" class="headerlink" title="三、核心能力"></a>三、核心能力</h2><h3 id="3-1-三批互不知情的-agent（对抗式验证）"><a href="#3-1-三批互不知情的-agent（对抗式验证）" class="headerlink" title="3.1 三批互不知情的 agent（对抗式验证）"></a>3.1 三批互不知情的 agent（对抗式验证）</h3><p>这是整套设计的地基。README 里写得很直白：</p>
+<blockquote>
+<p><strong>Adversarial validation.</strong> The agent that checks a finding is never the agent that found it.</p>
+</blockquote>
+<p>流程上是四道：</p>
+<ol>
+<li><strong>Hunter</strong>（Phase 2）从 ledger 单元领任务，做完记录自己的检查项；</li>
+<li><strong>Verifier</strong>（Phase 3）拿一个<strong>全新的上下文</strong>，任务是<strong>证伪</strong>（tries to disprove it），不是复述；</li>
+<li><strong>Record verifier</strong>（Phase 5）再换一批 fresh agent，专门核对最终记录里<strong>引用的源码声明</strong>是不是真的；</li>
+<li>若第 3 步发生了<strong>实质性替换</strong>（material replacement），再找<strong>另一个独立验证者</strong>复核这次替换。</li>
+</ol>
+<p>第 4 条是我觉得最狠的 —— <strong>连”修正”本身都不信任。</strong></p>
+<h3 id="3-2-覆盖账本（coverage-ledger-json）"><a href="#3-2-覆盖账本（coverage-ledger-json）" class="headerlink" title="3.2 覆盖账本（coverage-ledger.json）"></a>3.2 覆盖账本（coverage-ledger.json）</h3><p>这是它和传统 SAST 最本质的差别：<strong>按”覆盖”组织，不按”规则”组织。</strong></p>
+<p>Phase 1 侦察的产物是 <code>architecture.md</code> + <code>coverage-ledger.json</code>。ledger 把代码库切成<strong>审计单元</strong>，每个 hunter 领单元干活、记录自己查了什么。然后有专门的 <strong>coverage critics</strong> 去找<strong>空洞</strong> —— 哪些单元没人认领、哪些声称查了但记录里没有对应证据。</p>
+<p>父进程在<strong>创建 ledger 之后、以及之后每次 ledger 更新后</strong>都跑一次 <code>validate-coverage-ledger.cjs</code>。这个”每次更新都校验”的设定很关键：它防止 ledger 在长流程中被悄悄写坏。</p>
+<p>好处是<strong>多次运行是叠加的</strong>：</p>
+<blockquote>
+<p>Multiple runs against the same repo are additive. The skill uses prior ledgers and findings to target gaps, revalidate changed source, and carry forward current-source evidence <strong>without treating stale or unresolved work as covered</strong>.</p>
+</blockquote>
+<p>最后半句是关键 —— <strong>陈旧的和未解决的工作不会被当成”已覆盖”</strong>。很多增量扫描工具会犯这个错：上次扫过的文件这次跳过，结果上次那个 <code>needs_validation</code> 永远不会被重新处理。</p>
+<h3 id="3-3-三种裁决，语义严格分离"><a href="#3-3-三种裁决，语义严格分离" class="headerlink" title="3.3 三种裁决，语义严格分离"></a>3.3 三种裁决，语义严格分离</h3><table>
+<thead>
+<tr>
+<th>裁决</th>
+<th>含义</th>
+<th>有无 severity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>confirmed</code></td>
+<td>完整源码溯源 + 有边界的观测结果（complete source trace and bounded observed result）</td>
+<td>有</td>
+</tr>
+<tr>
+<td><code>needs_validation</code></td>
+<td>有一个<strong>精确的未解决事实</strong>（exact unresolved fact）</td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><code>rejected</code></td>
+<td>已被证伪的候选，仍记录在案</td>
+<td>无</td>
+</tr>
+</tbody></table>
+<p><code>needs_validation</code> 不给 severity 这条设计我很认同 —— <strong>没验证完的东西凭什么有评级</strong>。它强制你把它当”待办”而不是”低危漏洞”，避免那种”一堆 INFO 级告警淹没真问题”的经典死法。</p>
+<p><code>rejected</code> 也记录而不是丢弃，这个也值得学：<strong>被证伪的路径本身是审计证据</strong>（告诉下一个 hunter 这条路走过了，别再走）。</p>
+<h3 id="3-4-几条”反直觉但正确”的判定原则"><a href="#3-4-几条”反直觉但正确”的判定原则" class="headerlink" title="3.4 几条”反直觉但正确”的判定原则"></a>3.4 几条”反直觉但正确”的判定原则</h3><p>这几条我觉得比流程本身更值钱：</p>
+<ul>
+<li><strong>Only confirm established boundary failures.</strong> 只确认已成立的<strong>边界失效</strong>。够不上就放 <code>needs_validation</code>，写清楚那个精确的未解决事实。</li>
+<li><strong>Severity requires impact.</strong> 严重度 &#x3D; 可能性 × 影响，<strong>不是”偏离 checklist 的程度”</strong>。这条直接对着 CVSS 打分玄学来的。</li>
+<li><strong>Defense-in-depth gaps are not vulnerabilities.</strong> <strong>如果 A 层已经挡住了攻击，B 层缺失只是加固建议，不是漏洞。</strong> 这条能砍掉一半的无效工单。</li>
+<li><strong>Target-neutral reporting.</strong> 报告对目标中立 —— 不因为你审的是自家项目就放水。</li>
+</ul>
+<h2 id="四、架构：6-个阶段在干什么"><a href="#四、架构：6-个阶段在干什么" class="headerlink" title="四、架构：6 个阶段在干什么"></a>四、架构：6 个阶段在干什么</h2><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>做什么</th>
+<th>产物</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. Reconnaissance</strong></td>
+<td>摸架构、信任边界、输入面、已有证据、确定性覆盖</td>
+<td><code>architecture.md</code> + <code>coverage-ledger.json</code></td>
+</tr>
+<tr>
+<td><strong>2. Coverage-led hunting</strong></td>
+<td>从 ledger 单元派 hunter，记录检查项，coverage critics 找空洞</td>
+<td>候选 findings</td>
+</tr>
+<tr>
+<td><strong>3. Candidate validation</strong></td>
+<td>每个唯一候选交给 fresh verifier 去<strong>证伪</strong></td>
+<td>验证后候选</td>
+</tr>
+<tr>
+<td><strong>4. Structured output</strong></td>
+<td>写 <code>confirmed</code> &#x2F; <code>needs_validation</code> &#x2F; <code>rejected</code> 到 <code>findings.json</code>，按 <code>report-schema.json</code> 校验</td>
+<td><code>findings.json</code>（跑 <code>validate-findings.cjs</code>）</td>
+</tr>
+<tr>
+<td><strong>5. Independent record verification</strong></td>
+<td>fresh agent 核对最终源码声明；实质替换再找独立验证者</td>
+<td>已验证记录（<strong>每次替换后重跑校验器</strong>）</td>
+</tr>
+<tr>
+<td><strong>6. Target-neutral reporting</strong></td>
+<td>从已验证记录 + 覆盖账本推导报告</td>
+<td><code>REPORT.md</code> + <code>FINDINGS-DETAIL.md</code> + <code>NEEDS-VALIDATION.md</code></td>
+</tr>
+</tbody></table>
+<p>校验器的调用时机是刻意设计的：</p>
+<ul>
+<li><code>validate-coverage-ledger.cjs</code> —— Phase 1 <strong>建完就跑</strong>，之后<strong>每次 ledger 更新都跑</strong>（Phases 1–5）</li>
+<li><code>validate-findings.cjs</code> —— Phase 4 跑一次，<strong>Phase 5 每次替换后再跑</strong></li>
+</ul>
+<p><strong>这个”每次变更后重新校验”的模式，是长流程 agent 编排的标准答案。</strong> 6 个阶段跑下来可能几十分钟，中间产物极易漂移，靠末端一次性校验是拦不住的。</p>
+<h3 id="12-个攻击类文档"><a href="#12-个攻击类文档" class="headerlink" title="12 个攻击类文档"></a>12 个攻击类文档</h3><p>这是它真正的内容资产，也是唯一能脱离流程单独用的部分：</p>
+<table>
+<thead>
+<tr>
+<th>文档</th>
+<th>覆盖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ATTACK-CLASSES.md</code></td>
+<td>Core &#x2F; wildcard &#x2F; obvious-things</td>
+</tr>
+<tr>
+<td><code>MEMORY-SAFETY-AND-BINARY.md</code></td>
+<td>内存安全、二进制、内核（原生目标）</td>
+</tr>
+<tr>
+<td><code>AI-AND-LLM.md</code></td>
+<td>提示注入、agent&#x2F;工具、输出处理（LLM 目标）</td>
+</tr>
+<tr>
+<td><code>WEB-PROTOCOL-AND-AUTH.md</code></td>
+<td>HTTP 请求帧、缓存、认证协议</td>
+</tr>
+<tr>
+<td><code>CLIENT-SIDE.md</code></td>
+<td>DOM 注入、消息信任、UI 重定向、原型污染</td>
+</tr>
+<tr>
+<td><code>SUPPLY-CHAIN-AND-RELEASE.md</code></td>
+<td>依赖、CI、发布、签名、更新、插件、扩展</td>
+</tr>
+<tr>
+<td><code>CLOUD-AND-DEPLOYMENT.md</code></td>
+<td>IAM、IaC、容器、serverless、ingress、运行时配置</td>
+</tr>
+<tr>
+<td><code>PROTOCOLS-RPC-AND-MESSAGING.md</code></td>
+<td>RPC、序列化、队列、broker、webhook、流协议</td>
+</tr>
+<tr>
+<td><code>RESOURCE-EXHAUSTION-AND-AVAILABILITY.md</code></td>
+<td>共享资源、配额、队列、worker、<strong>operator 支出</strong></td>
+</tr>
+<tr>
+<td><code>DATA-ISOLATION-AND-LIFECYCLE.md</code></td>
+<td>租户隔离、缓存、搜索、导出、备份、迁移、删除、恢复</td>
+</tr>
+<tr>
+<td><code>DESKTOP-MOBILE-AND-LOCAL-IPC.md</code></td>
+<td>原生 App、deeplink、webview、导出组件、helper、daemon、本地 IPC</td>
+</tr>
+</tbody></table>
+<p><code>RESOURCE-EXHAUSTION</code> 里专门列了 <strong>operator spend</strong>（运营者支出）这一类 —— 在 AI agent 时代这是真实的攻击面（让你的 agent 疯狂烧 token &#x2F; 疯狂调付费 API），传统 checklist 里很少见。</p>
+<h2 id="五、生态与基准"><a href="#五、生态与基准" class="headerlink" title="五、生态与基准"></a>五、生态与基准</h2><p><strong>这里必须说清楚：它没有基准测试。</strong></p>
+<p>Cisco Skill Scanner（016 期）给了带混淆矩阵的评测，SkillSpector（015 期）扫了 3.1 万个 skill 出了统计。Cloudflare 这个<strong>一个数字都没有</strong>，唯一可引用的量化陈述是设计原则里那句 “a single run found roughly half of the vulnerabilities that repeated runs found in total”。</p>
+<p><strong>这句话的出处是 “In our test runs”，不是公开基准。</strong> 我把它当作量级参考，不当作可复现指标。</p>
+<p>不过它有几个别的”可信度来源”：</p>
+<ul>
+<li><strong>血统</strong>：README 明写这是 Cloudflare 内部漏洞发现 harness 的起点，harness 已长成 fleet-wide 系统。这是”我们在生产里真跑”的声明，虽然不可验证。</li>
+<li><strong>52 个 open issue</strong>（相对 22.6k star 比例极低，说明要么用的人少要么问题少，两者都有可能）。</li>
+<li><strong>1,315 fork</strong>，说明二次修改的人不少 —— 对一套提示词来说 fork 是主要的”使用”方式。</li>
+</ul>
+<p><strong>和同类的横向位置：</strong></p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>品类</th>
+<th>本质</th>
+<th>产出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Cloudflare security-audit-skill</strong></td>
+<td>审计<strong>编排</strong></td>
+<td>指挥你的 agent 审</td>
+<td><code>findings.json</code> + 3 个 md</td>
+</tr>
+<tr>
+<td>Cisco Skill Scanner（016）</td>
+<td>skill <strong>扫描器</strong></td>
+<td>9 引擎静态+LLM</td>
+<td>SARIF &#x2F; HTML &#x2F; JSON</td>
+</tr>
+<tr>
+<td>SkillSpector（015）</td>
+<td>skill <strong>扫描器</strong></td>
+<td>NVIDIA 大规模扫</td>
+<td>统计 + 报告</td>
+</tr>
+<tr>
+<td>deepsec（011）</td>
+<td>一键<strong>审计</strong></td>
+<td>Vercel 封装的全量审计</td>
+<td>报告</td>
+</tr>
+<tr>
+<td>LuaN1ao（009）</td>
+<td>渗透<strong>推理链</strong></td>
+<td>结论钉回证据</td>
+<td>证据链</td>
+</tr>
+</tbody></table>
+<p>它的独特位置是：<strong>唯一一个把”防 agent 自我欺骗”作为核心设计目标的公开产物。</strong> 其他工具都在提升”发现能力”，它在提升”结论可信度”。</p>
+<h2 id="六、部署"><a href="#六、部署" class="headerlink" title="六、部署"></a>六、部署</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 项目级</span></span><br><span class="line">npx skills add https://github.com/cloudflare/security-audit-skill \</span><br><span class="line">  --skill security-audit</span><br><span class="line"></span><br><span class="line"><span class="comment"># 用户级</span></span><br><span class="line">npx skills add https://github.com/cloudflare/security-audit-skill \</span><br><span class="line">  --skill security-audit \</span><br><span class="line">  --global</span><br></pre></td></tr></table></figure>
+
+<p>需要在目标仓库里（或指向它）启动你的 coding agent，然后直接说：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">security audit this codebase</span><br><span class="line">find security vulnerabilities in ./src</span><br><span class="line">do a security review, output to ~/audits/my-project</span><br></pre></td></tr></table></figure>
+
+<p>skill 会在请求匹配触发词（security audit &#x2F; find vulnerabilities &#x2F; pen-test the code 等）时自动激活。</p>
+<h3 id="两种模式"><a href="#两种模式" class="headerlink" title="两种模式"></a>两种模式</h3><ul>
+<li><strong>Full audit mode</strong> —— 直接的”审这个代码库 &#x2F; 做渗透测试”请求。产出完整报告产物。</li>
+<li><strong>Guidance mode</strong> —— 安全提问、聚焦的漏洞分析。默认走这个，<strong>除非你明确要求报告产物。</strong></li>
+</ul>
+<p>输出目录不指定时默认 <code>~/security-audit-skill/&lt;repo-name&gt;/run-&lt;N&gt;</code>。<strong>注意这个 <code>run-&lt;N&gt;</code></strong> —— 它就是为”多次运行叠加”设计的，第二次跑会开 <code>run-2</code> 并读 <code>run-1</code> 的 ledger。</p>
+<h3 id="硬性前置条件（这条最容易踩）"><a href="#硬性前置条件（这条最容易踩）" class="headerlink" title="硬性前置条件（这条最容易踩）"></a>硬性前置条件（这条最容易踩）</h3><ol>
+<li><strong>支持工具调用 + 并行子 agent 的 coding agent</strong>（Claude Code &#x2F; Codex 这类；不支持并行 sub-agent 的 agent 跑不了多 hunter）</li>
+<li><strong>Node.js</strong> —— 只为跑那两个零依赖校验器</li>
+<li><strong>OS 强制沙箱</strong>，用于执行目标控制的代码（build &#x2F; test &#x2F; process &#x2F; browser &#x2F; emulator &#x2F; fuzzer &#x2F; fixture）。要求：<ul>
+<li><strong>禁用外部网络</strong></li>
+<li>使用净化过的白名单环境</li>
+<li>强制资源上限</li>
+<li><strong>只允许写入指定的 scratch 路径</strong></li>
+</ul>
+</li>
+</ol>
+<p>第 3 条不是建议，是<strong>开关</strong>。README 原话：</p>
+<blockquote>
+<p>Without these controls, the workflow keeps the lead as <code>needs_validation</code> instead of executing target code.</p>
+</blockquote>
+<p><strong>没有沙箱 → 所有 lead 停在 <code>needs_validation</code> → 你拿到一份”什么都确认不了”的报告。</strong> 这是安全设计（审恶意代码时绝不裸跑），但如果你没配好沙箱，体验就是”这工具没用”。</p>
+<h3 id="关于”不写回仓库”"><a href="#关于”不写回仓库”" class="headerlink" title="关于”不写回仓库”"></a>关于”不写回仓库”</h3><p>README 有一句很克制的话：</p>
+<blockquote>
+<p>The workflow writes inside the target repository <strong>only when you explicitly select a directory that version control ignores</strong>.</p>
+</blockquote>
+<p>默认产物全在 <code>~/security-audit-skill/</code> 下，<strong>不会污染你的 git 工作区</strong>。对比一些会往仓库里塞 <code>.audit/</code> 目录的 agent 工具，这个默认行为很体面。</p>
+<h2 id="七、边界与风险"><a href="#七、边界与风险" class="headerlink" title="七、边界与风险"></a>七、边界与风险</h2><p><strong>1. 14 次提交 &#x2F; 3 个月历史，别被 22k star 骗了。</strong><br>Star 数来自 Cloudflare 品牌 + 那篇博客，不是代码成熟度。提交集中在两个人（literally-dan、Dan Jones）。<strong>这是一份高质量的方法论草案，不是一个 hardened 的产品。</strong></p>
+<p><strong>2. 零量化评测。</strong><br>“单次找到一半”来自设计原则里的一句 “in our test runs”。没有测试集、没有混淆矩阵、没有可复现脚本。<strong>你没法评估它在你的代码库上到底能覆盖多少。</strong> 这一点上它明显不如 Cisco Skill Scanner 诚实 —— 后者把难看的数字（召回 7.75%）写成了专门的章节。</p>
+<p><strong>3. 成本是真门槛。</strong><br>6 阶段 × 多 hunter × coverage critics × 三轮验证 × 官方建议多次运行。<strong>一次全量审计的 token 消耗可能比你想的高一个量级</strong>，而”要跑到约 100% 覆盖需要多跑几次”是官方明说的。在大仓库上先小范围试。</p>
+<p><strong>4. 沙箱没配好 &#x3D; 白跑。</strong><br>见上一节。这是最常见的”装完发现没用”的原因。</p>
+<p><strong>5. 它不产出合规交付物。</strong><br><code>findings.json</code> 是自定义 schema，不是 SARIF。<strong>进不了 DefectDojo &#x2F; Jira 安全工单这类现有流程</strong>，得自己写映射。</p>
+<p><strong>6. 非确定性。</strong><br>同样输入两次跑，结果不同。<strong>绝对不要拿它当 CI 门禁</strong> —— 你会得到一堆 flaky 的构建失败。它的定位是”定期人工触发的深度审计”，不是”每次 commit 的卡点”。</p>
+<p><strong>7. 提示词注入的面。</strong><br>审的是你自己仓库还好；如果你拿它审<strong>第三方 &#x2F; 不可信代码库</strong>，代码里的注释和文档本身就是注入载体（<code>AI-AND-LLM.md</code> 里明确列了 prompt injection 类）。官方的沙箱要求能挡一部分执行面，但 agent 读到的文本是挡不住的。</p>
+<p><strong>8. 51 个 open issue 里可能有你关心的问题。</strong><br>相对 22.6k star 这个比例不高，但项目只有 3 个月，issue 沉淀才刚开始。</p>
+<h2 id="八、上手建议（按这个顺序来）"><a href="#八、上手建议（按这个顺序来）" class="headerlink" title="八、上手建议（按这个顺序来）"></a>八、上手建议（按这个顺序来）</h2><ol>
+<li><strong>先只读 <code>SKILL.md</code> 和 <code>VALIDATION-AND-REPORTING.md</code>。</strong> 前者有”audit anti-patterns”（审计反模式）一节，后者是 Phase 3–6。这两篇读完你就知道它想干什么了，比直接跑省时间。</li>
+<li><strong>单独抽 <code>ATTACK-CLASSES.md</code> 用。</strong> 哪怕你不用这套流程，那份攻击类清单当人工 code review 的 checklist 也值。审 LLM 应用看 <code>AI-AND-LLM.md</code>，审 Web 看 <code>WEB-PROTOCOL-AND-AUTH.md</code>。</li>
+<li><strong>先把沙箱配好再跑第一次。</strong> 禁用外网 + 资源上限 + 只写 scratch 路径。这一步偷懒，后面全是 <code>needs_validation</code>。</li>
+<li><strong>第一次跑用小目录，别上整个仓库。</strong> 用 <code>find security vulnerabilities in ./src</code> 这类限定路径的指令先试水，摸清 token 消耗。</li>
+<li><strong>确认你的 agent 支持并行子 agent。</strong> 不支持的话多 hunter 退化成串行，时间会非常长。</li>
+<li><strong>显式指定输出目录</strong>（<code>do a security review, output to ~/audits/my-project</code>），别让它默认堆 <code>run-&lt;N&gt;</code>。</li>
+<li><strong>至少跑两次再看结论。</strong> 官方明说单次约一半。第二次跑会读第一次的 ledger 去填空洞 —— <strong>这才是这套设计真正发挥作用的时刻。</strong></li>
+<li><strong>先看 <code>NEEDS-VALIDATION.md</code>，不是 <code>REPORT.md</code>。</strong> 那份”精确的未解决事实”清单，往往比已确认项更能告诉你这套流程在你的代码上卡在哪。</li>
+<li><strong>想接自己的平台，从 <code>report-schema.json</code> 入手。</strong> 它是标准 JSON Schema，映射成你自己的 finding 格式不难。</li>
+<li><strong>别拿它当门禁。</strong> 定期人工触发的深度审计，不是 CI 卡点。</li>
+</ol>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>Cloudflare security-audit-skill 值 22k star 不是因为它多成熟（14 次提交、零量化评测、才 3 个月），而是因为它是我见过的唯一一个把「如何让 agent 不对自己的结论撒谎」写成可执行流程的公开产物 —— 三批互不知情的 agent、被证伪也要记录、陈旧工作不算覆盖、单次只找到一半，这四条任何一条单独拿走都能改进你现有的 AI 审计实践。</strong></p>
+<p>给开发者的第一动作：<strong><code>npx skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global</code> → 把 <code>ATTACK-CLASSES.md</code> 当 checklist 用起来 → 配好沙箱 → 拿 <code>./src</code> 下一个小模块跑第一次，先看 <code>NEEDS-VALIDATION.md</code>。</strong> 即便你最后不用这套流程，那份 6 阶段设计和 12 个攻击类文档也值得读一遍 —— <strong>它最好的部分不是代码，是那 14 个 Markdown 文件里的判断力。</strong></p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/">https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/cloudflare-security-audit-skill/&text=Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/cloudflare-security-audit-skill/&title=Cloudflare security-audit-skill 拆解：六阶段编排，查证漏洞的 agent 永远不是发现它的那个"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/cloudflare-security-audit-skill/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/cloudflare-security-audit-skill/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/cloudflare-security-audit-skill/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/cloudflare-security-audit-skill/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <a class="post-nav-prev" href="/en/ai-tools/cloudflare-security-audit-skill/">
+    <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
+    <span class="post-nav-title">Cloudflare security-audit-skill Breakdown: Six-Phase Orchestration Where the Verifying Agent Never Found the Bug</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/en/ai-tools/cisco-skill-scanner/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">Cisco Skill Scanner Breakdown: Nine Analysis Engines, and an Evaluation Brave Enough to Publish a 7.75% Recall</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

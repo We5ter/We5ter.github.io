@@ -12,6 +12,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 每日推荐 / Daily Picks
 
+- [017 Cloudflare security-audit-skill](https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/) (EN: https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/): Cloudflare 官方的 coding-agent skill：6 阶段编排，查 findings 的 agent 永远不是发现它的那个 agent · Cloudflare's official coding-agent skill: a six-phase orchestration where the agent verifying a finding is never the agent that found it · 分类/Category: Autonomous Vulnerability Discovery and Remediation Skills · GitHub: https://github.com/cloudflare/security-audit-skill (22616 stars)
 - [016 Cisco Skill Scanner](https://we5ter.github.io/ai-tools/cisco-skill-scanner/) (EN: https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/): Cisco AI Defense 的 skill 扫描器：9 个分析引擎 + cel-go 类型化决策层，敢把 7.75% 召回率原样写进 README · Cisco AI Defense's skill scanner: nine analysis engines over a typed cel-go decision layer, brave enough to publish a 7.75% recall in its README · 分类/Category: Security Auditing for Agent Skills · GitHub: https://github.com/cisco-ai-defense/skill-scanner (2561 stars)
 - [015 NVIDIA SkillSpector](https://we5ter.github.io/ai-tools/skillspector/) (EN: https://we5ter.github.io/en/ai-tools/skillspector/): 回答「这个 skill 装了安全吗」：71 个漏洞模式 × 17 类别，静态 + 可选 LLM 语义两阶段，SARIF 直接进 CI · Answers "is this skill safe to install?": 71 vulnerability patterns across 17 categories, static plus optional LLM semantic analysis, SARIF straight into CI · 分类/Category: Security Auditing for Agent Skills · GitHub: https://github.com/NVIDIA/SkillSpector (18488 stars)
 - [014 Rebuff](https://we5ter.github.io/ai-tools/rebuff/) (EN: https://we5ter.github.io/en/ai-tools/rebuff/): prompt injection 防御史上的绕不开的一章：canary token 检测 + 向量库自我加固的四层防线（仓库已归档，按史料读） · An unavoidable chapter in prompt-injection defense history: canary-token detection plus vector-store self-hardening across four layers (archived — read it as history) · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/protectai/rebuff (1522 stars)
@@ -31,6 +32,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 分类归档 / Categories
 
+- [Autonomous Vulnerability Discovery and Remediation Skills](https://we5ter.github.io/ai-tools/cat/autonomous-vulnerability-discovery-and-remediation-skills/)
 - [Security Auditing for Agent Skills](https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/)
 - [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
