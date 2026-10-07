@@ -6,6 +6,12 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/blogs/CVE-2020-16040/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
@@ -18,8 +24,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/CVE-2020-16040/</loc>
-    <lastmod>2026-10-07</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
+    <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -36,13 +42,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agentshield/</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/cairn-state-space-search/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cairn-state-space-search/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cairn-state-space-search/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -54,13 +60,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cisco-skill-scanner/</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cisco-skill-scanner/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -72,19 +78,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cairn-state-space-search/</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
+    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -156,6 +156,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/ai-tools/openshell-nvidia-agent-runtime/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
@@ -174,8 +180,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -205,12 +211,6 @@
   </url>
   <url>
     <loc>https://we5ter.github.io/en/ai-tools/shannon-ai-pentester/</loc>
-    <lastmod>2026-09-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/shannon-ai-pentester/</loc>
     <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -252,8 +252,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/shannon-ai-pentester/</loc>
+    <lastmod>2026-09-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
