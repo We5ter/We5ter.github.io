@@ -36,12 +36,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -56,12 +50,6 @@
   <url>
     <loc>https://we5ter.github.io/ai-tools/cairn-state-space-search/</loc>
     <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
-    <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -90,13 +78,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -132,14 +120,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
-    <lastmod>2026-10-10</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/garak/</loc>
+    <lastmod>2026-10-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/garak/</loc>
-    <lastmod>2026-10-03</lastmod>
+    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -162,14 +150,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/peekaboo-cve-2018-1149-camera-malware/</loc>
-    <lastmod>2026-10-10</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/openshell-nvidia-agent-runtime/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/openshell-nvidia-agent-runtime/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/blogs/peekaboo-cve-2018-1149-camera-malware/</loc>
+    <lastmod>2026-10-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -254,6 +242,18 @@
   <url>
     <loc>https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/</loc>
     <lastmod>2026-10-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
