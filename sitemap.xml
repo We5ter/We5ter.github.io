@@ -36,6 +36,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
@@ -50,6 +56,12 @@
   <url>
     <loc>https://we5ter.github.io/ai-tools/cairn-state-space-search/</loc>
     <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
+    <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -242,18 +254,6 @@
   <url>
     <loc>https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/</loc>
     <lastmod>2026-10-10</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
-    <lastmod>2026-10-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
-    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
