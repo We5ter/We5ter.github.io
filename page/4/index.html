@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = null;
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = ;
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791811100630" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791811100630" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/page/4/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta property="og:url" content="https://we5ter.github.io/page/4/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/static/avatar.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/static/avatar.png" />
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791811100630" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="home-template">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 墙</span><span class="i18n-en">CVE Wall</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+  
+
+
+<section id="news" class="home-section news-section">
+  <h2 class="section-heading"><span class="i18n-zh">最新动态</span><span class="i18n-en">Recent news</span></h2>
+
+  <ul class="news-list">
+    
+      
+    <li class="news-item">
+      <time class="news-date" datetime="2026-09-17">2026.9.17</time>
+      <span class="news-text">
+        <span class="i18n-zh">lightrains.org 已弃用，后续均使用 we5ter.github.io 访问</span>
+        <span class="i18n-en">lightrains.org has been retired. Please use we5ter.github.io from now on.</span>
+      </span>
+    </li>
+    
+  </ul>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Article",
+        "headline": "lightrains.org 已弃用，后续均使用 we5ter.github.io 访问 / lightrains.org has been retired. Please use we5ter.github.io from now on.",
+        "datePublished": "2026-09-17",
+        "url": "https://we5ter.github.io/#news",
+        "author": { "@type": "Person", "name": "Wester" }
+      }
+    }
+    
+  ]
+}
+  </script>
+</section>
+
+
+
+  <section id="blog" class="home-section">
+    <h2 class="section-heading"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></h2>
+    <p class="section-sub"><span class="i18n-zh">安全技术笔记、漏洞分析与研究记录</span><span class="i18n-en">Security notes, vulnerability analysis, and research logs</span></p>
+
+    <div class="post-list">
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2024-08-08</time>
+          <h3 class="post-title">
+            <a href="/blogs/CVE-2020-16040/">CVE-2020-16040:Analysis of Chromium V8 engine integer overflow vulnerability</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Browser-Security/">Browser Security</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>Vulnerability Overview V8 is the JavaScript engine in the Chromium kernel, responsible for interpreting, optimizing, and…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2019-05-18</time>
+          <h3 class="post-title">
+            <a href="/blogs/roundcube-122-command-execution-via-email/">Roundcube 1.2.2: Command Execution via Email</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>本文译自 RIPSTech（RIPS）团队博客，原发于知乎专栏， 查看原文 。 0x00. 前言 Roundcube 是一个在全球范围内被广泛使用的开源网络邮件程序。例如，SourceForge 上的镜像在过去 12 个月中的下载量就超过 …</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2019-05-18</time>
+          <h3 class="post-title">
+            <a href="/blogs/zabbix-jsrpc-sqli-analysis/">一个曾经的 Zabbix SQL 注入漏洞分析</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>本文原发于知乎专栏， 查看原文 。 0x00. 漏洞背景 Zabbix 是一个开源的企业级性能监控解决方案。zabbix 的 jsrpc 的 profileIdx2 参数存在 insert 方式的 SQL 注入漏洞，攻击者无需授权登陆即可登…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2018-12-19</time>
+          <h3 class="post-title">
+            <a href="/blogs/typora-rce-via-iframe-sandbox/">如何在 Typora 编辑器上实现远程命令执行</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>本文原发于知乎专栏， 查看原文 。 Typora 简介 Typora 是一款颜值与实力共存的跨平台 Markdown 编辑器，与 Vscode、Atom、GitHub Desktop 一样，Typora 也基于 Electron 框架进行开…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2018-09-26</time>
+          <h3 class="post-title">
+            <a href="/blogs/peekaboo-cve-2018-1149-camera-malware/">威胁快讯 | 腾讯 Tencent Blade Team 首度公开，恶意代码威胁全球摄像头</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Threat-Intel/">Threat Intel</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>本文原发于腾讯云开发者社区（腾讯安全应急响应中心专栏）， 查看原文 。 北京时间 2018 年 9 月 18 日，Tenable 官网上公开了由京晨科技（NUUO）公司开发的 NVRMini2 设备管理系统存在缓冲区溢出漏洞（代号为 Pee…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2017-05-22</time>
+          <h3 class="post-title">
+            <a href="/blogs/local-file-inclusion-in-cmsmadesimple/">Local file inclusion in cmsmadesimple &lt;=2.2.1</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/CVEs-Disclosure/">CVEs Disclosure</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>Description: The File Inclusion vulnerability allows an attacker to include a file, usually exploiting a “dynamic file i…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2017-02-25</time>
+          <h3 class="post-title">
+            <a href="/blogs/cve-2017-2500/">(CVE-2017-2500)Address bar spoofing on macOS Safari</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Browser-Security/">Browser Security</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>Affected Products Safari &lt;10.1.1 on macOS Description When we input an URL including a special port or visit a domain wh…</p></div>
+        
+      </article>
+      
+      <article class="post">
+        
+        <div class="post-header-row">
+          <time class="post-date-badge">2016-08-24</time>
+          <h3 class="post-title">
+            <a href="/blogs/phpmyadmin-sql-injection-cve-2016-5703/">phpMyAdmin SQL注入漏洞(CVE-2016-5703)分析</a>
+          </h3>
+          
+          <div class="post-tags">
+            
+            <a class="post-tag" href="/tags/Vulnerability-Analysis/">Vulnerability Analysis</a>
+            
+          </div>
+          
+        </div>
+        
+        <div class="post-excerpt"><p>本文原发于腾讯安全应急响应中心（TSRC）， 查看原文 。 0x00 影响版本 Version 4.6.x（&lt; 4.6.3） Version 4.4.x（&lt; 4.4.15.7） 0x01 漏洞描述 phpMyAdmin 是一个 web 端通…</p></div>
+        
+      </article>
+      
+    </div>
+
+    
+    <nav class="pagination">
+      
+      <a class="newer-posts" href="page/3/">&larr; <span class="i18n-zh">较新</span><span class="i18n-en">Newer</span></a>
+      
+      <span class="page-number"><span class="i18n-zh">第 4 / 5 页</span><span class="i18n-en">Page 4 of 5</span></span>
+      
+      <a class="older-posts" href="page/5/"><span class="i18n-zh">较早</span><span class="i18n-en">Older</span> &rarr;</a>
+      
+    </nav>
+    
+  </section>
+
+  <section id="talks" class="home-section">
+    <h2 class="section-heading"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></h2>
+    <p class="section-sub"><span class="i18n-zh">会议演讲、技术分享与幻灯片</span><span class="i18n-en">Conference presentations, technical sharing, and slides</span></p>
+    <div class="talk-grid" id="talk-grid"></div>
+
+<script>
+(function () {
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  fetch('/talks.json')
+    .then(function (r) { return r.json(); })
+    .then(function (talks) {
+      var grid = document.getElementById('talk-grid');
+      if (!grid) return;
+
+      talks.forEach(function (talk) {
+        // 右侧链接：Slides / Demo（Event 由会议名徽标承担，不重复）
+        var links = '';
+        if (talk.slideUrl) links += '<a href="' + esc(talk.slideUrl) + '" target="_blank" rel="noopener">Slides</a>';
+        if (talk.demoUrl)  links += '<a href="' + esc(talk.demoUrl) + '" target="_blank" rel="noopener">Demo</a>';
+
+        // 会议 logo：外链，加载失败就把整个 logo 框隐藏，不留破图
+        // logoFilter 字段支持 CSS filter（如 invert(1) 把黑底白字 logo 反相到白底可见）
+        var logoStyle = talk.logoFilter ? ' style="' + esc(talk.logoFilter) + '"' : '';
+        var logoHtml = talk.logo
+          ? '<span class="talk-logo">' +
+              '<img src="' + esc(talk.logo) + '" alt="" loading="lazy"' + logoStyle + ' ' +
+              'onerror="this.parentNode.style.display=\'none\'">' +
+            '</span>'
+          : '';
+
+        // 会议名称：标题上方的显著徽标，点击直达会议主页
+        var eventHtml = '';
+        if (talk.event) {
+          var eventHref = talk.eventUrl || talk.slideUrl || '#';
+          eventHtml = '<a class="talk-event" href="' + esc(eventHref) + '" target="_blank" rel="noopener">' +
+                        esc(talk.event) +
+                      '</a>';
+        }
+
+        var item = document.createElement('article');
+        item.className = 'talk-item';
+        item.innerHTML =
+          logoHtml +
+          '<div class="talk-main">' +
+            eventHtml +
+            '<h3 class="talk-title">' +
+              '<a href="' + esc(talk.slideUrl || talk.eventUrl || '#') + '" target="_blank" rel="noopener">' +
+                talk.title +
+              '</a>' +
+            '</h3>' +
+            (talk.author ? '<span class="talk-author">' + esc(talk.author) + '</span>' : '') +
+          '</div>' +
+          (links ? '<div class="talk-links">' + links + '</div>' : '');
+
+        grid.appendChild(item);
+      });
+    })
+    .catch(function (err) { console.error('Failed to load talks:', err); });
+})();
+</script>
+
+  </section>
+
+  <section id="repositories" class="home-section">
+    <h2 class="section-heading"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></h2>
+    <p class="section-sub"><span class="i18n-zh">开源工具与安全研究项目</span><span class="i18n-en">Open-source tools and security research projects</span></p>
+    <div class="repo-list" id="repo-grid"></div>
+
+<script>
+(function () {
+  var FORK_SVG = '<svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75 0 1 0-1.5 0 .75 0 0 0 1.5 0Zm6.75.75a.75 0 1 0 0-1.5.75 0 0 0 0 1.5Zm-3 8.75a.75 0 1 0-1.5 0 .75 0 0 0 1.5 0Z"></path></svg>';
+
+  var API_TIMEOUT = 8000;
+  var CACHE_TTL   = 30 * 60 * 1000;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function readCache(key) {
+    try {
+      var raw = sessionStorage.getItem(key);
+      if (!raw) return null;
+      var c = JSON.parse(raw);
+      if (!c || Date.now() - c.t > CACHE_TTL) return null;
+      return c;
+    } catch (e) { return null; }
+  }
+
+  function writeCache(key, obj) {
+    try { sessionStorage.setItem(key, JSON.stringify(obj)); } catch (e) {}
+  }
+
+  // 项目简介支持中英双语：有 descriptionEn 就输出 i18n-zh / i18n-en 两个 span，
+  // 显隐交给 screen.css 按 html[data-lang] 控制（和其他 UI 文案同一套机制）；
+  // 没有 descriptionEn 的条目退回单语言 description，老数据不用改。
+  function descHtml(repo) {
+    var zh = repo.description || '';
+    var en = repo.descriptionEn || '';
+    if (!en) return esc(zh);
+    return '<span class="i18n-zh">' + esc(zh) + '</span>' +
+           '<span class="i18n-en">' + esc(en) + '</span>';
+  }
+
+  // stars/forks 已经是 shields.io 格式化好的字符串（如 "9.1k"），直接拼进现有排版
+  function applyStats(item, stars, forks) {
+    var s = item.querySelector('.repo-stars');
+    var f = item.querySelector('.repo-forks');
+    if (s && stars) s.textContent = '★ ' + stars;
+    if (f && forks) f.innerHTML = FORK_SVG + ' ' + forks;
+  }
+
+  // 实时数据走 shields.io：它用自己的 GitHub token 取值，不受访客侧
+  // api.github.com 的 60 次/小时/IP 限流，国内可达性也更好。
+  // 失败/超时时保留静态兜底值，不做任何改动。
+  function fetchLive(item, owner, repo) {
+    var key = 'gh-repo-' + owner + '-' + repo;
+    var cached = readCache(key);
+    if (cached) { applyStats(item, cached.s, cached.f); return; }
+
+    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    var opts = ctrl ? { signal: ctrl.signal } : undefined;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, API_TIMEOUT);
+
+    function grab(kind) {
+      return fetch(
+        'https://img.shields.io/github/' + kind + '/' + owner + '/' + repo + '.json',
+        opts
+      ).then(function (r) { return r.ok ? r.json() : null; })
+       .catch(function () { return null; });
+    }
+
+    Promise.all([grab('stars'), grab('forks')])
+      .then(function (res) {
+        clearTimeout(timer);
+        var s = res[0] && res[0].value ? res[0].value : null;
+        var f = res[1] && res[1].value ? res[1].value : null;
+        if (!s && !f) return;
+        applyStats(item, s, f);
+        writeCache(key, { s: s, f: f, t: Date.now() });
+      })
+      .catch(function () { clearTimeout(timer); });
+  }
+
+  fetch('/repositories.json')
+    .then(function (r) { return r.json(); })
+    .then(function (repos) {
+      var list = document.getElementById('repo-grid');
+      if (!list) return;
+
+      repos.forEach(function (repo) {
+        // Extract owner/repo from GitHub URL for the stars/forks API call
+        var match = /github\.com\/([^/]+)\/([^/]+)/.exec(repo.repoUrl);
+        var apiOwner = match ? match[1] : '';
+        var apiRepo = match ? match[2] : '';
+
+        // 兜底值先渲染出来：即便 API 挂了/被限流，也不会显示空白
+        var starText = repo.stars ? '★ ' + esc(repo.stars) : '';
+        var forkText = repo.forks ? FORK_SVG + ' ' + esc(repo.forks) : '';
+        var statsHtml = (starText || forkText)
+          ? '<span class="repo-stars">' + starText + '</span>' +
+            '<span class="repo-forks">' + forkText + '</span>'
+          : '<a class="repo-gh" href="' + esc(repo.repoUrl) + '" target="_blank" rel="noopener">GitHub</a>';
+
+        var item = document.createElement('article');
+        item.className = 'repo-item';
+        item.innerHTML =
+          '<div class="repo-head">' +
+            '<h3 class="repo-name">' +
+              '<a href="' + esc(repo.repoUrl) + '" target="_blank" rel="noopener">' + esc(repo.title) + '</a>' +
+            '</h3>' +
+            '<div class="repo-stats">' + statsHtml + '</div>' +
+          '</div>' +
+          '<p class="repo-desc">' + descHtml(repo) + '</p>';
+
+        list.appendChild(item);
+
+        if (apiOwner && apiRepo) fetchLive(item, apiOwner, apiRepo);
+      });
+    })
+    .catch(function (err) { console.error('Failed to load repos:', err); });
+})();
+</script>
+
+  </section>
+
+  
+  
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the light site theme -->
+<script>
+(function() {
+  var siteTheme = 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: 'light' } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
