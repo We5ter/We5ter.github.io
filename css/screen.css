@@ -1088,6 +1088,7 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
      兜底走主题 accent —— 没配到色或未分类时仍能用。 */
   border-left: 3px solid var(--cat, var(--accent));
   border-radius: var(--radius);
+  position: relative;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 /* hover：轻微抬起 + 投影，边框跟分类色亮起来。
@@ -2327,4 +2328,211 @@ a.cve-hof:hover {
   .aitools-toolbar { padding: .75rem; }
   .aitools-chip { font-size: .75rem; padding: .3rem .55rem; }
   .aitools-search-input { font-size: .875rem; padding: .5rem 2rem .5rem 2rem; }
+}
+
+/* ==========================================================================
+   Dark theme — 只覆盖变量 + 少量硬编码浅色。
+   放在文件末尾：[data-theme="dark"] 与 :root 同特异性(0,1,0)，后者靠顺序胜出。
+   绝大多数组件用 var(--bg)/--bg-soft/--text/--border，改这几个就整体翻黑。
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg:            #12181b;
+  --bg-soft:       #1a2226;
+  --text:          #e4e8ea;
+  --text-muted:    #96a0a6;
+  --border:        #2b353a;
+  --accent:        #58b6d4;
+  --accent-soft:   #16313b;
+  /* 暗色下反复出现的「浅色调」集中在这里改，避免逐个选择器重复写 */
+  --shadow:        0 4px 16px rgba(0, 0, 0, .4);
+}
+
+/* 卡片/浮层的白底 → 抬升一档的表面色（比 --bg 略亮，做出层次） */
+[data-theme="dark"] .link-pop,
+[data-theme="dark"] .talk-logo { background: #1e272b; }
+[data-theme="dark"] .link-pop { box-shadow: var(--shadow); }
+/* 二维码必须留白底，否则扫码识别率下降 —— 不改 .contact-qr img / .aitools-qr img */
+
+/* 正文链接 hover 的深青色在暗底上太暗，换成亮一档的 accent */
+[data-theme="dark"] .post-content a:hover { color: #7fd0e8; }
+
+/* 「今日已更新」绿灯带：浅色成功底 → 暗色成功底 */
+[data-theme="dark"] .aitools-live { border-color: #2b353a; }
+[data-theme="dark"] .aitools-live.is-on {
+  background: #12312a; border-color: #1d4a3d; color: #5fd6b0;
+}
+
+/* 各种 hover 浅蓝底 (#d6e6ea) → 暗色 hover 底 */
+[data-theme="dark"] .aitools-drawer-btn:hover,
+[data-theme="dark"] .nav-ai:hover,
+[data-theme="dark"] .post-lang-toggle:hover,
+[data-theme="dark"] a.cve-hof:hover { background: #24343a; }
+
+/* 淡青描边 (#d6e9ef)：订阅带 / 二维码框 / 侧栏小组件 / 分隔虚线 → 暗色描边 */
+[data-theme="dark"] .aitools-subscribe,
+[data-theme="dark"] .aitools-qr,
+[data-theme="dark"] .sidebar-widget { border-color: #2b353a; }
+[data-theme="dark"] .sw-item { border-bottom-color: #2b353a; }
+
+/* toast：亮底深字 → 暗色下反过来（浅底深字），否则深底上看不见 */
+[data-theme="dark"] .aitools-toast { background: #e4e8ea; color: #12181b; }
+
+/* 星榜 top3 的金色名次在暗底上稍微提亮 */
+[data-theme="dark"] .aitools-view-board #aitools-flat .aitools-item.is-rank-top::before { color: #f0b429; }
+
+/* 免责声明的暖色警告块 → 暗色警告底（保留琥珀语义，压暗背景） */
+[data-theme="dark"] .post-disclaimer {
+  background: #2a2415; border-color: #4a3f22; border-left-color: #d9910b; color: #e8cf9a;
+}
+
+/* banner 图没加载出来时的兜底底色，暗色下再压深一点，不刺眼 */
+[data-theme="dark"] .section-heading--banner { background-color: #14343d; }
+
+/* 首屏数字带的浅色渐变起点 (#fcfdfe) 在暗色下发灰，换成深色渐变 */
+[data-theme="dark"] .aitools-stats {
+  background: linear-gradient(180deg, #1e272b 0%, var(--bg-soft) 100%);
+}
+
+/* 404 主按钮 hover 的深青底在暗色下改用 accent，保持可辨识 */
+[data-theme="dark"] .notfound-btn-primary:hover { background: #266a80; border-color: #266a80; }
+
+/* 主题切换按钮：与语言切换按钮同一套外观，日/月图标按当前主题互斥显示 */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; margin-right: .35rem; padding: 0;
+  color: var(--text-muted); background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; vertical-align: middle; transition: color .15s, border-color .15s, background .15s;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.theme-toggle .theme-icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .theme-icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .theme-icon-moon { display: block; }
+.lang-toggle-item { display: flex; align-items: center; }
+
+/* ==========================================================================
+   ai-tools 追加组件：收藏星标 / archived 徽章 / NEW 点 / 搜索高亮 /
+   加载更多 / 抽屉同类工具 / ⌘K 命令面板。全部用 var() 取色，暗色自动跟随。
+   ========================================================================== */
+
+/* ── 收藏星标（卡片右上角）────────────────────────────── */
+.aitools-fav {
+  position: absolute; top: .5rem; right: .6rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0;
+  color: var(--text-muted); background: transparent;
+  border: 0; border-radius: 50%; cursor: pointer;
+  opacity: .45; transition: opacity .15s, color .15s, background .15s, transform .15s;
+}
+.aitools-item:hover .aitools-fav,
+.aitools-fav:focus-visible { opacity: 1; }
+.aitools-fav:hover { background: var(--bg-soft); color: #f0b429; }
+.aitools-item.is-fav .aitools-fav { opacity: 1; color: #f0b429; }
+.aitools-item.is-fav .aitools-fav svg path { fill: #f0b429; }
+.aitools-fav:active { transform: scale(.86); }
+
+/* ── archived / 史料 徽章 ─────────────────────────────── */
+.aitools-archived {
+  display: inline-flex; align-items: center;
+  padding: .1rem .5rem; font-size: .6875rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--text-muted); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 999px; white-space: nowrap;
+}
+
+/* ── 自上次访问后的新期：左上角一颗 NEW 点 ─────────────── */
+.aitools-item.is-new::after {
+  content: "NEW";
+  position: absolute; top: -.4rem; left: .65rem;
+  padding: .05rem .35rem; font-size: .625rem; font-weight: 700; letter-spacing: .04em;
+  color: #fff; background: #ef476f; border-radius: 4px; line-height: 1.4;
+}
+
+/* ── 搜索命中高亮 ─────────────────────────────────────── */
+mark.aitools-hl {
+  background: #fff3b0; color: inherit;
+  padding: 0 .1em; border-radius: 2px;
+}
+[data-theme="dark"] mark.aitools-hl { background: #6b5900; color: #ffe9a3; }
+
+/* ── 收藏 chip 里的星标图标对齐 ───────────────────────── */
+.aitools-chip-star { flex: none; margin-right: .15rem; }
+
+/* ── 时间线「加载更多」────────────────────────────────── */
+.aitools-loadmore-wrap { text-align: center; margin: .5rem 0 1.25rem; }
+.aitools-loadmore {
+  padding: .5rem 1.2rem; font: inherit; font-size: .875rem; font-weight: 600;
+  color: var(--accent); background: var(--bg);
+  border: 1px solid var(--accent); border-radius: 999px; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.aitools-loadmore:hover { background: var(--accent); color: #fff; }
+.aitools-loadmore-n { margin-left: .35rem; opacity: .7; font-weight: 500; }
+
+/* ── 抽屉「同类工具」交叉链 ───────────────────────────── */
+.aitools-drawer-related { padding: 0 1.25rem; margin-top: .25rem; }
+.aitools-related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
+.aitools-related {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  width: 100%; padding: .45rem .6rem; font: inherit; font-size: .8125rem; text-align: left;
+  color: var(--text); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.aitools-related:hover { border-color: var(--cat, var(--accent)); color: var(--accent); }
+.aitools-related-issue { flex: none; font-size: .6875rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* ── ⌘K 命令面板 ──────────────────────────────────────── */
+.aitools-palette-scrim {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(15, 20, 23, .45); opacity: 0;
+  transition: opacity .18s ease; backdrop-filter: blur(1px);
+}
+.aitools-palette-scrim.is-open { opacity: 1; }
+.aitools-palette {
+  position: fixed; z-index: 91; top: 14vh; left: 50%;
+  width: min(560px, calc(100vw - 2rem));
+  transform: translate(-50%, -8px); opacity: 0;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+  overflow: hidden; transition: opacity .18s ease, transform .18s ease;
+}
+.aitools-palette.is-open { opacity: 1; transform: translate(-50%, 0); }
+.aitools-palette-search {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .75rem .9rem; border-bottom: 1px solid var(--border); color: var(--text-muted);
+}
+.aitools-palette-input {
+  flex: 1; min-width: 0; font: inherit; font-size: .9375rem;
+  color: var(--text); background: transparent; border: 0; outline: none;
+}
+.aitools-palette-esc {
+  flex: none; padding: .1rem .4rem; font-family: var(--font-mono); font-size: .6875rem;
+  color: var(--text-muted); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 4px;
+}
+.aitools-palette-list {
+  list-style: none; margin: 0; padding: .35rem;
+  max-height: min(52vh, 420px); overflow-y: auto;
+}
+.aitools-palette-row {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .6rem; border-radius: var(--radius); cursor: pointer;
+}
+.aitools-palette-row.is-active { background: var(--accent-soft); }
+.aitools-palette-kind {
+  flex: none; min-width: 3.6rem; text-align: center;
+  font-size: .6875rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: 4px; padding: .1rem .3rem; font-variant-numeric: tabular-nums;
+}
+.aitools-palette-row.is-active .aitools-palette-kind { color: var(--accent); border-color: var(--accent); }
+.aitools-palette-name {
+  flex: 1; min-width: 0; font-size: .9375rem; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.aitools-palette-empty { margin: 0; padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: .875rem; }
+body.aitools-palette-open { overflow: hidden; }
+@media (max-width: 560px) {
+  .aitools-palette { top: 8vh; }
+  .aitools-palette-kind { min-width: 3rem; }
 }
