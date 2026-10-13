@@ -12,6 +12,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 每日推荐 / Daily Picks
 
+- [018 LLMFuzzer](https://we5ter.github.io/ai-tools/llmfuzzer/) (EN: https://we5ter.github.io/en/ai-tools/llmfuzzer/): 自称「首个 LLM 模糊测试框架」的 100 行 PoC：其实不 fuzz、无模型在环，判定靠子串匹配——但那个确定性 oracle 是整类注入检测的地基 · A 100-line PoC self-billed as "the first LLM fuzzing framework" — it doesn't fuzz, no model in the loop, verdict is a substring match; but that deterministic oracle is the foundation of the whole injection-detection class · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/mnns/LLMFuzzer (383 stars)
 - [017 Cloudflare security-audit-skill](https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/) (EN: https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/): Cloudflare 官方的 coding-agent skill：6 阶段编排，查 findings 的 agent 永远不是发现它的那个 agent · Cloudflare's official coding-agent skill: a six-phase orchestration where the agent verifying a finding is never the agent that found it · 分类/Category: Autonomous Vulnerability Discovery and Remediation Skills · GitHub: https://github.com/cloudflare/security-audit-skill (22616 stars)
 - [016 Cisco Skill Scanner](https://we5ter.github.io/ai-tools/cisco-skill-scanner/) (EN: https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/): Cisco AI Defense 的 skill 扫描器：9 个分析引擎 + cel-go 类型化决策层，敢把 7.75% 召回率原样写进 README · Cisco AI Defense's skill scanner: nine analysis engines over a typed cel-go decision layer, brave enough to publish a 7.75% recall in its README · 分类/Category: Security Auditing for Agent Skills · GitHub: https://github.com/cisco-ai-defense/skill-scanner (2561 stars)
 - [015 NVIDIA SkillSpector](https://we5ter.github.io/ai-tools/skillspector/) (EN: https://we5ter.github.io/en/ai-tools/skillspector/): 回答「这个 skill 装了安全吗」：71 个漏洞模式 × 17 类别，静态 + 可选 LLM 语义两阶段，SARIF 直接进 CI · Answers "is this skill safe to install?": 71 vulnerability patterns across 17 categories, static plus optional LLM semantic analysis, SARIF straight into CI · 分类/Category: Security Auditing for Agent Skills · GitHub: https://github.com/NVIDIA/SkillSpector (18488 stars)
@@ -32,9 +33,9 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 分类归档 / Categories
 
+- [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [Autonomous Vulnerability Discovery and Remediation Skills](https://we5ter.github.io/ai-tools/cat/autonomous-vulnerability-discovery-and-remediation-skills/)
 - [Security Auditing for Agent Skills](https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/)
-- [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
 - [AI Autonomous Cybersecurity Agents](https://we5ter.github.io/ai-tools/cat/ai-autonomous-cybersecurity-agents/)
 - [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
