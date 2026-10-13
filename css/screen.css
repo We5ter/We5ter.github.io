@@ -2411,25 +2411,9 @@ a.cve-hof:hover {
 .lang-toggle-item { display: flex; align-items: center; }
 
 /* ==========================================================================
-   ai-tools 追加组件：收藏星标 / archived 徽章 / NEW 点 / 搜索高亮 /
+   ai-tools 追加组件：archived 徽章 / NEW 点 / 搜索高亮 /
    加载更多 / 抽屉同类工具 / ⌘K 命令面板。全部用 var() 取色，暗色自动跟随。
    ========================================================================== */
-
-/* ── 收藏星标（卡片右上角）────────────────────────────── */
-.aitools-fav {
-  position: absolute; top: .5rem; right: .6rem;
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 26px; height: 26px; padding: 0;
-  color: var(--text-muted); background: transparent;
-  border: 0; border-radius: 50%; cursor: pointer;
-  opacity: .45; transition: opacity .15s, color .15s, background .15s, transform .15s;
-}
-.aitools-item:hover .aitools-fav,
-.aitools-fav:focus-visible { opacity: 1; }
-.aitools-fav:hover { background: var(--bg-soft); color: #f0b429; }
-.aitools-item.is-fav .aitools-fav { opacity: 1; color: #f0b429; }
-.aitools-item.is-fav .aitools-fav svg path { fill: #f0b429; }
-.aitools-fav:active { transform: scale(.86); }
 
 /* ── archived / 史料 徽章 ─────────────────────────────── */
 .aitools-archived {
@@ -2453,9 +2437,6 @@ mark.aitools-hl {
   padding: 0 .1em; border-radius: 2px;
 }
 [data-theme="dark"] mark.aitools-hl { background: #6b5900; color: #ffe9a3; }
-
-/* ── 收藏 chip 里的星标图标对齐 ───────────────────────── */
-.aitools-chip-star { flex: none; margin-right: .15rem; }
 
 /* ── 时间线「加载更多」────────────────────────────────── */
 .aitools-loadmore-wrap { text-align: center; margin: .5rem 0 1.25rem; }
