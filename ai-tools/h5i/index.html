@@ -43,7 +43,7 @@
         en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = "h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里";
+      var pageTitle = "h5i：Agent 接过了 Burp 的活，也接过了它的规矩";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -77,7 +77,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <title>h5i：Agent 接过了 Burp 的活，也接过了它的规矩 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。" />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -86,8 +86,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791986040805" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791986040805" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1791986674797" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1791986674797" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/h5i/" />
@@ -100,14 +100,14 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:title" content="h5i：Agent 接过了 Burp 的活，也接过了它的规矩 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
   <meta property="og:description" content="h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。" />
   <meta property="og:url" content="https://we5ter.github.io/ai-tools/h5i/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/h5i-banner.jpg" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:title" content="h5i：Agent 接过了 Burp 的活，也接过了它的规矩 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
   <meta name="twitter:description" content="h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。" />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/h5i-banner.jpg" />
   
@@ -138,7 +138,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791986040805" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1791986674797" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -156,7 +156,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/h5i/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/h5i/"},"headline":"h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里","name":"h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里","description":"h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。","image":"https://we5ter.github.io/images/banners/h5i-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-14T06:00:00.000Z","dateModified":"2026-10-14T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/h5i/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/h5i/"},"headline":"h5i：Agent 接过了 Burp 的活，也接过了它的规矩","name":"h5i：Agent 接过了 Burp 的活，也接过了它的规矩","description":"h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。","image":"https://we5ter.github.io/images/banners/h5i-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-14T06:00:00.000Z","dateModified":"2026-10-14T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -349,7 +349,7 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/h5i-banner.jpg)">
-    <h1 class="post-title">h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里</h1>
+    <h1 class="post-title">h5i：Agent 接过了 Burp 的活，也接过了它的规矩</h1>
     <div class="article-meta">
       <time class="article-date" datetime="2026-10-14">
         <span class="i18n-zh">2026年10月14日</span>
@@ -741,13 +741,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/h5i/&text=h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/h5i/&text=h5i：Agent 接过了 Burp 的活，也接过了它的规矩"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/h5i/&title=h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/h5i/&title=h5i：Agent 接过了 Burp 的活，也接过了它的规矩"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
@@ -791,7 +791,7 @@
   
   <a class="post-nav-prev" href="/en/ai-tools/h5i/">
     <span class="post-nav-label">&larr; <span class="i18n-zh">上一篇</span><span class="i18n-en">Previous</span></span>
-    <span class="post-nav-title">h5i, Dissected: Rebuilding the Burp Layer as an Agent-Native Workbench — and Compiling the Evidence Discipline into the Binary</span>
+    <span class="post-nav-title">h5i: Handing the Burp Layer to an Agent, Rules and All</span>
   </a>
   
   

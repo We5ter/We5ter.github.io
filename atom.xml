@@ -15,7 +15,7 @@
     </image>
     <atom:link href="https://we5ter.github.io/atom.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>h5i, Dissected: Rebuilding the Burp Layer as an Agent-Native Workbench — and Compiling the Evidence Discipline into the Binary</title>
+      <title>h5i: Handing the Burp Layer to an Agent, Rules and All</title>
       <link>https://we5ter.github.io/en/ai-tools/h5i/</link>
       <description>h5i is a Rust workspace for agent-native web security, and it runs on two legs. The **red-team leg** hands an AI agent one coherent set of tools — browser driving, HTTP capture / tamper / replay, recon crawling, a sandbox called a box. The **proof leg** takes Rust business logic written against h5i-app, runs it through Aeneas into Lean 4, and proves properties about it. The most valuable part isn't the feature list. It's the SKILL.md that ships **compiled into the binary**: *No complete PoC, no vulnerability* / *a denial is a policy result, not an obstacle* / *never disable a hook or edit policy from inside a box*. That is the operating discipline of agent-driven security testing written as enforceable clauses distributed with the tool, rather than as friendly tips in a README.</description>
       <author>Wester</author>
@@ -25,7 +25,7 @@
       </content:encoded>
     </item>
     <item>
-      <title>h5i 拆解：把 Burp 那一层重做成 Agent 原生工作台，还把「证据纪律」写进了 skill 里</title>
+      <title>h5i：Agent 接过了 Burp 的活，也接过了它的规矩</title>
       <link>https://we5ter.github.io/ai-tools/h5i/</link>
       <description>h5i 是一个 Rust 写的 agent-native Web 安全工作台，两条腿走路：**红队侧**给 AI Agent 一套统一工具（浏览器驱动、HTTP 流量抓取/改包/重放、侦察爬取、沙箱 box），**证明侧**用 h5i-app 把 Rust 业务逻辑经 Aeneas 翻成 Lean 4 做形式化验证。它最值钱的不是功能清单，而是那份**编译进二进制**的 SKILL.md——**「No complete PoC, no vulnerability」「denial 是策略结果不是障碍」「禁止在 box 里改策略或关 hook」**，把 agent 安全测试的操作纪律写成了随工具分发的可执行条款，而不是留在 README 里的温馨提示。</description>
       <author>Wester</author>
