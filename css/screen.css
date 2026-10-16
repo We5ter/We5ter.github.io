@@ -1338,6 +1338,72 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
   100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
 }
 
+/* ---- 赞助商带 ----
+   位置：数字带和工具栏之间。设计上刻意「轻」——
+   左边框用 accent（和卡片左边框、统计带同一语言），不加渐变、
+   不加阴影、不放品牌色大底：赞助信息要看得见，但不能比工具列表更像正文。
+   Logo 是赞助商自己的视觉资产，放 56px 大小做品牌位，
+   它自带颜色，所以整块其余部分一律中性色，避免两套品牌色打架。
+   移动端 CTA 换行到第二行、占满宽度（见文件末尾媒体查询）。 */
+.aitools-sponsor {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+  padding: .75rem 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.aitools-sponsor-logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  /* 赞助商 PNG 自带阴影/渐变，圆角容器统一遮一下，边框不必需 */
+  border-radius: var(--radius);
+}
+.aitools-sponsor-body { flex: 1 1 auto; min-width: 0; }
+.aitools-sponsor-kicker {
+  margin: 0 0 .1rem;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.aitools-sponsor-name {
+  margin: 0 0 .15rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.aitools-sponsor-desc {
+  margin: 0;
+  font-size: .8125rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+/* CTA：幽灵按钮，和订阅带的按钮同一规格，但更小一号 */
+.aitools-sponsor-cta {
+  flex-shrink: 0;
+  padding: .45rem .9rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: .8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.aitools-sponsor-cta:hover {
+  background: var(--accent);
+  /* 亮色 accent 上用白字；暗色 accent (#58b6d4) 上的白字对比度不达标，
+     所以这里不用 #fff，改用深色字 —— 两个主题都靠 var() 自动切。 */
+  color: #ffffff;
+}
+[data-theme="dark"] .aitools-sponsor-cta:hover { color: #12181b; }
+
 /* ---- 卡片：整张可点开抽屉 ----
    点击态（手型 + 右箭头）只给主专栏页的 .aitools-item--link：
    分类归档页的卡片没有抽屉，挂上指针会骗人。 */
@@ -2465,6 +2531,20 @@ a.cve-hof:hover {
   .aitools-toolbar { padding: .75rem; }
   .aitools-chip { font-size: .75rem; padding: .3rem .55rem; }
   .aitools-search-input { font-size: .875rem; padding: .5rem 2rem .5rem 2rem; }
+}
+
+/* ---- 赞助商带：窄屏换行 ----
+   560px 以下 logo + 文字挤在一行会很憋，CTA 也不再塞得下。
+   改成「logo 和文字一行、CTA 独占第二行占满宽度」，
+   手机上拇指点 CTA 的面积也更大。 */
+@media (max-width: 560px) {
+  .aitools-sponsor { flex-wrap: wrap; }
+  .aitools-sponsor-cta { flex-basis: 100%; text-align: center; margin-top: .35rem; }
+}
+/* 420px 以下的极窄屏：logo 缩到 44px，给文字多留一行 */
+@media (max-width: 420px) {
+  .aitools-sponsor-logo { width: 44px; height: 44px; }
+  .aitools-sponsor-desc { font-size: .75rem; }
 }
 
 /* ==========================================================================
