@@ -12,6 +12,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 每日推荐 / Daily Picks
 
+- [020 agent-sandbox](https://we5ter.github.io/ai-tools/agent-sandbox/) (EN: https://we5ter.github.io/en/ai-tools/agent-sandbox/): Kubernetes SIG Apps 官方出品：把「一个长期活着、有稳定名字、带自己磁盘的单容器」补成 Sandbox 这层 API，隔离一行代码都不自己写，全交给 gVisor / Kata · Official Kubernetes SIG Apps project: turns "one long-lived container with a stable name and its own disk" into a first-class API — and writes zero isolation code itself, delegating it all to gVisor / Kata · 分类/Category: AI Agent Runtime Controls · GitHub: https://github.com/kubernetes-sigs/agent-sandbox (4270 stars)
 - [019 h5i](https://we5ter.github.io/ai-tools/h5i/) (EN: https://we5ter.github.io/en/ai-tools/h5i/): 把 Burp 那一层重做成 Agent 原生工作台：浏览器驱动 + 抓包改包重放 + 沙箱 box + Lean 4 形式化验证，纪律条款编译进二进制 · The Burp layer rebuilt as an agent-native workbench — browser driving, HTTP capture/tamper/replay, sandbox boxes and Lean 4 proofs, with the discipline compiled into the binary · 分类/Category: Security Toolkits for Agentic Workflows · GitHub: https://github.com/h5i-dev/h5i (775 stars)
 - [018 LLMFuzzer](https://we5ter.github.io/ai-tools/llmfuzzer/) (EN: https://we5ter.github.io/en/ai-tools/llmfuzzer/): 自称「首个 LLM 模糊测试框架」的 100 行 PoC：其实不 fuzz、无模型在环，判定靠子串匹配——但那个确定性 oracle 是整类注入检测的地基 · A 100-line PoC self-billed as "the first LLM fuzzing framework" — it doesn't fuzz, no model in the loop, verdict is a substring match; but that deterministic oracle is the foundation of the whole injection-detection class · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/mnns/LLMFuzzer (383 stars)
 - [017 Cloudflare security-audit-skill](https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/) (EN: https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/): Cloudflare 官方的 coding-agent skill：6 阶段编排，查 findings 的 agent 永远不是发现它的那个 agent · Cloudflare's official coding-agent skill: a six-phase orchestration where the agent verifying a finding is never the agent that found it · 分类/Category: Autonomous Vulnerability Discovery and Remediation Skills · GitHub: https://github.com/cloudflare/security-audit-skill (22616 stars)
@@ -34,11 +35,11 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 分类归档 / Categories
 
+- [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
 - [Security Toolkits for Agentic Workflows](https://we5ter.github.io/ai-tools/cat/security-toolkits-for-agentic-workflows/)
 - [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [Autonomous Vulnerability Discovery and Remediation Skills](https://we5ter.github.io/ai-tools/cat/autonomous-vulnerability-discovery-and-remediation-skills/)
 - [Security Auditing for Agent Skills](https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/)
 - [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
 - [AI Autonomous Cybersecurity Agents](https://we5ter.github.io/ai-tools/cat/ai-autonomous-cybersecurity-agents/)
-- [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
 
