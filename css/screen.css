@@ -1404,6 +1404,74 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
 }
 [data-theme="dark"] .aitools-sponsor-cta:hover { color: #12181b; }
 
+/* ---- 成为赞助商 ----
+   位置：赞助商带正下方。设计上比赞助商带「轻一档」——
+   没有左侧 accent 粗边、没有底色块、没有 Logo，只用虚线边框 + 中性文字，
+   因为它不是当期要推广的内容，而是一个常驻的「入口」。
+   ⚠️ 不放 PayPal 官方蓝按钮图：上面赞助商带的品牌色和本站 accent
+   已经是两套色，再塞一个 #009CDE 蓝按钮会让首屏出现三种主色。
+   统一走文字链，靠 hover 下划线反馈，保持视觉只有一种强调色。 */
+.aitools-sponsor-join {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem 1.25rem;
+  margin: -0.35rem 0 1.25rem;   /* 上负值：视觉上贴着赞助商带，两组是一件事 */
+  padding: .7rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+.aitools-sponsor-join-text { flex: 1 1 320px; min-width: 0; }
+.aitools-sponsor-join-k {
+  margin: 0;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.aitools-sponsor-join-h {
+  margin: .05rem 0 .1rem;
+  font-size: .9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.aitools-sponsor-join-d {
+  margin: 0;
+  font-size: .8125rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.aitools-sponsor-join-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .5rem;
+  flex-shrink: 0;
+}
+/* 文字链做成小药丸，hover 才起底色 —— 常驻时和正文文字同权重，
+   不会跟上面那个实心 CTA 抢注意力 */
+.aitools-join-link {
+  padding: .3rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.aitools-join-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+/* PayPal 是四个入口里唯一「直接给钱」的，稍微强调一档：
+   描边用 accent（不是 PayPal 蓝），保持全站单一强调色 */
+.aitools-join-link--paypal { color: var(--accent); border-color: var(--accent); }
+
 /* ---- 卡片：整张可点开抽屉 ----
    点击态（手型 + 右箭头）只给主专栏页的 .aitools-item--link：
    分类归档页的卡片没有抽屉，挂上指针会骗人。 */
@@ -2545,6 +2613,16 @@ a.cve-hof:hover {
 @media (max-width: 420px) {
   .aitools-sponsor-logo { width: 44px; height: 44px; }
   .aitools-sponsor-desc { font-size: .75rem; }
+}
+
+/* ---- 成为赞助商：窄屏 ----
+   flex-wrap 已经能让四个药丸自然换行，这里只处理两件事：
+   ① 负外边距在窄屏取消（否则文字块和上方赞助商带贴死）；
+   ② 药丸字号降到 .75rem，让四个入口在 375px 宽的手机上排成两行而不溢出。 */
+@media (max-width: 560px) {
+  .aitools-sponsor-join { margin-top: 0; }
+  .aitools-sponsor-join-actions { gap: .3rem .4rem; }
+  .aitools-join-link { font-size: .75rem; padding: .3rem .6rem; }
 }
 
 /* ==========================================================================
