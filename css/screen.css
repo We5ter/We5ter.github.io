@@ -1143,6 +1143,47 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
   text-shadow: none;
 }
 
+/* banner 右上角「GitHub 仓库」按钮。
+   ① 外观刻意复刻文章页 banner 上的 .post-tag 玻璃样式（白 16% 底 + 白 38% 描边），
+     不引入第三种强调色 —— 压暗层是深蓝灰，任何彩色按钮都会变成视觉噪音。
+   ② font-size / line-height 必须显式写：父级是 <h1>，不写会继承 banner 的大字号。
+      color 同理：全局 a { color: var(--accent) } 会抢过来，必须压回去 #fff。
+   ③ 选择器带 body.layout-ai-tools 前缀 (0,3,2)，压过文件后面
+     「.section-heading--banner .i18n-* { color:#fff }」(0,2,1)。
+   ④ 不占文档流（absolute），标题在 banner 里保持完美居中，不需要为它留空。 */
+body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.75rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: .38rem .8rem;
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+  background: rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 255, 255, .38);
+  border-radius: var(--radius);
+  transition: background .15s, border-color .15s;
+}
+body.layout-ai-tools .section-heading--banner .aitools-banner-cta:hover {
+  background: rgba(255, 255, 255, .3);
+  border-color: #fff;
+}
+.aitools-banner-cta-icon { flex-shrink: 0; opacity: .92; }
+/* 状态提示：告诉读者是新标签打开，别让人以为会离开当前页面 */
+.aitools-banner-cta::after {
+  content: "↗";
+  font-size: .75rem;
+  opacity: .75;
+  margin-left: .05rem;
+}
+
 @media (max-width: 640px) {
   /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
      收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
@@ -2227,6 +2268,18 @@ a.cve-hof:hover {
   .section-heading--banner { padding: 1.75rem 1.1rem 1.35rem; }
   .article-header--banner .post-title,
   .section-heading--banner { font-size: 1.45rem; }
+  /* 窄屏上右上角绝对定位会和居中的标题打架（375px 屏标题几乎满宽）。
+     改成 static 落回文档流，排在中英文标语下方，用
+     「display:block + width:fit-content + margin-left:auto」靠右 ——
+     光写 margin-left:auto 不够，inline-flex 元素不吃 auto 外边距，
+     必须先变成 block 才能靠这个技巧右对齐。靠右而不是居中，
+     是为了跟下方订阅带、卡片列表的左对齐节奏错开，不显得飘。 */
+  body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
+    position: static;
+    display: block;
+    width: fit-content;
+    margin: .7rem 0 0 auto;
+  }
 }
 
 /* ===== 专栏长文文末来源块：本文地址 + 项目仓库 =====
