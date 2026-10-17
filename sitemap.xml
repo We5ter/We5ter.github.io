@@ -90,14 +90,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
-    <lastmod>2026-10-17</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
-    <lastmod>2026-10-07</lastmod>
+    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
+    <lastmod>2026-10-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -146,12 +146,6 @@
   <url>
     <loc>https://we5ter.github.io/ai-tools/garak/</loc>
     <lastmod>2026-10-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/h5i/</loc>
-    <lastmod>2026-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -230,6 +224,12 @@
   <url>
     <loc>https://we5ter.github.io/en/ai-tools/rebuff/</loc>
     <lastmod>2026-10-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/h5i/</loc>
+    <lastmod>2026-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
