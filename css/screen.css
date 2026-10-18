@@ -1153,16 +1153,20 @@ body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slo
    ④ 不占文档流（absolute），标题在 banner 里保持完美居中，不需要为它留空。 */
 body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
   position: absolute;
-  top: 1.1rem;
+  /* 垂直居中：不能用固定 top 偏移——banner 高度随标语折行动态变化，
+     写死偏移在标语折两行/一行时按钮就贴顶或沉底。top:50% + translateY(-50%)
+     才是真正的居中。 */
+  top: 50%;
+  transform: translateY(-50%);
   right: 1.75rem;
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
-  font-size: .8125rem;
+  gap: .45rem;
+  font-size: .9375rem;
   font-weight: 600;
   line-height: 1.4;
-  padding: .38rem .8rem;
+  padding: .55rem 1.05rem;
   color: #fff;
   text-decoration: none;
   text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
@@ -1179,7 +1183,7 @@ body.layout-ai-tools .section-heading--banner .aitools-banner-cta:hover {
 /* 状态提示：告诉读者是新标签打开，别让人以为会离开当前页面 */
 .aitools-banner-cta::after {
   content: "↗";
-  font-size: .75rem;
+  font-size: .875rem;
   opacity: .75;
   margin-left: .05rem;
 }
@@ -2276,6 +2280,9 @@ a.cve-hof:hover {
      是为了跟下方订阅带、卡片列表的左对齐节奏错开，不显得飘。 */
   body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
     position: static;
+    /* transform 对 static 元素照样生效，不复位 translateY(-50%)
+       会把按钮往上顶半个身高、压到标语上，必须显式清掉。 */
+    transform: none;
     display: block;
     width: fit-content;
     margin: .7rem 0 0 auto;
