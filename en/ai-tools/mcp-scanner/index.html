@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "cisco-ai-defense/mcp-scanner is Cisco's open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. 'Did not finish' and 'finished clean' are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "cisco-ai-defense/mcp-scanner is Cisco's open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. 'Did not finish' and 'finished clean' are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      var pageTitle = "Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="cisco-ai-defense/mcp-scanner is Cisco's open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. 'Did not finish' and 'finished clean' are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1792391824840" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1792391824840" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/mcp-scanner/" />
+  
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/mcp-scanner/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/mcp-scanner/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/en/ai-tools/mcp-scanner/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="cisco-ai-defense/mcp-scanner is Cisco&#39;s open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. &#39;Did not finish&#39; and &#39;finished clean&#39; are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files." />
+  <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/mcp-scanner/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/mcp-scanner-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="cisco-ai-defense/mcp-scanner is Cisco&#39;s open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. &#39;Did not finish&#39; and &#39;finished clean&#39; are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/mcp-scanner-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-10-19T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-19T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792391824840" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/mcp-scanner/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/mcp-scanner/"},"headline":"Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers","name":"Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers","description":"cisco-ai-defense/mcp-scanner is Cisco's open-source scanner for MCP servers: YARA, LLM and the Cisco AI Defense inspect API in parallel, plus behavioral, VirusTotal, readiness, prompt_defense, vulnerable-package and meta — nine analyzers in total. After reading the code, the most valuable part is not the rule set but the reporting discipline: `is_safe` is three-valued. Findings make it False; only a complete scan with zero findings makes it True; a single analyzer error yields None. 'Did not finish' and 'finished clean' are not allowed to share one value at the interface. The caveats are equally plain: YARA and prompt_defense read description text rather than code, and the 95.7% detection rate comes from 141 self-authored synthetic malicious samples against only 3 benign files.","image":"https://we5ter.github.io/images/banners/mcp-scanner-banner.jpg","inLanguage":"en","datePublished":"2026-10-19T06:00:00.000Z","dateModified":"2026-10-19T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Case Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-ai-item">
+            <a class="nav-ai" href="/ai-tools/">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">Scanners-Box 每日 AI 工具推荐</span>
+              <span class="i18n-en">Scanners-Box Daily AI Tool Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="WeChat QR code">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="WeChat QR code">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="WeChat QR code" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/mcp-scanner-banner.jpg)">
+    <h1 class="post-title">Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-10-19">
+        <span class="i18n-zh">2026年10月19日</span>
+        <span class="i18n-en">Oct 19, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 15 分钟</span><span class="i18n-en">15 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/mcp-scanner/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content post-content--v2">
+    <div class="x-lede">
+<span class="x-label">The one-line summary</span>
+
+<p><strong>Before you install an MCP server, put it through security screening.</strong> mcp-scanner pulls out every place an MCP server can hide something — tool descriptions, prompts, resources, server instructions — and scans each one, with nine analyzers covering different ground. What sets it apart from its peers is not the number of rules but one interface contract: <strong>when the scan is incomplete, <code>is_safe</code> returns None, not True.</strong></p>
+</div>
+
+<h2 id="What-it-scans"><a href="#What-it-scans" class="headerlink" title="What it scans"></a>What it scans</h2><p>Code is not the only poisonable surface in an MCP server. A tool’s <code>name</code> &#x2F; <code>description</code> &#x2F; <code>inputSchema</code> is text the model reads directly; prompts and resources are text the server injects into context; even the server instructions in the handshake’s <code>InitializeResult</code> count. mcp-scanner gives each surface an entry point: <code>remote</code>, <code>stdio</code>, <code>config</code>, <code>known-configs</code> (scans the Cursor &#x2F; Claude &#x2F; VS Code config files on your machine), <code>prompts</code>, <code>resources</code>, <code>instructions</code>, plus offline <code>static</code>, package scanning via <code>pypi-scan</code> &#x2F; <code>npm-scan</code>, and source reading via <code>supplychain</code>.</p>
+<p>Three analyzers run by default: <code>--analyzers api,yara,llm</code>. The api engine is Cisco AI Defense’s commercial inspect endpoint and needs a key; yara has zero dependencies and works out of the box; llm needs a model key and goes through LiteLLM — OpenAI, Bedrock, Azure or a local Ollama all work.</p>
+<h2 id="Nine-analyzers-each-owning-one-slice"><a href="#Nine-analyzers-each-owning-one-slice" class="headerlink" title="Nine analyzers, each owning one slice"></a>Nine analyzers, each owning one slice</h2><p><strong>YARA is not scanning binaries here.</strong> All 10 rule files are regexes run over tool description text. <code>tool_poisoning.yara</code> catches “hidden second action” phrasing: <code>also / while processing / for caching purposes</code> followed by <code>collect|send|upload|log</code> and friends. The rule comments even keep the false-positive fix on record — legitimate mail tools describe themselves as “search emails”, the broad verb list flagged all of them, so <code>search|find</code> was removed from that rule’s verbs. The value and the limit of this rule set are the same thing: it reads the manual, so rephrase it or write it in another language and it slips past.</p>
+<p><strong>The LLM analyzer’s system prompt is a single sentence</strong> — “you are a security expert, follow the provided framework” — with all the judgment living in the analysis framework inside the user prompt. The failure path is what matters: if retries still return an empty completion, it does not silently pass the tool; it records an INFO-severity infrastructure finding that writes “this leg did not run” into the report.</p>
+<p><strong>behavioral is the only one that truly reads code.</strong> tree-sitter builds CFGs, dataflow and cross-file call graphs across 10 languages including Python, TypeScript, Go, Java and Rust, comparing what the docstring claims against what the implementation does, with an LLM alignment check on top. The bundled evals: 141 self-authored malicious samples across 14 categories, 135 detected under azure&#x2F;gpt-4.1, i.e. 95.7%. The benign side holds 3 files; what the false positives look like, the repo does not say.</p>
+<p><strong>readiness asks a different question: is this production-grade?</strong> 20 HEUR rules check timeouts, retries, error schemas and description quality, plus 3 Rego policies and one LLM judge pass. The Rego leg needs the <code>opa</code> binary on PATH; without it, policy evaluation is silently skipped.</p>
+<p><strong>prompt_defense works in reverse.</strong> It does not look for attacks in the description; it looks for defenses missing from it — 12 attack vectors, each checked for a corresponding protective statement. Pure regex, and the patterns include Traditional Chinese (<code>不要假裝</code>, <code>跨語言</code>, <code>不可見字元</code>). The README says it “always runs by default”; in the code it only runs when you pass <code>--analyzers prompt_defense</code> explicitly (<a target="_blank" rel="noopener" href="https://github.com/cisco-ai-defense/mcp-scanner/blob/main/mcpscanner/core/scanner.py#L1440">scanner.py:1440</a>). Docs and code disagree; trust the code.</p>
+<p>The remaining three: <code>virustotal</code> looks up SHA256 hashes of binary files bundled with the server; <code>vulnerable-package</code> wraps pip-audit for dependency CVEs; <code>meta</code> needs an explicit <code>--enable-meta</code> and does exactly one job — deleting other analyzers’ false positives. It only removes, never adds, and every removal leaves a <code>meta_analysis</code> audit block stating which findings were dropped and why.</p>
+<div class="x-callout">
+<span class="x-label">The part worth copying</span>
+
+<p><code>is_safe</code> is a three-valued property (<a target="_blank" rel="noopener" href="https://github.com/cisco-ai-defense/mcp-scanner/blob/main/mcpscanner/core/result.py#L88">result.py:88</a>): findings make it False; only <code>status == &quot;completed&quot;</code> with an empty <code>analyzer_errors</code> makes it True; everything else is None. The aggregation buckets results into safe &#x2F; unsafe &#x2F; incomplete, with incomplete listed on its own. Any analyzer exception lands in <code>analyzer_errors</code> and drops the status to <code>partial</code>, and the exception message keeps only the class name — provider errors can carry URLs, headers or even the scanned input, so none of that is echoed.</p>
+</div>
+
+<p>The same discipline shows up in two more places. The REST API accepts only <code>api / yara / llm / meta</code>; requests naming other analyzers are rejected with a 422 at the boundary, because the API response shape would silently drop those analyzers’ findings — better to refuse, in the code’s words, than to let an operator believe a scan ran. The Docker-sandboxed pypi &#x2F; npm scans behave the same way: unless the scan status is completed, <code>is_safe</code> is None, with the comment <em>a degraded scan can’t masquerade as is_safe&#x3D;True</em>.</p>
+<h2 id="Where-it-falls-short"><a href="#Where-it-falls-short" class="headerlink" title="Where it falls short"></a>Where it falls short</h2><div class="x-warn">
+<span class="x-label">Know before using</span>
+
+<p>The zero-dependency path (yara + readiness + prompt_defense) reads description text and metadata only; it never touches the implementation. The one analyzer that reads code, behavioral, requires an LLM key, and its detection number comes from synthetic samples the project wrote itself — swap the model and you get a different number. The readiness leg is looser than the main scan: missing <code>opa</code> is skipped silently, an LLM judge failure is only a warning, the score is computed anyway and the status never degrades to partial. Meta costs an extra LLM round per scan and is off by default.</p>
+</div>
+
+<p>The repo was created on 2025-09-24; Cisco’s official blog post followed on October 23 the same year; the current version is v4.8.6 under Apache-2.0. Its relationship to Cisco AI Defense is open-source front end over commercial engine: without an AI Defense subscription you lose one of the three default engines, and the other two still work.</p>
+<div class="x-verdict">
+<span class="x-label">Verdict</span>
+
+<p>Run <code>mcp-scanner --analyzers yara,readiness</code> before installing an MCP server: zero keys, zero cost, and it catches poisoning written plainly in the description plus a batch of production hazards. Add an LLM key when you want semantic judgment. But the thing worth copying from this project is its reporting contract: <strong>“did not finish” and “finished clean” must be two different values.</strong> In the scanner business, few projects dare to list incomplete as its own bucket.</p>
+</div>
+
+<div class="x-facts">
+<span class="x-label">At a glance</span>
+
+<ul>
+<li>Repo: cisco-ai-defense&#x2F;mcp-scanner, Apache-2.0, created 2025-09-24, current version v4.8.6</li>
+<li>Analyzers: 9 (api &#x2F; yara &#x2F; llm &#x2F; behavioral &#x2F; virustotal &#x2F; readiness &#x2F; prompt_defense &#x2F; vulnerable_package &#x2F; meta), default api,yara,llm</li>
+<li>YARA: 10 rule files applied to tool description text; behavioral covers 10 languages</li>
+<li>Verdict: <code>is_safe</code> three-valued (False &#x2F; True &#x2F; None), aggregated into safe &#x2F; unsafe &#x2F; incomplete</li>
+<li>Evals: 95.7% detection on 141 synthetic malicious samples (azure&#x2F;gpt-4.1), 3 benign samples</li>
+<li>Entry points: CLI, Python SDK, FastAPI REST, Claude Code plugin, PyInstaller single-file spec</div></li>
+</ul>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/mcp-scanner/">https://we5ter.github.io/en/ai-tools/mcp-scanner/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/mcp-scanner/&text=Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/mcp-scanner/&title=Cisco mcp-scanner: Zero Keys, Zero Config, One Command to Scan All Your MCP Servers"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/mcp-scanner/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/mcp-scanner/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/mcp-scanner/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/mcp-scanner/"
+  };
+</script>
+
+
+<!-- Post Navigation: Previous / Next -->
+<nav class="post-nav">
+  
+  <span class="post-nav-placeholder"></span>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/mcp-scanner/">
+    <span class="post-nav-label"><span class="i18n-zh">下一篇</span><span class="i18n-en">Next</span> &rarr;</span>
+    <span class="post-nav-title">Cisco mcp-scanner: 零 key 零配置，一条命令扫完所有 MCP</span>
+  </a>
+  
+</nav>
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
