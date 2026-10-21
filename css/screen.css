@@ -2170,8 +2170,11 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   box-shadow: 0 3px 10px rgba(219, 39, 119, .34);
 }
 .nav-aisec-logo {
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
+  /* 原图是 447x447 的 JPEG，圆标外还有一圈白边且没有透明通道：
+     直接方形贴在渐变上会露出白角，所以裁成内切圆，白边变成一圈细环。 */
+  border-radius: 50%;
   flex: none;
   align-self: center;
 }
@@ -2207,7 +2210,7 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   .nav-ai { padding: .3rem .5rem !important; }
   .nav-ai-logo { width: 20px; height: 20px; }
   .nav-aisec { padding: .3rem .55rem !important; gap: .25rem; }
-  .nav-aisec-logo { width: 13px; height: 13px; }
+  .nav-aisec-logo { width: 15px; height: 15px; }
 }
 
 /* ---- CVE 档案（/cve/）----
