@@ -1926,6 +1926,57 @@ body.layout-ai-tools-cat #main {
   color: var(--text-muted);
   white-space: nowrap;
 }
+
+/* ── 分类页：简介 + 本分类期号索引 ──────────────────────────────────────── */
+.aitools-catpage-desc {
+  max-width: 62ch;
+  margin: .9rem 0 0;
+  padding-left: .8rem;
+  border-left: 2px solid var(--cat, var(--accent));
+  font-size: .9375rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.aitools-catpage-issues { margin: 1.15rem 0 1.5rem; }
+.aitools-catpage-issues-title {
+  margin: 0 0 .4rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text-muted);
+}
+.aitools-catpage-issues-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.aitools-catpage-issue-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35rem;
+  padding: .18rem .5rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .75rem;
+  color: var(--text-muted);
+  transition: border-color .15s, color .15s, background .15s;
+}
+.aitools-catpage-issue-chip:hover {
+  color: var(--text);
+  border-color: var(--cat, var(--accent));
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+/* 期号是这枚 chip 的主信息，用等宽 + 分类色；名字只是提示，弱化成常规文本 */
+.aitools-catpage-issue-n {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  color: var(--cat, var(--accent));
+}
+.aitools-catpage-issue-name { color: var(--text); }
+/* chip 跳的是本页卡片：锚点滚动要躲开 sticky masthead，否则落点永远被压住一行 */
+#ai-tools-cat .aitools-item[id] { scroll-margin-top: 96px; }
 /* 归档页没有抽屉，note 不截断 —— 截了就没地方看全文了 */
 #ai-tools-cat .aitools-note {
   display: block;
@@ -2871,4 +2922,385 @@ body.aitools-palette-open { overflow: hidden; }
 @media (max-width: 560px) {
   .aitools-palette { top: 8vh; }
   .aitools-palette-kind { min-width: 3rem; }
+}
+
+/* ==========================================================================
+   阅读体验追加组件：阅读进度条 / 本页目录 / 代码块工具条。
+   全部走 var()，暗色自动跟随；硬编码的浅色单独在末尾补 dark 覆盖。
+   ========================================================================== */
+
+/* ── 阅读进度条 ──────────────────────────────────────────
+   压在 sticky masthead 的上沿（masthead z-index 100），高一级才不被盖住。
+   宽度用 scaleX 而不是 width：滚动每帧改 width 会触发 layout，scaleX 只走合成层。 */
+.read-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 101;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+/* ── 本页目录：窄屏形态（正文上方的折叠块）────────────── */
+.post-toc { margin: 0 0 1.5rem; }
+.post-toc[hidden] { display: none; }   /* 作者样式会盖掉 UA 的 [hidden]，必须补 */
+.post-toc-inner {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.post-toc-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem .8rem;
+  margin: 0;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  list-style: none;
+}
+.post-toc-title::-webkit-details-marker { display: none; }
+.post-toc-title::after {
+  content: "▾";
+  font-size: .75rem;
+  transition: transform .18s ease;
+}
+.post-toc-inner:not([open]) .post-toc-title::after { transform: rotate(-90deg); }
+.post-toc-nav { padding: 0 .8rem .7rem; }
+.post-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--border);
+}
+.post-toc-item a {
+  display: block;
+  margin-left: -2px;
+  padding: .2rem 0 .2rem .7rem;
+  border-left: 2px solid transparent;
+  font-size: .8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.post-toc-item a:hover { color: var(--accent); text-decoration: none; }
+.post-toc-item a.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.post-toc-h3 a { padding-left: 1.45rem; font-size: .78125rem; }
+/* 早期长文整篇只有 h3：没有 h2 时它们就是顶层，不该缩进 */
+.post-toc-list.is-flat .post-toc-h3 a { padding-left: 0; font-size: .8125rem; }
+
+/* 目录底部的公众号二维码：只在宽屏出现（那里 .float-qr 已经把右边让给目录了） */
+.post-toc-qr { display: none; }
+
+/* ── 本页目录：宽屏形态（正文右侧 sticky 一列）──────────
+   外壳（导航 / 主体 / 页脚）一起加宽 260px，正文列宽几乎不变，
+   只加宽 #main 会让侧栏和顶部导航的左边缘错开。
+   .page-content 变成两列网格：除目录外所有子元素显式占第一列，
+   否则自动放置会把 post-nav、评论区依次塞进第二列。 */
+@media (min-width: 1400px) {
+  body.has-post-toc .masthead__inner-wrap,
+  body.has-post-toc #main,
+  body.has-post-toc .footer__inner { max-width: calc(var(--content-max) + 260px); }
+
+  body.has-post-toc .page-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 208px;
+    gap: 0 2.75rem;
+    align-items: start;
+  }
+  body.has-post-toc .page-content > * { grid-column: 1; min-width: 0; }
+  body.has-post-toc .post-toc {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    position: sticky;
+    top: 85px;
+    margin: 0;
+  }
+
+  .post-toc-inner {
+    background: none;
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-radius: 0;
+    padding-left: .85rem;
+  }
+  .post-toc-title { padding: 0 0 .45rem; cursor: default; }
+  .post-toc-title::after { display: none; }
+  .post-toc-nav {
+    padding: 0;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+  }
+  .post-toc-list { border-left: 0; }
+  .post-toc-item a { margin-left: 0; border-left: 0; padding: .18rem 0; }
+  .post-toc-h3 a { padding-left: .8rem; }
+
+  .post-toc-qr {
+    display: block;
+    margin-top: 1.1rem;
+    padding-top: .9rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .post-toc-qr img {
+    display: block;
+    width: 112px; height: 112px;
+    margin: 0 auto;
+    padding: 4px;
+    background: #fff;               /* 二维码必须留白底，否则扫码识别率下降 */
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .post-toc-qr-name { display: block; margin-top: .4rem; font-size: .75rem; font-weight: 600; color: var(--text); }
+  .post-toc-qr-hint { display: block; font-size: .6875rem; color: var(--text-muted); }
+
+  /* 目录占了右侧，悬浮二维码就没地方了 —— 二选一，避免两块浮层叠在一起 */
+  body.has-post-toc .float-qr { display: none; }
+}
+
+/* ── 代码块工具条 ──────────────────────────────────────
+   figure.highlight 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码
+   横向跑掉，所以外面套 .code-box 承载工具条和折叠按钮。 */
+.code-box { margin: 0 0 1.4em; }
+.post-content .code-box .highlight {
+  margin: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.post-content .code-box.is-foldable .highlight { border-radius: 0; }
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .25rem .55rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  padding: .12rem .5rem;
+  font: inherit;
+  font-size: .75rem;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.code-copy:hover { color: var(--accent); border-color: var(--accent); }
+.code-copy.is-copied { color: #0f8a5f; border-color: #0f8a5f; background: #eaf7f1; }
+.code-copy.is-failed { color: #b4443a; border-color: #e0b4ae; background: #fdf1ef; }
+/* 折叠：默认只露 400px，剩下的按需展开 */
+.code-box.is-folded .highlight { max-height: 400px; overflow: hidden; }
+.code-more {
+  display: block;
+  width: 100%;
+  padding: .4rem;
+  font: inherit;
+  font-size: .75rem;
+  color: var(--accent);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  cursor: pointer;
+  transition: background .15s;
+}
+.code-more:hover { background: var(--accent-soft); }
+
+/* 目录锚点跳转要平滑滚动，但前庭敏感的人要关掉 */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .read-progress { transition: none; }
+  .post-toc-title::after { transition: none; }
+}
+
+/* 暗色覆盖：只有 .code-copy.is-copied 用了硬编码浅色 */
+[data-theme="dark"] .code-copy.is-copied { color: #6fd6a8; border-color: #2f6b52; background: #16302a; }
+
+/* ── 全站 ⌘K 搜索：结果行带正文摘要，比专栏页那版多一行 ── */
+.aitools-palette[hidden],
+.aitools-palette-scrim[hidden] { display: none; }
+#site-palette .aitools-palette-row { align-items: flex-start; }
+#site-palette .aitools-palette-kind { margin-top: .15rem; }
+.site-palette-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: .12rem;
+}
+.site-palette-main .aitools-palette-name { flex: none; white-space: normal; }
+.site-palette-snippet {
+  font-size: .75rem; line-height: 1.45; color: var(--text-muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* 从搜索结果跳进来时正文里的命中 */
+mark.search-hl { background: #fff3b0; color: inherit; padding: .05em .18em; border-radius: 2px; }
+[data-theme="dark"] mark.search-hl { background: #6b5900; color: #ffe9a3; }
+
+/* 顶部导航的搜索入口：和主题切换按钮同一套外观，免得导航里出现第三种按钮形状 */
+.nav-search {
+  display: inline-flex; align-items: center; justify-content: center; gap: .3rem;
+  height: 30px; margin-right: .35rem; padding: 0 .45rem;
+  font-family: inherit; font-size: .8125rem;
+  color: var(--text-muted); background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; vertical-align: middle;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.nav-search:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.nav-search-kbd { font-family: var(--font-mono); font-size: .6875rem; opacity: .85; }
+@media (max-width: 640px) {
+  .nav-search { width: 30px; padding: 0; }
+  .nav-search-kbd { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   专栏页：年份分隔 + 月度更新热力
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* 年份分隔：时间线的 ::before/::after 已经被竖线和小圆点占用，所以年份是真实子元素。
+   它跟着 .aitools-day 一起显隐 —— 网格/星榜视图把条目搬进 #aitools-flat 后整组隐藏，
+   年份条自然一起消失，不会在平铺视图里留下孤零零的年份。 */
+.aitools-year-marker {
+  /* 高度锁死（不是靠字号算出来的），下面 .42rem 那组偏移就是按这个值推的，改这里要同步改那边 */
+  height: 1.4rem;
+  margin: 0 0 .85rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  letter-spacing: .04em;
+  color: var(--text);
+}
+/* 尾部渐隐的横线：年份和「本期」是同一种「分组」语气，用线连到行尾才像分隔而不是多了一行标题 */
+.aitools-year-marker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+}
+/* 年份条占了 2.25rem（1.4rem 高 + .85rem 下边距），小圆点和竖线一起下移，
+   保证节点仍然贴的是日期标题而不是年份条。:has() 不支持时退化成「圆点贴在年份上」，
+   两种都读得通，所以不必为此写 JS。 */
+.aitools-day:has(.aitools-year-marker)::after { top: 2.67rem; }
+.aitools-day:has(.aitools-year-marker)::before { top: 2.85rem; }
+
+/* ── 月度热力：一年一行、一行十二格，格内数字 = 当月期数 ───────────────── */
+.aitools-heat {
+  margin: 0 0 1.5rem;
+  padding: .8rem .95rem .7rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.aitools-heat-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .5rem;
+  margin: 0 0 .55rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text-muted);
+}
+.aitools-heat-meta {
+  font-weight: 400;
+  font-size: .6875rem;
+  opacity: .8;
+}
+.aitools-heat-rows { display: grid; gap: .18rem; }
+/* 年份标签列宽固定，刻度行和年份行共用同一套列，月份数字才能对齐到格子正中 */
+.aitools-heat-row {
+  display: grid;
+  grid-template-columns: 2.9rem minmax(0, 1fr);
+  align-items: center;
+  gap: .5rem;
+}
+.aitools-heat-year {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+.aitools-heat-cells {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: .2rem;
+}
+.aitools-heat-s {
+  font-family: var(--font-mono);
+  font-size: .5625rem;
+  line-height: 1;
+  text-align: center;
+  color: var(--text-muted);
+  opacity: .75;
+}
+.aitools-heat-cell {
+  height: 1.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  background: var(--border);
+  font-family: var(--font-mono);
+  font-size: .625rem;
+  font-weight: 600;
+  color: var(--text);
+}
+/* 色阶用 accent 往背景色里掺，不引入新色相；最深只到 58% ——
+   再深的话暗色主题下格子发白，格内数字（永远走 --text）会糊成一片。
+   color-mix 不被支持时整条声明失效，退回上一行的实心 var(--border)，仍然可辨。 */
+.aitools-heat-cell.lv1 { background: var(--accent-soft); }
+.aitools-heat-cell.lv2 { background: var(--accent-soft); background: color-mix(in srgb, var(--accent) 26%, var(--bg)); }
+.aitools-heat-cell.lv3 { background: var(--accent-soft); background: color-mix(in srgb, var(--accent) 42%, var(--bg)); }
+.aitools-heat-cell.lv4 { background: var(--accent);      background: color-mix(in srgb, var(--accent) 58%, var(--bg)); }
+.aitools-heat-cell.is-out {
+  /* 专栏开始前 / 今天之后的月份：画成 0 期等于说「这个月断更了」，改成斜纹虚框表示「不在区间内」。
+     纹样刻意画得很稀（1px 线 / 5px 周期）—— 一年 12 格里通常有 10 格落在区间外，
+     密纹会把真正有数据的那两格淹掉。 */
+  background: repeating-linear-gradient(-45deg,
+    var(--bg) 0 4px, var(--border) 4px 5px);
+  color: transparent;
+}
+.aitools-heat-legend {
+  display: flex;
+  align-items: center;
+  gap: .2rem;
+  margin: .5rem 0 0;
+  padding-left: 3.4rem;
+  font-size: .625rem;
+  color: var(--text-muted);
+}
+.aitools-heat-legend .i18n-zh,
+.aitools-heat-legend .i18n-en { margin-right: .15rem; }
+.aitools-heat-cell.is-legend { width: .85rem; height: .85rem; flex: none; }
+.aitools-heat-cell.is-out.is-legend { margin-left: .5rem; }
+@media (max-width: 640px) {
+  .aitools-heat-row { grid-template-columns: 2.2rem minmax(0, 1fr); gap: .35rem; }
+  .aitools-heat-cells { gap: .14rem; }
+  .aitools-heat-cell { height: 1.25rem; font-size: .5625rem; }
+  .aitools-heat-s { font-size: .5rem; }
+  .aitools-heat-legend { padding-left: 2.55rem; }
 }
