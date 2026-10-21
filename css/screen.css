@@ -2113,7 +2113,10 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 .aitools-more:hover { background: #d6e6ea; color: var(--accent); text-decoration: none; }
 
 /* ---- 导航里的 AI 工具入口：做成一个胶囊，比纯文字更抓眼 ---- */
-.nav-ai {
+/* 选择器带上 .masthead__menu-item > ：单写 .nav-ai 的权重(0,1,0)低于
+   `.masthead__menu-item > a`(0,2,1)，border-radius 会被那条的 6px 吃掉，
+   胶囊一直是扁的。 */
+.masthead__menu-item > .nav-ai {
   display: inline-flex !important;
   align-items: center;
   gap: .3rem;
@@ -2128,7 +2131,7 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
      不反色变白字（白字在这个主题上对比度低且显脏）。 */
   transition: background-color .15s ease, border-color .15s ease;
 }
-.nav-ai:hover {
+.masthead__menu-item > .nav-ai:hover {
   background: #d6e6ea;
   border-color: var(--accent);
   color: var(--accent) !important;
@@ -2142,6 +2145,39 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   flex: none;
   /* 文字基线和 logo 中心对齐，避免 logo 把行高撑高 */
   align-self: center;
+}
+
+/* ---- 导航里的姊妹站入口：渐变实心胶囊，故意比其它项重一档 ---- */
+.masthead__menu-item > .nav-aisec {
+  display: inline-flex !important;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .7rem !important;
+  border-radius: 999px;
+  /* 取 aisec123 自己的板块色（#8338EC / #F72585）压暗一档：
+     原色配白字只有 3.9:1，压到 #6D28D9 / #DB2777 才过 4.5:1。 */
+  background: linear-gradient(100deg, #6d28d9, #db2777);
+  color: #fff !important;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(109, 40, 217, .28);
+  transition: box-shadow .15s ease, filter .15s ease;
+}
+.masthead__menu-item > .nav-aisec:hover {
+  color: #fff !important;
+  text-decoration: none;
+  filter: saturate(1.12) brightness(1.06);
+  box-shadow: 0 3px 10px rgba(219, 39, 119, .34);
+}
+.nav-aisec-logo {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  align-self: center;
+}
+[data-theme="dark"] .masthead__menu-item > .nav-aisec {
+  background: linear-gradient(100deg, #7c3aed, #e0357f);
+  box-shadow: 0 1px 6px rgba(124, 58, 237, .4);
 }
 
 /* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
@@ -2165,11 +2201,13 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   color: var(--accent);
   text-decoration: none;
 }
-/* 全称比其它菜单项长得多，窄屏允许换行，别把导航撑爆 */
+/* 导航项变多以后一行放不下，允许换行而不是横向溢出 */
 .visible-links { flex-wrap: wrap; }
 @media (max-width: 860px) {
   .nav-ai { padding: .3rem .5rem !important; }
   .nav-ai-logo { width: 20px; height: 20px; }
+  .nav-aisec { padding: .3rem .55rem !important; gap: .25rem; }
+  .nav-aisec-logo { width: 13px; height: 13px; }
 }
 
 /* ---- CVE 档案（/cve/）----
