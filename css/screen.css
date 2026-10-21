@@ -2149,15 +2149,15 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 
 /* ---- 导航里的姊妹站入口：实心蓝底白字 ---- */
 /* 导航里唯一的站外入口，所以做成实心块，跟浅底的 .nav-ai 明显分开。
-   蓝色取 aisec123 圆标自己的蓝：白字配 #1a5fb4 是 6.3:1，过 AA。
-   hover 只亮一圈边框、底色不动，避免点下去反而变淡。 */
+   底色 #2172cc：再浅一档（#2b7de0）白字就只剩 4.1:1，掉出 AA，所以这是
+   白字方案里能取到的最亮位置；hover 只亮边框、底色不动，避免点下去反而变淡。 */
 .masthead__menu-item > .nav-aisec {
   display: inline-flex !important;
   align-items: center;
   gap: .35rem;
   padding: .3rem .7rem !important;
   border-radius: 999px;
-  background: #1a5fb4;
+  background: #2172cc;
   border: 1px solid transparent;
   color: #fff !important;
   font-weight: 600;
@@ -2165,8 +2165,8 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   transition: border-color .15s ease;
 }
 .masthead__menu-item > .nav-aisec:hover {
-  background: #1a5fb4;
-  border-color: #7ab8f5;
+  background: #2172cc;
+  border-color: #cfe4fb;
   color: #fff !important;
   text-decoration: none;
 }
@@ -2179,13 +2179,14 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   flex: none;
   align-self: center;
 }
-/* 暗色下底色调深一档、边框换成同色相亮蓝，免得整块蓝在深色背景上发灰 */
+/* 暗色下比亮色档略深一点（#1e6cbe，白字 5.3:1）：同一亮度放在近黑背景上会发荧，
+   但不再退回原来那种接近藏青的 #14487f —— 那版被嫌太深。 */
 [data-theme="dark"] .masthead__menu-item > .nav-aisec {
-  background: #14487f;
+  background: #1e6cbe;
 }
 [data-theme="dark"] .masthead__menu-item > .nav-aisec:hover {
-  background: #14487f;
-  border-color: #7ab8f5;
+  background: #1e6cbe;
+  border-color: #9cc6f5;
 }
 
 /* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
