@@ -12,13 +12,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/agent-governance-toolkit/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/agent-sandbox/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/agent-governance-toolkit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -36,19 +42,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agent-sandbox/</loc>
-    <lastmod>2026-10-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
+    <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -66,13 +72,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cisco-skill-scanner/</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cisco-skill-scanner/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/cisco-skill-scanner/</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -102,25 +108,31 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/dark-moon/</loc>
-    <lastmod>2026-09-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
-    <lastmod>2026-10-01</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/dark-moon/</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/dark-moon/</loc>
+    <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://we5ter.github.io/ai-tools/deepsec/</loc>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -132,20 +144,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/dark-moon/</loc>
-    <lastmod>2026-09-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/ai-tools/garak/</loc>
     <lastmod>2026-10-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/h5i/</loc>
-    <lastmod>2026-10-14</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -156,7 +156,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/ai-tools/h5i/</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/en/ai-tools/llmfuzzer/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/llmfuzzer/</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -180,13 +192,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
-    <lastmod>2026-09-27</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/mcp-scanner/</loc>
+    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/mcp-scanner/</loc>
+    <loc>https://we5ter.github.io/ai-tools/mcp-scanner/</loc>
     <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -194,12 +206,6 @@
   <url>
     <loc>https://we5ter.github.io/en/ai-tools/openshell-nvidia-agent-runtime/</loc>
     <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/mcp-scanner/</loc>
-    <lastmod>2026-10-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -228,6 +234,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/en/ai-tools/rebuff/</loc>
     <lastmod>2026-10-04</lastmod>
     <changefreq>monthly</changefreq>
@@ -240,7 +252,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
+    <loc>https://we5ter.github.io/blogs/roundcube-122-command-execution-via-email/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -258,12 +270,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/roundcube-122-command-execution-via-email/</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/en/ai-tools/skillspector/</loc>
     <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
@@ -276,20 +282,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/vigolium/</loc>
-    <lastmod>2026-10-02</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/blogs/typora-rce-via-iframe-sandbox/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/vigolium/</loc>
+    <lastmod>2026-10-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -300,8 +300,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/llmfuzzer/</loc>
-    <lastmod>2026-10-13</lastmod>
+    <loc>https://we5ter.github.io/blogs/zabbix-jsrpc-sqli-analysis/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
