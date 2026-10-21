@@ -45,7 +45,8 @@
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
-         `var pageTitle = ;` —— 整段 <script> 直接 SyntaxError，语言切换和 title 回填全挂。 */
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
       var pageTitle = "LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model's Memory";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
@@ -89,8 +90,9 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1792582821843" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1792582821843" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1792583440425" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1792583440425" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/luan1ao-agent/" />
@@ -141,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792582821843" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792583440425" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
