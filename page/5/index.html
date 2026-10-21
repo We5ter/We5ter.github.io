@@ -43,7 +43,10 @@
         en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
         zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
-      var pageTitle = ;
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         `var pageTitle = ;` —— 整段 <script> 直接 SyntaxError，语言切换和 title 回填全挂。 */
+      var pageTitle = "";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -86,8 +89,8 @@
   <meta name="generator" content="hexo">
   
   <meta name="theme-color" content="#ffffff" />
-  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1792576483846" />
-  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1792576483846" />
+  <link rel="icon" type="image/png" href="/images/static/avatar.png?v=1792582041707" />
+  <link rel="apple-touch-icon" href="/images/static/avatar.png?v=1792582041707" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/page/5/" />
@@ -117,7 +120,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792576483846" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792582041707" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -159,15 +162,15 @@
           <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
           <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
           <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Case Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
           <li class="masthead__menu-item nav-aisec-item">
             
             <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="AISec123 · AI 安全导航">
-              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="22" height="22" loading="lazy" decoding="async" />
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
               <span class="i18n-zh">AISec123 安全导航</span>
               <span class="i18n-en">AISec123 Directory</span>
             </a>
           </li>
-          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
           <li class="masthead__menu-item nav-ai-item">
             
             <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
@@ -598,7 +601,7 @@
 
 <script>
 (function () {
-  var FORK_SVG = '<svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75 0 1 0-1.5 0 .75 0 0 0 1.5 0Zm6.75.75a.75 0 1 0 0-1.5.75 0 0 0 0 1.5Zm-3 8.75a.75 0 1 0-1.5 0 .75 0 0 0 1.5 0Z"></path></svg>';
+  var FORK_SVG = '<svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path></svg>';
 
   var API_TIMEOUT = 8000;
   var CACHE_TTL   = 30 * 60 * 1000;

@@ -12,13 +12,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/agent-governance-toolkit/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</loc>
+    <loc>https://we5ter.github.io/ai-tools/agent-governance-toolkit/</loc>
     <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -42,26 +42,26 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/ai-tools/agentshield/</loc>
     <lastmod>2026-09-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cairn-state-space-search/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
+    <lastmod>2026-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/ai-infra-guard/</loc>
+    <loc>https://we5ter.github.io/ai-tools/ai-infra-guard/</loc>
     <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/cairn-state-space-search/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -84,7 +84,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -96,13 +96,19 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
+    <loc>https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
     <lastmod>2026-09-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -114,25 +120,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
-    <lastmod>2026-10-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/ai-tools/dark-moon/</loc>
     <lastmod>2026-09-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/deepsec/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -150,6 +144,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/ai-tools/deepsec/</loc>
+    <lastmod>2026-10-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/en/ai-tools/h5i/</loc>
     <lastmod>2026-10-14</lastmod>
     <changefreq>monthly</changefreq>
@@ -162,19 +162,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/llmfuzzer/</loc>
+    <loc>https://we5ter.github.io/ai-tools/llmfuzzer/</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
-    <lastmod>2026-09-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://we5ter.github.io/ai-tools/llmfuzzer/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/llmfuzzer/</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -182,6 +176,12 @@
   <url>
     <loc>https://we5ter.github.io/en/ai-tools/luan1ao-agent/</loc>
     <lastmod>2026-09-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/blogs/local-file-inclusion-in-cmsmadesimple/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -228,14 +228,14 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/pentagi-autonomous-pentest-platform/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <loc>https://we5ter.github.io/blogs/phpmyadmin-sql-injection-cve-2016-5703/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -288,13 +288,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/vigolium/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/vigolium/</loc>
     <lastmod>2026-10-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/vigolium/</loc>
+    <loc>https://we5ter.github.io/ai-tools/vigolium/</loc>
     <lastmod>2026-10-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
