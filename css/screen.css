@@ -1132,12 +1132,14 @@ body.layout-post .page-content {
   max-width: 720px;
   margin-inline: auto;
 }
-/* ≥1400px 时目录要靠 .page-content 的两列网格挂到正文右侧（见文末
+/* ≥1100px 时目录要靠 .page-content 的两列网格挂到正文右侧（见文末
    「本页目录：宽屏形态」），上面那条 max-width 会把目录列一起挤扁。
    这里按「正文 720 + 目录 208」重新定列，并用 justify-content 把两列
    整体居中，左右留白对称。选择器多带一个 .layout-post，特异性高于
-   body.has-post-toc .page-content，不依赖本段在文件里的位置。 */
-@media (min-width: 1400px) {
+   body.has-post-toc .page-content，不依赖本段在文件里的位置。
+   断点跟着目录的宽屏形态走（1100px），两处必须一致，否则
+   1100–1399 这段会出现「正文已收窄、目录还在正文上方」的错位。 */
+@media (min-width: 1100px) {
   body.layout-post.has-post-toc .page-content {
     max-width: none;
     grid-template-columns: 720px 208px;
@@ -3082,8 +3084,14 @@ body.aitools-palette-open { overflow: hidden; }
    外壳（导航 / 主体 / 页脚）一起加宽 260px，正文列宽几乎不变，
    只加宽 #main 会让侧栏和顶部导航的左边缘错开。
    .page-content 变成两列网格：除目录外所有子元素显式占第一列，
-   否则自动放置会把 post-nav、评论区依次塞进第二列。 */
-@media (min-width: 1400px) {
+   否则自动放置会把 post-nav、评论区依次塞进第二列。
+
+   断点 1100px：原来定 1400px 是因为当时文章页还有 220px 的左侧栏，
+   侧栏 + 正文 + 目录要 1360 才放得下。侧栏藏掉之后目录只需要
+   「正文 720 + 间距 44 + 目录 208 = 972」加外壳 padding，1100 就够；
+   继续卡 1400 会把 1100–1399 这一大片（主流笔记本窗口）判成窄屏，
+   目录退化成压在文章标题上方的折叠条。 */
+@media (min-width: 1100px) {
   body.has-post-toc .masthead__inner-wrap,
   body.has-post-toc #main,
   body.has-post-toc .footer__inner { max-width: calc(var(--content-max) + 260px); }
