@@ -1115,6 +1115,36 @@ body.layout-ai-tools #main {
   max-width: 1100px;
 }
 
+/* ---- 文章页（/blogs/<slug>/ · /ai-tools/<slug>/）：隐藏左侧边栏 ----
+   这两个 URL 都是文章（post layout）：前者走 _config 的 permalink: blogs/:title/，
+   后者在 front-matter 里写了 permalink: ai-tools/<slug>/。body 上统一带
+   layout-post，按它限定作用域就行，不用逐个 URL 判断。
+   侧栏装的是作者名片 + 访问统计，跟正文无关，在长文页上白占 220px；窄屏（≤860px）
+   #main 塌成单列后它还会整块堆在正文上方，更该藏。
+   和专栏页不同：那边正文是宽卡片列表，藏完直接吃满 1100；文章正文是
+   .post-content 的 720px 长文本，吃满会贴着左边缘、右边空出一大条，
+   所以这里外壳（导航 / 页脚）宽度不动，只把正文列居中。 */
+body.layout-post .sidebar { display: none; }
+body.layout-post #main { grid-template-columns: minmax(0, 1fr); }
+/* 720px 与 .post-content 的 max-width 一致 —— 正文正好填满这一列，
+   标题、正文、脚注共用一条中轴，不用再给 .post-content 加 margin auto。 */
+body.layout-post .page-content {
+  max-width: 720px;
+  margin-inline: auto;
+}
+/* ≥1400px 时目录要靠 .page-content 的两列网格挂到正文右侧（见文末
+   「本页目录：宽屏形态」），上面那条 max-width 会把目录列一起挤扁。
+   这里按「正文 720 + 目录 208」重新定列，并用 justify-content 把两列
+   整体居中，左右留白对称。选择器多带一个 .layout-post，特异性高于
+   body.has-post-toc .page-content，不依赖本段在文件里的位置。 */
+@media (min-width: 1400px) {
+  body.layout-post.has-post-toc .page-content {
+    max-width: none;
+    grid-template-columns: 720px 208px;
+    justify-content: center;
+  }
+}
+
 /* 双语标语：作为 <h1> 里标题下面的一行小字，和标题同属一个视觉块。
    挂在 banner 上时是白字 —— banner 自带压暗层（rgba(8,20,28,.52→.78)），白字托得住。
    这里绝不能用主题色或渐变文字：深色图上会糊掉，也压不住背景纹理。
@@ -2149,15 +2179,16 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 
 /* ---- 导航里的姊妹站入口：实心蓝底白字 ---- */
 /* 导航里唯一的站外入口，所以做成实心块，跟浅底的 .nav-ai 明显分开。
-   底色 #2172cc：再浅一档（#2b7de0）白字就只剩 4.1:1，掉出 AA，所以这是
-   白字方案里能取到的最亮位置；hover 只亮边框、底色不动，避免点下去反而变淡。 */
+   底色 #2b7de0：白字 4.11:1，比 AA 要求的 4.5 略低一档（字重 600 所以还看得清）。
+   这是按「再浅两度」的要求取的；要回到 AA 就改 #2172cc（4.83:1），再浅就只剩 4.1 以下。
+   hover 只亮边框、底色不动，避免点下去反而变淡。 */
 .masthead__menu-item > .nav-aisec {
   display: inline-flex !important;
   align-items: center;
   gap: .35rem;
   padding: .3rem .7rem !important;
   border-radius: 999px;
-  background: #2172cc;
+  background: #2b7de0;
   border: 1px solid transparent;
   color: #fff !important;
   font-weight: 600;
@@ -2165,8 +2196,8 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   transition: border-color .15s ease;
 }
 .masthead__menu-item > .nav-aisec:hover {
-  background: #2172cc;
-  border-color: #cfe4fb;
+  background: #2b7de0;
+  border-color: #e3effd;
   color: #fff !important;
   text-decoration: none;
 }
@@ -2179,14 +2210,14 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   flex: none;
   align-self: center;
 }
-/* 暗色下比亮色档略深一点（#1e6cbe，白字 5.3:1）：同一亮度放在近黑背景上会发荧，
-   但不再退回原来那种接近藏青的 #14487f —— 那版被嫌太深。 */
+/* 暗色下比亮色档收一档（#2673d6，白字 4.66:1 过 AA）：同一亮度放在近黑背景上会发荧。
+   不再退回原来那种接近藏青的 #1e6cbe / #14487f —— 那两版都被嫌太深。 */
 [data-theme="dark"] .masthead__menu-item > .nav-aisec {
-  background: #1e6cbe;
+  background: #2673d6;
 }
 [data-theme="dark"] .masthead__menu-item > .nav-aisec:hover {
-  background: #1e6cbe;
-  border-color: #9cc6f5;
+  background: #2673d6;
+  border-color: #b3d5fa;
 }
 
 /* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
