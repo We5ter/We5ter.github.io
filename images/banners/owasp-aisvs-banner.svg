@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1726"/>
+      <stop offset="0.58" stop-color="#12364b"/>
+      <stop offset="1" stop-color="#101d35"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#62d9e8" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#62d9e8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#72d6e6" stroke-opacity="0.07"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="420" fill="url(#bg)"/>
+  <rect width="1600" height="420" fill="url(#grid)"/>
+  <circle cx="1220" cy="208" r="260" fill="url(#glow)"/>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif">
+    <text x="92" y="112" fill="#7fd9e8" font-size="25" font-weight="700" letter-spacing="5">OWASP · AI SECURITY VERIFICATION STANDARD</text>
+    <text x="88" y="220" fill="#f2fbff" font-size="92" font-weight="800" letter-spacing="2">AISVS 1.01</text>
+    <text x="94" y="286" fill="#c2d9e4" font-size="30" letter-spacing="1">FROM AI RISKS TO VERIFIABLE CONTROLS</text>
+    <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="22">
+      <rect x="94" y="326" width="208" height="48" rx="24" fill="#1f6276"/>
+      <text x="198" y="358" text-anchor="middle" fill="#e8fbff">12 CHAPTERS</text>
+      <rect x="320" y="326" width="254" height="48" rx="24" fill="#173f55" stroke="#43889b"/>
+      <text x="447" y="358" text-anchor="middle" fill="#e8fbff">213 REQUIREMENTS</text>
+      <rect x="592" y="326" width="206" height="48" rx="24" fill="#173f55" stroke="#43889b"/>
+      <text x="695" y="358" text-anchor="middle" fill="#e8fbff">3 LEVELS</text>
+    </g>
+  </g>
+
+  <g transform="translate(1070 58)">
+    <path d="M150 0 L278 48 V146 C278 230 220 282 150 310 C80 282 22 230 22 146 V48 Z" fill="#102b3d" stroke="#68c9dc" stroke-width="3"/>
+    <path d="M150 22 L252 61 V145 C252 210 209 254 150 281 C91 254 48 210 48 145 V61 Z" fill="#153c50" stroke="#68c9dc" stroke-opacity="0.35"/>
+    <g fill="none" stroke="#9be6ef" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M85 106 l13 13 27-31"/>
+      <path d="M85 160 l13 13 27-31"/>
+      <path d="M85 214 l13 13 27-31"/>
+    </g>
+    <g stroke="#79aabd" stroke-width="8" stroke-linecap="round">
+      <path d="M151 104 H215 M151 158 H215 M151 212 H197"/>
+    </g>
+    <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" text-anchor="middle">
+      <rect x="84" y="256" width="132" height="38" rx="19" fill="#67c8da"/>
+      <text x="150" y="282" fill="#0b2432" font-size="20" font-weight="700">VERIFY</text>
+    </g>
+  </g>
+</svg>
