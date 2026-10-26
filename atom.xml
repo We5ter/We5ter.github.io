@@ -17,7 +17,12 @@
     <item>
       <title>OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements</title>
       <link>https://we5ter.github.io/en/ai-tools/owasp-aisvs/</link>
-      <description>OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.</description>
+      <description>
+        <![CDATA[<div class="x-lede">
+<span class="x-label">The one-line summary</span>
+
+<p><strong>AISVS is a security verification standard for AI systems.</strong> It breaks “what an AI system should defend against” into <strong>12 control families, 44 sections and 213 requirements</strong>, each starting with <e]]>
+      </description>
       <author>Wester</author>
       <pubDate>Sun, 25 Oct 2026 06:00:00 GMT</pubDate>
       <content:encoded>
@@ -27,7 +32,15 @@
     <item>
       <title>OWASP AISVS：213 条要求组成的 AI 系统安全验收标准</title>
       <link>https://we5ter.github.io/ai-tools/owasp-aisvs/</link>
-      <description>OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。</description>
+      <description>
+        <![CDATA[<div class="x-lede">
+<span class="x-label">一句话看懂</span>
+
+<p><strong>AISVS 是一份 AI 系统安全验收标准。</strong> 它把「AI 系统应该防住什么」拆成 <strong>12 个控制域、44 个小节、213 条要求</strong>，每条都以 <em>Verify that</em>（确认……）开头，都能测、能引用、能追责。它不回答「AI 有哪些风险」，只回答一句：<strong>你怎么证明这里防住了。</strong></p>
+</div>
+
+<h2 id="一、它解决什么问题"><a href="#一、它解决]]>
+      </description>
       <author>Wester</author>
       <pubDate>Sun, 25 Oct 2026 06:00:00 GMT</pubDate>
       <content:encoded>
