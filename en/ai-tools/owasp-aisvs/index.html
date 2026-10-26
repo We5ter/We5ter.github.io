@@ -40,14 +40,14 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
          一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
          语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
-      var pageTitle = "What Is OWASP AISVS: 213 Requirements for Verifying AI Systems";
+      var pageTitle = "OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -81,8 +81,8 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
+  <title>OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793003123041" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793003123041" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793005492642" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793005492642" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/owasp-aisvs/" />
@@ -105,15 +105,15 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
+  <meta property="og:title" content="OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/owasp-aisvs/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
+  <meta name="twitter:title" content="OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg" />
   
   <meta property="article:published_time" content="2026-10-25T06:00:00.000Z" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793003123041" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793005492642" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/"},"headline":"What Is OWASP AISVS: 213 Requirements for Verifying AI Systems","name":"What Is OWASP AISVS: 213 Requirements for Verifying AI Systems","description":"OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.","image":"https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg","inLanguage":"en","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-26T07:30:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/"},"headline":"OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements","name":"OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements","description":"OWASP AISVS is a security verification standard for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.","image":"https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg","inLanguage":"en","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-26T07:30:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -394,7 +394,7 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/owasp-aisvs-banner.jpg)">
-    <h1 class="post-title">What Is OWASP AISVS: 213 Requirements for Verifying AI Systems</h1>
+    <h1 class="post-title">OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements</h1>
     <div class="article-meta">
       <time class="article-date" datetime="2026-10-25">
         <span class="i18n-zh">2026年10月25日</span>
@@ -448,10 +448,10 @@
     <div class="x-lede">
 <span class="x-label">The one-line summary</span>
 
-<p><strong>AISVS is an acceptance checklist for AI systems.</strong> It breaks “what an AI system should defend against” into <strong>12 control families, 44 sections and 213 requirements</strong>, each starting with <em>Verify that</em> — each one testable, citable and assignable to an owner. It does not answer “what are the risks in AI”; it answers one question: <strong>how would you prove the defense holds?</strong></p>
+<p><strong>AISVS is a security verification standard for AI systems.</strong> It breaks “what an AI system should defend against” into <strong>12 control families, 44 sections and 213 requirements</strong>, each starting with <em>Verify that</em> — each one testable, citable and assignable to an owner. It does not answer “what are the risks in AI”; it answers one question: <strong>how would you prove the defense holds?</strong></p>
 </div>
 
-<h2 id="1-The-problem-it-solves"><a href="#1-The-problem-it-solves" class="headerlink" title="1. The problem it solves"></a>1. The problem it solves</h2><p>AI is not short of risk lists: the OWASP LLM Top 10 tells you where things can go wrong, and NIST AI RMF or ISO 42001 tell an organization how to govern AI risk. But on launch-review day a security engineer has to answer a third question: <strong>which defenses does this system actually have, and is each one really working?</strong> Until now there was no checklist for that — only individual experience improvised on the spot.</p>
+<h2 id="1-The-problem-it-solves"><a href="#1-The-problem-it-solves" class="headerlink" title="1. The problem it solves"></a>1. The problem it solves</h2><p>AI is not short of risk lists: the OWASP LLM Top 10 tells you where things can go wrong, and NIST AI RMF or ISO 42001 tell an organization how to govern AI risk. But on launch-review day a security engineer has to answer a third question: <strong>which defenses does this system actually have, and is each one really working?</strong> Until now there was no standard for that — only individual experience improvised on the spot.</p>
 <p>AISVS fills that gap: it takes the AI system apart end to end and writes each piece as a testable technical statement, so a review can mark every row pass or fail.</p>
 <table>
 <thead>
@@ -547,7 +547,7 @@
 <ol>
 <li><strong>One requirement, one concern</strong> → a review can rule pass or fail per row, with no “we did half of it, does that count”.</li>
 <li><strong>Stricter criteria at a higher level must be a separate requirement</strong>, never a note inside an L1 item → level boundaries stay clean; L1 means L1.</li>
-<li><strong>It must be objectively verifiable</strong> — by test, inspection or audit. Purely theoretical, subjective or aspirational wording is rejected → no un-decidable rows in the checklist.</li>
+<li><strong>It must be objectively verifiable</strong> — by test, inspection or audit. Purely theoretical, subjective or aspirational wording is rejected → no un-decidable rows in the standard.</li>
 </ol>
 </div>
 
@@ -655,13 +655,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&text=What Is OWASP AISVS: 213 Requirements for Verifying AI Systems"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&text=OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&title=What Is OWASP AISVS: 213 Requirements for Verifying AI Systems"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&title=OWASP AISVS: A Security Verification Standard for AI Systems, in 213 Requirements"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">

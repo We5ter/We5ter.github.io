@@ -40,14 +40,14 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
          一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
          语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
-      var pageTitle = "OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单";
+      var pageTitle = "OWASP AISVS：213 条要求组成的 AI 系统安全验收标准";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -81,8 +81,8 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
+  <title>OWASP AISVS：213 条要求组成的 AI 系统安全验收标准 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793003123042" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793003123042" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793005492650" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793005492650" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/owasp-aisvs/" />
@@ -105,15 +105,15 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
+  <meta property="og:title" content="OWASP AISVS：213 条要求组成的 AI 系统安全验收标准 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
   <meta property="og:url" content="https://we5ter.github.io/ai-tools/owasp-aisvs/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
+  <meta name="twitter:title" content="OWASP AISVS：213 条要求组成的 AI 系统安全验收标准 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。" />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg" />
   
   <meta property="article:published_time" content="2026-10-25T06:00:00.000Z" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793003123042" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793005492650" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/owasp-aisvs/"},"headline":"OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单","name":"OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单","description":"OWASP AISVS 是一份给 AI 系统用的安全验收清单：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。","image":"https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-26T07:30:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/owasp-aisvs/"},"headline":"OWASP AISVS：213 条要求组成的 AI 系统安全验收标准","name":"OWASP AISVS：213 条要求组成的 AI 系统安全验收标准","description":"OWASP AISVS 是一份 AI 系统安全验收标准：12 个控制域、213 条以 Verify that 开头的要求，每条都能测、能引用、能追责。本文用最短的篇幅讲清它解决什么问题、12 章怎么分组、一条要求长什么样、三个等级怎么选、以及怎么落到验收。","image":"https://we5ter.github.io/images/banners/owasp-aisvs-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-26T07:30:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -394,7 +394,7 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/owasp-aisvs-banner.jpg)">
-    <h1 class="post-title">OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单</h1>
+    <h1 class="post-title">OWASP AISVS：213 条要求组成的 AI 系统安全验收标准</h1>
     <div class="article-meta">
       <time class="article-date" datetime="2026-10-25">
         <span class="i18n-zh">2026年10月25日</span>
@@ -448,7 +448,7 @@
     <div class="x-lede">
 <span class="x-label">一句话看懂</span>
 
-<p><strong>AISVS 是一份给 AI 系统用的安全验收清单。</strong> 它把「AI 系统应该防住什么」拆成 <strong>12 个控制域、44 个小节、213 条要求</strong>，每条都以 <em>Verify that</em>（确认……）开头，都能测、能引用、能追责。它不回答「AI 有哪些风险」，只回答一句：<strong>你怎么证明这里防住了。</strong></p>
+<p><strong>AISVS 是一份 AI 系统安全验收标准。</strong> 它把「AI 系统应该防住什么」拆成 <strong>12 个控制域、44 个小节、213 条要求</strong>，每条都以 <em>Verify that</em>（确认……）开头，都能测、能引用、能追责。它不回答「AI 有哪些风险」，只回答一句：<strong>你怎么证明这里防住了。</strong></p>
 </div>
 
 <h2 id="一、它解决什么问题"><a href="#一、它解决什么问题" class="headerlink" title="一、它解决什么问题"></a>一、它解决什么问题</h2><p>AI 领域不缺「风险清单」：OWASP LLM Top 10 会告诉你哪里可能出事，NIST AI RMF 和 ISO 42001 会告诉组织该怎么管。但真到上线评审那天，安全工程师要回答的是第三个问题——<strong>这个系统到底装了哪些防线，每条是不是真的生效？</strong> 这个问题以前没有清单可对照，只能靠个人经验临场发挥。</p>
@@ -547,7 +547,7 @@
 <ol>
 <li><strong>一条只管一件事</strong> → 验收时能逐条判定通过与不通过，不会出现「做了一半算不算过」。</li>
 <li><strong>更高等级的更严标准必须另立新条</strong>，不能塞进 L1 的备注里 → 等级边界干净，L1 就是 L1。</li>
-<li><strong>必须可客观验证</strong>（测试、检查或审计），纯理论、主观、愿景式的表述不收 → 清单里没有「无法判定」的条款。</li>
+<li><strong>必须可客观验证</strong>（测试、检查或审计），纯理论、主观、愿景式的表述不收 → 标准里没有「无法判定」的条款。</li>
 </ol>
 </div>
 
@@ -609,7 +609,7 @@
 <div class="x-verdict">
 <span class="x-label">结论</span>
 
-<p>AISVS 的价值不在「多」，而在于它把 AI 安全从一段形容词变成了 <strong>213 个可以被引用、被测试、被追责的对象</strong>。如果你在做 AI 应用上线评审、Agent 门禁或供应商技术评估，它可以当要求清单和共同语言直接用：从 L1 起步，按风险升 L2，把关键条款落成带证据的测试。它最该被记住的一句是——<strong>AI 安全不只是测模型会不会说错话，而是验证整个系统只允许它做被授权做的事。</strong></p>
+<p>AISVS 的价值不在「多」，而在于它把 AI 安全从一段形容词变成了 <strong>213 个可以被引用、被测试、被追责的对象</strong>。如果你在做 AI 应用上线评审、Agent 门禁或供应商技术评估，它可以当验收标准和共同语言直接用：从 L1 起步，按风险升 L2，把关键条款落成带证据的测试。它最该被记住的一句是——<strong>AI 安全不只是测模型会不会说错话，而是验证整个系统只允许它做被授权做的事。</strong></p>
 </div>
 
 <div class="x-facts">
@@ -655,13 +655,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/owasp-aisvs/&text=OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/owasp-aisvs/&text=OWASP AISVS：213 条要求组成的 AI 系统安全验收标准"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/owasp-aisvs/&title=OWASP AISVS 是什么：213 条要求组成的 AI 系统验收清单"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/owasp-aisvs/&title=OWASP AISVS：213 条要求组成的 AI 系统安全验收标准"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
