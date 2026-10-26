@@ -25,7 +25,7 @@
       </content:encoded>
     </item>
     <item>
-      <title>OWASP AISVS 1.01 解读：AI 安全怎么做，213 条要求逐项说清</title>
+      <title>OWASP AISVS AI安全规范：AI 安全怎么做，213 条要求逐项说清</title>
       <link>https://we5ter.github.io/ai-tools/owasp-aisvs/</link>
       <description>OWASP AISVS 不是又一份 AI 风险清单，而是把训练数据、模型生命周期、RAG 记忆、Agent 和 MCP 拆成 213 条可验证要求的工程标准。1.01 已冻结，1.02 正在开发。它最值得借鉴的是用带版本编号的要求把设计、评审和验收串起来：每条要求要做什么、拿什么证据算完成，都说得清楚；但它不是扫描器，也不能替代 ASVS、NIST AI RMF 或组织自己的威胁建模。</description>
       <author>Wester</author>
