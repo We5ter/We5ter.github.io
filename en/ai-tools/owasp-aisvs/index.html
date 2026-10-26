@@ -40,14 +40,14 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
          一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
          语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
-      var pageTitle = "OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering";
+      var pageTitle = "What Is OWASP AISVS: 213 Requirements for Verifying AI Systems";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -81,8 +81,8 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work." />
+  <title>What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1792983103311" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1792983103311" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793000687307" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793000687307" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/owasp-aisvs/" />
@@ -105,19 +105,19 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work." />
+  <meta property="og:title" content="What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/owasp-aisvs/" />
   <meta property="og:image" content="https://we5ter.github.io/images/static/wester-og.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work." />
+  <meta name="twitter:title" content="What Is OWASP AISVS: 213 Requirements for Verifying AI Systems | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/static/wester-og.png" />
   
   <meta property="article:published_time" content="2026-10-25T06:00:00.000Z" />
-  <meta property="article:modified_time" content="2026-10-25T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-26T07:30:00.000Z" />
   <meta property="article:author" content="Wester" />
   
   <meta property="article:tag" content="Browser security" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1792983103311" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793000687307" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/"},"headline":"OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering","name":"OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering","description":"OWASP AISVS is a security verification standard for AI systems. It turns training data, model lifecycle, RAG memory, agents and MCP into 12 control families and 213 requirements that begin with Verify that. Version 1.01 is frozen and 1.02 is under development. This article walks through the standard itself: what it is, how it is organized, its key controls and where it still needs work.","image":"https://we5ter.github.io/images/static/wester-og.png","inLanguage":"en","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-25T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/owasp-aisvs/"},"headline":"What Is OWASP AISVS: 213 Requirements for Verifying AI Systems","name":"What Is OWASP AISVS: 213 Requirements for Verifying AI Systems","description":"OWASP AISVS is an acceptance checklist for AI systems: 12 control families, 213 requirements that all begin with Verify that, each one testable, citable and assignable. This piece covers what problem it solves, how the 12 chapters group into five layers, what a requirement looks like, how to pick a level, and how to turn it into an assessment.","image":"https://we5ter.github.io/images/static/wester-og.png","inLanguage":"en","datePublished":"2026-10-25T06:00:00.000Z","dateModified":"2026-10-26T07:30:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -394,14 +394,14 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/owasp-aisvs-banner.svg)">
-    <h1 class="post-title">OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering</h1>
+    <h1 class="post-title">What Is OWASP AISVS: 213 Requirements for Verifying AI Systems</h1>
     <div class="article-meta">
       <time class="article-date" datetime="2026-10-25">
         <span class="i18n-zh">2026年10月25日</span>
         <span class="i18n-en">Oct 25, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 17 分钟</span><span class="i18n-en">17 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 23 分钟</span><span class="i18n-en">23 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -448,145 +448,184 @@
     <div class="x-lede">
 <span class="x-label">The one-line summary</span>
 
-<p><strong>If the OWASP LLM Top 10 tells you where things can go wrong, AISVS asks how you would prove the defense works.</strong> It breaks an AI system into 12 control families and 213 requirements, each beginning with <em>Verify that</em>—every one answers two questions: what exactly to do, and how to prove it is done.</p>
+<p><strong>AISVS is an acceptance checklist for AI systems.</strong> It breaks “what an AI system should defend against” into <strong>12 control families, 44 sections and 213 requirements</strong>, each starting with <em>Verify that</em> — each one testable, citable and assignable to an owner. It does not answer “what are the risks in AI”; it answers one question: <strong>how would you prove the defense holds?</strong></p>
 </div>
 
-<h2 id="What-AISVS-is"><a href="#What-AISVS-is" class="headerlink" title="What AISVS is"></a>What AISVS is</h2><p>The <em>Artificial Intelligence Security Verification Standard</em> is an OWASP community project modeled on ASVS: requirements should be <strong>implementable, testable and verifiable</strong>. The current stable release is <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/tree/main/1.01/en">1.01</a>; 1.02 is the only active development release. The project is licensed under CC BY-SA 4.0.</p>
-<p>Its role alongside other documents is explicit. The LLM and Agentic Top 10s build risk awareness; NIST AI RMF and ISO&#x2F;IEC 42001 address governance; ASVS covers general application security; AISVS adds verification for AI-specific controls. <strong>It is neither a self-contained AI security program nor a certification you obtain by installing a tool</strong>—the official guidance says AISVS Level N should be applied together with ASVS Level N.</p>
-<h2 id="How-the-213-requirements-are-organized"><a href="#How-the-213-requirements-are-organized" class="headerlink" title="How the 213 requirements are organized"></a>How the 213 requirements are organized</h2><p>The 12 chapters in 1.01 contain <strong>213 core requirements</strong> across three assurance levels (counted from the stable requirement tables, excluding appendices):</p>
+<h2 id="1-The-problem-it-solves"><a href="#1-The-problem-it-solves" class="headerlink" title="1. The problem it solves"></a>1. The problem it solves</h2><p>AI is not short of risk lists: the OWASP LLM Top 10 tells you where things can go wrong, and NIST AI RMF or ISO 42001 tell an organization how to govern AI risk. But on launch-review day a security engineer has to answer a third question: <strong>which defenses does this system actually have, and is each one really working?</strong> Until now there was no checklist for that — only individual experience improvised on the spot.</p>
+<p>AISVS fills that gap: it takes the AI system apart end to end and writes each piece as a testable technical statement, so a review can mark every row pass or fail.</p>
 <table>
+<thead>
+<tr>
+<th>Document</th>
+<th>What it answers</th>
+<th>Granularity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OWASP LLM Top 10</td>
+<td>What are the common risks in AI applications</td>
+<td>Risk categories, not specific mechanisms</td>
+</tr>
+<tr>
+<td>NIST AI RMF &#x2F; ISO 42001</td>
+<td>How should an organization govern AI risk</td>
+<td>Process and accountability, no technical mechanisms</td>
+</tr>
+<tr>
+<td>OWASP ASVS</td>
+<td>How do you verify security requirements in a web app</td>
+<td>Per-mechanism, testable</td>
+</tr>
+<tr>
+<td><strong>OWASP AISVS</strong></td>
+<td><strong>How do you verify security requirements in an AI system</strong></td>
+<td><strong>Per-mechanism, testable</strong></td>
+</tr>
+</tbody></table>
+<p>Positioned in one line: <strong>AISVS is ASVS for AI</strong> — same founder (Jim Manico), same licence (CC BY-SA 4.0), same shape (one requirement &#x3D; one testable technical mechanism). And the two are <strong>not alternatives</strong>: verifying AISVS Level N assumes you are also verifying ASVS Level N. Authentication, sessions, encryption and logging operations stay with ASVS; AISVS covers only the AI-specific layer stacked on top.</p>
+<h2 id="2-The-whole-thing-in-30-seconds-12-chapters-five-layers"><a href="#2-The-whole-thing-in-30-seconds-12-chapters-five-layers" class="headerlink" title="2. The whole thing in 30 seconds: 12 chapters, five layers"></a>2. The whole thing in 30 seconds: 12 chapters, five layers</h2><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Chapters</th>
+<th>What it covers</th>
+<th align="center">Reqs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Data &amp; model</strong></td>
+<td>C1 training data · C3 model lifecycle · C6 model supply chain</td>
+<td>Where data comes from, how models ship and roll back, whether third-party models are clean</td>
+<td align="center">35</td>
+</tr>
+<tr>
+<td><strong>Input &amp; output</strong></td>
+<td>C2 input validation · C7 output control · C8 memory &amp; vector DB</td>
+<td>Prompt injection, output sanitization and attribution, read&#x2F;write boundaries of RAG memory</td>
+<td align="center">37</td>
+</tr>
+<tr>
+<td><strong>Runtime</strong></td>
+<td>C4 infrastructure &amp; deployment</td>
+<td>Model sandboxing, accelerator firmware, edge and distributed AI</td>
+<td align="center">14</td>
+</tr>
+<tr>
+<td><strong>Agents &amp; tools</strong></td>
+<td>C9 orchestration &amp; agentic · C10 MCP · C5 access control</td>
+<td>Budgets and circuit breakers, approval of high-impact actions, tool and MCP calls, who may access what</td>
+<td align="center">87</td>
+</tr>
+<tr>
+<td><strong>Adversarial &amp; observable</strong></td>
+<td>C11 adversarial robustness · C12 monitoring &amp; logging</td>
+<td>Resistance to evasion, extraction and poisoning, and whether what happened can be reconstructed</td>
+<td align="center">40</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>Total</strong></td>
+<td align="center"><strong>213</strong></td>
+</tr>
+</tbody></table>
+<p>Three facts you can read straight off the structure:</p>
+<ul>
+<li><strong>The weight sits on agents and tools, not on the model.</strong> C9 + C10 alone are 76 requirements (36%); with C5 access control that is 87, over 40% of the standard. What it really cares about is <em>who can make the AI do what</em>, not how smart the model is.</li>
+<li><strong>Model supply chain is the shortest chapter (7)</strong>, because dependency scanning, SBOM and build provenance are explicitly handed to SCVS &#x2F; SLSA &#x2F; CIS.</li>
+<li><strong>Chapters are organized by control family, not by attack.</strong> So one threat usually needs several chapters stitched together — the easiest way to misuse this standard, with an example in section 5.</li>
+</ul>
+<h2 id="3-What-a-requirement-looks-like"><a href="#3-What-a-requirement-looks-like" class="headerlink" title="3. What a requirement looks like"></a>3. What a requirement looks like</h2><p>All twelve chapters share one format — read one and you can read them all: <strong>a control objective</strong> for the chapter → <strong>sections</strong> grouped by defense goal, each introduced by what it defends against → a <strong>requirement table</strong> (unique ID &#x2F; description always starting with <em>Verify that</em> &#x2F; level 1·2·3).</p>
+<p>Two examples (paraphrased):</p>
+<ul>
+<li><code>9.2.1</code> (L1): <strong>Verify that</strong> privileged or irreversible actions are blocked until an explicit human approval is received and validated.</li>
+<li><code>2.1.6</code> (L2): <strong>Verify that</strong> an instruction hierarchy is enforced — system and developer messages outrank user instructions, and untrusted content cannot gain higher priority through retrieval, tool processing or persistence across turns.</li>
+</ul>
+<p>Three drafting rules explain why it works well in practice:</p>
+<div class="x-steps">
+
+<ol>
+<li><strong>One requirement, one concern</strong> → a review can rule pass or fail per row, with no “we did half of it, does that count”.</li>
+<li><strong>Stricter criteria at a higher level must be a separate requirement</strong>, never a note inside an L1 item → level boundaries stay clean; L1 means L1.</li>
+<li><strong>It must be objectively verifiable</strong> — by test, inspection or audit. Purely theoretical, subjective or aspirational wording is rejected → no un-decidable rows in the checklist.</li>
+</ol>
+</div>
+
+<h2 id="4-Picking-a-level"><a href="#4-Picking-a-level" class="headerlink" title="4. Picking a level"></a>4. Picking a level</h2><table>
 <thead>
 <tr>
 <th>Level</th>
-<th>Meaning</th>
-<th>Typical use</th>
+<th align="center">Reqs</th>
+<th>What it is</th>
+<th>When to use it</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Level 1</td>
-<td>Essential baseline controls for every AI system</td>
-<td>Internal tools and lower-risk applications</td>
+<td><strong>L1</strong></td>
+<td align="center">57</td>
+<td>The most critical and foundational: defenses against common attacks that <strong>need no other precondition</strong>, mostly cheap to implement</td>
+<td>Any AI application handling untrusted input or data of any sensitivity</td>
 </tr>
 <tr>
-<td>Level 2</td>
-<td>Standard controls for sensitive data and consequential decisions</td>
-<td>Production, customer-facing AI and personal data</td>
+<td><strong>L2</strong></td>
+<td align="center">110</td>
+<td>More advanced or less common attacks, plus defense in depth against widespread threats</td>
+<td>Sensitive business data, regulated data, adversarial contexts</td>
 </tr>
 <tr>
-<td>Level 3</td>
-<td>Defense in depth against sophisticated attacks</td>
-<td>Critical infrastructure and regulated environments</td>
+<td><strong>L3</strong></td>
+<td align="center">46</td>
+<td>Harder to implement, situational high-assurance controls</td>
+<td>Life-safety decisions, critical infrastructure, highly sensitive personal data</td>
 </tr>
 </tbody></table>
-<p>The 12 chapters span the lifecycle, one family per concern:</p>
-<table>
-<thead>
-<tr>
-<th>Chapter</th>
-<th>Control family</th>
-<th>Focus</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>C1</td>
-<td>Training data</td>
-<td>sourcing, labeling, poisoning and bias</td>
-</tr>
-<tr>
-<td>C2</td>
-<td>Input validation</td>
-<td>normalization, encoding smuggling, injection, length limits</td>
-</tr>
-<tr>
-<td>C3</td>
-<td>Model lifecycle</td>
-<td>training, fine-tuning, evaluation, retirement</td>
-</tr>
-<tr>
-<td>C4</td>
-<td>Infrastructure</td>
-<td>compute, isolation, secrets, configuration</td>
-</tr>
-<tr>
-<td>C5</td>
-<td>Access control</td>
-<td>identity, authorization, least privilege</td>
-</tr>
-<tr>
-<td>C6</td>
-<td>Model supply chain</td>
-<td>model provenance, signing, third-party components</td>
-</tr>
-<tr>
-<td>C7</td>
-<td>Model behavior</td>
-<td>output boundaries, refusal, content safety</td>
-</tr>
-<tr>
-<td>C8</td>
-<td>Memory&#x2F;embeddings&#x2F;vector stores</td>
-<td>retrieval scope, write quarantine, lifecycle</td>
-</tr>
-<tr>
-<td>C9</td>
-<td>Orchestration and agents</td>
-<td>approval, budgets, tool calls, kill switch</td>
-</tr>
-<tr>
-<td>C10</td>
-<td>MCP security</td>
-<td>tool schema validation, indirect-injection screening</td>
-</tr>
-<tr>
-<td>C11</td>
-<td>Adversarial robustness</td>
-<td>evasion, perturbation, red teaming</td>
-</tr>
-<tr>
-<td>C12</td>
-<td>Monitoring and logging</td>
-<td>audit, traceability, anomaly detection</td>
-</tr>
-</tbody></table>
-<p>The usage is straightforward: <strong>pick a target level from the system’s risk profile instead of ticking from requirement one</strong>, use AISVS for AI-specific controls alongside ASVS, and mark out-of-scope requirements with documented rationale rather than writing “we cannot control it” as “passed”.</p>
-<h2 id="Three-key-families-to-read-first"><a href="#Three-key-families-to-read-first" class="headerlink" title="Three key families to read first"></a>Three key families to read first</h2><p><strong>Prompt injection is not just an input-filter problem.</strong> C2 covers normalization, encoding smuggling, injection screening and context-length limits; C2.1.4 explicitly requires rejecting oversized input instead of silently truncating it. C2 alone is insufficient. C10.4.1&#x2F;2 require MCP tool-list and tool-call responses to be schema-validated and screened for indirect prompt injection before entering model context. C9.5.3 assigns access-control decisions to application logic or a policy engine, <strong>never to the model itself</strong>. Detection, context boundaries, deterministic authorization and auditing have to work together.</p>
-<p><strong>Agent approval cannot be a meaningless Allow button.</strong> C9.2.1 makes verified human approval before privileged or irreversible actions a Level 1 requirement. C9.2.2 requires the approval interface to display canonical, complete parameters—commands, diffs, recipients, amounts cannot be replaced by a reassuring model summary. At Level 3, C9.2.8 cryptographically binds approval to the action parameters, requester, context and a unique single-use nonce; any changed value or reused nonce must be rejected. C9.1 adds token, cost and recursion budgets plus kill switches. <strong>Real approval authorizes a deterministic action object, not a plausible-looking plan.</strong></p>
-<p><strong>RAG memory writes are an attack surface too.</strong> C8.1.3 requires scope enforcement during retrieval; C8.2.3 prohibits agent or tool output from entering trusted memory without source validation; C8.3.1 requires expired vectors to disappear from retrieval. C12.1.4 adds logs of queries, retrieved documents and knowledge sources. A knowledge base is therefore persistent state with tenant boundaries, write quarantine, lifecycle rules and an audit trail—not a read-only document pile.</p>
-<h2 id="Adoption-notes"><a href="#Adoption-notes" class="headerlink" title="Adoption notes"></a>Adoption notes</h2><div class="x-callout">
-<span class="x-label">A versioned language for acceptance</span>
+<p>Levels add depth: start at L1 and move up as data sensitivity and “what the system can do on its own” grow. The standard explicitly does not ask you to satisfy all 213 at once — pick a target level from the system’s risk profile.</p>
+<h2 id="5-Putting-it-to-work"><a href="#5-Putting-it-to-work" class="headerlink" title="5. Putting it to work"></a>5. Putting it to work</h2><div class="x-steps">
 
-<p>AISVS citations look like <code>v1.01-C9.2.1</code>, rather than a vague “human approval added”. Version, chapter, section and requirement identifiers let review comments, test cases, remediation tickets and vendor contracts point to the same object. The 1.01 directory is locked after release, so formal reports must carry the version because requirement text and levels can still change between minor releases.</p>
+<ol>
+<li><strong>Pick the level first; do not tick from the top down.</strong> Confirm the matching ASVS level is in scope too — AISVS does not cover general application security.</li>
+<li><strong>Scope it, and write down the reasoning.</strong> Mark requirements outside your control as out of scope with a reason (a model vendor’s internal capabilities can only be evidenced by a model card, not retested by your team), and <strong>never write “cannot reach it” as “passed”</strong>.</li>
+<li><strong>Turn requirements into evidence-producing tests.</strong> Automate the ones with deterministic evidence first: schema negative cases, out-of-scope parameters, budget overruns, unapproved high-impact actions, whether expired vectors are still retrievable, whether attribution can be fabricated by the model.</li>
+<li><strong>Always cite with a version.</strong> Write <code>v1.01-C9.2.1</code>, not “human approval added”, so review comments, test cases, remediation tickets and vendor contracts all point at the same object.</li>
+<li><strong>Re-verify on change.</strong> After a model, prompt, tool list or MCP server version changes, re-run the relevant chapters against the same version.</li>
+</ol>
 </div>
 
-<p>Turning key requirements into evidence-backed tests beats attempting all 213 at once: start at Level 1, move to Level 2 by data and action risk, put automatable evidence (negative schema tests, unauthorized arguments, budget exhaustion, unapproved dangerous actions) into CI, and re-run verification against the same version after material changes to models, prompts or tool manifests.</p>
-<h2 id="Limitations-where-the-standard-still-needs-work"><a href="#Limitations-where-the-standard-still-needs-work" class="headerlink" title="Limitations (where the standard still needs work)"></a>Limitations (where the standard still needs work)</h2><div class="x-warn">
-<span class="x-label">What to know before using it</span>
+<h3 id="Example-defending-prompt-injection-spans-six-chapters"><a href="#Example-defending-prompt-injection-spans-six-chapters" class="headerlink" title="Example: defending prompt injection spans six chapters"></a>Example: defending prompt injection spans six chapters</h3><p>Because chapters are organized by control family, one attack surface usually spans several. The standard’s own example is prompt injection in an agentic application:</p>
+<p><strong>C2 input filtering</strong> (normalization, injection detection, reject rather than truncate on overflow) → <strong>C10.4 tool-result screening</strong> (validate <code>tools/list</code> and <code>tools/call</code> responses against the declared schema and screen them for indirect injection before they enter model context) → <strong>C9.5 authorization stays out of the model</strong> (access decisions are made by application logic or a policy engine) → <strong>C9.2 human approval for high-impact actions</strong> → <strong>C8.2 memory write quarantine</strong> (agent or tool output never lands in trusted memory without provenance verification) → <strong>C7 output side</strong> (schema validation, RAG attribution taken from retrieval metadata rather than generated by the model) → <strong>C12 forensic audit</strong>.</p>
+<p><strong>This is the single most useful idea to copy into an internal standard: prompt injection is not an input-filtering problem, it is filtering + context boundaries + deterministic authorization + audit, all four at once.</strong> Doing only the twelve requirements in C2 leaves the defense wide open at the two entrances that matter most: tool return values and memory writes.</p>
+<h2 id="6-What-to-know-before-you-use-it"><a href="#6-What-to-know-before-you-use-it" class="headerlink" title="6. What to know before you use it"></a>6. What to know before you use it</h2><div class="x-callout x-warn">
+<span class="x-label">The biggest caveat</span>
 
-<p>“Verifiable” does not mean “easy to verify”. There is no universally reliable oracle for hallucination detection, poisoning detection or adversarial robustness. An assessment must record its datasets, thresholds, applicable models and evidence dates; the standard states the control objective, it does not prove that your detector works.</p>
+<p>“Verifiable” is not the same as “easy to verify”. Hallucination detection, poisoning detection and adversarial robustness have no universally reliable oracle; the standard gives you a <strong>control objective</strong>, not proof that your detector works. An assessment conclusion must carry the test set, thresholds, models covered and evidence date — otherwise it is just an assertion.</p>
 </div>
 
 <ul>
-<li><strong>Some requirements need judgment rather than literal application.</strong> C2.1.5’s character-set allow-list, if applied indiscriminately to free-form multilingual text, could reject legitimate input. Separate commands, arguments and identifiers from natural-language fields before defining scope and exceptions. Controls inside a model vendor’s boundary may be supported only by documentation rather than independent application-side testing.</li>
-<li><strong>1.01 is a stable snapshot, not a live rule feed.</strong> Version 1.02 remains in development, and the project provides no official scanner, compliance score or security guarantee; teams still need to build tooling and evidence automation themselves.</li>
+<li><strong>It covers AI-specific controls only.</strong> General application security → ASVS; software supply chain → SCVS &#x2F; SLSA &#x2F; CIS; infrastructure and cloud hardening → CIS Benchmarks &#x2F; NIST SP 800-53; AI governance and ethics → ISO 42001 &#x2F; NIST AI RMF; how to actually attack → OWASP AI Testing Guide.</li>
+<li><strong>No official toolchain.</strong> The project ships no scanner, compliance score or certification; evidence collection and automation are on your team.</li>
+<li><strong>1.01 is a snapshot, not a live rule base.</strong> <code>1.0/</code> and <code>1.01/</code> are locked and 1.02 is the only active development branch. By the release policy a MINOR version only appends and never renumbers — the count may grow, <code>v1.01-C9.2.1</code> will not move, and formal reports still cite the locked version.</li>
+<li><strong>Some requirements cannot be applied literally.</strong> The character-set allow-list in <code>2.1.5</code> breaks free-form multilingual input; separate commands, parameters, identifiers and natural-language fields first, then define scope and exceptions per category.</li>
 </ul>
-<p>These are points to judge against your context or that are still evolving. Record them alongside scope assumptions, detector error and residual risk—an immaculate checklist is less valuable than an honest one.</p>
 <div class="x-verdict">
 <span class="x-label">Verdict</span>
 
-<p>For teams running AI design reviews, agent release gates or vendor assessments, AISVS 1.01 is valuable as a <strong>requirement checklist and shared vocabulary</strong>. Start with Level 1, move to Level 2 according to risk, and turn key requirements into evidence-backed tests. Its central lesson is simple: <strong>AI security is not only about testing whether a model says the wrong thing; it is about verifying that the whole system permits only the behavior it was authorized to perform.</strong></p>
+<p>The value of AISVS is not that it is long; it is that it turns AI security from a paragraph of adjectives into <strong>213 objects you can cite, test and hold someone accountable for</strong>. If you run AI launch reviews, agent gating or vendor technical assessments, it works out of the box as a requirement list and a shared vocabulary: start at L1, move to L2 where risk warrants it, and turn the key requirements into evidence-producing tests. The line worth remembering is this — <strong>AI security is not about testing whether the model says the wrong thing; it is about verifying that the whole system only lets it do what it is authorized to do.</strong></p>
 </div>
 
 <div class="x-facts">
-<span class="x-label">At a glance</span>
+<span class="x-label">Quick facts</span>
 
 <ul>
-<li><strong>Project</strong>: OWASP&#x2F;AISVS, created 2025-05-05, CC BY-SA 4.0</li>
-<li><strong>Release</strong>: 1.01 stable and locked; 1.02 is the only active development version</li>
-<li><strong>Core requirements</strong>: 213 across 12 chapters; L1&#x2F;L2&#x2F;L3 &#x3D; 57&#x2F;110&#x2F;46</li>
-<li><strong>Coverage</strong>: training data, model supply chain, RAG memory, agents, MCP and monitoring</li>
+<li><strong>Project</strong>: OWASP&#x2F;AISVS, founded by Jim Manico, CC BY-SA 4.0, © 2025–2026</li>
+<li><strong>Current version</strong>: 1.01 released and locked; 1.02 is the only active development branch (2.0 deferred)</li>
+<li><strong>Structure</strong>: 12 chapters &#x2F; 44 sections &#x2F; 213 core requirements; L1&#x2F;L2&#x2F;L3 &#x3D; 57&#x2F;110&#x2F;46 (excluding appendices)</li>
+<li><strong>Heaviest</strong>: C10 MCP 39 + C9 agentic 37, 36% of the standard; largest section is C10.4 (21)</li>
+<li><strong>Lightest</strong>: C6 model supply chain, 7; C5 access control is the only chapter with no L1 requirements</li>
+<li><strong>Appendices</strong>: A glossary · B AI security controls inventory (re-indexed by control category) · C AI-assisted secure coding</li>
+<li><strong>Versioning</strong>: two-part <code>v&lt;MAJOR&gt;.&lt;MINOR&gt;</code>; MINOR never renumbers, MAJOR may restructure</li>
 <li><strong>Citation</strong>: use <code>v1.01-Cx.y.z</code> in formal assessments</li>
-<li><strong>Boundaries</strong>: does not replace ASVS, general supply-chain or infrastructure baselines, AI governance or threat modeling</li>
-<li><strong>Resources</strong>: <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/raw/main/1.01/dist/AISVS-1.01.pdf">Stable PDF</a> · <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/blob/main/1.01/en/0x03-Using-AISVS.md">Usage guide</a> · <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/tree/main/1.01/research">Research Wiki</a></div></li>
+<li><strong>Boundaries</strong>: does not replace ASVS, SCVS&#x2F;SLSA, CIS baselines, ISO 42001 &#x2F; NIST AI RMF or the AI Testing Guide</li>
+<li><strong>Links</strong>: <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/raw/main/1.01/dist/AISVS-1.01.pdf">stable PDF</a> · <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/blob/main/1.01/en/0x03-Using-AISVS.md">using AISVS</a> · <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/blob/main/RELEASE.md">release policy</a> · <a target="_blank" rel="noopener" href="https://github.com/OWASP/AISVS/tree/main/1.02-dev/en">1.02-dev</a></div></li>
 </ul>
 
   </section>
@@ -616,13 +655,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&text=OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&text=What Is OWASP AISVS: 213 Requirements for Verifying AI Systems"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&title=OWASP AISVS 1.01: 213 Testable Requirements That Bring AI Security Back to Engineering"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/owasp-aisvs/&title=What Is OWASP AISVS: 213 Requirements for Verifying AI Systems"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
