@@ -12,6 +12,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 每日推荐 / Daily Picks
 
+- [023 DeepTeam](https://we5ter.github.io/ai-tools/deepteam/) (EN: https://we5ter.github.io/en/ai-tools/deepteam/): 双模型红队流水线：一个 LLM 按你勾选的漏洞类型现出攻击题，另一个 LLM 当裁判逐条判定，失败用例自带 CVSS 评分与 OWASP/NIST 映射 · A dual-model red team pipeline: one LLM writes attacks on the fly from the vulnerability types you pick, another judges each case, and failures come out with CVSS scores and OWASP/NIST mapping · 分类/Category: AI Red Teaming Frameworks & Agents · GitHub: https://github.com/confident-ai/deepteam (3061 stars)
 - [022 OWASP AISVS](https://we5ter.github.io/ai-tools/owasp-aisvs/) (EN: https://we5ter.github.io/en/ai-tools/owasp-aisvs/): 不是又一份 AI 风险 Top 10：它把训练数据、RAG 记忆、Agent 与 MCP 拆成 213 条可验证要求，告诉团队具体该做什么、做完怎么验 · Not another AI-risk Top 10: 213 testable requirements across training data, RAG memory, agents and MCP — turning security principles into reviewable, testable engineering objects · 分类/Category: AI Security Verification Standards · GitHub: https://github.com/OWASP/AISVS (565 stars)
 - [021 mcp-scanner](https://we5ter.github.io/ai-tools/mcp-scanner/) (EN: https://we5ter.github.io/en/ai-tools/mcp-scanner/): Cisco 开源的 MCP 服务器安检：YARA + LLM + AI Defense 三引擎并联，共 9 个分析器；最值钱的是报告纪律——扫描没跑完 is_safe 返回 None，不许说安全 · Cisco's open-source security screening for MCP servers — YARA + LLM + AI Defense in parallel, nine analyzers; the real prize is the reporting discipline: an unfinished scan returns is_safe=None, never "safe" · 分类/Category: Security Auditing for AI Agents & Apps · GitHub: https://github.com/cisco-ai-defense/mcp-scanner (1094 stars)
 - [020 agent-sandbox](https://we5ter.github.io/ai-tools/agent-sandbox/) (EN: https://we5ter.github.io/en/ai-tools/agent-sandbox/): Kubernetes SIG Apps 官方出品：把「一个长期活着、有稳定名字、带自己磁盘的单容器」补成 Sandbox 这层 API，隔离一行代码都不自己写，全交给 gVisor / Kata · Official Kubernetes SIG Apps project: turns "one long-lived container with a stable name and its own disk" into a first-class API — and writes zero isolation code itself, delegating it all to gVisor / Kata · 分类/Category: AI Agent Runtime Controls · GitHub: https://github.com/kubernetes-sigs/agent-sandbox (4270 stars)
@@ -37,6 +38,7 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 
 ## 分类归档 / Categories
 
+- [AI Red Teaming Frameworks & Agents](https://we5ter.github.io/ai-tools/cat/ai-red-teaming-frameworks-agents/)
 - [AI Security Verification Standards](https://we5ter.github.io/ai-tools/cat/ai-security-verification-standards/)
 - [Security Auditing for AI Agents & Apps](https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/)
 - [AI Agent Runtime Controls](https://we5ter.github.io/ai-tools/cat/ai-agent-runtime-controls/)
@@ -44,5 +46,4 @@ This file summarizes the site structure for AI/LLM crawlers. Full sitemap: https
 - [Agent Skills for Vulnerability Discovery & Remediation](https://we5ter.github.io/ai-tools/cat/agent-skills-for-vulnerability-discovery-remediation/)
 - [Security Auditing for Agent Skills](https://we5ter.github.io/ai-tools/cat/security-auditing-for-agent-skills/)
 - [LLM-Powered Vulnerability Scanners](https://we5ter.github.io/ai-tools/cat/llm-powered-vulnerability-scanners/)
-- [AI Red Teaming Frameworks & Agents](https://we5ter.github.io/ai-tools/cat/ai-red-teaming-frameworks-agents/)
 
