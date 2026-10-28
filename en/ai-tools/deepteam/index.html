@@ -40,14 +40,14 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "DeepTeam is Confident AI's LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "DeepTeam is Confident AI's LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "DeepTeam is Confident AI's AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "DeepTeam is Confident AI's AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
          一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
          语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
-      var pageTitle = "DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS";
+      var pageTitle = "DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -81,8 +81,8 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="DeepTeam is Confident AI's LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
+  <title>DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="DeepTeam is Confident AI's AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793188859547" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793188859547" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793189255683" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793189255683" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/deepteam/" />
@@ -105,15 +105,15 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="DeepTeam is Confident AI&#39;s LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
+  <meta property="og:title" content="DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="DeepTeam is Confident AI&#39;s AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
   <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/deepteam/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/deepteam-banner.jpg" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="DeepTeam is Confident AI&#39;s LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
+  <meta name="twitter:title" content="DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="DeepTeam is Confident AI&#39;s AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/deepteam-banner.jpg" />
   
   <meta property="article:published_time" content="2026-10-28T06:00:00.000Z" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793188859547" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793189255683" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/deepteam/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/deepteam/"},"headline":"DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS","name":"DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS","description":"DeepTeam is Confident AI's LLM red teaming framework: one model plays the attacker and generates attacks from the vulnerability types you pick, another model judges each case, and every failure gets a CVSS score plus OWASP/NIST framework mapping. This piece walks through the dual-model pipeline, the 36-class/251-type vulnerability surface, and three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.","image":"https://we5ter.github.io/images/banners/deepteam-banner.jpg","inLanguage":"en","datePublished":"2026-10-28T06:00:00.000Z","dateModified":"2026-10-28T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/deepteam/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/deepteam/"},"headline":"DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails","name":"DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails","description":"DeepTeam is Confident AI's AI security framework in two halves: a red teaming half — attacks written on the fly per vulnerability type, automatic judging, and CVSS scores with OWASP/NIST mapping on failures; and a production guardrail half — 7 guards screening inputs and outputs for bias, PII leakage, prompt injection and more. This piece covers how the two halves fit together, plus three findings from reading the source: refusals auto-pass, agentic risks get no category, and the CVSS impact is a constant.","image":"https://we5ter.github.io/images/banners/deepteam-banner.jpg","inLanguage":"en","datePublished":"2026-10-28T06:00:00.000Z","dateModified":"2026-10-28T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -394,14 +394,14 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/deepteam-banner.jpg)">
-    <h1 class="post-title">DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS</h1>
+    <h1 class="post-title">DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails</h1>
     <div class="article-meta">
       <time class="article-date" datetime="2026-10-28">
         <span class="i18n-zh">2026年10月28日</span>
         <span class="i18n-en">Oct 28, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 24 分钟</span><span class="i18n-en">24 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 30 分钟</span><span class="i18n-en">30 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -448,7 +448,7 @@
     <div class="x-lede">
 <span class="x-label">The one-line summary</span>
 
-<p><strong>DeepTeam is a red teaming framework for LLM applications.</strong> It uses <strong>one model as the attacker</strong>, generating attacks on the fly from the vulnerability types you select; <strong>another model as the judge</strong>, ruling on each case; then it computes a <strong>CVSS score</strong> for every failure and maps results onto OWASP, NIST and other frameworks. What separates it from static benchmark evaluation: <strong>the questions are not written in advance — they are written against your system.</strong></p>
+<p><strong>DeepTeam splits AI application security into two halves.</strong> The red teaming half: one model plays the attacker and writes attacks on the fly from the vulnerability types you pick, another model judges each case, and failures come out with CVSS scores. <strong>The guardrail half: 7 production guards</strong> — for the bias, PII leakage, prompt injection and SQL injection the tests surface, there is a matching check on the live path.</p>
 </div>
 
 <h2 id="1-The-problem-it-solves"><a href="#1-The-problem-it-solves" class="headerlink" title="1. The problem it solves"></a>1. The problem it solves</h2><p>Adversarial testing of LLM applications currently has three routes: static datasets (HEx-PHI, HarmBench — run a fixed set of prompts), attack generators (garak — template-driven malicious inputs), and human red teams (expensive, unrepeatable). All three share one gap: <strong>judgment</strong>. After the attack lands, someone still has to read whether the response was dangerous, or plug in a scorer that is disconnected from the test itself.</p>
@@ -487,7 +487,7 @@
 <td>213 pass&#x2F;fail requirements</td>
 </tr>
 </tbody></table>
-<p>In one line: <strong>garak handles “how to attack”, AISVS handles “what to require”, and DeepTeam tries to make “attack + judge + score” one pipeline that produces a formal report.</strong></p>
+<p>In one line: <strong>garak handles “how to attack”, AISVS handles “what to require”, and DeepTeam does two things — turn “attack + judge + score” into a pipeline, and use guardrails to stop the vulnerability types it found at the production door.</strong> The two halves share one vulnerability taxonomy: red teaming surfaces “bias”, “PII leakage” or “prompt injection”, and the guardrails have guards with the same names — a test finding translates directly into a production config.</p>
 <h2 id="2-How-the-pipeline-works"><a href="#2-How-the-pipeline-works" class="headerlink" title="2. How the pipeline works"></a>2. How the pipeline works</h2><p>The core is <strong>two models</strong>: <code>simulator_model</code> generates attacks (default gpt-4o-mini), <code>evaluation_model</code> judges (default gpt-4o-mini). The system under test plugs in through a <strong>callback contract</strong>:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">model_callback</span>(<span class="params"><span class="built_in">input</span>: <span class="built_in">str</span>, turns: <span class="built_in">list</span> = <span class="literal">None</span></span>) -&gt; RTTurn:</span><br><span class="line">    <span class="keyword">return</span> RTTurn(</span><br><span class="line">        content=...,                 <span class="comment"># the model&#x27;s reply</span></span><br><span class="line">        retrieval_context=...,       <span class="comment"># what RAG retrieved (the judge sees this)</span></span><br><span class="line">        tools_called=...,            <span class="comment"># tool calls made (the judge sees this too)</span></span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
 
@@ -578,18 +578,67 @@
 <p>In <code>red_teamer/cvss.py</code>, <code>DEFAULT_IMPACT = MEDIUM</code>, with the source comment: <em>“Impact is not yet derived from the vulnerability type, so every test case…”</em> — <strong>every case gets the same MEDIUM impact</strong>. Score differences therefore come only from the attack method’s exploitability (default LOW) and the exposure you pass in (default MEDIUM). Today’s CVSS is closer to “how potent is this attack method” than “<strong>how much would this vulnerability actually hurt your system</strong>“. State that clearly if you quote it in an acceptance report.</p>
 </div>
 
-<h2 id="5-What-ships-alongside"><a href="#5-What-ships-alongside" class="headerlink" title="5. What ships alongside"></a>5. What ships alongside</h2><ul>
+<h2 id="5-Guardrails-the-production-line-of-defense"><a href="#5-Guardrails-the-production-line-of-defense" class="headerlink" title="5. Guardrails: the production line of defense"></a>5. Guardrails: the production line of defense</h2><p>Red teaming answers “where does it leak”; guardrails answer “what stops it in production”. DeepTeam ships 7 guards, positioned by the project itself as production-grade:</p>
+<table>
+<thead>
+<tr>
+<th>Guard</th>
+<th>What it blocks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PromptInjection</td>
+<td>Prompt injection</td>
+</tr>
+<tr>
+<td>Toxicity</td>
+<td>Abuse, hate, harassment</td>
+</tr>
+<tr>
+<td>Privacy</td>
+<td>PII and sensitive information leakage</td>
+</tr>
+<tr>
+<td>Illegal</td>
+<td>Illegal content</td>
+</tr>
+<tr>
+<td>Hallucination</td>
+<td>Hallucination (output with no grounding)</td>
+</tr>
+<tr>
+<td>Topical</td>
+<td>Off-topic drift</td>
+</tr>
+<tr>
+<td>Cybersecurity</td>
+<td>Cyberattack techniques</td>
+</tr>
+</tbody></table>
+<p>You hang guards on both the input and the output side:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> deepteam <span class="keyword">import</span> Guardrails</span><br><span class="line"><span class="keyword">from</span> deepteam.guardrails.guards <span class="keyword">import</span> PromptInjectionGuard, ToxicityGuard</span><br><span class="line"></span><br><span class="line">guardrails = Guardrails(</span><br><span class="line">    input_guards=[PromptInjectionGuard(), ToxicityGuard()],  <span class="comment"># inputs screened first</span></span><br><span class="line">    output_guards=[ToxicityGuard()],                         <span class="comment"># outputs screened too</span></span><br><span class="line">    evaluation_model=<span class="string">&quot;gpt-4.1&quot;</span>,</span><br><span class="line">    sample_rate=<span class="number">1.0</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">result = guardrails.guard_input(user_input)</span><br><span class="line">result.breached   <span class="comment"># True if any guard is not explicitly safe</span></span><br><span class="line">result.verdicts   <span class="comment"># per-guard verdict + reason + latency + score</span></span><br></pre></td></tr></table></figure>
+
+<p>Mechanics worth knowing, straight from the source:</p>
+<ul>
+<li><strong>The verdict is an LLM structured output</strong>: each guard hands the text to a model (default gpt-4.1) that may only answer safe &#x2F; borderline &#x2F; unsafe plus a reason. These are not local rule-based classifiers, so <strong>every check burns tokens</strong> and cost scales linearly with traffic.</li>
+<li><strong>A strict breach rule</strong>: unsafe, borderline, or even uncertain from any guard sets <code>breached</code> — anything that is not explicitly safe counts as a breach.</li>
+<li><strong>Fail closed</strong>: if a guard call itself errors, the verdict is recorded as unsafe. Better a false block than a missed one.</li>
+<li><strong>Output guards see the input</strong>: <code>guard_output(input, output)</code> hands the user input to the guard together with the model output — prompt injection and context-dependent content can only be judged with both.</li>
+<li><strong><code>sample_rate</code> is the cost knob</strong>: set 0.1 and exactly every 10th request gets guarded — deterministic sampling, not random. At high traffic, dial it down instead of guarding 100% from day one.</li>
+</ul>
+<h2 id="6-What-else-ships-alongside"><a href="#6-What-else-ships-alongside" class="headerlink" title="6. What else ships alongside"></a>6. What else ships alongside</h2><ul>
 <li><strong>7 framework mappings</strong>: OWASP Top 10 for LLM (2025), OWASP Top 10 for Agentic Applications (2026), NIST AI RMF, MITRE ATLAS, AEGIS, BeaverTails, EU AI Act. Results map directly onto framework items, saving one translation step in compliance reports.</li>
-<li><strong>7 guardrails</strong>: Toxicity &#x2F; PromptInjection &#x2F; Privacy &#x2F; Illegal &#x2F; Hallucination &#x2F; Topical &#x2F; Cybersecurity. Note they are <strong>not local classifiers</strong>: each calls an LLM (default gpt-4.1) for structured output (safe&#x2F;borderline&#x2F;unsafe) and records latency and cost. Light to set up, but every call burns tokens.</li>
 <li><strong>CodeScanner</strong>: static scanning for vulnerabilities, driven through Claude &#x2F; Codex &#x2F; Cursor harness engines (openai-codex and claude-agent-sdk are optional dependencies).</li>
 <li><strong>Auto-upload</strong>: <code>_upload_to_confident=True</code> is the default — logged into Confident AI, your results upload automatically and it <strong>opens a browser</strong> to the report. Turn it off if you want results to stay local.</li>
 </ul>
-<h2 id="6-How-to-use-it-and-what-to-know-first"><a href="#6-How-to-use-it-and-what-to-know-first" class="headerlink" title="6. How to use it, and what to know first"></a>6. How to use it, and what to know first</h2><p>The smallest start is a YAML config:</p>
+<h2 id="7-How-to-use-it-and-what-to-know-first"><a href="#7-How-to-use-it-and-what-to-know-first" class="headerlink" title="7. How to use it, and what to know first"></a>7. How to use it, and what to know first</h2><p>The smallest start is a YAML config:</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">models:</span></span><br><span class="line">  <span class="attr">simulator:</span> <span class="string">gpt-3.5-turbo-0125</span></span><br><span class="line">  <span class="attr">evaluation:</span> <span class="string">gpt-4o</span></span><br><span class="line"><span class="attr">target:</span></span><br><span class="line">  <span class="attr">purpose:</span> <span class="string">&quot;A helpful AI assistant&quot;</span></span><br><span class="line">  <span class="attr">model:</span></span><br><span class="line">    <span class="attr">provider:</span> <span class="string">custom</span></span><br><span class="line">    <span class="attr">file:</span> <span class="string">&quot;tests/test_callback.py&quot;</span></span><br><span class="line">    <span class="attr">class:</span> <span class="string">&quot;CustomFireworksLLM&quot;</span></span><br><span class="line"><span class="attr">system_config:</span></span><br><span class="line">  <span class="attr">max_concurrent:</span> <span class="number">10</span></span><br><span class="line">  <span class="attr">attacks_per_vulnerability_type:</span> <span class="number">3</span></span><br><span class="line">  <span class="attr">run_async:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">ignore_errors:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">default_vulnerabilities:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;Bias&quot;</span></span><br><span class="line">    <span class="attr">types:</span> [<span class="string">&quot;race&quot;</span>, <span class="string">&quot;gender&quot;</span>]</span><br></pre></td></tr></table></figure>
 
 <p>Before you run:</p>
 <ul>
 <li><strong>Cost is three layers of LLM</strong>: attack generation + three-phase refinement + judging, all burning tokens. Start small and measure per-case cost before scaling up.</li>
+<li><strong>Guardrails are a fourth layer of LLM</strong>: every guarded request adds a gpt-4.1 round trip — latency and cost belong in the production budget. Lowering <code>sample_rate</code> saves money but voluntarily skips part of the traffic.</li>
+<li><strong>Guardrails will false-block</strong>: fail-closed means borderline&#x2F;uncertain verdicts also block, so legitimate requests can be turned away. Measure the false-block rate on real traffic before launch.</li>
 <li><strong>The judge is also an LLM</strong> and will misjudge. <code>ignore_errors</code> defaults to True; errored cases go to a separate bucket and <strong>pass rate &#x3D; passing ÷ (passing + failing), excluding the error bucket</strong> — watch the shrunken denominator in reports.</li>
 <li><strong>The refusal heuristic is English-only</strong> (finding 1): pass rates for Chinese-language systems may be inflated, and Chinese refusals may be mis-scored as failures.</li>
 <li><strong>CVSS impact is a constant</strong> (finding 3): do not quote the score as a real risk level.</li>
@@ -598,7 +647,7 @@
 <div class="x-verdict">
 <span class="x-label">Verdict</span>
 
-<p>DeepTeam’s value is moving red teaming from “run a fixed pile of prompts” to “<strong>write, judge and score attacks against your system, on the spot</strong>“ — the callback contract lets the judge see RAG context and tool calls, the Agentic surface lets it test whether the agent <em>does</em> the wrong thing, and the framework mapping makes its report drop straight into a compliance process. But it is currently in a state of <strong>complete pipeline, rough numbers</strong>: refusals auto-pass, agentic risks go uncategorized, and the CVSS impact is a constant — all three visible in the source. The right way to use it: <strong>treat it as the engine for attack-surface discovery and regression testing, re-check every conclusion it draws yourself, and read its CVSS as a relative ordering, not a risk rating.</strong></p>
+<p>DeepTeam turns AI application security into two complete halves: <strong>the red teaming half writes, judges and scores attacks against your system on the spot</strong> — the callback contract lets the judge see RAG context and tool calls, and the Agentic surface lets it test whether the agent <em>does</em> the wrong thing; <strong>the guardrail half stops the vulnerability types it found at the production door</strong> — guards on inputs, guards on outputs, a strict breach rule and fail-closed errors. But it is currently in a state of <strong>complete pipeline, rough numbers</strong>: refusals auto-pass, agentic risks go uncategorized, and the CVSS impact is a constant — all three visible in the source. The right way to use it: <strong>run the red teaming half as your attack-surface discovery and regression engine and re-check its conclusions yourself; run the guardrail half as a first line of defense after measuring the false-block rate on real traffic; and read the CVSS as a relative ordering, not a risk rating.</strong></p>
 </div>
 
 <div class="x-facts">
@@ -614,7 +663,7 @@
 <li><strong>CVSS</strong>: impact×0.6 + exploitability×0.3 + exposure×0.1; DEFAULT_IMPACT always MEDIUM; cutoffs at 9&#x2F;7&#x2F;4</li>
 <li><strong>Refusal auto-pass</strong>: 16 opener prefixes + 24 body markers, English-only, empty replies skip the judge</li>
 <li><strong>Risk categories</strong>: only 19 type families mapped to 5 categories; all Agentic types land in “Others”</li>
-<li><strong>Extras</strong>: 7 framework mappings (OWASP LLM&#x2F;Agentic, NIST AI RMF, MITRE ATLAS, AEGIS, BeaverTails, EU AI Act) · 7 LLM-judged guardrails (default gpt-4.1) · CodeScanner (Claude&#x2F;Codex&#x2F;Cursor)</li>
+<li><strong>Extras</strong>: 7 framework mappings (OWASP LLM&#x2F;Agentic, NIST AI RMF, MITRE ATLAS, AEGIS, BeaverTails, EU AI Act) · CodeScanner (Claude&#x2F;Codex&#x2F;Cursor) · <strong>Guardrails</strong>: 7 guards (PromptInjection&#x2F;Toxicity&#x2F;Privacy&#x2F;Illegal&#x2F;Hallucination&#x2F;Topical&#x2F;Cybersecurity), LLM structured-output verdicts safe&#x2F;borderline&#x2F;unsafe, default gpt-4.1; any guard not explicitly safe sets breached; guard errors count as unsafe (fail-closed); deterministic sample_rate to control cost</li>
 <li><strong>Defaults</strong>: ignore_errors&#x3D;True; _upload_to_confident&#x3D;True (auto-upload + opens browser)</li>
 <li><strong>Resources</strong>: <a target="_blank" rel="noopener" href="https://github.com/confident-ai/deepteam">repo</a> · <a target="_blank" rel="noopener" href="https://github.com/confident-ai/deepteam/blob/main/examples/example_config.yaml">example config</a> · <a target="_blank" rel="noopener" href="https://confident-ai.github.io/deepteam/">docs</a></div></li>
 </ul>
@@ -646,13 +695,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/deepteam/&text=DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/deepteam/&text=DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/deepteam/&title=DeepTeam: An LLM Red Teaming Framework That Generates Attacks and Scores Failures with CVSS"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/deepteam/&title=DeepTeam: A General-Purpose AI Red Teaming Framework with Built-in Guardrails"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
