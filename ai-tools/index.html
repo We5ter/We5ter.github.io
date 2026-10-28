@@ -95,8 +95,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793018809035" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793018809035" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793180686178" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793180686178" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/" />
@@ -126,7 +126,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793018809035" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793180686178" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -340,7 +340,7 @@
       </span>
     </div>
     <div class="aitools-stat">
-      <span class="aitools-stat-v">7</span>
+      <span class="aitools-stat-v">8</span>
       <span class="aitools-stat-k">
         <span class="i18n-zh">覆盖分类</span><span class="i18n-en">Categories</span>
       </span>
@@ -351,11 +351,6 @@
         <span class="i18n-zh">最近更新</span><span class="i18n-en">Last update</span>
       </span>
     </div>
-    
-    <span class="aitools-live">
-      <span class="aitools-live-dot" aria-hidden="true"></span>
-      <span class="i18n-zh">第 023 期在写了</span><span class="i18n-en">No. 23 in the works</span>
-    </span>
     
   </div>
   
@@ -496,8 +491,8 @@
       </button>
       
         
-        <button type="button" class="aitools-chip" data-cat="AI Autonomous Cybersecurity Agents" style="--cat: #F72585">
-          <span class="i18n-zh">AI 自主网络安全智能体</span><span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+        <button type="button" class="aitools-chip" data-cat="AI Red Teaming Frameworks &amp; Agents" style="--cat: #F72585">
+          <span class="i18n-zh">AI 红队测试框架与 Agent</span><span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           <span class="aitools-chip-n">6</span>
         </button>
       
@@ -510,7 +505,7 @@
         
         <button type="button" class="aitools-chip" data-cat="Security Auditing for AI Agents &amp; Apps" style="--cat: #06D6A0">
           <span class="i18n-zh">AI 智能体与应用安全审计</span><span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
-          <span class="aitools-chip-n">6</span>
+          <span class="aitools-chip-n">5</span>
         </button>
       
         
@@ -526,14 +521,20 @@
         </button>
       
         
-        <button type="button" class="aitools-chip" data-cat="Autonomous Vulnerability Discovery and Remediation Skills" style="--cat: #FF9F1C">
-          <span class="i18n-zh">自主漏洞发现与修复SKILLs</span><span class="i18n-en">Autonomous Vulnerability Discovery and Remediation Skills</span>
+        <button type="button" class="aitools-chip" data-cat="Agent Skills for Vulnerability Discovery &amp; Remediation" style="--cat: #FF9F1C">
+          <span class="i18n-zh">Agent 技能：漏洞发现与修复</span><span class="i18n-en">Agent Skills for Vulnerability Discovery &amp; Remediation</span>
           <span class="aitools-chip-n">1</span>
         </button>
       
         
         <button type="button" class="aitools-chip" data-cat="Security Toolkits for Agentic Workflows" style="--cat: #2EC4B6">
           <span class="i18n-zh">Agent 工作流安全工具箱</span><span class="i18n-en">Security Toolkits for Agentic Workflows</span>
+          <span class="aitools-chip-n">1</span>
+        </button>
+      
+        
+        <button type="button" class="aitools-chip" data-cat="AI Security Verification Standards" style="--cat: #E63946">
+          <span class="i18n-zh">AI 安全验证标准与规范</span><span class="i18n-en">AI Security Verification Standards</span>
           <span class="aitools-chip-n">1</span>
         </button>
       
@@ -566,12 +567,12 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20261025-owasp-aisvs"
-               data-cat="Security Auditing for AI Agents &amp; Apps" data-search="owasp aisvs 不是又一份 ai 风险 top 10：它把训练数据、rag 记忆、agent 与 mcp 拆成 213 条可验证要求，告诉团队具体该做什么、做完怎么验 not another ai-risk top 10: 213 testable requirements across training data, rag memory, agents and mcp — turning security principles into reviewable, testable engineering objects 1.01 已锁定，1.02 开发中；12 章 213 条核心要求，l1/l2/l3 为 57/110/46。重点是跨章节联防：c2 输入检测 + c10 mcp 输出筛查 + c9 确定性授权；agent 审批从展示完整参数走到密码学绑定动作对象；rag 记忆要有租户边界、写入检疫、过期与审计。短板：没有官方扫描器，幻觉/投毒等判定器本身仍不可靠，部分条款需按输入类型裁剪；不替代 asvs、nist ai rmf 或威胁建模。 stable 1.01 is locked while 1.02 is in development: 213 core requirements across 12 chapters, with l1/l2/l3 at 57/110/46. its strength is cross-chapter defense: c2 input screening + c10 mcp response validation + c9 deterministic authorization. agent approval progresses from complete parameter display to cryptographic binding with the action object; rag memory gets tenant boundaries, write quarantine, expiry and audit. caveats: no official scanner, imperfect oracles for hallucination and poisoning, and some requirements need careful scoping. it does not replace asvs, nist ai rmf or threat modeling."
+               data-cat="AI Security Verification Standards" data-search="owasp aisvs 不是又一份 ai 风险 top 10：它把训练数据、rag 记忆、agent 与 mcp 拆成 213 条可验证要求，告诉团队具体该做什么、做完怎么验 not another ai-risk top 10: 213 testable requirements across training data, rag memory, agents and mcp — turning security principles into reviewable, testable engineering objects 1.01 已锁定，1.02 开发中；12 章 213 条核心要求，l1/l2/l3 为 57/110/46。重点是跨章节联防：c2 输入检测 + c10 mcp 输出筛查 + c9 确定性授权；agent 审批从展示完整参数走到密码学绑定动作对象；rag 记忆要有租户边界、写入检疫、过期与审计。短板：没有官方扫描器，幻觉/投毒等判定器本身仍不可靠，部分条款需按输入类型裁剪；不替代 asvs、nist ai rmf 或威胁建模。 stable 1.01 is locked while 1.02 is in development: 213 core requirements across 12 chapters, with l1/l2/l3 at 57/110/46. its strength is cross-chapter defense: c2 input screening + c10 mcp response validation + c9 deterministic authorization. agent approval progresses from complete parameter display to cryptographic binding with the action object; rag memory gets tenant boundaries, write quarantine, expiry and audit. caveats: no official scanner, imperfect oracles for hallucination and poisoning, and some requirements need careful scoping. it does not replace asvs, nist ai rmf or threat modeling."
                data-name="OWASP AISVS" data-status=""
                data-srank="21"
                data-issue="22" data-date="2026-10-25"
                data-url="https://github.com/OWASP/AISVS"
-               data-post-zh="/ai-tools/owasp-aisvs/" data-post-en="/en/ai-tools/owasp-aisvs/" style="--cat: #06D6A0">
+               data-post-zh="/ai-tools/owasp-aisvs/" data-post-en="/en/ai-tools/owasp-aisvs/" style="--cat: #E63946">
         <div class="aitools-head">
           <a class="i18n-zh aitools-name" href="/ai-tools/owasp-aisvs/">OWASP AISVS</a>
           <a class="i18n-en aitools-name" href="/en/ai-tools/owasp-aisvs/">OWASP AISVS</a>
@@ -579,7 +580,7 @@
           
           
           
-          <img class="aitools-badge" src="https://img.shields.io/github/stars/OWASP/AISVS?style=flat-square&label=stars&cacheSeconds=3600&color=06D6A0"
+          <img class="aitools-badge" src="https://img.shields.io/github/stars/OWASP/AISVS?style=flat-square&label=stars&cacheSeconds=3600&color=E63946"
                alt="OWASP AISVS GitHub stars"
                height="16" loading="lazy" decoding="async"
                onerror="this.style.display='none'">
@@ -587,9 +588,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/security-auditing-for-ai-agents-apps/" style="--cat: #06D6A0">
-            <span class="i18n-zh">AI 智能体与应用安全审计</span>
-            <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-security-verification-standards/" style="--cat: #E63946">
+            <span class="i18n-zh">AI 安全验证标准与规范</span>
+            <span class="i18n-en">AI Security Verification Standards</span>
           </a>
           
           
@@ -946,7 +947,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20261007-cloudflare-security-audit-skill"
-               data-cat="Autonomous Vulnerability Discovery and Remediation Skills" data-search="cloudflare security-audit-skill cloudflare 官方的 coding-agent skill：6 阶段编排，查 findings 的 agent 永远不是发现它的那个 agent cloudflare&#39;s official coding-agent skill: a six-phase orchestration where the agent verifying a finding is never the agent that found it 侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告；官方自己写进 readme「单次运行只找到重复运行能找到的漏洞的一半」。短板：22.6k star 只有 14 次提交、mit 但维护节奏存疑、效果强依赖宿主 agent 的模型与权限。 recon → coverage-driven hunting → candidate validation → structured output → independent record verification → neutral reporting; the readme itself states a single run finds only half of what repeated runs find. caveats: 22.6k stars on just 14 commits, mit but an uncertain maintenance cadence, and effectiveness depends heavily on the host agent&#39;s model and permissions."
+               data-cat="Agent Skills for Vulnerability Discovery &amp; Remediation" data-search="cloudflare security-audit-skill cloudflare 官方的 coding-agent skill：6 阶段编排，查 findings 的 agent 永远不是发现它的那个 agent cloudflare&#39;s official coding-agent skill: a six-phase orchestration where the agent verifying a finding is never the agent that found it 侦察 → 覆盖驱动狩猎 → 候选验证 → 结构化输出 → 独立记录验证 → 中立报告；官方自己写进 readme「单次运行只找到重复运行能找到的漏洞的一半」。短板：22.6k star 只有 14 次提交、mit 但维护节奏存疑、效果强依赖宿主 agent 的模型与权限。 recon → coverage-driven hunting → candidate validation → structured output → independent record verification → neutral reporting; the readme itself states a single run finds only half of what repeated runs find. caveats: 22.6k stars on just 14 commits, mit but an uncertain maintenance cadence, and effectiveness depends heavily on the host agent&#39;s model and permissions."
                data-name="Cloudflare security-audit-skill" data-status=""
                data-srank="3"
                data-issue="17" data-date="2026-10-07"
@@ -972,9 +973,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/autonomous-vulnerability-discovery-and-remediation-skills/" style="--cat: #FF9F1C">
-            <span class="i18n-zh">自主漏洞发现与修复SKILLs</span>
-            <span class="i18n-en">Autonomous Vulnerability Discovery and Remediation Skills</span>
+          <a class="aitools-cat" href="/ai-tools/cat/agent-skills-for-vulnerability-discovery-remediation/" style="--cat: #FF9F1C">
+            <span class="i18n-zh">Agent 技能：漏洞发现与修复</span>
+            <span class="i18n-en">Agent Skills for Vulnerability Discovery &amp; Remediation</span>
           </a>
           
           
@@ -1498,7 +1499,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260930-dark-moon"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="dark-moon 把真实 ip / 主机 / url / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台 real ips, hosts, urls and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools privacy gateway 的可逆本地 tokenization 在主流程里而非插件位，占位符确定性所以模型仍能做关联推理；docker compose 全栈、可全本地模型跑。短板：gpl-3.0、pro 版存在感过强、57 漏洞 benchmark 是云端 claude 跑的、社区样本小。 the privacy gateway&#39;s reversible local tokenization sits in the main flow rather than a plugin slot, and deterministic placeholders let the model still correlate. docker compose full stack, runs fully on local models. caveats: gpl-3.0, heavy pro-tier presence, the 57-vuln benchmark was run on cloud claude, small community sample."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="dark-moon 把真实 ip / 主机 / url / 凭证在本地换成确定性占位符、只在工具执行那一刻还原：50 个专家 agent + 140+ 真实工具的自主渗透平台 real ips, hosts, urls and credentials become deterministic local placeholders, restored only at tool-execution time: an autonomous pentest platform with 50 specialist agents and 140+ real tools privacy gateway 的可逆本地 tokenization 在主流程里而非插件位，占位符确定性所以模型仍能做关联推理；docker compose 全栈、可全本地模型跑。短板：gpl-3.0、pro 版存在感过强、57 漏洞 benchmark 是云端 claude 跑的、社区样本小。 the privacy gateway&#39;s reversible local tokenization sits in the main flow rather than a plugin slot, and deterministic placeholders let the model still correlate. docker compose full stack, runs fully on local models. caveats: gpl-3.0, heavy pro-tier presence, the 57-vuln benchmark was run on cloud claude, small community sample."
                data-name="Dark-Moon" data-status=""
                data-srank="19"
                data-issue="10" data-date="2026-09-30"
@@ -1519,9 +1520,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
@@ -1574,7 +1575,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260929-luan1ao"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="luan1ao 把每条渗透结论钉回证据链：p-e-o 三角色 + 三图分离 + evidence→hypothesis→vulnerability→exploit 因果链 pinning every pentest finding to evidence: planner-executor-observer roles + three graph separations + an enforced evidence → hypothesis → vulnerability → exploit chain typescript + pi sdk 重写的 v2 自主渗透 agent：证据引用是 schema 层面的硬约束（没有 evidence 引用就写不进 vulnerability / exploit 节点）。docker 出网收口在内核态，scope 校验确定性拒绝臆造网段。短板：agpl-3.0、node.js 25+、v2 benchmark 还没发、高危动作没有审批闸门。 v2 autonomous pentest agent rewritten in typescript on the pi sdk — evidence references are an enforced schema constraint (no vulnerability / exploit node without evidence). docker-based egress gating at the kernel layer, and deterministic scope checks reject any fabricated cidr. caveats: agpl-3.0, node.js 25+ required, no v2 benchmark published yet, and no human approval gate on high-risk actions."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="luan1ao 把每条渗透结论钉回证据链：p-e-o 三角色 + 三图分离 + evidence→hypothesis→vulnerability→exploit 因果链 pinning every pentest finding to evidence: planner-executor-observer roles + three graph separations + an enforced evidence → hypothesis → vulnerability → exploit chain typescript + pi sdk 重写的 v2 自主渗透 agent：证据引用是 schema 层面的硬约束（没有 evidence 引用就写不进 vulnerability / exploit 节点）。docker 出网收口在内核态，scope 校验确定性拒绝臆造网段。短板：agpl-3.0、node.js 25+、v2 benchmark 还没发、高危动作没有审批闸门。 v2 autonomous pentest agent rewritten in typescript on the pi sdk — evidence references are an enforced schema constraint (no vulnerability / exploit node without evidence). docker-based egress gating at the kernel layer, and deterministic scope checks reject any fabricated cidr. caveats: agpl-3.0, node.js 25+ required, no v2 benchmark published yet, and no human approval gate on high-risk actions."
                data-name="LuaN1ao" data-status=""
                data-srank="15"
                data-issue="9" data-date="2026-09-29"
@@ -1595,9 +1596,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
@@ -1964,7 +1965,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260921-pentagi"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="pentagi 全自主渗透平台：docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞 a fully autonomous pentesting platform: 20+ tools in a docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs go 写的全自主渗透平台，五层结构（核心 / 知识图谱 / 监控 / 沙箱工具 / 分析），13 个 agent 角色由四道闸门（调用上限 / reflector / 执行监控 / 任务规划）监管。官方维护 vllm + qwen3.5-27b-fp8 气隙部署指南。 autonomous pentesting platform in go with five layers (core / knowledge graph / monitoring / sandbox tools / analytics), 13 agent roles supervised by four gates (call caps / reflector / execution monitoring / task planning). ships an official vllm + qwen3.5-27b-fp8 air-gapped deployment guide."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="pentagi 全自主渗透平台：docker 沙箱里跑 20+ 工具，13 个 agent 角色分工，四道闸门防止跑飞 a fully autonomous pentesting platform: 20+ tools in a docker sandbox, 13 specialized agent roles, and four supervision gates to stop runaway runs go 写的全自主渗透平台，五层结构（核心 / 知识图谱 / 监控 / 沙箱工具 / 分析），13 个 agent 角色由四道闸门（调用上限 / reflector / 执行监控 / 任务规划）监管。官方维护 vllm + qwen3.5-27b-fp8 气隙部署指南。 autonomous pentesting platform in go with five layers (core / knowledge graph / monitoring / sandbox tools / analytics), 13 agent roles supervised by four gates (call caps / reflector / execution monitoring / task planning). ships an official vllm + qwen3.5-27b-fp8 air-gapped deployment guide."
                data-name="PentAGI" data-status=""
                data-srank="2"
                data-issue="4" data-date="2026-09-21"
@@ -1985,9 +1986,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
@@ -2040,7 +2041,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260920-cairn"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="cairn 通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 agent 在黑板上自己搜路 a general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard 黑板架构 + 事实/意图图，只有 fact / intent / hint 三个原语；worker 跑 ooda 循环，靠 stigmergy 间接协作，角色在运行时涌现而非写死。腾讯云黑客松 ai 渗透挑战赛 610 队里唯一 ak（54/54）。 state-space search engine built on a blackboard + fact-intent graph with three primitives (fact, intent, hint). workers run ooda loops and coordinate via stigmergy; roles emerge at runtime. the only team to ak (54/54) at the tencent cloud ai pentesting hackathon out of 610."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="cairn 通用状态空间搜索引擎：不定义角色与工作流，给起点和终点，让 agent 在黑板上自己搜路 a general state-space search engine: no roles, no workflows — hand it an origin and a goal and let agents find the path on a shared blackboard 黑板架构 + 事实/意图图，只有 fact / intent / hint 三个原语；worker 跑 ooda 循环，靠 stigmergy 间接协作，角色在运行时涌现而非写死。腾讯云黑客松 ai 渗透挑战赛 610 队里唯一 ak（54/54）。 state-space search engine built on a blackboard + fact-intent graph with three primitives (fact, intent, hint). workers run ooda loops and coordinate via stigmergy; roles emerge at runtime. the only team to ak (54/54) at the tencent cloud ai pentesting hackathon out of 610."
                data-name="Cairn" data-status=""
                data-srank="12"
                data-issue="3" data-date="2026-09-20"
@@ -2061,9 +2062,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
@@ -2116,7 +2117,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260919-shannon"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="shannon ai 渗透测试 agent：读源码找攻击面，再真打一遍验证，只有跑通 poc 的漏洞才进报告 an ai pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no poc, no report. 六段流水线：侦察 + 代码分析双流候选 → 归并去重 → 利用 agent 真打 → 打不穿就丢 → pdf/markdown/sarif 报告。原生接 github actions，只有 exploited 的发现才卡流水线。agpl-3.0，会改目标状态，只打 staging。 six-stage pipeline: recon and code analysis produce candidates, dedup, exploitation agents attack the live app, undemonstrated findings get discarded, and survivors become pdf / markdown / sarif. native github actions; only exploited findings gate the pipeline. agpl-3.0, staging only."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="shannon ai 渗透测试 agent：读源码找攻击面，再真打一遍验证，只有跑通 poc 的漏洞才进报告 an ai pentesting agent: read the source, map attack paths, then prove every finding with a real exploit — no poc, no report. 六段流水线：侦察 + 代码分析双流候选 → 归并去重 → 利用 agent 真打 → 打不穿就丢 → pdf/markdown/sarif 报告。原生接 github actions，只有 exploited 的发现才卡流水线。agpl-3.0，会改目标状态，只打 staging。 six-stage pipeline: recon and code analysis produce candidates, dedup, exploitation agents attack the live app, undemonstrated findings get discarded, and survivors become pdf / markdown / sarif. native github actions; only exploited findings gate the pipeline. agpl-3.0, staging only."
                data-name="Shannon" data-status=""
                data-srank="1"
                data-issue="2" data-date="2026-09-19"
@@ -2137,9 +2138,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
@@ -2192,7 +2193,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20260918-cyberstrikeai"
-               data-cat="AI Autonomous Cybersecurity Agents" data-search="cyberstrikeai ai 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆 an ai-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory. go + eino 编排，100+ yaml 工具配方 + mcp，内置审批、调用前正则拦截、rbac 与审计日志。它的差异不在能调多少工具，而在于敢不敢让 agent 真的动手。 go + eino orchestration with 100+ yaml tool recipes plus mcp, plus first-class approval, pre-call regex intercept, rbac and audit logs. its edge isn&#39;t how many tools it can call — it&#39;s whether it dares to let the agent really act."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="cyberstrikeai ai 原生的安全执行中枢：把自然语言意图转成受治理的行动，并把证据沉淀成可复用的运营记忆 an ai-native security execution hub: turns natural-language intent into governed action and bakes evidence into reusable operational memory. go + eino 编排，100+ yaml 工具配方 + mcp，内置审批、调用前正则拦截、rbac 与审计日志。它的差异不在能调多少工具，而在于敢不敢让 agent 真的动手。 go + eino orchestration with 100+ yaml tool recipes plus mcp, plus first-class approval, pre-call regex intercept, rbac and audit logs. its edge isn&#39;t how many tools it can call — it&#39;s whether it dares to let the agent really act."
                data-name="CyberStrikeAI" data-status=""
                data-srank="8"
                data-issue="1" data-date="2026-09-18"
@@ -2213,9 +2214,9 @@
           
           
           
-          <a class="aitools-cat" href="/ai-tools/cat/ai-autonomous-cybersecurity-agents/" style="--cat: #F72585">
-            <span class="i18n-zh">AI 自主网络安全智能体</span>
-            <span class="i18n-en">AI Autonomous Cybersecurity Agents</span>
+          <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style="--cat: #F72585">
+            <span class="i18n-zh">AI 红队测试框架与 Agent</span>
+            <span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
           </a>
           
           
