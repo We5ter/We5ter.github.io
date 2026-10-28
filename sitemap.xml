@@ -84,26 +84,26 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://we5ter.github.io/en/ai-tools/cloudflare-security-audit-skill/</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <loc>https://we5ter.github.io/ai-tools/cloudflare-security-audit-skill/</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://we5ter.github.io/en/ai-tools/cyberstrikeai-ai-native-security-hub/</loc>
     <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/blogs/cve-2017-2500/</loc>
+    <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -126,13 +126,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/ai-tools/deepsec/</loc>
+    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://we5ter.github.io/en/ai-tools/deepsec/</loc>
+    <loc>https://we5ter.github.io/ai-tools/deepsec/</loc>
     <lastmod>2026-10-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
