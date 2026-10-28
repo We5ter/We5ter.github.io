@@ -95,8 +95,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793183828387" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793183828387" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793188859543" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793188859543" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/" />
@@ -126,7 +126,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793183828387" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793188859543" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -572,7 +572,7 @@
       
       
       <article class="aitools-item aitools-item--link" id="tool-20261028-deepteam"
-               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="deepteam 双模型红队流水线：一个 llm 按你勾选的漏洞类型现出攻击题，另一个 llm 当裁判逐条判定，失败用例自带 cvss 评分与 owasp/nist 映射 a dual-model red team pipeline: one llm writes attacks on the fly from the vulnerability types you pick, another judges each case, and failures come out with cvss scores and owasp/nist mapping 36 类 251 型漏洞面（agentic 占 11 类），22 种单轮 + 5 种多轮攻击（crescendo/linear/tree/sequential/badlikertjudge）。callback 契约把 retrieval_context 和 tools_called 交给裁判，rag 投毒与工具滥用才测得出来。读码三个坑：拒答即过（16 前缀 + 24 标记，仅英文，中文拒答会被误判）；risks.py 只映射 19 个类型族，agentic 全落 others；cvss 的 impact 恒为 medium（源码注释承认未按漏洞类型推导）。默认 ignore_errors=true、自动上传 confident ai 并开浏览器。guardrail 全是 llm 判定（gpt-4.1），没有本地分类器。 36 classes / 251 vulnerability types (11 in agentic), 22 single-turn plus 5 multi-turn attacks (crescendo/linear/tree/sequential/badlikertjudge). the callback contract hands retrieval_context and tools_called to the judge, which is what makes rag poisoning and tool abuse testable at all. three gotchas from the source: refusals auto-pass (16 prefixes + 24 markers, english-only — chinese refusals get mis-scored); risks.py maps only 19 type families and all agentic types land in others; cvss impact is always medium (a source comment admits it is not yet derived from the vulnerability type). defaults: ignore_errors=true and auto-upload to confident ai with a browser popup. guardrails are all llm calls (gpt-4.1), no local classifiers."
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="deepteam 红队测试 + 生产护栏两半都包：一个 llm 现写攻击、一个 llm 判定、失败带 cvss；测出来的偏见/pii/提示注入，线上挂 7 个守卫直接拦 a dual-model red team pipeline: one llm writes attacks on the fly from the vulnerability types you pick, another judges each case, and failures come out with cvss scores and owasp/nist mapping 36 类 251 型漏洞面（agentic 占 11 类），22 种单轮 + 5 种多轮攻击（crescendo/linear/tree/sequential/badlikertjudge）。callback 契约把 retrieval_context 和 tools_called 交给裁判，rag 投毒与工具滥用才测得出来。读码三个坑：拒答即过（16 前缀 + 24 标记，仅英文，中文拒答会被误判）；risks.py 只映射 19 个类型族，agentic 全落 others；cvss 的 impact 恒为 medium（源码注释承认未按漏洞类型推导）。护栏 7 个（输入/输出两侧挂守卫），llm 判定 safe/borderline/unsafe，任一守卫非明确 safe 即 breached、出错按 unsafe（fail-closed），sample_rate 降采样控成本。默认 ignore_errors=true、自动上传 confident ai 并开浏览器。 36 classes / 251 vulnerability types (11 in agentic), 22 single-turn plus 5 multi-turn attacks (crescendo/linear/tree/sequential/badlikertjudge). the callback contract hands retrieval_context and tools_called to the judge, which is what makes rag poisoning and tool abuse testable at all. three gotchas from the source: refusals auto-pass (16 prefixes + 24 markers, english-only — chinese refusals get mis-scored); risks.py maps only 19 type families and all agentic types land in others; cvss impact is always medium (a source comment admits it is not yet derived from the vulnerability type). defaults: ignore_errors=true and auto-upload to confident ai with a browser popup. guardrails are all llm calls (gpt-4.1), no local classifiers."
                data-name="DeepTeam" data-status=""
                data-srank="13"
                data-issue="23" data-date="2026-10-28"
@@ -602,13 +602,13 @@
         </div>
 
         <p class="aitools-tagline">
-          <span class="i18n-zh">双模型红队流水线：一个 LLM 按你勾选的漏洞类型现出攻击题，另一个 LLM 当裁判逐条判定，失败用例自带 CVSS 评分与 OWASP/NIST 映射</span>
+          <span class="i18n-zh">红队测试 + 生产护栏两半都包：一个 LLM 现写攻击、一个 LLM 判定、失败带 CVSS；测出来的偏见/PII/提示注入，线上挂 7 个守卫直接拦</span>
           <span class="i18n-en">A dual-model red team pipeline: one LLM writes attacks on the fly from the vulnerability types you pick, another judges each case, and failures come out with CVSS scores and OWASP/NIST mapping</span>
         </p>
 
         
         <div class="aitools-note">
-          <span class="i18n-zh">36 类 251 型漏洞面（Agentic 占 11 类），22 种单轮 + 5 种多轮攻击（Crescendo/Linear/Tree/Sequential/BadLikertJudge）。callback 契约把 retrieval_context 和 tools_called 交给裁判，RAG 投毒与工具滥用才测得出来。读码三个坑：拒答即过（16 前缀 + 24 标记，仅英文，中文拒答会被误判）；risks.py 只映射 19 个类型族，Agentic 全落 Others；CVSS 的 impact 恒为 MEDIUM（源码注释承认未按漏洞类型推导）。默认 ignore_errors=True、自动上传 Confident AI 并开浏览器。guardrail 全是 LLM 判定（gpt-4.1），没有本地分类器。</span>
+          <span class="i18n-zh">36 类 251 型漏洞面（Agentic 占 11 类），22 种单轮 + 5 种多轮攻击（Crescendo/Linear/Tree/Sequential/BadLikertJudge）。callback 契约把 retrieval_context 和 tools_called 交给裁判，RAG 投毒与工具滥用才测得出来。读码三个坑：拒答即过（16 前缀 + 24 标记，仅英文，中文拒答会被误判）；risks.py 只映射 19 个类型族，Agentic 全落 Others；CVSS 的 impact 恒为 MEDIUM（源码注释承认未按漏洞类型推导）。护栏 7 个（输入/输出两侧挂守卫），LLM 判定 safe/borderline/unsafe，任一守卫非明确 safe 即 breached、出错按 unsafe（fail-closed），sample_rate 降采样控成本。默认 ignore_errors=True、自动上传 Confident AI 并开浏览器。</span>
           <span class="i18n-en">36 classes / 251 vulnerability types (11 in Agentic), 22 single-turn plus 5 multi-turn attacks (Crescendo/Linear/Tree/Sequential/BadLikertJudge). The callback contract hands retrieval_context and tools_called to the judge, which is what makes RAG poisoning and tool abuse testable at all. Three gotchas from the source: refusals auto-pass (16 prefixes + 24 markers, English-only — Chinese refusals get mis-scored); risks.py maps only 19 type families and all Agentic types land in Others; CVSS impact is always MEDIUM (a source comment admits it is not yet derived from the vulnerability type). Defaults: ignore_errors=True and auto-upload to Confident AI with a browser popup. Guardrails are all LLM calls (gpt-4.1), no local classifiers.</span>
         </div>
         
@@ -2488,7 +2488,7 @@
       "item": {
         "@type": "SoftwareApplication",
         "name": "DeepTeam",
-        "description": "双模型红队流水线：一个 LLM 按你勾选的漏洞类型现出攻击题，另一个 LLM 当裁判逐条判定，失败用例自带 CVSS 评分与 OWASP/NIST 映射",
+        "description": "红队测试 + 生产护栏两半都包：一个 LLM 现写攻击、一个 LLM 判定、失败带 CVSS；测出来的偏见/PII/提示注入，线上挂 7 个守卫直接拦",
         "url": "https://github.com/confident-ai/deepteam",
         "datePublished": "2026-10-28",
         "applicationCategory": "SecurityApplication",
