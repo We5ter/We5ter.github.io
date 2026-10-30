@@ -40,8 +40,8 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "审的是智能体本身和它跑在上面的底座：MCP 配置、agent 设置、注入防线、AI 基础设施。共同套路是先把「配置里能出什么事」摊开，再谈模型行为。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "审的是智能体本身和它跑在上面的应用：MCP 配置、agent 设置、注入防线。共同套路是先把「配置里能出什么事」摊开，再谈模型行为。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
@@ -82,7 +82,7 @@
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <title>AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour." />
+  <meta name="description" content="Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793191559065" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793191559065" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793334786979" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793334786979" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/" />
@@ -102,14 +102,14 @@
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="AI 智能体与应用安全审计 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour." />
+  <meta property="og:description" content="Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour." />
   <meta property="og:url" content="https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/" />
   <meta property="og:image" content="https://we5ter.github.io/images/static/wester-og.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AI 智能体与应用安全审计 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour." />
+  <meta name="twitter:description" content="Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/static/wester-og.png" />
   
 
@@ -122,7 +122,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793191559065" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793334786979" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -140,7 +140,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"CollectionPage","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#collection","url":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/","name":"AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour.","image":"https://we5ter.github.io/images/static/wester-og.png","inLanguage":["en","zh-CN"],"isPartOf":{"@id":"https://we5ter.github.io/#website"},"mainEntity":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#tool-list"}},{"@type":"ItemList","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#tool-list","name":"AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour.","numberOfItems":5,"isPartOf":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#collection"},"itemListElement":[{"@type":"ListItem","position":1,"url":"https://we5ter.github.io/ai-tools/mcp-scanner/","name":"21. mcp-scanner","description":"Cisco's open-source security screening for MCP servers — YARA + LLM + AI Defense in parallel, nine analyzers; the real prize is the reporting discipline: an unfinished scan returns is_safe=None, never \"safe\""},{"@type":"ListItem","position":2,"url":"https://we5ter.github.io/ai-tools/llmfuzzer/","name":"18. LLMFuzzer","description":"A 100-line PoC self-billed as \"the first LLM fuzzing framework\" — it doesn't fuzz, no model in the loop, verdict is a substring match; but that deterministic oracle is the foundation of the whole injection-detection class"},{"@type":"ListItem","position":3,"url":"https://we5ter.github.io/ai-tools/rebuff/","name":"14. Rebuff","description":"An unavoidable chapter in prompt-injection defense history: canary-token detection plus vector-store self-hardening across four layers (archived — read it as history)"},{"@type":"ListItem","position":4,"url":"https://we5ter.github.io/ai-tools/agentshield/","name":"7. AgentShield","description":"A Claude Code Hackathon project from the Everything Claude Code ecosystem: a 0–100 graded audit of AI agent configurations that drops into CI as a compliance gate"},{"@type":"ListItem","position":5,"url":"https://we5ter.github.io/ai-tools/ai-infra-guard/","name":"6. AI-Infra-Guard","description":"A full-stack AI red teaming platform from Tencent Zhuque Lab: five capabilities spanning AI infrastructure CVEs, agent loss of control, the MCP supply chain, skill backdoors and jailbreak evaluation"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"CollectionPage","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#collection","url":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/","name":"AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour.","image":"https://we5ter.github.io/images/static/wester-og.png","inLanguage":["en","zh-CN"],"isPartOf":{"@id":"https://we5ter.github.io/#website"},"mainEntity":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#tool-list"}},{"@type":"ItemList","@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#tool-list","name":"AI 智能体与应用安全审计 | 西风微雨 · Wester's blog — Security Research & AI Tooling","description":"Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour.","numberOfItems":4,"isPartOf":{"@id":"https://we5ter.github.io/ai-tools/cat/security-auditing-for-ai-agents-apps/#collection"},"itemListElement":[{"@type":"ListItem","position":1,"url":"https://we5ter.github.io/ai-tools/llmfuzzer/","name":"18. LLMFuzzer","description":"A 100-line PoC self-billed as \"the first LLM fuzzing framework\" — it doesn't fuzz, no model in the loop, verdict is a substring match; but that deterministic oracle is the foundation of the whole injection-detection class"},{"@type":"ListItem","position":2,"url":"https://we5ter.github.io/ai-tools/rebuff/","name":"14. Rebuff","description":"An unavoidable chapter in prompt-injection defense history: canary-token detection plus vector-store self-hardening across four layers (archived — read it as history)"},{"@type":"ListItem","position":3,"url":"https://we5ter.github.io/ai-tools/agentshield/","name":"7. AgentShield","description":"A Claude Code Hackathon project from the Everything Claude Code ecosystem: a 0–100 graded audit of AI agent configurations that drops into CI as a compliance gate"},{"@type":"ListItem","position":4,"url":"https://we5ter.github.io/ai-tools/ai-infra-guard/","name":"6. AI-Infra-Guard","description":"A full-stack AI red teaming platform from Tencent Zhuque Lab: five capabilities spanning AI infrastructure CVEs, agent loss of control, the MCP supply chain, skill backdoors and jailbreak evaluation"}]}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -319,14 +319,14 @@
     <span class="i18n-en">Security Auditing for AI Agents &amp; Apps</span>
   </h1>
   <p class="section-sub">
-    <span class="i18n-zh">共 5 个工具 · 专栏不定期更新</span>
-    <span class="i18n-en">5 tools · new issues as they're written</span>
+    <span class="i18n-zh">共 4 个工具 · 专栏不定期更新</span>
+    <span class="i18n-en">4 tools · new issues as they're written</span>
   </p>
 
   
   
   <p class="aitools-catpage-desc">
-    <span class="i18n-zh">审的是智能体本身和它跑在上面的底座：MCP 配置、agent 设置、注入防线、AI 基础设施。共同套路是先把「配置里能出什么事」摊开，再谈模型行为。</span><span class="i18n-en">Auditing the agent and the stack underneath it: MCP configs, agent settings, injection defences, AI infrastructure. The shared move is laying out what configuration can do before discussing model behaviour.</span>
+    <span class="i18n-zh">审的是智能体本身和它跑在上面的应用：MCP 配置、agent 设置、注入防线。共同套路是先把「配置里能出什么事」摊开，再谈模型行为。</span><span class="i18n-en">Auditing the agent and the apps built on it: MCP configs, agent settings, injection defences. The shared move is laying out what configuration can do before discussing model behaviour.</span>
   </p>
   
   
@@ -335,11 +335,6 @@
       <span class="i18n-zh">本分类期号</span><span class="i18n-en">Issues in this category</span>
     </p>
     <div class="aitools-catpage-issues-list">
-      
-      <a class="aitools-catpage-issue-chip" href="#t21">
-        <span class="aitools-catpage-issue-n">021</span>
-        <span class="aitools-catpage-issue-name">mcp-scanner</span>
-      </a>
       
       <a class="aitools-catpage-issue-chip" href="#t18">
         <span class="aitools-catpage-issue-n">018</span>
@@ -365,36 +360,6 @@
   </nav>
   
 
-  
-  
-  <article class="aitools-item" id="t21" style="--cat: #06D6A0">
-    <div class="aitools-head">
-      <a class="i18n-zh aitools-name" href="/ai-tools/mcp-scanner/">mcp-scanner</a>
-      <a class="i18n-en aitools-name" href="/en/ai-tools/mcp-scanner/">mcp-scanner</a>
-      
-      <img class="aitools-badge" src="https://img.shields.io/github/stars/cisco-ai-defense/mcp-scanner?style=flat-square&label=stars&cacheSeconds=3600&color=06D6A0" alt="mcp-scanner GitHub stars"
-           height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
-      
-      <span class="aitools-catpage-issue">
-        <span class="i18n-zh">第 021 期 · 2026.10.19</span>
-        <span class="i18n-en">No. 21 · Oct 19, 2026</span>
-      </span>
-    </div>
-
-    <p class="aitools-tagline">
-      <span class="i18n-zh">Cisco 开源的 MCP 服务器安检：YARA + LLM + AI Defense 三引擎并联，共 9 个分析器；最值钱的是报告纪律——扫描没跑完 is_safe 返回 None，不许说安全</span>
-      <span class="i18n-en">Cisco&#39;s open-source security screening for MCP servers — YARA + LLM + AI Defense in parallel, nine analyzers; the real prize is the reporting discipline: an unfinished scan returns is_safe=None, never &#34;safe&#34;</span>
-    </p>
-
-    
-    <div class="aitools-note">
-      <span class="i18n-zh">MCP 能投毒的四张面（工具描述 / prompts / resources / server instructions）逐个开入口，known-configs 直接扫本机 Cursor、Claude、VS Code 配置。YARA 的 10 个规则文件跑在描述文本上不是二进制，规则注释里留着误报修复记录；behavioral 用 tree-sitter 建 CFG 和跨文件调用图比 docstring 与实现，10 种语言，evals 141 个自造恶意样本 95.7% 但良性只有 3 个文件。is_safe 三值（result.py:88），汇总分 safe/unsafe/incomplete 三桶；分析器异常只留类名进 analyzer_errors，status 降 partial；REST API 对响应形状会丢 finding 的分析器直接 422。短板：零 key 路径全读描述不碰代码，readiness 的 opa 没装静默跳过、LLM judge 失败只 warning，prompt_defense 的 README 与代码不符（要显式开启）。</span>
-      <span class="i18n-en">Every poisonable surface of MCP (tool descriptions / prompts / resources / server instructions) gets its own entry point, and known-configs scans your local Cursor, Claude and VS Code configs directly. The 10 YARA rule files run over description text, not binaries, with false-positive fixes kept in the rule comments; behavioral builds CFGs and cross-file call graphs with tree-sitter to compare docstrings against implementations across 10 languages — 95.7% on 141 self-authored malicious samples, but only 3 benign files. is_safe is three-valued (result.py:88) and results bucket into safe/unsafe/incomplete; analyzer exceptions keep only the class name in analyzer_errors and drop status to partial; the REST API answers 422 for analyzers whose findings its response shape would drop. Caveats: the zero-key path reads descriptions without touching code, readiness silently skips Rego when opa is missing and only warns on LLM judge failure, and prompt_defense&#39;s README contradicts the code (it needs an explicit flag).</span>
-    </div>
-    
-
-    <a class="aitools-link" href="https://github.com/cisco-ai-defense/mcp-scanner" target="_blank" rel="noopener">https://github.com/cisco-ai-defense/mcp-scanner</a>
-  </article>
   
   
   <article class="aitools-item" id="t18" style="--cat: #06D6A0">
@@ -524,6 +489,11 @@
     </p>
     
       
+      <a class="aitools-cat" href="/ai-tools/cat/ai-infrastructure-attack-surface-discovery/" style=&#34;--cat: #0284C7&#34;>
+        <span class="i18n-zh">AI 基础设施攻击面发现</span><span class="i18n-en">AI Infrastructure Attack Surface Discovery</span>
+      </a>
+    
+      
       <a class="aitools-cat" href="/ai-tools/cat/ai-red-teaming-frameworks-agents/" style=&#34;--cat: #F72585&#34;>
         <span class="i18n-zh">AI 红队测试框架与 Agent</span><span class="i18n-en">AI Red Teaming Frameworks &amp; Agents</span>
       </a>
@@ -534,7 +504,6 @@
       </a>
     
       
-      
       <a class="aitools-cat" href="/ai-tools/cat/ai-agent-runtime-controls/" style=&#34;--cat: #FB5607&#34;>
         <span class="i18n-zh">AI 智能体运行时管控</span><span class="i18n-en">AI Agent Runtime Controls</span>
       </a>
@@ -544,6 +513,7 @@
         <span class="i18n-zh">Agent 工作流安全工具箱</span><span class="i18n-en">Security Toolkits for Agentic Workflows</span>
       </a>
     
+      
       
       <a class="aitools-cat" href="/ai-tools/cat/agent-skills-for-vulnerability-discovery-remediation/" style=&#34;--cat: #FF9F1C&#34;>
         <span class="i18n-zh">Agent 技能：漏洞发现与修复</span><span class="i18n-en">Agent Skills for Vulnerability Discovery &amp; Remediation</span>
@@ -581,20 +551,6 @@
       "position": 1,
       "item": {
         "@type": "SoftwareApplication",
-        "name": "mcp-scanner",
-        "description": "Cisco 开源的 MCP 服务器安检：YARA + LLM + AI Defense 三引擎并联，共 9 个分析器；最值钱的是报告纪律——扫描没跑完 is_safe 返回 None，不许说安全",
-        "url": "https://github.com/cisco-ai-defense/mcp-scanner",
-        "datePublished": "2026-10-19",
-        "applicationCategory": "SecurityApplication",
-        "author": { "@type": "Person", "name": "Wester" }
-      }
-    },
-    
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "item": {
-        "@type": "SoftwareApplication",
         "name": "LLMFuzzer",
         "description": "自称「首个 LLM 模糊测试框架」的 100 行 PoC：其实不 fuzz、无模型在环，判定靠子串匹配——但那个确定性 oracle 是整类注入检测的地基",
         "url": "https://github.com/mnns/LLMFuzzer",
@@ -606,7 +562,7 @@
     
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 2,
       "item": {
         "@type": "SoftwareApplication",
         "name": "Rebuff",
@@ -620,7 +576,7 @@
     
     {
       "@type": "ListItem",
-      "position": 4,
+      "position": 3,
       "item": {
         "@type": "SoftwareApplication",
         "name": "AgentShield",
@@ -634,7 +590,7 @@
     
     {
       "@type": "ListItem",
-      "position": 5,
+      "position": 4,
       "item": {
         "@type": "SoftwareApplication",
         "name": "AI-Infra-Guard",
