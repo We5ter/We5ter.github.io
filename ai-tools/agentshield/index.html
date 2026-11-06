@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
+      var pageTitle = "AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085458" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085458" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/ai-tools/agentshield/" />
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/agentshield/" />
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/agentshield/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/ai-tools/agentshield/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta property="og:url" content="https://we5ter.github.io/ai-tools/agentshield/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/agentshield-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/agentshield-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-09-27T13:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-09-27T13:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085458" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/agentshield/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/agentshield/"},"headline":"AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具","name":"AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","image":"https://we5ter.github.io/images/banners/agentshield-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-09-27T13:00:00.000Z","dateModified":"2026-09-27T13:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-aisec-item">
+            
+            <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="“全网最全”AI安全知识图谱">
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
+              <span class="i18n-zh">AI安全知识图谱</span>
+              <span class="i18n-en">AI Security KG</span>
+            </a>
+          </li>
+          <li class="masthead__menu-item nav-ai-item">
+            
+            <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">每日 AI 工具</span>
+              <span class="i18n-en">Daily AI Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            
+            
+            <button class="nav-search" id="nav-search" type="button"
+                    title="Search / 搜索 (⌘K)" aria-label="Search / 搜索">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+              <kbd class="nav-search-kbd">⌘K</kbd>
+            </button>
+            
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="公众号二维码">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="公众号二维码">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="公众号二维码" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+
+<aside class="post-toc" id="post-toc" hidden>
+  <details class="post-toc-inner" id="post-toc-inner" open>
+    <summary class="post-toc-title">
+      <span class="i18n-zh">本页目录</span><span class="i18n-en">On this page</span>
+    </summary>
+    <nav class="post-toc-nav" id="post-toc-nav" aria-label="Table of contents"></nav>
+    
+    <div class="post-toc-qr">
+      <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="112" height="112" loading="lazy" decoding="async">
+      <span class="post-toc-qr-name">Wester的AI安全札记</span>
+      <span class="post-toc-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+    </div>
+    
+  </details>
+</aside>
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/agentshield-banner.jpg)">
+    <h1 class="post-title">AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-27">
+        <span class="i18n-zh">2026年9月27日</span>
+        <span class="i18n-en">Sep 27, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 39 分钟</span><span class="i18n-en">39 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/agentshield/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="一、速览"><a href="#一、速览" class="headerlink" title="一、速览"></a>一、速览</h2><p>★★★★☆（4&#x2F;5）。affaan-m 在 2026-02 的 <a target="_blank" rel="noopener" href="https://cerebralvalley.ai/e/claude-code-hackathon">Claude Code 黑客松</a>（Cerebral Valley × Anthropic）上做出的 <strong>AI Agent 配置审计器</strong>，MIT，<strong>1,229 star &#x2F; 268 fork</strong>（截至 2026-09-27），归属于他主理的 <a target="_blank" rel="noopener" href="https://github.com/affaan-m/everything-claude-code">Everything Claude Code</a> 生态（42K+ star）。它做的事情不是「扫业务代码漏洞」，而是<strong>扫你自己的 <code>.claude/</code> 目录</strong> —— <strong>硬编码密钥、过度宽松的 tool permission、hook 里的命令注入、MCP server 暴露面、Agent prompt injection 触发点</strong> —— 268 条规则（README 自报）打成 0–100 分 + A–F 评级，CI 里 fail-on-findings 就能直接当门禁。扣一星的原因很具体：README 里<strong>规则数有三套口径</strong>（268 &#x2F; 102 &#x2F; 17+40+49+41，详见第七章），项目<strong>只有 6 个月历史</strong>，且 <code>--opus</code>&#x2F;<code>--injection</code> 会<strong>把你 <code>.claude/</code> 的配置内容外发到 Anthropic（或 OrcaRouter）的 API</strong> —— 敏感配置必须先脱敏再用。<strong>给 Claude Code 重度用户：直接装、立刻用；其他 harness 适配当加分项看；公网 &#x2F; 多租户场景不推荐</strong>。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主语言</td>
+<td>TypeScript</td>
+</tr>
+<tr>
+<td>许可证</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td>1,229 &#x2F; 268</td>
+</tr>
+<tr>
+<td>首次发布</td>
+<td>2026-02-11（Claude Code Hackathon）</td>
+</tr>
+<tr>
+<td>最近一次推送</td>
+<td>2026-09-10</td>
+</tr>
+<tr>
+<td>规则覆盖（README 口径）</td>
+<td>268 条 &#x2F; 15 模块；分模块章节里又写成 Secrets 10 &#x2F; Permissions 17 &#x2F; Hooks 40 &#x2F; MCP 49 &#x2F; Agents 41；架构表汇总是 102 条</td>
+</tr>
+<tr>
+<td>评分体系</td>
+<td>A–F 评级 + 0–100 分；critical 25 &#x2F; high 15 &#x2F; medium 5 &#x2F; low 2 &#x2F; info 0 扣分</td>
+</tr>
+<tr>
+<td>输出格式</td>
+<td>terminal &#x2F; json &#x2F; markdown &#x2F; html &#x2F; sarif &#x2F; evidence-pack</td>
+</tr>
+<tr>
+<td>自动化形态</td>
+<td>CLI + GitHub Action + GitHub App（<a target="_blank" rel="noopener" href="https://github.com/apps/ecc-tools">ecc-tools</a>）+ MiniClaw HTTP API</td>
+</tr>
+<tr>
+<td>主扫描对象</td>
+<td><code>~/.claude/</code>、<code>.claude/settings.json</code>、<code>.claude/mcp.json</code>、<code>.claude/subagents/</code>、<code>hooks/</code>、<code>CLAUDE.md</code> 等</td>
+</tr>
+<tr>
+<td>地址</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/affaan-m/agentshield">https://github.com/affaan-m/agentshield</a></td>
+</tr>
+</tbody></table>
+<p><strong>适合谁</strong>（5 分制）：</p>
+<table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Claude Code 重度用户 &#x2F; Agent 开发者</td>
+<td>5</td>
+<td>直接扫你 <code>.claude/</code> 目录里自己配的 hooks &#x2F; MCP &#x2F; permissions &#x2F; sub-agents，覆盖面最贴合日常踩坑点；<code>--fix</code> 能自动替换硬编码密钥 + 收紧 wildcards</td>
+</tr>
+<tr>
+<td>企业安全运营 &#x2F; CISO</td>
+<td>4</td>
+<td>唯一打动我的是 <code>--compliance soc2,pci,iso</code> 直接输出 GRC 友好的控制覆盖表 + <code>--policy</code> 组织策略门禁，evidence-pack 出可验证审计包；但<strong>只覆盖 Claude Code 系生态</strong>，别的 harness 适配还很浅</td>
+</tr>
+<tr>
+<td>红队 &#x2F; 渗透</td>
+<td>3</td>
+<td>它不是攻击平台，是<strong>自查平台</strong>；<code>--injection</code> 可以主动注入 prompt 测 agent 抗注入，但攻击面摸底还得用别的手工方法（hook 沙箱执行 &#x2F; MCP 流量侧录）</td>
+</tr>
+<tr>
+<td>安全研究员 &#x2F; 误报治理方向</td>
+<td>3</td>
+<td><code>runtimeConfidence</code> 七档分类 + <code>template-example</code> &#x2F; <code>project-local-optional</code> 不同权重 + <code>false-positive-audit.md</code> 工作流这套<strong>误报治理方法论</strong>值得借鉴；但工具本身是配置扫描，不是研究产出</td>
+</tr>
+<tr>
+<td>个人学习 &#x2F; 自部署</td>
+<td>4</td>
+<td><code>npx ecc-agentshield scan</code> 一条命令零安装，6 个月年轻项目文档完整；要 <code>--opus</code> 才会产生额外 LLM API 调用费，不开就跟普通 lint 一样白嫖</td>
+</tr>
+</tbody></table>
+<p><strong>二次开发</strong>（MIT 三档）：</p>
+<table>
+<thead>
+<tr>
+<th>难度</th>
+<th>能做的事</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改配置</td>
+<td><strong>不需要碰代码</strong>：写一个 JSON <code>--rule-pack</code>（schema 校验 + fail-closed）就能挂自定义规则；<code>agentshield policy init/export/promote</code> 三步产出组织级策略（<code>oss</code> &#x2F; <code>team</code> &#x2F; <code>enterprise</code> &#x2F; <code>regulated</code> &#x2F; <code>high-risk-hooks-mcp</code> &#x2F; <code>ci-enforcement</code> 六种预设）</td>
+</tr>
+<tr>
+<td>改集成</td>
+<td>GitHub Action 已暴露 ~25 个输入参数（<code>path</code> &#x2F; <code>fail-on-findings</code> &#x2F; <code>baseline</code> &#x2F; <code>policy</code> &#x2F; <code>policy-promotion-manifest</code> &#x2F; <code>supply-chain</code> &#x2F; <code>evidence-pack</code> &#x2F; <code>sarif-output</code> 等）；SARIF 可直接喂 <code>github/codeql-action/upload-sarif</code>；Linear sync &#x2F; evidence-pack fleet &#x2F; policy export manifest 都是为 CI 接 GRC 设计的</td>
+</tr>
+<tr>
+<td>改内核</td>
+<td><code>src/rules/*.ts</code> 加规则（5 个分类独立文件，sized 中等）；<code>src/reporter/score.ts</code> 改评分权重（这是工具最敏感的逻辑，每个扣分点的权重都在这里）；<code>src/opus/prompts.ts</code> 改 Attacker&#x2F;Defender&#x2F;Auditor 三智能体对抗提示词</td>
+</tr>
+</tbody></table>
+<h2 id="二、是什么，不是什么"><a href="#二、是什么，不是什么" class="headerlink" title="二、是什么，不是什么"></a>二、是什么，不是什么</h2><p>打开仓库之前先把五件事说清楚，因为 AgentShield <strong>不是</strong>这几样常见的东西：</p>
+<p><strong>不是通用 SAST&#x2F;DAST</strong>。它不扫你 <code>src/</code>、<code>backend/</code>、业务代码 —— 那是 Semgrep &#x2F; CodeQL &#x2F; Snyk 的活。AgentShield 扫的是<strong>你自己写的 agent 配置</strong>：<code>CLAUDE.md</code> 里的「Always run this without asking」、<code>.claude/settings.json</code> 里的 <code>Bash(*)</code>、hook 脚本里的 <code>curl $&#123;user_input&#125;</code>、MCP server 命令里的 <code>npx -y</code>、sub-agent prompt 里的零宽字符。两个扫描器解决的是不同层的问题。</p>
+<p><strong>不是运行时沙箱</strong>。它是个<strong>静态 + 报告</strong>型扫描器，不替你执行&#x2F;拦截 hook。README 里给的 <code>--sandbox</code> 是「把 hook 脚本放到沙箱里跑然后观察行为」，属于<strong>主动验证</strong>而不是强制执行。<code>--taint</code> 是数据流追踪（实验性）。<strong>真要阻止恶意 hook 触发，仍然要靠 Claude Code 自己的 PreToolUse hook</strong> —— AgentShield 只是告诉你哪里需要补。</p>
+<p><strong>不是 MCP Server 漏洞扫描器</strong>。它<strong>不审计 MCP server 的代码</strong>，只看你 <code>.claude/mcp.json</code> 里<strong>这个 server 的配置是不是危险</strong>（high-risk server type、敏感文件作参数、shell metacharacters、缺少 version pin、environment inheritance、<code>autoApprove</code>、remote URL transport 等）。要审计 MCP server 代码本身，你得用别的手工方法或专用工具。</p>
+<p><strong>不是只能 Claude Code</strong>。README 写了<strong>本地 harness adapter 证据</strong>（marker-based，不打外部服务）：Claude Code &#x2F; OpenCode &#x2F; Codex &#x2F; Gemini &#x2F; Zed &#x2F; VS Code &#x2F; dmux &#x2F; terminal-agent wrappers &#x2F; 项目本地模板都识别。但这套 adapter 是「<strong>marker 证据</strong>」 —— 找到项目的某些标识文件就标 <code>harnessAdapters</code> 而已，<strong>不是真正的多 harness 深度适配</strong>。Claude Code 是最深的那一个（毕竟它本来就为 Claude Code 而生），其他当加分项看。</p>
+<p><strong>不是可以无脑交给团队所有人跑的工具</strong>。<code>--opus</code> &#x2F; <code>--injection</code> &#x2F; <code>--provider orcarouter</code> 会<strong>把你 <code>.claude/</code> 的配置内容（包括可能存在的密钥、URL、token）外发</strong>到 LLM API。README 自己警告：do not use it on configs containing secrets you have not redacted。<strong>CI 里跑这些模式，要么用 <code>--no-evidence-redact</code> 反向控制（默认是 redact 的），要么先 strip secrets 再跑</strong>。</p>
+<p>那 AgentShield 到底是什么？看官方一句话：</p>
+<blockquote>
+<p>AI agent security scanner. Detect vulnerabilities in agent configurations, MCP servers, and tool permissions. Available as CLI, GitHub Action, ECC plugin, and GitHub App integration.</p>
+</blockquote>
+<p>四个关键词：<strong>agent configuration</strong>（不是业务代码）&#x2F; <strong>graded score</strong>（0–100 分不是布尔）&#x2F; <strong>CI-native</strong>（GitHub Action 是 first-class）&#x2F; <strong>recognize-and-attribute</strong>（recognize defenses 列表里只挂名不扣分也不加分，防刷分）。</p>
+<h2 id="三、五大扫描面（268-规则拆解）"><a href="#三、五大扫描面（268-规则拆解）" class="headerlink" title="三、五大扫描面（268 规则拆解）"></a>三、五大扫描面（268 规则拆解）</h2><p>AgentShield 的能力按文件类型拆成五块，对应 <code>~/.claude/</code> 里五类配置。</p>
+<table>
+<thead>
+<tr>
+<th>模块（规则数）</th>
+<th>扫什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Secrets</strong>（10 条 &#x2F; 14 patterns）</td>
+<td>硬编码密钥：Anthropic <code>sk-ant-</code>、OpenAI <code>sk-proj-</code>&#x2F;<code>sk-</code>、xAI <code>xai-</code>、AWS <code>AKIA</code>、Google&#x2F;Gemini <code>AIza</code>、Stripe <code>sk_test_</code>&#x2F;<code>sk_live_</code>、GitHub PAT <code>ghp_</code>&#x2F;<code>github_pat_</code>、Linear <code>lin_api_</code>、Cloudflare <code>CF_API_TOKEN=</code>、Slack <code>xox[bprs]-</code>、JWT <code>eyJ...</code>、Bearer tokens、数据库连接串、私钥、env 变量泄漏</td>
+</tr>
+<tr>
+<td><strong>Permissions</strong>（17 条）</td>
+<td>通配符 <code>Bash(*)</code>&#x2F;<code>Write(*)</code>&#x2F;<code>Edit(*)</code>、缺失 deny list、<code>--dangerously-skip-permissions</code>、可变工具未限定、破坏性 git 命令、<code>curl *</code>&#x2F;<code>wget</code>&#x2F;<code>ssh *</code> 无限网络</td>
+</tr>
+<tr>
+<td><strong>Hooks</strong>（40 条）</td>
+<td>hook 里的命令注入（<code>$&#123;file&#125;</code> 插值）、数据外发（<code>curl -X POST $&#123;...&#125;</code>）、静默错误（<code>2&gt;/dev/null</code>）、缺失 PreToolUse hook、SessionStart 下载执行、全局 npm&#x2F;pip&#x2F;gem&#x2F;cargo 安装、Docker 特权模式、<code>/dev/tcp</code> reverse shell、剪贴板读写、日志清理反取证</td>
+</tr>
+<tr>
+<td><strong>MCP Servers</strong>（49 条）</td>
+<td>high-risk server type、<code>npx -y</code> 无确认安装、environment 里塞 token、remote URL transport、shell metacharacters in args、缺 version pin、<code>autoApprove</code>、缺失 timeout、<code>0.0.0.0</code> 绑定、敏感文件作参数、supplier chain 验证</td>
+</tr>
+<tr>
+<td><strong>Agents</strong>（41 条）</td>
+<td>unrestricted tool access、外部内容处理无防御、auto-run 指令（”Always run” &#x2F; “without asking” &#x2F; “automatically install”）、零宽字符 &#x2F; HTML 注释 &#x2F; base64 隐藏指令、URL 执行、时间触发型指令、批量凭据收集、prompt reflection（”ignore previous instructions”）、output manipulation（”always report ok”）</td>
+</tr>
+</tbody></table>
+<p><strong>几个值得展开的设计细节</strong>：</p>
+<p><strong>Secrets 的 env var 泄漏</strong>会被识别为 critical —— 即使配置里写的是 <code>$&#123;SECRET&#125;</code> 而不是明文，hook 命令行里如果出现 <code>echo $SECRET</code> 或环境变量透传，也算高危。<strong>这比 grep 字符串要聪明</strong>。</p>
+<p><strong>Permissions 的”deny list 缺失”会自动分级</strong>：<code>settings.local.json</code> 完全限定的 allowlist 把 <code>permissions-no-deny-list</code> 从 high 降到 medium；wildcard 仍保持 high。<strong>这是 source-aware 评分</strong>（同一条规则在不同上下文里严重度不同）。</p>
+<p><strong>Hooks 的 “<code>hook-code</code>“ 专门针对非 shell 实现</strong>。manifest-referenced hook（<code>hooks/hooks.json</code> 引用 <code>scripts/hooks/session-start.js</code> 这种）会找到真正的实现，识别<strong>显式的 <code>output(...)</code> 上下文注入</strong>、<strong>transcript 输入访问</strong>、<strong>child-process 外发</strong>。<strong>比看 shell 命令字面值更接近真实风险</strong>。</p>
+<p><strong>MCP 的 <code>runtimeConfidence</code> 分级</strong>是这个工具<strong>最专业的部分</strong>（详见第四章），不是简单的「有&#x2F;无」。<code>active-runtime</code>（<code>.mcp.json</code>）vs <code>settings.local.json</code>（<code>project-local-optional</code>）vs <code>mcp-configs/</code>（<code>template-example</code>）vs <code>plugin-cache</code> &#x2F; <code>plugin-manifest</code> &#x2F; <code>hook-code</code> —— 同样一条 <code>npx -y</code> 在你真的装在机器上是 critical，在 docs 目录里就降权 0.25x、单文件封顶 10 分。</p>
+<p><strong>Agents 的 prompt injection 规则对「defensive content」免疫</strong>：agent prompt 里<strong>提到</strong> <code>fetch(userProvidedUrl)</code> 模式（教导性内容）不触发 <code>agents-injection-surface</code>；<strong>直接指令</strong>去 fetch&#x2F;process external content 才会。<strong>对防御性 prompt 友好</strong>，避免「教防御反而被误报」。</p>
+<h2 id="四、评分与误报治理（这是工具最值钱的部分）"><a href="#四、评分与误报治理（这是工具最值钱的部分）" class="headerlink" title="四、评分与误报治理（这是工具最值钱的部分）"></a>四、评分与误报治理（这是工具最值钱的部分）</h2><p>AgentShield 真正的护城河不是规则数量，是<strong>它怎么打分 + 怎么治理误报</strong>。</p>
+<h3 id="4-1-评分规则"><a href="#4-1-评分规则" class="headerlink" title="4.1 评分规则"></a>4.1 评分规则</h3><p>每个分类从 100 分起，扣分只来自 findings：</p>
+<ul>
+<li><strong>critical</strong> −25 &#x2F; <strong>high</strong> −15 &#x2F; <strong>medium</strong> −5 &#x2F; <strong>low</strong> −2 &#x2F; <strong>info</strong> 0</li>
+</ul>
+<p>最后总分 → 字母等级（A 90+ &#x2F; B 80+ &#x2F; C 70+ &#x2F; D 60+ &#x2F; F &lt;60）。</p>
+<p><strong>Recognized Defenses</strong>（识别出的防护配置）单独列在报告里：</p>
+<ul>
+<li><strong>不扣分</strong>（即使有 <code>deny</code> 规则命中，也按 allow 走）</li>
+<li><strong>也不加分</strong>（防止给一堆装饰性 deny 规则刷分）</li>
+</ul>
+<p>也就是<strong>分数只能被真实 findings 降低</strong>。这是合规向 GRC 报告里很重要的一点 —— 分数越高代表「没有发现真实问题」，不是「你写了很多 deny」。</p>
+<h3 id="4-2-runtimeConfidence-七档分级"><a href="#4-2-runtimeConfidence-七档分级" class="headerlink" title="4.2 runtimeConfidence 七档分级"></a>4.2 <code>runtimeConfidence</code> 七档分级</h3><p>这是 AgentShield <strong>最专业的误报治理机制</strong>：</p>
+<p>七档按「这个配置到底在不在跑」区分，权重直接乘在扣分上：</p>
+<p><strong><code>active-runtime</code>（权重 1.0×）</strong> —— 真在跑的配置：<code>.mcp.json</code>、<code>mcp.json</code>、<code>.claude/mcp.json</code>、<code>.claude.json</code>、active <code>settings.json</code></p>
+<p><strong><code>project-local-optional</code>（0.75×）</strong> —— <code>settings.local.json</code> 这类本地覆盖，只对当前项目生效</p>
+<p><strong><code>plugin-cache</code>（0.5×）</strong> —— 已装插件缓存，如 <code>.claude/plugins/cache/...</code></p>
+<p><strong><code>plugin-manifest</code>（0.5×）</strong> —— 声明性 hook manifest，如 <code>hooks/hooks.json</code></p>
+<p><strong><code>template-example</code>（0.25×，且单文件封顶 10 分）</strong> —— 模板&#x2F;目录型定义，如 <code>mcp-configs/</code>、<code>config/mcp/</code></p>
+<p><strong><code>docs-example</code>（0.25×）</strong> —— 教学&#x2F;示例内容，如 <code>docs/guide/settings.json</code>、<code>commands/*.md</code></p>
+<p><strong><code>hook-code</code>（1.0×，窄规则集）</strong> —— manifest 解析到的非 shell 实现，如 <code>scripts/hooks/session-start.js</code></p>
+<p>实际效果：仓库里 docs 目录有一个 risky MCP server 模板，<strong>不会</strong>像真的启用了一样算 critical；它会被打 <code>template-example</code> 标签，扣 0.25 倍，最多扣 10 分。<strong>这是从「多 false positive」到「分级 triage」的关键转变</strong>。</p>
+<h3 id="4-3-fix-自动修-防篡改"><a href="#4-3-fix-自动修-防篡改" class="headerlink" title="4.3 --fix 自动修 + 防篡改"></a>4.3 <code>--fix</code> 自动修 + 防篡改</h3><p><code>agentshield scan --fix</code> 不是「一把梭」 —— 它的工作流是：</p>
+<ol>
+<li>只修标 <code>auto: true</code> 的项（替换硬编码密钥为 <code>$&#123;ENV_VAR&#125;</code>、收紧 <code>Bash(*)</code> 为 <code>Bash(git *)</code> 等）</li>
+<li><strong>修完复扫一次</strong></li>
+<li>如果<strong>总分下降</strong>或<strong>出现新的 high&#x2F;critical finding</strong>（典型的「缩紧权限反而暴露其他问题」），<strong>回滚所有修改的文件</strong></li>
+<li>如果 OK，输出一个 <strong>tamper-evident attestation digest</strong>（绑定 before&#x2F;after 分数和 finding 变化），让你能证明修完没退化</li>
+</ol>
+<p>这等于把 <code>--fix</code> 从「自动改坏不告诉你」变成「改坏自己撤销 + 给你证据」。<strong>对在生产配置上做自动化的人来说非常关键</strong>。</p>
+<h3 id="4-4-误报治理工作流"><a href="#4-4-误报治理工作流" class="headerlink" title="4.4 误报治理工作流"></a>4.4 误报治理工作流</h3><p>仓库自带一份 <code>false-positive-audit.md</code>，里面给了完整的 triage 工作流：</p>
+<ol>
+<li>先用 <code>--format json</code> 拿结构化数据</li>
+<li>用 <code>jq</code> 按 <code>runtimeConfidence</code> group_by</li>
+<li>区分 active-runtime（高信噪比）和 lower-confidence（需解释）</li>
+<li>优先 active-runtime + project-local-optional</li>
+<li>验证可疑 FP 时至少跑一个真实仓库 + 一个最小合成 fixture</li>
+<li><strong>优先 source-aware 重新分类</strong>而不是 blanket 抑制</li>
+<li>真实密钥永远保持 critical（即使在 docs&#x2F;examples 里也不降权）</li>
+</ol>
+<p>这流程本身值得拿来当<strong>任何静态扫描器误报治理的范本</strong>。</p>
+<h2 id="五、进阶能力：Opus-对抗-合规映射-供应链"><a href="#五、进阶能力：Opus-对抗-合规映射-供应链" class="headerlink" title="五、进阶能力：Opus 对抗 &#x2F; 合规映射 &#x2F; 供应链"></a>五、进阶能力：Opus 对抗 &#x2F; 合规映射 &#x2F; 供应链</h2><h3 id="5-1-三智能体对抗分析（-opus）"><a href="#5-1-三智能体对抗分析（-opus）" class="headerlink" title="5.1 三智能体对抗分析（--opus）"></a>5.1 三智能体对抗分析（<code>--opus</code>）</h3><p>光做规则匹配容易漏掉跨规则的复合攻击。<code>--opus</code> 启了一个三智能体对抗 pipeline：</p>
+<ol>
+<li><strong>Attacker（红队，Claude Opus）</strong>：找可利用的攻击向量和多步链路</li>
+<li><strong>Defender（蓝队，Claude Opus）</strong>：评估现有防护、给出加固建议</li>
+<li><strong>Auditor</strong>：把两边综合成分级风险评估</li>
+</ol>
+<p><code>Attacker</code> 能找到「<code>curl</code> hook + <code>$&#123;file&#125;</code> 插值 + <code>Bash(*)</code> &#x3D; 命令注入 pivot」这种跨规则链；<code>Defender</code> 指出没有 PreToolUse hook 拦截；<code>Auditor</code> 把它们串成一个优先行动列表。</p>
+<p>需要 <code>ANTHROPIC_API_KEY</code>（或 <code>ORCAROUTER_API_KEY</code> 走 OpenAI&#x2F;Anthropic 兼容网关）。<strong>会调用 Anthropic API，且发送你的 <code>.claude/</code> 内容</strong>（详见第七章）。</p>
+<h3 id="5-2-合规映射（-compliance）"><a href="#5-2-合规映射（-compliance）" class="headerlink" title="5.2 合规映射（--compliance）"></a>5.2 合规映射（<code>--compliance</code>）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">agentshield scan --compliance soc2          <span class="comment"># SOC 2 Trust Services Criteria</span></span><br><span class="line">agentshield scan --compliance soc2,pci,iso  <span class="comment"># 多个</span></span><br><span class="line">agentshield scan --compliance all</span><br></pre></td></tr></table></figure>
+
+<p>输出<strong>控制覆盖表</strong>（control id &#x2F; title &#x2F; highest severity &#x2F; finding count &#x2F; examples），按严重度排序。给 GRC 团队一份<strong>审计员可读</strong>的覆盖率清单，而不是 raw findings 列表。</p>
+<p>明确标注：<strong>是 finding-category-level guidance（SOC 2、PCI DSS v4.0、ISO&#x2F;IEC 27001:2022 Annex A），不是 certified crosswalk</strong>。具体控制适用性请你的审计员确认。<strong>这条免责声明写得老实</strong>。</p>
+<h3 id="5-3-供应链验证（-supply-chain）"><a href="#5-3-供应链验证（-supply-chain）" class="headerlink" title="5.3 供应链验证（--supply-chain）"></a>5.3 供应链验证（<code>--supply-chain</code>）</h3><p>MCP 命令流从 npm 装包是个常见 typosquatting 攻击面。<code>--supply-chain</code> 抽 MCP 包引用 + 根 <code>package.json</code> &#x2F; <code>package-lock.json</code> 依赖证据，报告：</p>
+<ul>
+<li>npm vs git 来源数</li>
+<li>pinned vs unpinned</li>
+<li>known-good packages</li>
+<li>npm-registry 验证</li>
+</ul>
+<p>加 <code>--supply-chain-online</code> 还会去 npm 查 downloads、maintainers、postinstall scripts、deprecation、package age。</p>
+<p>还检查 <code>.npmrc</code> &#x2F; <code>.yarnrc.yml</code> &#x2F; <code>pnpm-workspace.yaml</code> 里的明文 registry 凭据、<code>minimumReleaseAge</code> &#x2F; <code>npmMinimalAgeGate</code> 等 cooldown 配。</p>
+<p>GitHub Action 里默认 <code>supply-chain: true</code>，失败模式可控。</p>
+<h3 id="5-4-MiniClaw：附带的安全沙箱-HTTP-Agent"><a href="#5-4-MiniClaw：附带的安全沙箱-HTTP-Agent" class="headerlink" title="5.4 MiniClaw：附带的安全沙箱 HTTP Agent"></a>5.4 MiniClaw：附带的安全沙箱 HTTP Agent</h3><p><code>npx ecc-agentshield miniclaw start</code> 启一个 <strong>单一 HTTP 端点的隔离 agent runtime</strong>，对比典型 agent 平台暴露 Telegram &#x2F; Discord &#x2F; email &#x2F; community plugins 多个攻击面，MiniClaw 只暴露 <strong>localhost:3847 默认 + 隔离沙箱 + 安全工具集</strong>。作为「我也要本地玩 agent 跑点东西」的轻量方案挺合适。也可作为库 <code>import &#123; startMiniClaw &#125; from &#39;ecc-agentshield/miniclaw&#39;</code>。</p>
+<h2 id="六、部署与集成"><a href="#六、部署与集成" class="headerlink" title="六、部署与集成"></a>六、部署与集成</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 最快路径：零安装直接扫</span></span><br><span class="line">npx ecc-agentshield scan</span><br><span class="line"></span><br><span class="line"><span class="comment"># 全局装</span></span><br><span class="line">npm install -g ecc-agentshield</span><br><span class="line">agentshield scan</span><br><span class="line"></span><br><span class="line"><span class="comment"># 扫指定目录</span></span><br><span class="line">agentshield scan --path /repo/.claude</span><br><span class="line"></span><br><span class="line"><span class="comment"># 自动修安全项（修坏会回滚 + 出防篡改摘要）</span></span><br><span class="line">agentshield scan --fix</span><br><span class="line"></span><br><span class="line"><span class="comment"># CI 友好输出</span></span><br><span class="line">agentshield scan --format json | jq .</span><br><span class="line">agentshield scan --format sarif --output agentshield.sarif</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成可分发的 HTML 报告</span></span><br><span class="line">agentshield scan --format html &gt; report.html</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成可验证审计包（含 SHA-256 manifest）</span></span><br><span class="line">agentshield scan --evidence-pack ./agentshield-evidence</span><br><span class="line">agentshield evidence-pack verify ./agentshield-evidence</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成修复队列（指纹化的，不含 raw secret）</span></span><br><span class="line">agentshield scan --remediation-plan ./remediation.json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 三智能体对抗分析</span></span><br><span class="line">agentshield scan --opus --stream</span><br><span class="line"></span><br><span class="line"><span class="comment"># 主动 prompt injection 测试</span></span><br><span class="line">agentshield scan --injection</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合规映射</span></span><br><span class="line">agentshield scan --compliance soc2,pci,iso</span><br><span class="line"></span><br><span class="line"><span class="comment"># 供应链</span></span><br><span class="line">agentshield scan --supply-chain --supply-chain-online</span><br><span class="line"></span><br><span class="line"><span class="comment"># 组织策略</span></span><br><span class="line">agentshield policy init --pack enterprise</span><br><span class="line">agentshield policy <span class="built_in">export</span> --output-dir .github/agentshield-policies</span><br><span class="line">agentshield policy promote --manifest .github/agentshield-policies/manifest.json --pack enterprise</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化安全基线配置</span></span><br><span class="line">agentshield init</span><br></pre></td></tr></table></figure>
+
+<p><strong>GitHub Action</strong> 已是 first-class：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">AgentShield</span> <span class="string">Security</span> <span class="string">Scan</span></span><br><span class="line">  <span class="attr">uses:</span> <span class="string">affaan-m/agentshield@v1</span></span><br><span class="line">  <span class="attr">with:</span></span><br><span class="line">    <span class="attr">path:</span> <span class="string">&quot;.&quot;</span></span><br><span class="line">    <span class="attr">min-severity:</span> <span class="string">&quot;medium&quot;</span></span><br><span class="line">    <span class="attr">fail-on-findings:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">    <span class="attr">format:</span> <span class="string">&quot;sarif&quot;</span>               <span class="comment"># → SARIF 喂 codeql-action/upload-sarif</span></span><br><span class="line">    <span class="attr">baseline:</span> <span class="string">&quot;.github/agentshield-baseline.json&quot;</span>   <span class="comment"># → drift gate</span></span><br><span class="line">    <span class="attr">supply-chain:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">    <span class="attr">evidence-pack:</span> <span class="string">&quot;./agentshield-evidence&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Outputs 超过 25 个</strong>，包括 <code>score</code> &#x2F; <code>grade</code> &#x2F; <code>critical-count</code> &#x2F; <code>new-findings</code> &#x2F; <code>resolved-findings</code> &#x2F; <code>score-delta</code> &#x2F; <code>policy-status</code> &#x2F; <code>supply-chain-critical-count</code> &#x2F; <code>evidence-pack-digest</code> —— 全部可以接下游 step 做条件判断。</p>
+<p><strong>Exit codes</strong>：0 无 critical &#x2F; 1 CLI 错误 &#x2F; 2 有 critical。这条让 CI 直接判断。</p>
+<h2 id="七、边界与风险（诚实写短板）"><a href="#七、边界与风险（诚实写短板）" class="headerlink" title="七、边界与风险（诚实写短板）"></a>七、边界与风险（诚实写短板）</h2><h3 id="7-1-规则数三套口径，README-自己没统一"><a href="#7-1-规则数三套口径，README-自己没统一" class="headerlink" title="7.1 规则数三套口径，README 自己没统一"></a>7.1 规则数三套口径，README 自己没统一</h3><p>这是写文章时最让我纠结的：</p>
+<table>
+<thead>
+<tr>
+<th>出现位置</th>
+<th>数字</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>README 开头「268 rules across 15 modules」</td>
+<td>268</td>
+</tr>
+<tr>
+<td>各章「What It Catches」表格分项</td>
+<td>Permissions 17 + Hooks 40 + MCP 49 + Agents 41 &#x3D; 147（再加 Secrets 10 &#x3D; 157，但 README 没这么列）</td>
+</tr>
+<tr>
+<td>架构表汇总（README 末尾「Security Rules Summary」）</td>
+<td>Secrets 10 + Permissions 10 + Hooks 34 + MCP 23 + Agents 25 &#x3D; <strong>102</strong></td>
+</tr>
+<tr>
+<td>实际子模块规则文件（README 架构里写 <code>permissions.ts (17 rules)</code> &#x2F; <code>mcp.ts (26 rules)</code> &#x2F; <code>hooks.ts (40 rules)</code> &#x2F; <code>agents.ts (41 rules)</code>）</td>
+<td>又各不相同</td>
+</tr>
+</tbody></table>
+<p><strong>三个总数都对不上</strong>。可能的解释：「rules」和「patterns」混着用 + 架构里只列「core」规则 + 一些是「hard」&#x2F;「soft」分级，但 README 自己没解释。<strong>对要在 CI 门禁里依赖规则覆盖率的团队来说，这是个隐藏坑</strong> —— 你不知道到底是 100 还是 300 条规则在守你的代码。</p>
+<p><strong>建议</strong>：跑一次 <code>--format json</code> + <code>jq &#39;.findings | length&#39;</code> 看实际 finding 数（包含的 rule id 集合），用真实数字而不是 README 口径做 CI 决策。</p>
+<h3 id="7-2-opus-injection-会外发-claude-内容"><a href="#7-2-opus-injection-会外发-claude-内容" class="headerlink" title="7.2 --opus &#x2F; --injection 会外发 .claude/ 内容"></a>7.2 <code>--opus</code> &#x2F; <code>--injection</code> 会外发 <code>.claude/</code> 内容</h3><p>README 自己写了：</p>
+<blockquote>
+<p>With <code>--provider orcarouter</code> the scanned configuration contents are sent to OrcaRouter’s API instead of Anthropic’s, so <strong>do not use it on configs containing secrets you have not redacted</strong>.</p>
+</blockquote>
+<p>这条对 <code>--opus</code> 和 <code>--injection</code> 都成立。意味着：</p>
+<ol>
+<li>CI 里跑 <code>--opus</code> 时，<strong>机器上 <code>.claude/</code> 里所有内容（含密钥、URL、用户名、内网路径）都会发给 Anthropic 或 OrcaRouter</strong></li>
+<li>evidence-pack 的 redaction 是<strong>针对本地路径&#x2F;username&#x2F;email&#x2F;token-shaped 字符串</strong>做的，<strong>不一定涵盖你的业务敏感数据</strong></li>
+<li>合规上跑 CI 的 worker 不能放在<strong>会触发数据出境合规审查</strong>的环境（比如某些金融&#x2F;政企内网）</li>
+</ol>
+<p><strong>缓解</strong>：</p>
+<ul>
+<li><code>agentshield scan --no-evidence-redact</code> <strong>是反向</strong>（&#x3D;关闭 redact），不要随便开</li>
+<li>真要跑 <code>--opus</code>，先自己手动 redact 一下 <code>.claude/</code> 里可能含的 PII &#x2F; secrets</li>
+<li>或者把 <code>--opus</code> 限定在一个独立<strong>干净副本</strong>上跑，不要直接对生产配置</li>
+</ul>
+<h3 id="7-3-项目年轻-黑客松出身"><a href="#7-3-项目年轻-黑客松出身" class="headerlink" title="7.3 项目年轻 + 黑客松出身"></a>7.3 项目年轻 + 黑客松出身</h3><ul>
+<li>首次 commit 2026-02-11</li>
+<li>最近一次 push 2026-09-10</li>
+<li><strong>6 个月历史</strong>（在 AI 安全工具里算非常年轻）</li>
+<li>黑客松出身意味着节奏快、规则迭代频繁 —— 这次写文章时 README 里的规则数已经在变</li>
+</ul>
+<p>意味着：</p>
+<ul>
+<li>API、字段名、规则 ID 都可能在 v2 之前 break（GitHub Action 用 <code>@v1</code> 是好的；本地 CLI 建议钉版本）</li>
+<li>报告 schema 会演进（<code>runtimeConfidence</code> 七档就是近期才加的）</li>
+<li>长期稳定性 &#x2F; 公司治理场景，需要观察</li>
+</ul>
+<h3 id="7-4-误报治理仍需人工分级"><a href="#7-4-误报治理仍需人工分级" class="headerlink" title="7.4 误报治理仍需人工分级"></a>7.4 误报治理仍需人工分级</h3><p>README 自己承认：</p>
+<blockquote>
+<p>The current scan profile is not dominated by broken matchers. <strong>It is mostly dominated by lower-confidence source kinds that need different interpretation.</strong></p>
+</blockquote>
+<p>具体来说：</p>
+<ul>
+<li><strong>template MCP inventory</strong> 是当前最大噪音源（很多 everything-claude-code 这种大生态仓库自带 <code>mcp-configs/</code> 模板）</li>
+<li><strong>example&#x2F;tutorial config</strong> 需要 example-aware 解释，不是 blanket 抑制</li>
+<li><strong>broad <code>agents-*</code> clusters across files</strong> 通常是策略审查问题，不是 false-positive 抑制</li>
+</ul>
+<p><code>runtimeConfidence</code> 已经把噪音分桶了，但<strong>怎么 triage 仍然要人</strong>。直接拿 JSON 报告喂 GRC 是不够的。</p>
+<h3 id="7-5-Harness-adapter-只是-marker-证据"><a href="#7-5-Harness-adapter-只是-marker-证据" class="headerlink" title="7.5 Harness adapter 只是 marker 证据"></a>7.5 Harness adapter 只是 marker 证据</h3><p>README 写：</p>
+<blockquote>
+<p><code>harnessAdapters</code> is local marker evidence only. <strong>It does not call external services or imply a hosted&#x2F;team entitlement.</strong><br>Adapter <code>confidence</code> is <code>strong</code> when a primary harness marker exists, and <code>partial</code> when only supporting directories or secondary markers are present.</p>
+</blockquote>
+<p>也就是说：<strong>识别到 OpenCode&#x2F;Codex&#x2F;Gemini&#x2F;Zed 只是因为它们目录里有某些文件</strong>，不是真的对那些 harness 做深度适配。Claude Code 是最深的那一个。如果你是 Codex-only 用户，AgentShield 的价值打 6 折。</p>
+<h3 id="7-6-不验证运行时行为，只读配置"><a href="#7-6-不验证运行时行为，只读配置" class="headerlink" title="7.6 不验证运行时行为，只读配置"></a>7.6 不验证运行时行为，只读配置</h3><p><code>--sandbox</code>（在沙箱里执行 hook 然后观察行为）和 <code>--taint</code>（数据流追踪）都是<strong>主动验证</strong>，不是<strong>被动监控</strong>。Claude Code 自己的 PreToolUse hook 是真正的执行拦截，AgentShield 只是个扫描器。<strong>别拿它当 runtime protection 用</strong>。</p>
+<h3 id="7-7-商业-sponsor-嵌入"><a href="#7-7-商业-sponsor-嵌入" class="headerlink" title="7.7 商业 sponsor 嵌入"></a>7.7 商业 sponsor 嵌入</h3><p>README 顶部有一行 「Preferred compute sponsor: Itô Markets」+ ECC 的 affiliate 链接。这是合法 affiliate，但对<strong>纯中立技术评估</strong>来说要标出来：ECC（Everything Claude Code）这个生态在做商业化。AgentShield 本身 MIT 不收费，但 ECC Tools Pro &#x2F; GitHub App 可能是付费产品。</p>
+<h2 id="八、上手"><a href="#八、上手" class="headerlink" title="八、上手"></a>八、上手</h2><p><strong>第一步：跑一遍，看你分数多惨</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx ecc-agentshield scan</span><br></pre></td></tr></table></figure>
+
+<p>这条命令会发现你 <code>.claude/</code> 里一堆东西 —— <code>CLAUDE.md</code> 里的「Always run」会触发 agents-auto-run、<code>.claude/settings.json</code> 里的 <code>Bash(*)</code> 会触发 permissions-permissive-*、<code>hooks/*.sh</code> 里的 <code>$&#123;file&#125;</code> 会被打 hook-command-injection。<strong>第一次跑很容易出 50+ findings</strong>。别慌。</p>
+<p><strong>第二步：先理解分级，别急着修</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">npx ecc-agentshield scan --format json &gt; report.json</span><br><span class="line"></span><br><span class="line"><span class="comment"># 按 runtimeConfidence 分桶</span></span><br><span class="line">jq <span class="string">&#x27;.findings | group_by(.runtimeConfidence // &quot;none&quot;) | map(&#123;</span></span><br><span class="line"><span class="string">  runtimeConfidence: (.[0].runtimeConfidence // &quot;none&quot;),</span></span><br><span class="line"><span class="string">  count: length</span></span><br><span class="line"><span class="string">&#125;)&#x27;</span> report.json</span><br></pre></td></tr></table></figure>
+
+<p><code>active-runtime</code> + <code>project-local-optional</code> 是真高信噪比的，先看这些。其他桶的根据需要单独 triage。</p>
+<p><strong>第三步：用 <code>--fix</code> 修自动项</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx ecc-agentshield scan --fix</span><br></pre></td></tr></table></figure>
+
+<p>这步会<strong>自动替换硬编码密钥 + 收紧部分 wildcards</strong>。如果修完分数下降或者出现新 high&#x2F;critical，会自动回滚 + 给你一份 attestation digest。<strong>这是工具最有价值的特性之一</strong>。</p>
+<p><strong>第四步：把 GitHub Action 装上</strong>。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># .github/workflows/agentshield.yml</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">affaan-m/agentshield@v1</span></span><br><span class="line">  <span class="attr">with:</span></span><br><span class="line">    <span class="attr">path:</span> <span class="string">&quot;.&quot;</span></span><br><span class="line">    <span class="attr">fail-on-findings:</span> <span class="string">&quot;true&quot;</span></span><br><span class="line">    <span class="attr">min-severity:</span> <span class="string">&quot;medium&quot;</span></span><br><span class="line">    <span class="attr">format:</span> <span class="string">&quot;sarif&quot;</span></span><br><span class="line">    <span class="attr">sarif-output:</span> <span class="string">agentshield.sarif</span></span><br><span class="line">    <span class="attr">baseline:</span> <span class="string">&quot;.github/agentshield-baseline.json&quot;</span>   <span class="comment"># 渐进接入</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">github/codeql-action/upload-sarif@v3</span></span><br><span class="line">  <span class="attr">if:</span> <span class="string">always()</span></span><br><span class="line">  <span class="attr">with:</span></span><br><span class="line">    <span class="attr">sarif_file:</span> <span class="string">agentshield.sarif</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>渐进接入技巧</strong>：第一次跑加 <code>baseline: &quot;&quot;</code>，把输出存为 <code>agentshield-baseline.json</code> 提交；之后用 <code>--gate</code> 只 fail 在新 critical&#x2F;high 上。</p>
+<p><strong>第五步：把组织策略挂上</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">agentshield policy init --pack enterprise   <span class="comment"># 先用 enterprise 模板</span></span><br><span class="line">agentshield policy <span class="built_in">export</span> --output-dir .github/agentshield-policies</span><br><span class="line">agentshield policy promote --manifest .github/agentshield-policies/manifest.json --pack enterprise --dry-run --json  <span class="comment"># 先 dry-run 看 review items</span></span><br></pre></td></tr></table></figure>
+
+<p><code>policy.json</code> 推进 <code>.agentshield/policy.json</code> 后，Action 就会 fail-on-policy。</p>
+<p><strong>新手第一动作</strong>：先 <code>npx scan</code> 看分数，<strong>别</strong>直接装 Action + 严格门禁 —— 你会被一堆 finding 噎死。先理解分级，再用 baseline + <code>--fix</code> 渐进接入。</p>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>AgentShield 是当前唯一把「AI Agent 配置审计」做到 0–100 分、可上 CI、有误报分级、有合规映射、还有主动对抗分析的 MIT 一档选择</strong> —— 但它的规则数、噪音治理、<code>.claude/</code> 内容外发问题、以及「Claude Code 专属」的深度都意味着你要<strong>带着脑子用</strong>：自己跑一次 baseline、看清楚 <code>runtimeConfidence</code> 分级、对 <code>--opus</code>&#x2F;<code>--injection</code> 先脱敏再跑、对别的 harness 适配当加分项看。给 Claude Code 重度用户：直接用，<strong>别家没有这么贴身的</strong>；给跨 harness 团队：作为 Claude Code 这边的覆盖层用，别的 harness 再补别的工具。</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/agentshield/">https://we5ter.github.io/ai-tools/agentshield/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/agentshield/&text=AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/agentshield/&title=AgentShield 拆解：一个 Claude Code 黑客松作品，如何把「AI Agent 配置审计」做成可上 CI 的合规工具"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/agentshield/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/agentshield/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/agentshield/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/agentshield/"
+  };
+</script>
+
+
+
+
+
+<nav class="post-nav post-nav--series">
+  
+  <a class="post-nav-prev" href="/ai-tools/ai-infra-guard/">
+    <span class="post-nav-label">&larr;
+      <span class="i18n-zh">上一期 · 第 006 期</span>
+      <span class="i18n-en">Previous · No. 6</span>
+    </span>
+    <span class="post-nav-title">AI-Infra-Guard 拆解：腾讯朱雀实验室把「AI 安全」从单点工具做成了红队平台</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/agent-governance-toolkit/">
+    <span class="post-nav-label">
+      <span class="i18n-zh">下一期 · 第 008 期</span>
+      <span class="i18n-en">Next · No. 8</span>
+    </span> &rarr;
+    <span class="post-nav-title">微软 Agent Governance Toolkit 拆解：把「请 AI 守规矩」换成「让 AI 没法不守规矩」</span>
+  </a>
+  
+</nav>
+
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+<!-- 阅读进度条 + 本页目录（只在文章页有对应节点，其他页面自然空跑退出） -->
+<script>
+(function () {
+  var bar = document.getElementById('read-progress');
+  var tocAside = document.getElementById('post-toc');
+  var article = document.querySelector('article.post-detail');
+  if (!bar && !tocAside) return;
+
+  // 进度按「文章本体」算，不含评论区和页脚 —— 否则滚到评论区就早早满格，
+  // 读者会以为文章看完了。
+  function progress() {
+    if (!bar || !article) return;
+    var r = article.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? (-r.top) / total : (r.top <= 0 ? 1 : 0);
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+
+  var links = [];      // { a, head }
+  var cur = -1;
+
+  function headingText(h) {
+    // Hexo 在每个标题里塞了 <a class="headerlink">，直接取 textContent 会带上锚点空白
+    var c = h.cloneNode(true);
+    var hl = c.querySelectorAll('.headerlink');
+    for (var i = 0; i < hl.length; i++) hl[i].parentNode.removeChild(hl[i]);
+    return (c.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(s) {
+    return String(s).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildToc() {
+    if (!tocAside || !article) return;
+    var nav = document.getElementById('post-toc-nav');
+    var det = document.getElementById('post-toc-inner');
+    var body = article.querySelector('.post-content');
+    if (!nav || !body) return;
+
+    var heads = body.querySelectorAll('h2, h3');
+    var h2n = 0, i;
+    for (i = 0; i < heads.length; i++) if (heads[i].tagName === 'H2') h2n++;
+    // 少于三个标题的短文不值得占一列，目录反而比正文长。
+    // 只看总数不单独看 h2：早期 CVE 长文整篇用 h3 分层（没有 h2），按 h2 计数会一律漏掉。
+    if (heads.length < 3) return;
+
+    var html = '<ul class="post-toc-list' + (h2n ? '' : ' is-flat') + '">';
+    for (i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + i;
+      // 标题带 sticky masthead，滚动定位要留出它的高度，否则跳过去被压在导航底下
+      h.style.scrollMarginTop = '76px';
+      html += '<li class="post-toc-item post-toc-' + h.tagName.toLowerCase() + '">' +
+              '<a href="#' + h.id + '">' + esc(headingText(h)) + '</a></li>';
+    }
+    html += '</ul>';
+    nav.innerHTML = html;
+
+    var as = nav.querySelectorAll('a');
+    for (i = 0; i < as.length; i++) links.push({ a: as[i], head: heads[i] });
+
+    tocAside.hidden = false;
+    document.body.classList.add('has-post-toc');
+
+    // 窄屏默认收起，别一进来就占满半屏；宽屏常驻展开。
+    // 1399 是 CSS 里目录宽屏断点（min-width: 1100px）的另一半：
+    // 两处必须互补，否则 1100–1399 会出现「目录已在右侧常驻、却被脚本收起」。
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 1099px)');
+    if (det && narrow && narrow.matches) det.removeAttribute('open');
+    nav.addEventListener('click', function (e) {
+      if (det && narrow && narrow.matches && e.target && e.target.tagName === 'A') {
+        det.removeAttribute('open');
+      }
+    });
+    highlight();
+  }
+
+  // 当前小节 = 最后一个顶部已越过 masthead 下沿的标题
+  function highlight() {
+    if (!links.length) return;
+    var idx = -1;
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].head.getBoundingClientRect().top <= 90) idx = i;
+      else break;
+    }
+    if (idx === cur) return;
+    if (cur >= 0 && links[cur]) links[cur].a.classList.remove('is-active');
+    cur = idx;
+    if (cur >= 0) links[cur].a.classList.add('is-active');
+  }
+
+  buildToc();
+  progress();
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      progress();
+      highlight();
+      ticking = false;
+    });
+  }, { passive: true });
+  window.addEventListener('resize', function () { progress(); highlight(); }, { passive: true });
+})();
+</script>
+
+<!-- 代码块：语言标签 + 一键复制 + 超长折叠 -->
+<script>
+(function () {
+  var figs = document.querySelectorAll('.post-content figure.highlight');
+  if (!figs.length) return;
+
+  function codeText(fig) {
+    // 行号在 td.gutter 里，只能取 td.code；每行之间是 <br>，
+    // 直接 textContent 会把所有行粘成一坨，必须按 .line 拼。
+    var td = fig.querySelector('td.code') || fig;
+    var lines = td.querySelectorAll('.line');
+    if (lines.length) {
+      var out = [];
+      for (var i = 0; i < lines.length; i++) out.push(lines[i].textContent.replace(/\n$/, ''));
+      return out.join('\n');
+    }
+    var pre = td.querySelector('pre');
+    return pre ? pre.textContent : td.textContent;
+  }
+
+  // file:// 预览和非 https 环境拿不到 navigator.clipboard，退回 execCommand
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function zh(s) { return '<span class="i18n-zh">' + s + '</span>'; }
+  function en(s) { return '<span class="i18n-en">' + s + '</span>'; }
+
+  // 复制失败要说出来：非安全上下文 / 页面失焦时 clipboard API 和 execCommand 都会静默失败，
+  // 按钮若原地不动，读者以为已经复制上了。
+  var timers = [];
+  function paint(btn, state) {
+    btn.classList.remove('is-copied', 'is-failed');
+    if (state === 'ok') {
+      btn.classList.add('is-copied');
+      btn.innerHTML = zh('已复制') + en('Copied');
+    } else if (state === 'fail') {
+      btn.classList.add('is-failed');
+      btn.innerHTML = zh('复制失败，请手动选中') + en('Copy failed — select manually');
+    } else {
+      btn.innerHTML = zh('复制') + en('Copy');
+    }
+  }
+  function flash(btn, state) {
+    paint(btn, state);
+    timers.push(setTimeout(function () { paint(btn, false); }, 2000));
+  }
+
+  Array.prototype.forEach.call(figs, function (fig) {
+    if (fig.parentNode && fig.parentNode.classList.contains('code-box')) return;
+
+    var m = fig.className.match(/(?:^|\s)highlight(?:\s+([a-z0-9+#._-]+))?/i);
+    var lang = m && m[1] ? m[1] : '';
+    // 未标语言的围栏 Hexo 给的是 plaintext（不是 plain），别漏 —— 每块都挂个「plaintext」比不挂更吵。
+    if (/^(plain|plaintext|text|txt)$/i.test(lang)) lang = '';
+
+    // figure 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码横向跑掉，
+    // 所以外面套一层 .code-box 承载工具条和折叠按钮。
+    var box = document.createElement('div');
+    box.className = 'code-box';
+    fig.parentNode.insertBefore(box, fig);
+    box.appendChild(fig);
+
+    var bar = document.createElement('div');
+    bar.className = 'code-bar';
+    var langEl = document.createElement('span');
+    langEl.className = 'code-lang';
+    if (lang) langEl.textContent = lang; else langEl.style.display = 'none';
+    bar.appendChild(langEl);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    paint(btn, false);
+    btn.addEventListener('click', function () {
+      var text = codeText(fig);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn, 'ok'); },
+          function () { flash(btn, legacyCopy(text) ? 'ok' : 'fail'); });
+      } else {
+        flash(btn, legacyCopy(text) ? 'ok' : 'fail');
+      }
+    });
+    bar.appendChild(btn);
+    box.insertBefore(bar, fig);
+
+    // 超长代码折叠：默认只露 20 行。不折叠的话一段两百行的日志能把整篇的滚动条吃光。
+    var lines = fig.querySelectorAll('td.code .line');
+    if (lines.length > 20) {
+      box.classList.add('is-foldable', 'is-folded');
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'code-more';
+      function paintMore(folded) {
+        more.innerHTML = folded
+          ? zh('展开全部 ' + lines.length + ' 行') + en('Expand all ' + lines.length + ' lines')
+          : zh('收起') + en('Collapse');
+      }
+      paintMore(true);
+      more.addEventListener('click', function () {
+        // toggle 返回「切换后是否还带着这个 class」，正好就是折叠状态
+        paintMore(box.classList.toggle('is-folded'));
+      });
+      box.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- 全站 ⌘K 搜索：正文级索引（search.json 按需拉取）。
+     专栏页 /ai-tools/ 自带一份「搜工具」的面板，这里让位，不抢同一个快捷键。 -->
+<script>
+(function () {
+  if (document.body.classList.contains('layout-ai-tools')) return;
+
+  var INDEX_URL = '/search.json';
+  var KEY = 'site-search-index';
+  var pal, scrim, input, list, idx = null, loading = false;
+  var rows = [], active = -1, lastFocus = null;
+
+  var L = {
+    ph:    function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Search articles, issues and body text…'
+             : '搜索文章、期号与正文…'; },
+    kind:  function (d) {
+      var en = document.documentElement.getAttribute('data-lang') === 'en';
+      if (d.k === 'issue' && d.i !== '') return en ? 'No. ' + d.i : '第 ' + d.i + ' 期';
+      if (d.k === 'page') return en ? 'Page' : '页面';
+      return en ? 'Post' : '文章';
+    },
+    empty: function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'No match.' : '没有匹配的结果。'; },
+    load:  function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Loading index…' : '索引加载中…'; }
+  };
+
+  function build() {
+    if (pal) return;
+    scrim = document.createElement('div');
+    scrim.className = 'aitools-palette-scrim';
+    scrim.id = 'site-palette-scrim';
+    scrim.hidden = true;
+
+    pal = document.createElement('div');
+    pal.className = 'aitools-palette';
+    pal.id = 'site-palette';
+    pal.setAttribute('role', 'dialog');
+    pal.setAttribute('aria-modal', 'true');
+    pal.setAttribute('aria-label', 'Site search');
+    pal.hidden = true;
+    pal.innerHTML =
+      '<div class="aitools-palette-search">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+          '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>' +
+          '<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>' +
+        '</svg>' +
+        '<input type="text" class="aitools-palette-input" id="site-palette-q" autocomplete="off" spellcheck="false">' +
+        '<kbd class="aitools-palette-esc">Esc</kbd>' +
+      '</div>' +
+      '<ul class="aitools-palette-list" id="site-palette-list" role="listbox"></ul>';
+
+    document.body.appendChild(scrim);
+    document.body.appendChild(pal);
+    input = document.getElementById('site-palette-q');
+    list = document.getElementById('site-palette-list');
+    input.placeholder = L.ph();
+
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', onNav);
+    scrim.addEventListener('click', close);
+  }
+
+  function loadIndex(cb) {
+    if (idx) return cb(idx);
+    try {
+      var cached = sessionStorage.getItem(KEY);
+      if (cached) { idx = JSON.parse(cached); return cb(idx); }
+    } catch (e) { /* 隐私模式 / 超配额：当成没缓存 */ }
+    if (loading) return;
+    loading = true;
+    msg(L.load());
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', INDEX_URL, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      loading = false;
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          idx = JSON.parse(xhr.responseText);
+          try { sessionStorage.setItem(KEY, xhr.responseText); } catch (e) {}
+          cb(idx);
+        } catch (e) { msg(L.empty()); }
+      } else {
+        msg(document.documentElement.getAttribute('data-lang') === 'en'
+            ? 'Index unavailable.' : '索引加载失败。');
+      }
+    };
+    xhr.send();
+  }
+
+  function msg(text) {
+    rows = []; active = -1;
+    list.innerHTML = '<li class="aitools-palette-empty"></li>';
+    list.firstChild.textContent = text;
+  }
+
+  // 命中位置：返回该词在文本里第一次出现的位置，找不到返回 -1
+  function firstHit(hay, w) { return hay.indexOf(w); }
+
+  function snippet(text, pos) {
+    var from = Math.max(0, pos - 42);
+    var to = Math.min(text.length, pos + 96);
+    return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+  }
+
+  function search(q) {
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var uiLang = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+    var out = [];
+    idx.docs.forEach(function (d) {
+      var t = (d.t || '').toLowerCase();
+      var de = (d.d || '').toLowerCase();
+      var x = (d.x || '').toLowerCase();
+      var score = 0, hitPos = -1, ok = true;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        var inT = t.indexOf(w), inD = de.indexOf(w), inX = x.indexOf(w);
+        if (inT < 0 && inD < 0 && inX < 0) { ok = false; break; }
+        score += (inT >= 0 ? 8 : 0) + (inD >= 0 ? 3 : 0) + (inX >= 0 ? 1 : 0);
+        if (hitPos < 0) hitPos = inX;
+      }
+      if (!ok) return;
+      if (d.l === uiLang) score += 2;
+      out.push({ d: d, score: score, pos: hitPos });
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out.slice(0, 12);
+  }
+
+  function draw() {
+    var q = input.value.trim();
+    list.innerHTML = '';
+    rows = []; active = -1;
+    if (!idx) { msg(L.load()); return; }
+    if (!q) { msg(document.documentElement.getAttribute('data-lang') === 'en'
+                   ? 'Type to search ' + idx.docs.length + ' pages.'
+                   : '输入关键词，共 ' + idx.docs.length + ' 篇可搜。'); return; }
+    var hits = search(q);
+    if (!hits.length) { msg(L.empty()); return; }
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    hits.forEach(function (h, n) {
+      var d = h.d;
+      var li = document.createElement('li');
+      li.className = 'aitools-palette-row';
+      li.setAttribute('role', 'option');
+
+      var kind = document.createElement('span');
+      kind.className = 'aitools-palette-kind';
+      kind.textContent = L.kind(d);
+
+      var box = document.createElement('span');
+      box.className = 'site-palette-main';
+      var name = document.createElement('span');
+      name.className = 'aitools-palette-name';
+      name.textContent = d.t;
+      box.appendChild(name);
+
+      // 摘要优先给正文命中那一段（标题命中时正文摘要意义不大，但仍给读者上下文）
+      var pos = h.pos;
+      if (pos < 0) {
+        for (var i = 0; i < words.length && pos < 0; i++) pos = firstHit((d.x || '').toLowerCase(), words[i]);
+      }
+      if (pos >= 0) {
+        var sn = document.createElement('span');
+        sn.className = 'site-palette-snippet';
+        markWords(sn, snippet(d.x, pos), words);
+        box.appendChild(sn);
+      }
+
+      li.appendChild(kind);
+      li.appendChild(box);
+      li.addEventListener('click', function () { go(n); });
+      list.appendChild(li);
+      rows.push({ li: li, url: d.u });
+    });
+    setActive(0);
+  }
+
+  // 用 DOM 拼接而不是 innerHTML：关键词来自用户输入，不能进 HTML 解析
+  function markWords(el, text, words) {
+    var low = text.toLowerCase();
+    var marks = [];
+    words.forEach(function (w) {
+      if (w.length < 1) return;
+      var from = 0, p;
+      while ((p = low.indexOf(w, from)) !== -1) { marks.push([p, p + w.length]); from = p + w.length; }
+    });
+    if (!marks.length) { el.textContent = text; return; }
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var cur = 0;
+    marks.forEach(function (m) {
+      if (m[0] < cur) return;
+      if (m[0] > cur) el.appendChild(document.createTextNode(text.slice(cur, m[0])));
+      var k = document.createElement('mark');
+      k.className = 'aitools-hl';
+      k.textContent = text.slice(m[0], m[1]);
+      el.appendChild(k);
+      cur = m[1];
+    });
+    if (cur < text.length) el.appendChild(document.createTextNode(text.slice(cur)));
+  }
+
+  function setActive(n) {
+    if (!rows.length) return;
+    if (active >= 0 && rows[active]) rows[active].li.classList.remove('is-active');
+    active = (n + rows.length) % rows.length;
+    rows[active].li.classList.add('is-active');
+    rows[active].li.scrollIntoView({ block: 'nearest' });
+  }
+
+  function go(n) {
+    var words = input.value.trim();
+    var url = '/' + rows[n].url;
+    if (words) url += (url.indexOf('?') === -1 ? '?' : '&') + 'hl=' + encodeURIComponent(words);
+    window.location.href = url;
+  }
+
+  function onNav(e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (rows.length) go(active < 0 ? 0 : active); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  }
+
+  function open() {
+    build();
+    lastFocus = document.activeElement;
+    scrim.hidden = false;
+    pal.hidden = false;
+    document.body.classList.add('aitools-palette-open');
+    window.requestAnimationFrame(function () { scrim.classList.add('is-open'); pal.classList.add('is-open'); });
+    input.placeholder = L.ph();
+    input.value = '';
+    draw();
+    loadIndex(function () { draw(); });
+    input.focus();
+  }
+
+  function close() {
+    if (!pal) return;
+    scrim.classList.remove('is-open');
+    pal.classList.remove('is-open');
+    document.body.classList.remove('aitools-palette-open');
+    scrim.hidden = true;
+    pal.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!pal || pal.hidden) open(); else close();
+      return;
+    }
+    // 文章页的「/」也留给搜索：正文页没有专栏页那套列表快捷键，不冲突
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && (!pal || pal.hidden)) {
+      var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      open();
+    }
+  });
+
+  var trigger = document.getElementById('nav-search');
+  if (trigger) trigger.addEventListener('click', open);
+})();
+</script>
+
+<!-- 从搜索结果跳进来时高亮正文命中：?hl=关键词，标出第一处并滚过去。
+     用完就把参数从地址栏抹掉，免得分享出去的链接自带一个高亮。 -->
+<script>
+(function () {
+  var q;
+  try { q = new URLSearchParams(location.search).get('hl'); } catch (e) { return; }
+  if (!q) return;
+  var body = document.querySelector('.post-content');
+  if (!body) return;
+
+  var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+  if (!words.length) return;
+
+  var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentNode;
+      // 代码块和高亮脚本里不插 mark：会破坏缩进，也可能被复制走
+      while (p && p !== body) {
+        var tag = p.nodeName ? p.nodeName.toLowerCase() : '';
+        if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'mark') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  var node, hit = null;
+  while ((node = walker.nextNode())) {
+    var low = node.nodeValue.toLowerCase();
+    for (var i = 0; i < words.length; i++) {
+      var at = low.indexOf(words[i]);
+      if (at !== -1) { hit = { node: node, at: at, len: words[i].length }; break; }
+    }
+    if (hit) break;
+  }
+
+  if (hit) {
+    var k = document.createElement('mark');
+    k.className = 'search-hl';
+    k.textContent = hit.node.nodeValue.substr(hit.at, hit.len);
+    hit.node.splitText(hit.at);
+    hit.node.nextSibling.parentNode.insertBefore(k, hit.node.nextSibling);
+    if (k.scrollIntoView) k.scrollIntoView({ block: 'center' });
+  }
+
+  try {
+    var p = new URLSearchParams(location.search);
+    p.delete('hl');
+    var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>

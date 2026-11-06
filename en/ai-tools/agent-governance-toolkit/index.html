@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
+      var pageTitle = "Agent Governance Toolkit: from \"asking AI to behave\" to \"making it structurally incapable of misbehaving\"";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34; | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085457" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085457" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/" />
+  
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/agent-governance-toolkit/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34; | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/agent-governance-toolkit-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34; | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/agent-governance-toolkit-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-09-28T07:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-09-28T07:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085457" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/"},"headline":"Agent Governance Toolkit: from \"asking AI to behave\" to \"making it structurally incapable of misbehaving\"","name":"Agent Governance Toolkit: from \"asking AI to behave\" to \"making it structurally incapable of misbehaving\"","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","image":"https://we5ter.github.io/images/banners/agent-governance-toolkit-banner.jpg","inLanguage":"en","datePublished":"2026-09-28T07:00:00.000Z","dateModified":"2026-09-28T07:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-aisec-item">
+            
+            <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="“全网最全”AI安全知识图谱">
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
+              <span class="i18n-zh">AI安全知识图谱</span>
+              <span class="i18n-en">AI Security KG</span>
+            </a>
+          </li>
+          <li class="masthead__menu-item nav-ai-item">
+            
+            <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">每日 AI 工具</span>
+              <span class="i18n-en">Daily AI Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            
+            
+            <button class="nav-search" id="nav-search" type="button"
+                    title="Search / 搜索 (⌘K)" aria-label="Search / 搜索">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+              <kbd class="nav-search-kbd">⌘K</kbd>
+            </button>
+            
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="WeChat QR code">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="WeChat QR code">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="WeChat QR code" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+
+<aside class="post-toc" id="post-toc" hidden>
+  <details class="post-toc-inner" id="post-toc-inner" open>
+    <summary class="post-toc-title">
+      <span class="i18n-zh">本页目录</span><span class="i18n-en">On this page</span>
+    </summary>
+    <nav class="post-toc-nav" id="post-toc-nav" aria-label="Table of contents"></nav>
+    
+    <div class="post-toc-qr">
+      <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="112" height="112" loading="lazy" decoding="async">
+      <span class="post-toc-qr-name">Wester的AI安全札记</span>
+      <span class="post-toc-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+    </div>
+    
+  </details>
+</aside>
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/agent-governance-toolkit-banner.jpg)">
+    <h1 class="post-title">Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34;</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-28">
+        <span class="i18n-zh">2026年9月28日</span>
+        <span class="i18n-en">Sep 28, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 48 分钟</span><span class="i18n-en">48 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/agent-governance-toolkit/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="1-At-a-Glance"><a href="#1-At-a-Glance" class="headerlink" title="1. At a Glance"></a>1. At a Glance</h2><p>★★★★☆ (4&#x2F;5). Microsoft’s <strong>runtime governance suite for AI agents</strong> — a <strong>deterministic gate</strong> in front of every tool call, making denied actions <strong>structurally impossible</strong> rather than merely unlikely.</p>
+<p><strong>What it doesn’t do:</strong> it does not scan your code, does not grade your configuration, and does not try to win the jailbreak fight inside the prompt. The README states the thesis outright: <em>“Prompt-level safety is not a control surface. It is a polite request to a stochastic system.”</em></p>
+<p><strong>Where the missing star goes</strong> (section 7 has the full list):</p>
+<ul>
+<li><strong>Public Preview with only seven months of history</strong> — v4.1.0 just collapsed 45 packages into 5 distributions, so the API is still drifting</li>
+<li><strong>The default is <code>allow</code> when no policies are loaded</strong> — governance fails silently while the dashboard still reports “governed”</li>
+<li><strong>The <code>kill switch</code> doesn’t kill processes in the Go SDK</strong> — it is a cooperative circuit breaker, and its semantics differ across SDKs</li>
+</ul>
+<p><strong>Verdict:</strong> enterprise security and platform teams — the most complete compliance mapping in open source today, run a PoC now. Personal projects — built for enterprise governance; don’t.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Primary language</td>
+<td>Python (3.11+; the Prerequisites section says 3.10+)</td>
+</tr>
+<tr>
+<td>License</td>
+<td>MIT — core packages carry <strong>zero Azure&#x2F;Microsoft dependencies</strong>, runnable offline and air-gapped</td>
+</tr>
+<tr>
+<td>Stars &#x2F; Forks</td>
+<td>6,351 &#x2F; 1,132</td>
+</tr>
+<tr>
+<td>Open issues &#x2F; watchers</td>
+<td>82 &#x2F; 91</td>
+</tr>
+<tr>
+<td>First commit</td>
+<td>2026-03-02</td>
+</tr>
+<tr>
+<td>Last push</td>
+<td>2026-09-28 (PR numbers already at #4168)</td>
+</tr>
+<tr>
+<td>Commits</td>
+<td>2,751 (~7 months, ~13&#x2F;day)</td>
+</tr>
+<tr>
+<td>Release status</td>
+<td><strong>Public Preview</strong>; latest release <strong>v4.1.0 (2026-06-09)</strong></td>
+</tr>
+<tr>
+<td>Repository size</td>
+<td>~46 MB</td>
+</tr>
+<tr>
+<td>Language SDKs</td>
+<td>Python (full stack) &#x2F; TypeScript &#x2F; .NET &#x2F; Rust &#x2F; Go (the latter four: core only — policy, identity, trust, audit)</td>
+</tr>
+<tr>
+<td>Specs &amp; tests</td>
+<td>10 RFC 2119 specifications, <strong>992 conformance tests</strong>, 29 ADRs, 60+ tutorials</td>
+</tr>
+<tr>
+<td>Compliance mapping</td>
+<td>OWASP Agentic Top 10 &#x2F; NIST AI RMF 1.0 &#x2F; EU AI Act &#x2F; SOC 2 &#x2F; <strong>AARM R1–R9</strong> &#x2F; <strong>ATF (all five elements)</strong></td>
+</tr>
+<tr>
+<td>Policy evaluation cost</td>
+<td>&lt;0.1 ms (single process, full overhead); 5–50 ms in a multi-agent mesh</td>
+</tr>
+<tr>
+<td>URL</td>
+<td><a target="_blank" rel="noopener" href="https://github.com/microsoft/agent-governance-toolkit">https://github.com/microsoft/agent-governance-toolkit</a></td>
+</tr>
+</tbody></table>
+<p><strong>Who it’s for</strong> (out of 5):</p>
+<table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Score</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Enterprise security &#x2F; CISO &#x2F; GRC</td>
+<td>5</td>
+<td>The only open-source project that turns six standards — OWASP Agentic Top 10, NIST AI RMF, EU AI Act, SOC 2, AARM and ATF — into <strong>exportable evidence</strong>. <code>agt verify --evidence --strict</code> gates CI directly, and the audit chain is Merkle-structured with a Decision BOM</td>
+</tr>
+<tr>
+<td>Agent application developers</td>
+<td>4</td>
+<td>Two-line <code>govern()</code> onboarding and 14 framework integrations (AutoGen, LangGraph, CrewAI, Semantic Kernel, OpenAI Agents, Claude Code, Dify…). The cost is writing YAML policy and understanding verdict semantics</td>
+</tr>
+<tr>
+<td>Platform &#x2F; SRE teams</td>
+<td>4</td>
+<td>Agent SRE is the real deal: kill switch, SLOs, error budgets, chaos testing, circuit breakers. But kill switch semantics differ across SDKs (section 7) — do not treat it as a life-saving guarantee</td>
+</tr>
+<tr>
+<td>Red team &#x2F; offensive security</td>
+<td>3</td>
+<td><code>agt red-team scan --min-grade B</code> runs a 12-vector prompt injection audit and the MCP Security Gateway catches tool poisoning, drift and typosquatting. But this is a <strong>defensive</strong> tool; attack surface mapping is still manual work</td>
+</tr>
+<tr>
+<td>Individuals &#x2F; small projects</td>
+<td>2</td>
+<td>Designed for enterprise governance. The docs say so themselves: the full stack (mesh identity, execution rings, SRE) is overkill for simple cases. Use the minimal <code>AgentControl.from_path()</code> path instead</td>
+</tr>
+</tbody></table>
+<p><strong>Building on it</strong> (MIT, three tiers):</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>What you do</th>
+<th>Difficulty</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Configuration</td>
+<td>Write YAML policy (<code>block-destructive</code>, <code>require_approval</code>, <code>blocked_patterns</code>), plug in a framework adapter</td>
+<td>Low, under an hour</td>
+</tr>
+<tr>
+<td>Integration</td>
+<td>Embed core governance via the TypeScript&#x2F;.NET&#x2F;Rust&#x2F;Go SDKs into your own platform; wire up the MCP Security Gateway</td>
+<td>Medium — read the relevant spec and its conformance tests</td>
+</tr>
+<tr>
+<td>Kernel</td>
+<td>Touch the Rust ACS policy runtime, privilege rings, Merkle audit, cross-SDK DID standardization</td>
+<td>High — 10 RFC 2119 specs and 29 ADRs of prerequisite reading</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="2-What-It-Is-What-It-Isn’t"><a href="#2-What-It-Is-What-It-Isn’t" class="headerlink" title="2. What It Is, What It Isn’t"></a>2. What It Is, What It Isn’t</h2><p><strong>Not</strong> a prompt guardrail (it does not ask the LLM to “please follow the rules”). <strong>Not</strong> model safety or content moderation (it does not judge hallucinations or harmful content). <strong>Not</strong> OS-kernel-level isolation — the docs state plainly that the policy engine and the agents share the same process boundary, and recommend one container per agent in production. <strong>Not</strong> a managed cloud service (it is a framework-agnostic library). <strong>Not</strong> a turnkey compliance solution — the official framing is <em>enforcement infrastructure</em>.</p>
+<p>The one-line positioning: <em>Policy enforcement, identity, sandboxing, and SRE for autonomous AI agents. One <code>pip install</code>, any framework.</em></p>
+<p>Four keywords: <strong>deterministic</strong> (not probabilistic), <strong>fail-closed</strong> (evaluation errors deny), <strong>tamper-evident audit</strong> (Merkle), and <strong>layered and optional</strong> (each layer installs independently; most teams run policy + audit and nothing else).</p>
+<p>The README frames the problem through three questions, and this framing is, in my view, the most worth-stealing part of the whole project:</p>
+<ol>
+<li><strong>Is this action allowed?</strong> OAuth scopes and IAM roles govern <em>which services</em> an agent can reach, not <em>what it does once connected</em>. An agent with <code>send_email</code> and <code>query_database</code> should not be able to <code>drop_table</code>.</li>
+<li><strong>Which agent did this?</strong> When five agents share one API key, “an agent did it” is not an incident response.</li>
+<li><strong>Can you prove what happened?</strong> Auditors and regulators need tamper-evident records: which policy was active, what the agent requested, why it was allowed or denied.</li>
+</ol>
+<p>It backs the thesis with three hard references: Andriushchenko et al. (ICLR 2025) report a <strong>100% attack success rate</strong> against GPT-4o, GPT-3.5, Claude 3 and Llama-3 on JailbreakBench using adaptive attacks with logprob access and suffix optimization; OWASP LLM01:2025 states outright that <em>“it is unclear if there are fool-proof methods of prevention for prompt injection”</em>; and Microsoft’s own AI Red Teaming Agent formalizes <strong>Attack Success Rate (ASR)</strong> as the canonical metric for this failure class. The conclusion: model-layer defenses are probabilistic by construction, so <strong>don’t fight there</strong>.</p>
+<hr>
+<h2 id="3-The-Four-Layers"><a href="#3-The-Four-Layers" class="headerlink" title="3. The Four Layers"></a>3. The Four Layers</h2><p>The official pipeline is <code>Agent → Policy Engine → Identity → Audit Log</code>, with every layer optional.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Package</th>
+<th>What it does</th>
+<th>Key mechanism</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Policy enforcement</strong></td>
+<td>Agent OS + <strong>Agent Control Specification</strong> (Rust core)</td>
+<td>Evaluates every tool call before it happens</td>
+<td>Stateless, deterministic, <strong>fail-closed</strong>; four verdicts: allow &#x2F; deny &#x2F; transform &#x2F; require_approval</td>
+</tr>
+<tr>
+<td><strong>Zero-trust identity</strong></td>
+<td>Agent Mesh</td>
+<td>Who is calling, and how much to trust them</td>
+<td>SPIFFE &#x2F; DID &#x2F; mTLS, Ed25519 signatures, trust scoring, delegation chains</td>
+</tr>
+<tr>
+<td><strong>Execution sandboxing</strong></td>
+<td>Agent Runtime</td>
+<td>Where it runs, what it can touch</td>
+<td><strong>Four privilege rings</strong>, saga orchestration, command denylist</td>
+</tr>
+<tr>
+<td><strong>Reliability engineering</strong></td>
+<td>Agent SRE</td>
+<td>How you recover when it breaks</td>
+<td>Kill switch, SLOs, error budgets, chaos testing, circuit breakers</td>
+</tr>
+</tbody></table>
+<p>Five cross-cutting capabilities sit alongside, and two of them have more immediate value than the main layers:</p>
+<ul>
+<li><strong>MCP Security Gateway</strong> — tool poisoning detection, configuration drift monitoring, typosquatting, hidden-instruction scanning (127 conformance tests). MCP is the de facto standard of the agent ecosystem and where the attack surface concentrates; this is one of the few targeted open-source answers.</li>
+<li><strong>Shadow AI Discovery</strong> — finds <strong>unregistered agents</strong> across processes, configs and repos. For most enterprises, the actual starting point of agent governance is “we don’t know how many agents are running,” and this hits it directly.</li>
+<li>Plus a Governance Dashboard (Streamlit fleet view), <strong>PromptDefense Evaluator</strong> (12-vector prompt injection audit), and Contributor Reputation (PR&#x2F;issue author screening for social engineering, shipped as a reusable GitHub Action).</li>
+</ul>
+<p>Policy reads plainly:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">governance.toolkit/v1</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">production-policy</span></span><br><span class="line"><span class="attr">default_action:</span> <span class="string">allow</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">block-destructive</span></span><br><span class="line">    <span class="attr">condition:</span> <span class="string">&quot;action.type in [&#x27;drop&#x27;, &#x27;delete&#x27;, &#x27;truncate&#x27;]&quot;</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">deny</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">require-approval-for-send</span></span><br><span class="line">    <span class="attr">condition:</span> <span class="string">&quot;action.type == &#x27;send_email&#x27;&quot;</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">require_approval</span></span><br><span class="line">    <span class="attr">approvers:</span> [<span class="string">&quot;security-team&quot;</span>]</span><br></pre></td></tr></table></figure>
+
+<p>And the denial carries the rule name rather than a vague refusal:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GovernanceDenied: Action denied by policy rule <span class="string">&#x27;block-destructive&#x27;</span>:</span><br><span class="line">  Destructive operations require human approval</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-Architecture-How-Two-Lines-Become-a-Gate"><a href="#4-Architecture-How-Two-Lines-Become-a-Gate" class="headerlink" title="4. Architecture: How Two Lines Become a Gate"></a>4. Architecture: How Two Lines Become a Gate</h2><p>The core is the <code>govern()</code> wrapper:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> agentmesh.governance <span class="keyword">import</span> govern</span><br><span class="line">safe_tool = govern(my_tool, policy=<span class="string">&quot;policy.yaml&quot;</span>)   <span class="comment"># every call: evaluate + audit + raise on violation</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>The interception point sits in deterministic application code, before the model’s intent reaches the wire.</strong> That single sentence carries the entire value proposition: it demotes “will the agent misbehave” from a model-behavior question to a function return value. A cleverly worded prompt does not change what the policy engine decides.</p>
+<p>Underneath sits <strong>ACS (Agent Control Specification)</strong> — a stateless, deterministic, fail-closed policy decision runtime with a Rust core. It backs the verdict semantics of the whole policy layer and also provides the minimal onboarding path, <code>AgentControl.from_path(&quot;manifest.yaml&quot;)</code>, which needs neither mesh nor identity.</p>
+<p>On the audit side: a <strong>Merkle audit chain plus a Decision BOM</strong> (157 conformance tests), recording which policy was in force, what the agent requested, and the verdict. Note the boundary documented in section 2 of LIMITATIONS.md: it records <strong>attempts, not outcomes</strong>. Section 7 expands on that.</p>
+<p>The performance accounting is unusually honest — it does not lead with the flattering number:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Typical latency</th>
+<th>When it applies</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Policy evaluation</td>
+<td>&lt;0.1 ms</td>
+<td>Every action</td>
+</tr>
+<tr>
+<td>Ed25519 signature verification</td>
+<td>1–3 ms</td>
+<td>Inter-agent messages</td>
+</tr>
+<tr>
+<td>Trust score lookup</td>
+<td>&lt;1 ms</td>
+<td>Inter-agent messages</td>
+</tr>
+<tr>
+<td>IATP handshake (first contact)</td>
+<td>10–50 ms</td>
+<td>First message between two agents</td>
+</tr>
+<tr>
+<td>Network round-trip (mesh)</td>
+<td>1–10 ms</td>
+<td>Distributed deployments only</td>
+</tr>
+</tbody></table>
+<p>For single-agent, single-process deployments, &lt;0.1 ms <em>is</em> the full overhead. In a multi-agent mesh, expect 5–50 ms per governed interaction, and note that the dominant cost is <strong>cryptographic verification and network latency, not the policy engine</strong>.</p>
+<hr>
+<h2 id="5-Compliance-and-Specifications-The-Real-Moat"><a href="#5-Compliance-and-Specifications-The-Real-Moat" class="headerlink" title="5. Compliance and Specifications: The Real Moat"></a>5. Compliance and Specifications: The Real Moat</h2><p>Six standards, all turned into exportable evidence, each backed by an RFC 2119 specification and conformance tests:</p>
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Coverage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OWASP Agentic AI Top 10</td>
+<td>All ASI risk categories mapped to deterministic controls</td>
+</tr>
+<tr>
+<td>NIST AI RMF 1.0</td>
+<td>Full GOVERN &#x2F; MAP &#x2F; MEASURE &#x2F; MANAGE alignment</td>
+</tr>
+<tr>
+<td>EU AI Act</td>
+<td>Compliance mapping with automated evidence</td>
+</tr>
+<tr>
+<td>SOC 2</td>
+<td>Control mapping with audit trail export</td>
+</tr>
+<tr>
+<td><strong>AARM Extended</strong></td>
+<td>All R1–R9 satisfied; verified 2026-06-14</td>
+</tr>
+<tr>
+<td><strong>ATF</strong></td>
+<td>All five elements mapped: Agent Mesh (identity), Agent OS (policy), Agent Compliance (governance), Agent Runtime (sandboxing), Agent SRE (incident response)</td>
+</tr>
+</tbody></table>
+<p>The CLI turns compliance into a CI gate:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">agt verify                                          <span class="comment"># OWASP compliance check</span></span><br><span class="line">agt verify --evidence ./agt-evidence.json --strict   <span class="comment"># fail CI on weak evidence</span></span><br><span class="line">agt red-team scan ./prompts/ --min-grade B           <span class="comment"># prompt injection audit</span></span><br><span class="line">agt lint-policy policies/                            <span class="comment"># validate policy files</span></span><br><span class="line">agt doctor                                           <span class="comment"># installation self-check</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>992 conformance tests, 10 specifications, 29 ADRs</strong> — a number that leads the open-source agent governance field by a wide margin. The engineering discipline is itself a signal: CodeQL (Python + TypeScript SAST), Gitleaks (secret scanning on PR&#x2F;push&#x2F;weekly), <strong>ClusterFuzzLite with seven fuzz targets</strong> (policy, injection, MCP, sandbox, trust), Dependabot across 13 ecosystems, and weekly OpenSSF Scorecard scoring with SARIF upload.</p>
+<p><strong>One inconsistency worth flagging:</strong> the repository description says <em>“Covers 10&#x2F;10 OWASP Agentic Top 10”</em> while the README badge says <strong>“7 Full, 3 Partial”</strong>, with no reconciliation between them. Trust the badge: seven of ten fully covered, three partially.</p>
+<hr>
+<h2 id="6-Deployment-and-Integration"><a href="#6-Deployment-and-Integration" class="headerlink" title="6. Deployment and Integration"></a>6. Deployment and Integration</h2><p>One line, and use the <code>[full]</code> extra — the base wheel installs only the compliance CLI:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install <span class="string">&quot;agent-governance-toolkit[full]&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>v4.1.0 <strong>consolidated 45 packages into 5 distributions</strong>, the largest structural change to date: <code>-core</code> (policy engine, capability model, audit, MCP gateway, zero-trust identity, trust scoring, A2A&#x2F;MCP&#x2F;IATP bridges), <code>-runtime</code> (privilege rings, saga orchestration, termination control, command denylist), <code>-sre</code> (SLOs, error budgets, chaos, circuit breakers), <code>-cli</code> (the <code>agt</code> command, OWASP verification, policy linting), and <code>[full]</code> as the meta-package. Legacy names (<code>agent-os-kernel</code>, <code>agentmesh-platform</code>, <code>agent-sre</code>, and others) remain installable as stubs that redirect.</p>
+<p><strong>Note that <code>agent_os</code> is deprecated</strong>: importing it emits a <code>DeprecationWarning</code>, and the replacement is <code>agent-governance-toolkit-core</code>. The pre-v4 <code>agent_os.policies</code> rule model is gone; <code>BREAKING_CHANGES.md</code> lists replacements.</p>
+<p>Five language packages:</p>
+<table>
+<thead>
+<tr>
+<th>Language</th>
+<th>Package</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python</td>
+<td><code>agent-governance-toolkit</code></td>
+<td><code>pip install &quot;agent-governance-toolkit[full]&quot;</code></td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td><code>@microsoft/agent-governance-sdk</code></td>
+<td><code>npm install @microsoft/agent-governance-sdk</code></td>
+</tr>
+<tr>
+<td>.NET</td>
+<td><code>Microsoft.AgentGovernance</code></td>
+<td><code>dotnet add package Microsoft.AgentGovernance</code></td>
+</tr>
+<tr>
+<td>Rust</td>
+<td><code>agent-governance</code></td>
+<td><code>cargo add agent-governance</code></td>
+</tr>
+<tr>
+<td>Go</td>
+<td><code>agent-governance-toolkit</code></td>
+<td><code>go get .../agent-governance-golang</code></td>
+</tr>
+</tbody></table>
+<p>Fourteen framework integrations: Microsoft Agent Framework (native middleware), Semantic Kernel (native, .NET + Python), AutoGen &#x2F; LangGraph &#x2F; LangChain &#x2F; CrewAI &#x2F; Mastra &#x2F; Google ADK (adapters), OpenAI Agents SDK &#x2F; LlamaIndex (middleware), Haystack (pipeline), Dify (plugin), Azure AI Foundry (deployment guide). <strong>Claude Code and GitHub Copilot CLI are first-party developer surfaces</strong> built on the TypeScript SDK:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/plugin marketplace add microsoft/agent-governance-toolkit</span><br><span class="line">/plugin install agt-governance@agent-governance-toolkit</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-Boundaries-and-Risks"><a href="#7-Boundaries-and-Risks" class="headerlink" title="7. Boundaries and Risks"></a>7. Boundaries and Risks</h2><p>This chapter carries more weight than the others, because <code>docs/LIMITATIONS.md</code> is the <strong>most honest self-disclosure document</strong> I have seen in an open-source project: 408 lines, 13 boundaries, each with “how to mitigate today” and “what we’re building,” and it reproduces external criticism verbatim with links. The six that matter most:</p>
+<p><strong>① It governs actions, not reasoning.</strong> If policy allows both <code>read_database</code> and <code>send_slack_message</code>, an agent can read your customer list and post it to a public channel — <strong>both actions individually permitted</strong>. Worse, there is a cross-session variant: attack state carried by persistent memory or persistent tools (notes, files, calendar) crosses session boundaries under permission isolation, so every session looks compliant while the full attack chain only resolves across the session sequence. Dai et al. (preprint, 2026-05) report <strong>80–95% attack success rates</strong> across four base models under supply-chain SFT delivery. The docs concede this is <strong>not closed today</strong> (workflow-level policies are on the roadmap).</p>
+<p><strong>② The default is <code>allow</code> when no policies are loaded.</strong> The most silent-failure-prone item on the list: when the policy evaluator has <strong>no policies loaded, the default action is <code>allow</code></strong>, and misusing <code>permissive</code> mode does the same. A developer who imports the governance layer but forgets to load policy files sees a dashboard reporting “governed” while zero rules are enforced. Credit where due: <strong>on runtime errors during evaluation, AGT fails closed (denies)</strong> — the direction is right. Mitigation: run <code>strict</code> mode in production (deny-by-default, requiring an explicit allow for every permitted action) and use <code>agt audit</code> to inspect what is actually loaded. This item came from external red-teaming — <a target="_blank" rel="noopener" href="https://www.periculo.co.uk/cyber-security-blog/red-teaming-the-microsoft-agent-governance-toolkit-15-bypass-vectors">Periculo reported 15 bypass vectors</a>.</p>
+<p><strong>③ The audit trail records attempts, not outcomes.</strong> An agent calls a web API that returns 200 with stale data; the audit chain still records “action allowed, executed” even though the agent’s goal was not achieved. For a project whose stated goal is “can you prove what happened,” that is a material gap. Mitigation today: SRE SLOs plus application-level result validation; post-action verification hooks are in progress.</p>
+<p><strong>④ Knowledge governance is missing.</strong> AGT does not govern <strong>the knowledge agents consume</strong> — not the provenance, freshness or authorization of documents, databases or embeddings retrieved during reasoning. An agent retrieves a confidential HR document (policy permits), summarizes it into a Slack message (policy permits); both actions are governed, but <strong>the knowledge flow — confidential data reaching an unauthorized channel — is invisible to AGT</strong>. From <a target="_blank" rel="noopener" href="https://www.mojar.ai/blog/industry-news/microsoft-agent-governance-toolkit-missing-knowledge-layer">external analysis by Mojar AI</a>.</p>
+<p><strong>⑤ Kill switch semantics differ across SDKs — the easiest one to misread.</strong> “Kill switch” does not currently describe a single cross-SDK termination contract. A recorded kill is not by itself proof that a process stopped:</p>
+<table>
+<thead>
+<tr>
+<th>Behavior</th>
+<th>Python</th>
+<th>TypeScript</th>
+<th>Go</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Model</td>
+<td>Registered termination callback plus step handoff&#x2F;compensation</td>
+<td>Registered termination handlers plus compensation handlers</td>
+<td><strong>Scoped cooperative allow&#x2F;deny registry</strong></td>
+</tr>
+<tr>
+<td>Termination success signal</td>
+<td><code>KillResult.terminated</code></td>
+<td><code>KillSwitchResult.terminated</code> (handlers completed within budget; no independent process confirmation)</td>
+<td><strong>None</strong> — <code>KillSwitchDecision.Allowed</code> describes permission, not process termination</td>
+</tr>
+<tr>
+<td>Stops a non-cooperating execution</td>
+<td>Only if the registered callback stops it</td>
+<td>Only if a registered handler stops it</td>
+<td><strong>No</strong> — the consumer must consult <code>DecisionFor()</code></td>
+</tr>
+</tbody></table>
+<p>There is an extra trap in Python: after a failed or timed-out kill attempt, <strong>the target’s callback registration is removed unconditionally</strong>, so you must re-register the agent before retrying. <strong>Do not treat the kill switch as a life-saving guarantee.</strong> It is cooperative.</p>
+<p><strong>⑥ Credential persistence is unmanaged.</strong> AGT does not track which API keys, OAuth tokens or secrets an agent currently holds, does not revoke credentials at task boundaries within a session, and does not detect credential accumulation beyond what the current task needs. An agent receives an email token for Task A, moves to Task B which needs no email access, and the token persists — so a compromise during Task B hands the attacker email access that should have expired.</p>
+<p>The remaining seven: <strong>performance framing</strong> (the &lt;0.1 ms figure measures the policy engine only, excluding distributed overhead); <strong>complexity spectrum</strong> (full stack is overkill for simple cases); <strong>vendor independence</strong> (MIT with zero Azure dependencies — actually a strength); <strong>physical AI is out of scope</strong> (no hardware kill switches, force limiting or actuator safety interlocks, and real-time control loops under 10 ms may not tolerate the full governance stack); <strong>no continuous assurance over streaming data</strong> (it governs the subscribe action, not message-level quality); <strong>DID method inconsistency across SDKs</strong> (Python&#x2F;.NET use <code>did:mesh:*</code>, TypeScript&#x2F;Rust&#x2F;Go use <code>did:agentmesh:*</code>, so <strong>prefix-matching policies silently miss half your fleet</strong> — mitigate with <code>did:*</code> wildcards or normalize at the application boundary); and <strong>application layer, not kernel layer</strong> (the policy engine shares a process with the agents, so production requires one container per agent).</p>
+<p>The official positioning is clear-eyed: <strong>AGT is one layer in a defense-in-depth strategy, not the entire strategy.</strong> Model safety (Azure AI Content Safety, Llama Guard) filters inputs and outputs; AGT enforces actions; the application layer validates business logic; the infrastructure layer (containers, network policy, IAM) catches escape attempts.</p>
+<hr>
+<h2 id="8-Getting-Started"><a href="#8-Getting-Started" class="headerlink" title="8. Getting Started"></a>8. Getting Started</h2><ol>
+<li><code>pip install &quot;agent-governance-toolkit[full]&quot;</code> (Python 3.11+), then run <code>agt doctor</code> — it also confirms that no installed package requires cloud connectivity.</li>
+<li>Take the <strong>minimal path</strong> before considering the full stack: <code>AgentControl.from_path(&quot;policies/manifest.yaml&quot;)</code> gives native ACS policy evaluation with no mesh or identity dependency. Most teams stop here.</li>
+<li>Start with <strong>three rules</strong>: one deny for destructive operations (drop&#x2F;delete&#x2F;truncate), one <code>require_approval</code> for outbound actions (send_email), one <code>blocked_patterns</code> regex to catch PII. Don’t build out a full rule table on day one.</li>
+<li>Always run <strong><code>strict</code> mode in production</strong> (deny-by-default). It is the only configuration that defends against “no policies loaded → silent allow.”</li>
+<li>Pick your integration: adapters for AutoGen &#x2F; LangGraph &#x2F; CrewAI, middleware for OpenAI Agents &#x2F; LlamaIndex, native for Semantic Kernel. Nine examples ship in <code>examples/</code>, including multi-agent role-based policy with CrewAI, a trust-verified MCP server, and Kubernetes agent-sandbox with pre-dispatch command policy.</li>
+<li><strong>Pin <code>agt verify --evidence ./agt-evidence.json --strict</code> and <code>agt lint-policy policies/</code> into CI.</strong> Policy files deserve the same review process as code.</li>
+<li><strong>On Claude Code:</strong> <code>/plugin marketplace add microsoft/agent-governance-toolkit</code> then <code>/plugin install agt-governance@agent-governance-toolkit</code> — one command to a governed plugin.</li>
+<li>Deployment shape: one container per agent (the official production recommendation). Azure &#x2F; AWS &#x2F; GCP &#x2F; Docker Compose all documented. Air-gapped environments work: core packages have zero cloud dependencies, and all governance state uses standard formats (YAML, JSON, Ed25519 keys) — no proprietary lock-in.</li>
+<li><strong>Read <code>docs/LIMITATIONS.md</code> before you ship</strong> (408 lines, 13 boundaries) plus <code>docs/security/threat-model.md</code>. That document deserves to be read before the README.</li>
+</ol>
+<hr>
+<h2 id="9-The-One-Line-Verdict"><a href="#9-The-One-Line-Verdict" class="headerlink" title="9. The One-Line Verdict"></a>9. The One-Line Verdict</h2><p><strong>The most disciplined and most completely compliance-mapped open-source answer to “how do I govern AI agents at runtime” right now</strong> — 992 conformance tests, 10 RFC 2119 specifications, 29 ADRs, exportable evidence for six standards, and a self-disclosure document that reproduces external red-team criticism verbatim. That honesty alone earns a star. The missing star is equally clear: <strong>Public Preview with seven months of history and a v4.1.0 that just collapsed 45 packages into 5</strong> (the API is still drifting); <strong>the default is <code>allow</code> when no policies are loaded, so governance can fail silently</strong>; the <strong>kill switch does not kill processes in the Go SDK</strong> and its semantics differ across SDKs; plus three material blanks — actions are governed, but not reasoning, knowledge flow or credential persistence. <strong>For enterprise security and platform teams: run a PoC now, start from the minimal path in strict mode, and don’t deploy the full stack on day one. For personal projects: this was built for enterprise governance and you almost certainly don’t need it. First move: <code>pip install &quot;agent-governance-toolkit[full]&quot;</code> → <code>agt doctor</code> → wrap your single riskiest tool function with three policy rules.</strong></p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/">https://we5ter.github.io/en/ai-tools/agent-governance-toolkit/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/agent-governance-toolkit/&text=Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34;"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/agent-governance-toolkit/&title=Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34;"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/agent-governance-toolkit/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/agent-governance-toolkit/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/agent-governance-toolkit/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/agent-governance-toolkit/"
+  };
+</script>
+
+
+
+
+
+<nav class="post-nav post-nav--series">
+  
+  <a class="post-nav-prev" href="/en/ai-tools/agentshield/">
+    <span class="post-nav-label">&larr;
+      <span class="i18n-zh">上一期 · 第 007 期</span>
+      <span class="i18n-en">Previous · No. 7</span>
+    </span>
+    <span class="post-nav-title">AgentShield: turning &#34;AI agent configuration audit&#34; from a Claude Code hackathon project into a CI-ready compliance tool</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/en/ai-tools/luan1ao-agent/">
+    <span class="post-nav-label">
+      <span class="i18n-zh">下一期 · 第 009 期</span>
+      <span class="i18n-en">Next · No. 9</span>
+    </span> &rarr;
+    <span class="post-nav-title">LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory</span>
+  </a>
+  
+</nav>
+
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+<!-- 阅读进度条 + 本页目录（只在文章页有对应节点，其他页面自然空跑退出） -->
+<script>
+(function () {
+  var bar = document.getElementById('read-progress');
+  var tocAside = document.getElementById('post-toc');
+  var article = document.querySelector('article.post-detail');
+  if (!bar && !tocAside) return;
+
+  // 进度按「文章本体」算，不含评论区和页脚 —— 否则滚到评论区就早早满格，
+  // 读者会以为文章看完了。
+  function progress() {
+    if (!bar || !article) return;
+    var r = article.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? (-r.top) / total : (r.top <= 0 ? 1 : 0);
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+
+  var links = [];      // { a, head }
+  var cur = -1;
+
+  function headingText(h) {
+    // Hexo 在每个标题里塞了 <a class="headerlink">，直接取 textContent 会带上锚点空白
+    var c = h.cloneNode(true);
+    var hl = c.querySelectorAll('.headerlink');
+    for (var i = 0; i < hl.length; i++) hl[i].parentNode.removeChild(hl[i]);
+    return (c.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(s) {
+    return String(s).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildToc() {
+    if (!tocAside || !article) return;
+    var nav = document.getElementById('post-toc-nav');
+    var det = document.getElementById('post-toc-inner');
+    var body = article.querySelector('.post-content');
+    if (!nav || !body) return;
+
+    var heads = body.querySelectorAll('h2, h3');
+    var h2n = 0, i;
+    for (i = 0; i < heads.length; i++) if (heads[i].tagName === 'H2') h2n++;
+    // 少于三个标题的短文不值得占一列，目录反而比正文长。
+    // 只看总数不单独看 h2：早期 CVE 长文整篇用 h3 分层（没有 h2），按 h2 计数会一律漏掉。
+    if (heads.length < 3) return;
+
+    var html = '<ul class="post-toc-list' + (h2n ? '' : ' is-flat') + '">';
+    for (i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + i;
+      // 标题带 sticky masthead，滚动定位要留出它的高度，否则跳过去被压在导航底下
+      h.style.scrollMarginTop = '76px';
+      html += '<li class="post-toc-item post-toc-' + h.tagName.toLowerCase() + '">' +
+              '<a href="#' + h.id + '">' + esc(headingText(h)) + '</a></li>';
+    }
+    html += '</ul>';
+    nav.innerHTML = html;
+
+    var as = nav.querySelectorAll('a');
+    for (i = 0; i < as.length; i++) links.push({ a: as[i], head: heads[i] });
+
+    tocAside.hidden = false;
+    document.body.classList.add('has-post-toc');
+
+    // 窄屏默认收起，别一进来就占满半屏；宽屏常驻展开。
+    // 1399 是 CSS 里目录宽屏断点（min-width: 1100px）的另一半：
+    // 两处必须互补，否则 1100–1399 会出现「目录已在右侧常驻、却被脚本收起」。
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 1099px)');
+    if (det && narrow && narrow.matches) det.removeAttribute('open');
+    nav.addEventListener('click', function (e) {
+      if (det && narrow && narrow.matches && e.target && e.target.tagName === 'A') {
+        det.removeAttribute('open');
+      }
+    });
+    highlight();
+  }
+
+  // 当前小节 = 最后一个顶部已越过 masthead 下沿的标题
+  function highlight() {
+    if (!links.length) return;
+    var idx = -1;
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].head.getBoundingClientRect().top <= 90) idx = i;
+      else break;
+    }
+    if (idx === cur) return;
+    if (cur >= 0 && links[cur]) links[cur].a.classList.remove('is-active');
+    cur = idx;
+    if (cur >= 0) links[cur].a.classList.add('is-active');
+  }
+
+  buildToc();
+  progress();
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      progress();
+      highlight();
+      ticking = false;
+    });
+  }, { passive: true });
+  window.addEventListener('resize', function () { progress(); highlight(); }, { passive: true });
+})();
+</script>
+
+<!-- 代码块：语言标签 + 一键复制 + 超长折叠 -->
+<script>
+(function () {
+  var figs = document.querySelectorAll('.post-content figure.highlight');
+  if (!figs.length) return;
+
+  function codeText(fig) {
+    // 行号在 td.gutter 里，只能取 td.code；每行之间是 <br>，
+    // 直接 textContent 会把所有行粘成一坨，必须按 .line 拼。
+    var td = fig.querySelector('td.code') || fig;
+    var lines = td.querySelectorAll('.line');
+    if (lines.length) {
+      var out = [];
+      for (var i = 0; i < lines.length; i++) out.push(lines[i].textContent.replace(/\n$/, ''));
+      return out.join('\n');
+    }
+    var pre = td.querySelector('pre');
+    return pre ? pre.textContent : td.textContent;
+  }
+
+  // file:// 预览和非 https 环境拿不到 navigator.clipboard，退回 execCommand
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function zh(s) { return '<span class="i18n-zh">' + s + '</span>'; }
+  function en(s) { return '<span class="i18n-en">' + s + '</span>'; }
+
+  // 复制失败要说出来：非安全上下文 / 页面失焦时 clipboard API 和 execCommand 都会静默失败，
+  // 按钮若原地不动，读者以为已经复制上了。
+  var timers = [];
+  function paint(btn, state) {
+    btn.classList.remove('is-copied', 'is-failed');
+    if (state === 'ok') {
+      btn.classList.add('is-copied');
+      btn.innerHTML = zh('已复制') + en('Copied');
+    } else if (state === 'fail') {
+      btn.classList.add('is-failed');
+      btn.innerHTML = zh('复制失败，请手动选中') + en('Copy failed — select manually');
+    } else {
+      btn.innerHTML = zh('复制') + en('Copy');
+    }
+  }
+  function flash(btn, state) {
+    paint(btn, state);
+    timers.push(setTimeout(function () { paint(btn, false); }, 2000));
+  }
+
+  Array.prototype.forEach.call(figs, function (fig) {
+    if (fig.parentNode && fig.parentNode.classList.contains('code-box')) return;
+
+    var m = fig.className.match(/(?:^|\s)highlight(?:\s+([a-z0-9+#._-]+))?/i);
+    var lang = m && m[1] ? m[1] : '';
+    // 未标语言的围栏 Hexo 给的是 plaintext（不是 plain），别漏 —— 每块都挂个「plaintext」比不挂更吵。
+    if (/^(plain|plaintext|text|txt)$/i.test(lang)) lang = '';
+
+    // figure 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码横向跑掉，
+    // 所以外面套一层 .code-box 承载工具条和折叠按钮。
+    var box = document.createElement('div');
+    box.className = 'code-box';
+    fig.parentNode.insertBefore(box, fig);
+    box.appendChild(fig);
+
+    var bar = document.createElement('div');
+    bar.className = 'code-bar';
+    var langEl = document.createElement('span');
+    langEl.className = 'code-lang';
+    if (lang) langEl.textContent = lang; else langEl.style.display = 'none';
+    bar.appendChild(langEl);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    paint(btn, false);
+    btn.addEventListener('click', function () {
+      var text = codeText(fig);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn, 'ok'); },
+          function () { flash(btn, legacyCopy(text) ? 'ok' : 'fail'); });
+      } else {
+        flash(btn, legacyCopy(text) ? 'ok' : 'fail');
+      }
+    });
+    bar.appendChild(btn);
+    box.insertBefore(bar, fig);
+
+    // 超长代码折叠：默认只露 20 行。不折叠的话一段两百行的日志能把整篇的滚动条吃光。
+    var lines = fig.querySelectorAll('td.code .line');
+    if (lines.length > 20) {
+      box.classList.add('is-foldable', 'is-folded');
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'code-more';
+      function paintMore(folded) {
+        more.innerHTML = folded
+          ? zh('展开全部 ' + lines.length + ' 行') + en('Expand all ' + lines.length + ' lines')
+          : zh('收起') + en('Collapse');
+      }
+      paintMore(true);
+      more.addEventListener('click', function () {
+        // toggle 返回「切换后是否还带着这个 class」，正好就是折叠状态
+        paintMore(box.classList.toggle('is-folded'));
+      });
+      box.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- 全站 ⌘K 搜索：正文级索引（search.json 按需拉取）。
+     专栏页 /ai-tools/ 自带一份「搜工具」的面板，这里让位，不抢同一个快捷键。 -->
+<script>
+(function () {
+  if (document.body.classList.contains('layout-ai-tools')) return;
+
+  var INDEX_URL = '/search.json';
+  var KEY = 'site-search-index';
+  var pal, scrim, input, list, idx = null, loading = false;
+  var rows = [], active = -1, lastFocus = null;
+
+  var L = {
+    ph:    function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Search articles, issues and body text…'
+             : '搜索文章、期号与正文…'; },
+    kind:  function (d) {
+      var en = document.documentElement.getAttribute('data-lang') === 'en';
+      if (d.k === 'issue' && d.i !== '') return en ? 'No. ' + d.i : '第 ' + d.i + ' 期';
+      if (d.k === 'page') return en ? 'Page' : '页面';
+      return en ? 'Post' : '文章';
+    },
+    empty: function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'No match.' : '没有匹配的结果。'; },
+    load:  function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Loading index…' : '索引加载中…'; }
+  };
+
+  function build() {
+    if (pal) return;
+    scrim = document.createElement('div');
+    scrim.className = 'aitools-palette-scrim';
+    scrim.id = 'site-palette-scrim';
+    scrim.hidden = true;
+
+    pal = document.createElement('div');
+    pal.className = 'aitools-palette';
+    pal.id = 'site-palette';
+    pal.setAttribute('role', 'dialog');
+    pal.setAttribute('aria-modal', 'true');
+    pal.setAttribute('aria-label', 'Site search');
+    pal.hidden = true;
+    pal.innerHTML =
+      '<div class="aitools-palette-search">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+          '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>' +
+          '<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>' +
+        '</svg>' +
+        '<input type="text" class="aitools-palette-input" id="site-palette-q" autocomplete="off" spellcheck="false">' +
+        '<kbd class="aitools-palette-esc">Esc</kbd>' +
+      '</div>' +
+      '<ul class="aitools-palette-list" id="site-palette-list" role="listbox"></ul>';
+
+    document.body.appendChild(scrim);
+    document.body.appendChild(pal);
+    input = document.getElementById('site-palette-q');
+    list = document.getElementById('site-palette-list');
+    input.placeholder = L.ph();
+
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', onNav);
+    scrim.addEventListener('click', close);
+  }
+
+  function loadIndex(cb) {
+    if (idx) return cb(idx);
+    try {
+      var cached = sessionStorage.getItem(KEY);
+      if (cached) { idx = JSON.parse(cached); return cb(idx); }
+    } catch (e) { /* 隐私模式 / 超配额：当成没缓存 */ }
+    if (loading) return;
+    loading = true;
+    msg(L.load());
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', INDEX_URL, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      loading = false;
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          idx = JSON.parse(xhr.responseText);
+          try { sessionStorage.setItem(KEY, xhr.responseText); } catch (e) {}
+          cb(idx);
+        } catch (e) { msg(L.empty()); }
+      } else {
+        msg(document.documentElement.getAttribute('data-lang') === 'en'
+            ? 'Index unavailable.' : '索引加载失败。');
+      }
+    };
+    xhr.send();
+  }
+
+  function msg(text) {
+    rows = []; active = -1;
+    list.innerHTML = '<li class="aitools-palette-empty"></li>';
+    list.firstChild.textContent = text;
+  }
+
+  // 命中位置：返回该词在文本里第一次出现的位置，找不到返回 -1
+  function firstHit(hay, w) { return hay.indexOf(w); }
+
+  function snippet(text, pos) {
+    var from = Math.max(0, pos - 42);
+    var to = Math.min(text.length, pos + 96);
+    return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+  }
+
+  function search(q) {
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var uiLang = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+    var out = [];
+    idx.docs.forEach(function (d) {
+      var t = (d.t || '').toLowerCase();
+      var de = (d.d || '').toLowerCase();
+      var x = (d.x || '').toLowerCase();
+      var score = 0, hitPos = -1, ok = true;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        var inT = t.indexOf(w), inD = de.indexOf(w), inX = x.indexOf(w);
+        if (inT < 0 && inD < 0 && inX < 0) { ok = false; break; }
+        score += (inT >= 0 ? 8 : 0) + (inD >= 0 ? 3 : 0) + (inX >= 0 ? 1 : 0);
+        if (hitPos < 0) hitPos = inX;
+      }
+      if (!ok) return;
+      if (d.l === uiLang) score += 2;
+      out.push({ d: d, score: score, pos: hitPos });
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out.slice(0, 12);
+  }
+
+  function draw() {
+    var q = input.value.trim();
+    list.innerHTML = '';
+    rows = []; active = -1;
+    if (!idx) { msg(L.load()); return; }
+    if (!q) { msg(document.documentElement.getAttribute('data-lang') === 'en'
+                   ? 'Type to search ' + idx.docs.length + ' pages.'
+                   : '输入关键词，共 ' + idx.docs.length + ' 篇可搜。'); return; }
+    var hits = search(q);
+    if (!hits.length) { msg(L.empty()); return; }
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    hits.forEach(function (h, n) {
+      var d = h.d;
+      var li = document.createElement('li');
+      li.className = 'aitools-palette-row';
+      li.setAttribute('role', 'option');
+
+      var kind = document.createElement('span');
+      kind.className = 'aitools-palette-kind';
+      kind.textContent = L.kind(d);
+
+      var box = document.createElement('span');
+      box.className = 'site-palette-main';
+      var name = document.createElement('span');
+      name.className = 'aitools-palette-name';
+      name.textContent = d.t;
+      box.appendChild(name);
+
+      // 摘要优先给正文命中那一段（标题命中时正文摘要意义不大，但仍给读者上下文）
+      var pos = h.pos;
+      if (pos < 0) {
+        for (var i = 0; i < words.length && pos < 0; i++) pos = firstHit((d.x || '').toLowerCase(), words[i]);
+      }
+      if (pos >= 0) {
+        var sn = document.createElement('span');
+        sn.className = 'site-palette-snippet';
+        markWords(sn, snippet(d.x, pos), words);
+        box.appendChild(sn);
+      }
+
+      li.appendChild(kind);
+      li.appendChild(box);
+      li.addEventListener('click', function () { go(n); });
+      list.appendChild(li);
+      rows.push({ li: li, url: d.u });
+    });
+    setActive(0);
+  }
+
+  // 用 DOM 拼接而不是 innerHTML：关键词来自用户输入，不能进 HTML 解析
+  function markWords(el, text, words) {
+    var low = text.toLowerCase();
+    var marks = [];
+    words.forEach(function (w) {
+      if (w.length < 1) return;
+      var from = 0, p;
+      while ((p = low.indexOf(w, from)) !== -1) { marks.push([p, p + w.length]); from = p + w.length; }
+    });
+    if (!marks.length) { el.textContent = text; return; }
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var cur = 0;
+    marks.forEach(function (m) {
+      if (m[0] < cur) return;
+      if (m[0] > cur) el.appendChild(document.createTextNode(text.slice(cur, m[0])));
+      var k = document.createElement('mark');
+      k.className = 'aitools-hl';
+      k.textContent = text.slice(m[0], m[1]);
+      el.appendChild(k);
+      cur = m[1];
+    });
+    if (cur < text.length) el.appendChild(document.createTextNode(text.slice(cur)));
+  }
+
+  function setActive(n) {
+    if (!rows.length) return;
+    if (active >= 0 && rows[active]) rows[active].li.classList.remove('is-active');
+    active = (n + rows.length) % rows.length;
+    rows[active].li.classList.add('is-active');
+    rows[active].li.scrollIntoView({ block: 'nearest' });
+  }
+
+  function go(n) {
+    var words = input.value.trim();
+    var url = '/' + rows[n].url;
+    if (words) url += (url.indexOf('?') === -1 ? '?' : '&') + 'hl=' + encodeURIComponent(words);
+    window.location.href = url;
+  }
+
+  function onNav(e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (rows.length) go(active < 0 ? 0 : active); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  }
+
+  function open() {
+    build();
+    lastFocus = document.activeElement;
+    scrim.hidden = false;
+    pal.hidden = false;
+    document.body.classList.add('aitools-palette-open');
+    window.requestAnimationFrame(function () { scrim.classList.add('is-open'); pal.classList.add('is-open'); });
+    input.placeholder = L.ph();
+    input.value = '';
+    draw();
+    loadIndex(function () { draw(); });
+    input.focus();
+  }
+
+  function close() {
+    if (!pal) return;
+    scrim.classList.remove('is-open');
+    pal.classList.remove('is-open');
+    document.body.classList.remove('aitools-palette-open');
+    scrim.hidden = true;
+    pal.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!pal || pal.hidden) open(); else close();
+      return;
+    }
+    // 文章页的「/」也留给搜索：正文页没有专栏页那套列表快捷键，不冲突
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && (!pal || pal.hidden)) {
+      var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      open();
+    }
+  });
+
+  var trigger = document.getElementById('nav-search');
+  if (trigger) trigger.addEventListener('click', open);
+})();
+</script>
+
+<!-- 从搜索结果跳进来时高亮正文命中：?hl=关键词，标出第一处并滚过去。
+     用完就把参数从地址栏抹掉，免得分享出去的链接自带一个高亮。 -->
+<script>
+(function () {
+  var q;
+  try { q = new URLSearchParams(location.search).get('hl'); } catch (e) { return; }
+  if (!q) return;
+  var body = document.querySelector('.post-content');
+  if (!body) return;
+
+  var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+  if (!words.length) return;
+
+  var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentNode;
+      // 代码块和高亮脚本里不插 mark：会破坏缩进，也可能被复制走
+      while (p && p !== body) {
+        var tag = p.nodeName ? p.nodeName.toLowerCase() : '';
+        if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'mark') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  var node, hit = null;
+  while ((node = walker.nextNode())) {
+    var low = node.nodeValue.toLowerCase();
+    for (var i = 0; i < words.length; i++) {
+      var at = low.indexOf(words[i]);
+      if (at !== -1) { hit = { node: node, at: at, len: words[i].length }; break; }
+    }
+    if (hit) break;
+  }
+
+  if (hit) {
+    var k = document.createElement('mark');
+    k.className = 'search-hl';
+    k.textContent = hit.node.nodeValue.substr(hit.at, hit.len);
+    hit.node.splitText(hit.at);
+    hit.node.nextSibling.parentNode.insertBefore(k, hit.node.nextSibling);
+    if (k.scrollIntoView) k.scrollIntoView({ block: 'center' });
+  }
+
+  try {
+    var p = new URLSearchParams(location.search);
+    p.delete('hl');
+    var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>

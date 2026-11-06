@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "en";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
+      var pageTitle = "LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model's Memory";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085454" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085454" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/luan1ao-agent/" />
+  
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/luan1ao-agent/" />
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/luan1ao-agent/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/en/ai-tools/luan1ao-agent/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/luan1ao-agent/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/luan1ao-agent-banner.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance." />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/luan1ao-agent-banner.png" />
+  
+  <meta property="article:published_time" content="2026-09-29T13:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-09-29T13:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085454" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/luan1ao-agent/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/luan1ao-agent/"},"headline":"LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the M","name":"LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model's Memory","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","image":"https://we5ter.github.io/images/banners/luan1ao-agent-banner.png","inLanguage":"en","datePublished":"2026-09-29T13:00:00.000Z","dateModified":"2026-09-29T13:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-aisec-item">
+            
+            <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="“全网最全”AI安全知识图谱">
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
+              <span class="i18n-zh">AI安全知识图谱</span>
+              <span class="i18n-en">AI Security KG</span>
+            </a>
+          </li>
+          <li class="masthead__menu-item nav-ai-item">
+            
+            <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">每日 AI 工具</span>
+              <span class="i18n-en">Daily AI Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            
+            
+            <button class="nav-search" id="nav-search" type="button"
+                    title="Search / 搜索 (⌘K)" aria-label="Search / 搜索">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+              <kbd class="nav-search-kbd">⌘K</kbd>
+            </button>
+            
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="WeChat QR code">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="WeChat QR code">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="WeChat QR code" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+
+<aside class="post-toc" id="post-toc" hidden>
+  <details class="post-toc-inner" id="post-toc-inner" open>
+    <summary class="post-toc-title">
+      <span class="i18n-zh">本页目录</span><span class="i18n-en">On this page</span>
+    </summary>
+    <nav class="post-toc-nav" id="post-toc-nav" aria-label="Table of contents"></nav>
+    
+    <div class="post-toc-qr">
+      <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="112" height="112" loading="lazy" decoding="async">
+      <span class="post-toc-qr-name">Wester的AI安全札记</span>
+      <span class="post-toc-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+    </div>
+    
+  </details>
+</aside>
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/luan1ao-agent-banner.png)">
+    <h1 class="post-title">LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-29">
+        <span class="i18n-zh">2026年9月29日</span>
+        <span class="i18n-en">Sep 29, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 43 分钟</span><span class="i18n-en">43 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle is-en"
+         href="/ai-tools/luan1ao-agent/"
+         title="切换到中文版">中文</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <blockquote>
+<p>The v2 of a 1.3k-star autonomous pentest agent: Planner-Executor-Observer roles + task &#x2F; reasoning &#x2F; operation graphs, turning Evidence → Hypothesis → Vulnerability → Exploit into a traceable structured chain. Rewritten entirely in TypeScript on the Pi SDK. AGPL-3.0.</p>
+</blockquote>
+<h2 id="1-At-a-Glance-Is-It-Worth-Your-Time"><a href="#1-At-a-Glance-Is-It-Worth-Your-Time" class="headerlink" title="1. At a Glance: Is It Worth Your Time"></a>1. At a Glance: Is It Worth Your Time</h2><p><strong>Rating: ★★★★☆ (4 &#x2F; 5)</strong></p>
+<p>Why this score: it is the open-source pentest project I have seen that takes <strong>“what exactly entitles an agent to a conclusion”</strong> the most seriously. In most autonomous pentest tools, the reasoning lives only in the model’s context — the run ends, you get a report, and the step “why is there a hole here” remains a black box that cannot be reviewed or replayed. LuaN1ao v2 inverts that: <strong>every confirmed Vulnerability node and every successful Exploit node must carry an evidence reference, or it cannot be written at all</strong>. It turns “evidence” from a slogan into a schema-level hard constraint.</p>
+<p>Look deeper and it gets one harder thing right: <strong>planning is not a linear checklist but a dependency graph</strong>. When new evidence arrives, the plan is not torn up and regenerated — only the affected nodes and edges get patched. A long task no longer gets globally reshuffled just because something new turned up midway.</p>
+<p>The missing star goes to four places, and none of them is trivial: <strong>AGPL-3.0</strong> (strongly viral — corporate legal will block it); <strong>Node.js 25+</strong> (it relies on the built-in <code>node:sqlite</code>, a threshold that shuts out most existing environments); <strong>no v2 benchmark yet</strong> — the README states explicitly that v1 results do not automatically carry over to v2, and v1 is the version that placed in Tencent’s competition, so the track record you see belongs to the old implementation; and <strong>human approval gates (manual sign-off for high-risk actions) are still unchecked on the roadmap</strong> — as things stand, it really will keep attacking on its own.</p>
+<h3 id="Key-Data-as-of-2026-09-29"><a href="#Key-Data-as-of-2026-09-29" class="headerlink" title="Key Data (as of 2026-09-29)"></a>Key Data (as of 2026-09-29)</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Language</td>
+<td><strong>TypeScript</strong> (Pi SDK runtime)</td>
+</tr>
+<tr>
+<td>Stars &#x2F; Forks</td>
+<td><strong>1,316</strong> &#x2F; 187</td>
+</tr>
+<tr>
+<td>Commits &#x2F; Open Issues</td>
+<td>151 &#x2F; <strong>4</strong></td>
+</tr>
+<tr>
+<td>License</td>
+<td><strong>AGPL-3.0</strong></td>
+</tr>
+<tr>
+<td>First commit</td>
+<td>2025-12-04 (~10 months)</td>
+</tr>
+<tr>
+<td>Last commit</td>
+<td>2026-09-15 (14 days ago)</td>
+</tr>
+<tr>
+<td>Runtime requirements</td>
+<td><strong>Node.js 25+</strong> (needs built-in <code>node:sqlite</code>), Docker recommended</td>
+</tr>
+<tr>
+<td>Model access</td>
+<td>OpenAI-compatible (Chat Completions default, Responses API optional)</td>
+</tr>
+<tr>
+<td>Official tags</td>
+<td>agents, autonomous-agents, causal-graphs, penetration-testing, pi-sdk, plan-execute-reflect</td>
+</tr>
+</tbody></table>
+<h3 id="Who-It’s-For"><a href="#Who-It’s-For" class="headerlink" title="Who It’s For"></a>Who It’s For</h3><table>
+<thead>
+<tr>
+<th>Audience</th>
+<th>Score</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Red team &#x2F; pentest engineers</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>Replayable evidence chains, hard scope constraints, Docker egress lockdown — reports can go straight to review</td>
+</tr>
+<tr>
+<td>Security researchers (agent architecture)</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>The P-E-O responsibility boundaries + three-graph separation are a rarely clear design worth stealing</td>
+</tr>
+<tr>
+<td>Enterprise security operations</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td>Capable, but AGPL-3.0 and the missing approval gates keep it out of production workflows for now</td>
+</tr>
+<tr>
+<td>Developers (CI integration)</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td><code>--jsonl</code> output exists, but it is built for interactive long tasks, not pipeline gating</td>
+</tr>
+<tr>
+<td>Individuals &#x2F; learners</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>Node 25 + Docker + image builds are three hurdles in a row, and the executor runs shell — real environment risk</td>
+</tr>
+</tbody></table>
+<h3 id="Building-on-It"><a href="#Building-on-It" class="headerlink" title="Building on It"></a>Building on It</h3><table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Difficulty</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Configuration</td>
+<td><strong>Low</strong> — set <code>LLM_API_KEY</code> &#x2F; <code>LLM_API_BASE_URL</code> &#x2F; <code>LLM_DEFAULT_MODEL</code> in <code>.env</code>; pass <code>--goal</code> <code>--scope</code> <code>--max-cycles</code> on the CLI</td>
+<td></td>
+</tr>
+<tr>
+<td>Integration</td>
+<td><strong>Medium</strong> — <code>--jsonl</code> event stream (last record is <code>type: &quot;result&quot;</code>), <code>web-server.ts</code>, React web workbench</td>
+<td>real hooks for external systems</td>
+</tr>
+<tr>
+<td>Kernel</td>
+<td><strong>High</strong> — three-graph persistence + P-E-O contracts + 8 runtime invariants interlock; touching one means minding the rest</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-What-It-Is-What-It-Isn’t"><a href="#2-What-It-Is-What-It-Isn’t" class="headerlink" title="2. What It Is, What It Isn’t"></a>2. What It Is, What It Isn’t</h2><p>Draw the boundary first, or it is easy to expect the wrong thing from it:</p>
+<ul>
+<li><strong>Not</strong> a vulnerability scanner. It does not match versions against CVE rulesets, and there is no fixed “scan → produce a list” pipeline.</li>
+<li><strong>Not</strong> a report generator. The report is a projection of the reasoning graph, not the goal itself.</li>
+<li><strong>Not</strong> an in-place refactor of v1. The README marks it IMPORTANT: v2 is a <strong>new implementation</strong> — configuration, persistence, agent lifecycle and the observability contracts all changed. Python v1 lives on in the <code>v1</code> branch and the <code>v1.0.0</code> release.</li>
+<li><strong>Not</strong> a “here’s an agent, let it roam” framework. It is precisely freedom fenced in — who edits the task graph, who picks tools, and who projects facts is written into the Runtime invariants.</li>
+</ul>
+<p>Its self-positioning in the Introduction is blunt (paraphrased): <strong>every significant conclusion must be traceable to persisted events, artifacts, and graph evidence</strong>. The entire README is one long argument for that single sentence.</p>
+<p>Three keywords: <strong>graph-based cognitive reasoning</strong>, <strong>explicit agent boundaries</strong>, <strong>evidence-backed memory</strong>.</p>
+<h2 id="3-P-E-O-Three-Roles-Each-Staying-in-Its-Lane"><a href="#3-P-E-O-Three-Roles-Each-Staying-in-Its-Lane" class="headerlink" title="3. P-E-O: Three Roles, Each Staying in Its Lane"></a>3. P-E-O: Three Roles, Each Staying in Its Lane</h2><p>v2 replaces v1’s P-E-R (Planner &#x2F; Executor &#x2F; Reflector) with <strong>P-E-O</strong>. The most important difference: <strong>the Reflector’s “shared-history reflection loop” is split into two independent modes</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Manages</th>
+<th>Submits via</th>
+<th>Explicitly does NOT</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Planner</strong></td>
+<td>goals, scope, dependencies, task budget, graph-level scheduling</td>
+<td><code>planner_submit</code></td>
+<td>dictate concrete actions</td>
+</tr>
+<tr>
+<td><strong>Executor</strong></td>
+<td>picks the tool strategy autonomously within one <code>TaskEnvelope</code> boundary</td>
+<td><code>task_result_submit</code></td>
+<td>change task topology</td>
+</tr>
+<tr>
+<td><strong>Observer · Supervisor</strong></td>
+<td>hot-path control: continue &#x2F; checkpoint &#x2F; stop &#x2F; hand back to Planner</td>
+<td><code>control_submit</code></td>
+<td>project semantic graph facts</td>
+</tr>
+<tr>
+<td><strong>Observer · Projector</strong></td>
+<td>asynchronously turns observations into reasoning-graph &#x2F; operation-graph deltas</td>
+<td><code>graph_delta_submit</code></td>
+<td>modify task nodes</td>
+</tr>
+</tbody></table>
+<p>A few design details I particularly appreciate:</p>
+<p><strong>1) Every agent call has an explicit termination-tool contract.</strong> The Planner must end with <code>planner_submit</code>, the Executor with <code>task_result_submit</code>. This turns “the agent stopped mid-run not knowing what to output” from an uncertainty into a schema-validation problem.</p>
+<p><strong>2) The Observer’s two modes each run in a brand-new Pi session, sharing no hidden model history.</strong> This one matters — if the supervisor shares context with the executor, it will “understand” the executor’s line of thinking and be more likely to let errors slide. Cutting the history forces it to judge purely from <strong>normalized observations</strong>.</p>
+<p><strong>3) The Planner does not wait for an entire parallel wave to finish before scheduling.</strong> It reads a compact task &#x2F; reasoning &#x2F; operation graph view and reconciles ready tasks against available capacity the moment the graph changes. Concurrency is <strong>incremental</strong>, not batch.</p>
+<p><strong>4) Large outputs never enter the model context — they become content-addressed artifacts.</strong> The Executor writes tool outputs over a threshold as immutable artifacts and passes only a reference and a preview to the model. This directly mitigates context explosion in long tasks.</p>
+<h3 id="Plan-on-Graph-Patching-the-Plan-Not-Regenerating-It"><a href="#Plan-on-Graph-Patching-the-Plan-Not-Regenerating-It" class="headerlink" title="Plan-on-Graph: Patching the Plan, Not Regenerating It"></a>Plan-on-Graph: Patching the Plan, Not Regenerating It</h3><p>This is the one point I think deserves its own section. Comparison table (from the README):</p>
+<table>
+<thead>
+<tr>
+<th>Capability</th>
+<th>Linear task checklist</th>
+<th>LuaN1ao’s PoG</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Plan structure</td>
+<td>ordered steps</td>
+<td>dependency graph</td>
+</tr>
+<tr>
+<td>Adaptation</td>
+<td>regenerate the entire plan</td>
+<td>patch the affected nodes and edges</td>
+</tr>
+<tr>
+<td>Scheduling</td>
+<td>manual ordering</td>
+<td>dependency-aware admitted waves</td>
+</tr>
+<tr>
+<td>Traceability</td>
+<td>natural-language history</td>
+<td>structured commands + persisted events</td>
+</tr>
+</tbody></table>
+<p>The Planner’s “planning language” is five structured graph operations: <code>create_tasks</code>, <code>patch_task</code>, <code>replace_dependencies</code>, <code>set_task_status</code>, <code>set_node_status</code>. Every Planner command must carry a reason, and may reference the graph nodes or events it relies on.</p>
+<p><strong>Tasks and actions are separated</strong>: goals, tasks, milestones, blockers and scope live in the Task Graph; low-level tool actions stay in the append-only ExecutionLog. This layering keeps the “plan” and the “execution traces” from contaminating each other.</p>
+<h2 id="4-The-Three-Graph-Architecture-and-the-Causal-Reasoning-Chain"><a href="#4-The-Three-Graph-Architecture-and-the-Causal-Reasoning-Chain" class="headerlink" title="4. The Three-Graph Architecture and the Causal Reasoning Chain"></a>4. The Three-Graph Architecture and the Causal Reasoning Chain</h2><p>What v2 persists is <strong>three graphs</strong>, plus one append-only event ledger:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">flowchart LR</span><br><span class="line">    Evidence[Evidence] --&gt;|supports / contradicts| Hypothesis[Hypothesis]</span><br><span class="line">    Hypothesis --&gt;|confirms| Vulnerability[Vulnerability]</span><br><span class="line">    Vulnerability --&gt;|exploited by| Exploit[Exploit]</span><br><span class="line">    Evidence -. observed on .-&gt; Endpoint[WebEndpoint / Service]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Task Graph</strong>: goals, tasks, dependencies, milestones, blockers, scope. The Planner’s turf.</li>
+<li><strong>Reasoning Graph</strong>: the Evidence &#x2F; Hypothesis &#x2F; Vulnerability &#x2F; Exploit causal chain. The Projector’s turf.</li>
+<li><strong>Operation Graph</strong>: concrete entities like WebEndpoint and Service. The reasoning graph links to it via cross-graph context.</li>
+<li><strong>ExecutionLog</strong>: the append-only ledger of execution events — the input source for everything above.</li>
+</ul>
+<p>The four constraints of the causal chain (this is the “hard constraint” from the opening, made concrete):</p>
+<ol>
+<li><strong>Evidence first</strong> — reasoning nodes and edges must retain references to the events that support them.</li>
+<li><strong>Explicit uncertainty</strong> — a hypothesis and a confirmed vulnerability &#x2F; successful exploit are <strong>different node types</strong>; conflating them is not allowed.</li>
+<li><strong>Enforced provenance</strong> — confirmed Vulnerability nodes and successful Exploit nodes <strong>cannot be written without an evidence reference</strong>.</li>
+<li><strong>Asynchronous projection</strong> — the Projector turns bounded observation batches into graph deltas asynchronously, <strong>without blocking the Executor’s loop</strong>.</li>
+</ol>
+<p>Constraint 3 is the entire point of the project. The problem with most “AI pentest tools” is not that the model is not smart enough — it is that <strong>when it says there is a hole, you cannot verify why it says so</strong>. When the schema forces an evidence reference, you structurally shut most of the “hallucinate into a vulnerability” path at the data-structure level. The remaining half depends on whether the reviewer bothers to look at the evidence.</p>
+<h3 id="Runtime-Invariants-8-—-read-before-touching-the-code"><a href="#Runtime-Invariants-8-—-read-before-touching-the-code" class="headerlink" title="Runtime Invariants (8 — read before touching the code)"></a>Runtime Invariants (8 — read before touching the code)</h3><p>The README lists these separately, and I believe they are the part the author most wants people to see:</p>
+<ul>
+<li>The Planner has exclusive task-graph decision authority; the Executor never changes task topology</li>
+<li>The Executor has exclusive low-level action choice within a <code>TaskEnvelope</code> boundary</li>
+<li>The Supervisor only decides whether to continue; it never projects semantic graph facts</li>
+<li>The Projector only writes the reasoning &#x2F; operation graphs; it never modifies task nodes</li>
+<li>Every agent call has an explicit termination-tool contract</li>
+<li>The Projector’s desired &#x2F; committed watermark is monotonic</li>
+<li>Graph changes are atomic with committed projection watermarks</li>
+<li>Persisted events and artifacts are the single source of truth for observability</li>
+</ul>
+<h2 id="5-Sandbox-and-Egress-Lockdown"><a href="#5-Sandbox-and-Egress-Lockdown" class="headerlink" title="5. Sandbox and Egress Lockdown"></a>5. Sandbox and Egress Lockdown</h2><p>This section is the dividing line between it and a toy project.</p>
+<p><strong>Docker runs one Executor per task, on a private internal network.</strong> The Executor and its Gateway sit in <strong>different network namespaces</strong>, and the Gateway is <strong>the sole egress</strong> for that task’s network. HTTP&#x2F;HTTPS is transparently captured on any TCP port; other TCP is relayed as-is.</p>
+<p>The permission hygiene is equally clean:</p>
+<ul>
+<li>The Executor container runs as <strong>UID 1000, zero capabilities, read-only root filesystem</strong>, with a size-limited <code>/tmp</code>; only <code>/workspace</code> is persistent and host-visible.</li>
+<li>The Gateway container drops all capabilities first, then adds back only <code>NET_ADMIN</code> &#x2F; <code>SETUID</code> &#x2F; <code>SETGID</code>; PID 1 sets up the TUN device and policy routing, starts the Go gateway process, and <strong>that process then clears its own capability bounding set</strong>.</li>
+<li>Without Docker: Seatbelt on macOS, Bubblewrap on Linux, with <code>workspace</code> as an explicit development fallback.</li>
+<li><strong>Host paths outside the Executor workspace fail closed under enforced sandbox mode.</strong></li>
+</ul>
+<p><strong>Scope is the network authorization root — not a prompt.</strong> <code>--scope</code> accepts comma-separated IPv4 &#x2F; CIDR &#x2F; exact domains &#x2F; leading-wildcard domains. Bare IPs are normalized to <code>/32</code>. When <code>--scope</code> is omitted, the Planner extracts only IPv4 and CIDR <strong>explicitly present</strong> in <code>--goal</code>, and <strong>deterministic validation rejects fabricated or widened ranges</strong>; domain scope must be given explicitly. If the goal contains no explicit IPv4 target at all, startup fails outright and asks you to supply <code>--scope</code>.</p>
+<p>This is, in my view, stricter than its peers: <strong>scope is not a line in the system prompt begging the model to stay inside — it is written into the Gateway’s policy, and out-of-scope traffic is rejected in the kernel</strong>. Domains get an extra layer: the Gateway filters DNS queries, adds the returned IPv4 addresses into a per-task, expiring kernel set before responses are allowed through; domain-derived UDP&#x2F;ICMP may only reach addresses learned via that Gateway-controlled DNS.</p>
+<h3 id="Session-Directory-Layout"><a href="#Session-Directory-Layout" class="headerlink" title="Session Directory Layout"></a>Session Directory Layout</h3><p>Every CLI invocation creates an isolated session (<code>.agent-runtime/sessions/&lt;session&gt;/</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>state.sqlite</code></td>
+<td>three graphs, execution events, projector watermarks, artifacts, runtime state</td>
+</tr>
+<tr>
+<td><code>execution.jsonl</code></td>
+<td>append-only audit mirror of normalized execution events</td>
+</tr>
+<tr>
+<td><code>graph-deltas.jsonl</code></td>
+<td>replayable mirror of graph deltas</td>
+</tr>
+<tr>
+<td><code>artifacts/</code></td>
+<td>large outputs and cross-task persistent artifacts</td>
+</tr>
+<tr>
+<td><code>sandboxes/</code></td>
+<td>per-task persistent workspace + host-only Pi session root</td>
+</tr>
+<tr>
+<td><code>executor-sessions/</code></td>
+<td>Pi session lineage for the same task across epochs</td>
+</tr>
+<tr>
+<td><code>traffic/</code></td>
+<td>segmented <code>.mitm</code> traffic, <code>.net.jsonl</code> telemetry, public CA, route&#x2F;index metadata</td>
+</tr>
+<tr>
+<td><code>web-auth.sqlite</code></td>
+<td>local users and sessions for the web workbench</td>
+</tr>
+</tbody></table>
+<h2 id="6-Deployment-and-Getting-Started"><a href="#6-Deployment-and-Getting-Started" class="headerlink" title="6. Deployment and Getting Started"></a>6. Deployment and Getting Started</h2><h3 id="Hard-Environment-Requirements"><a href="#Hard-Environment-Requirements" class="headerlink" title="Hard Environment Requirements"></a>Hard Environment Requirements</h3><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Requirement</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>OS</td>
+<td>macOS or Linux</td>
+<td><strong>Windows is not validated as a v2 release target</strong></td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td><strong>25+</strong></td>
+<td>must support the built-in <code>node:sqlite</code></td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>recommended</td>
+<td>on Linux the current user must reach the daemon (rootless Docker, or <code>sudo usermod -aG docker $USER</code> and re-login); otherwise it falls back to the host-native backend</td>
+</tr>
+<tr>
+<td>LLM API</td>
+<td>OpenAI-compatible</td>
+<td>Chat Completions default</td>
+</tr>
+<tr>
+<td>Terminal</td>
+<td>ANSI-capable TTY</td>
+<td>required by the interactive timeline</td>
+</tr>
+<tr>
+<td>Browser</td>
+<td>current Chromium &#x2F; Firefox &#x2F; Safari</td>
+<td>required by the authenticated web workbench</td>
+</tr>
+</tbody></table>
+<h3 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/SanMuzZzZz/LuaN1aoAgent.git</span><br><span class="line"><span class="built_in">cd</span> LuaN1aoAgent</span><br><span class="line">npm ci</span><br><span class="line">npm run build</span><br><span class="line"></span><br><span class="line"><span class="comment"># the Docker backend needs these two images; ./install.sh builds them automatically</span></span><br><span class="line">npm run build:executor-image</span><br><span class="line">npm run build:network-image</span><br></pre></td></tr></table></figure>
+
+<p>Configure <code>.env</code> (git-ignored — <strong>never commit it</strong>):</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">LLM_API_KEY</span>=your-api-key</span><br><span class="line"><span class="attr">LLM_API_BASE_URL</span>=https://api.openai.com/v1</span><br><span class="line"><span class="attr">LLM_DEFAULT_MODEL</span>=your-model-id</span><br><span class="line"></span><br><span class="line"><span class="comment"># optional: openai-completions or openai-responses</span></span><br><span class="line"><span class="attr">LLM_API_TYPE</span>=openai-completions</span><br></pre></td></tr></table></figure>
+
+<h3 id="A-First-Run"><a href="#A-First-Run" class="headerlink" title="A First Run"></a>A First Run</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">npm start -- \</span><br><span class="line">  --goal <span class="string">&quot;assess authorized target 10.0.0.10&quot;</span> \</span><br><span class="line">  --scope <span class="string">&quot;10.0.0.0/24,11.0.0.0/24&quot;</span> \</span><br><span class="line">  --max-cycles 8 \</span><br><span class="line">  --max-parallel-tasks 2</span><br></pre></td></tr></table></figure>
+
+<p>Main CLI arguments:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">--goal &lt;text&gt;                agent goal</span><br><span class="line">--scope &lt;entries&gt;            authorized IPv4 / CIDR / domains (e.g. example.com,*.example.com)</span><br><span class="line">--proxy &lt;socks5-url&gt;         route in-scope agent TCP transparently through SOCKS5</span><br><span class="line">--runtime-dir &lt;path&gt;         empty directory for the new runtime</span><br><span class="line">--resume &lt;session&gt;           resume a runtime (brings back its goal and scope automatically)</span><br><span class="line">--max-cycles &lt;number&gt;        max consecutive no-progress rounds for the Planner</span><br><span class="line">--max-parallel-tasks &lt;n&gt;     max concurrent tasks</span><br><span class="line">--max-run-time-ms &lt;number&gt;   global run timeout (milliseconds)</span><br><span class="line">--json                       disable TUI, print JSON at the end</span><br><span class="line">--jsonl                      stream persisted events as JSON Lines</span><br><span class="line">--no-tui                     disable the interactive TUI</span><br></pre></td></tr></table></figure>
+
+<p><strong>Do not pass <code>--goal</code> or <code>--scope</code> together with <code>--resume</code></strong> — resume restores the original session’s goal and scope, and passing them again can override the authorized scope. This is an easy safety trap to step on.</p>
+<p><strong>Machine-readable output</strong>: the last JSONL record is <code>type: &quot;result&quot;</code>; everything before it is <code>type: &quot;event&quot;</code>. Use this to integrate with external systems.</p>
+<p><strong>Two optional keys beyond the LLM</strong>: <code>BRAVE_SEARCH_API_KEY</code> (<code>web_search</code>; degrades to an HTML-search fallback without it) and <code>NVD_API_KEY</code> (rate-limit boost for <code>vulnerability_search</code>; not required).</p>
+<h2 id="7-Boundaries-and-Risks-the-part-that-must-be-said-honestly"><a href="#7-Boundaries-and-Risks-the-part-that-must-be-said-honestly" class="headerlink" title="7. Boundaries and Risks (the part that must be said honestly)"></a>7. Boundaries and Risks (the part that must be said honestly)</h2><p><strong>1) AGPL-3.0 is the most practical hurdle.</strong> This is not MIT &#x2F; Apache “take it and use it” — deploying it as a network service triggers source-disclosure obligations. In an enterprise, legal will very likely block it. Personal research, teaching and authorized red-team self-use are fine.</p>
+<p><strong>2) There is no v2 benchmark yet.</strong> The README states in a NOTE that v1 results <strong>do not automatically carry over to v2</strong>, and v2 numbers will only be published once they can be “reproduced on a frozen release.” The Tencent competition badge you see at the top of the README belongs to the v1 era. <strong>There is no public v2 head-to-head evaluation data at this stage</strong> — if you want to assess it, you have to build the environment and run it yourself.</p>
+<p><strong>3) No human approval gates for high-risk actions.</strong> <code>Human approval gates for high-risk actions</code> is still unchecked on the roadmap. In other words, in the current version, when the Executor decides to exploit something inside scope, it does. <strong>Practical advice: run it only in a fully isolated range or a disposable VM — never on any network that carries production traffic.</strong></p>
+<p><strong>4) The Node.js 25+ threshold is higher than it looks.</strong> Because it depends on the built-in <code>node:sqlite</code>, this is not just “install a newer version” — many teams’ CI images and internal mirrors simply do not have a 25.x. And v2 is a new implementation that only started in 2025-12, so <strong>production-environment validation samples are scarce</strong>.</p>
+<p><strong>5) Docker permissions on Linux are a latent risk.</strong> The docs suggest <code>sudo usermod -aG docker $USER</code>, and the docker group is effectively root. If other things run on that machine, weigh the side effects yourself; without it you only get the Seatbelt &#x2F; Bubblewrap fallback, and the egress lockdown gets weaker.</p>
+<p><strong>6) Several key roadmap items remain unfinished</strong>: a stable v2 extension API, a packaged container runtime and deployment profiles, a reproducible public benchmark, and cross-run capability memory. <strong>There is no stable API for extending the toolset today</strong> — adding your own tools means waiting or chewing through internal interfaces yourself.</p>
+<p><strong>7) Only 4 open issues is not necessarily “very stable.”</strong> The project is 10 months old, v2 is a rewrite, and the user base is still small — a low issue count more likely reflects <strong>not enough users yet</strong> rather than converged quality.</p>
+<h2 id="8-Getting-Started-in-This-Order"><a href="#8-Getting-Started-in-This-Order" class="headerlink" title="8. Getting Started (in This Order)"></a>8. Getting Started (in This Order)</h2><ol>
+<li><strong>Install first in a disposable VM or container.</strong> The executor can run shell commands, and the README’s own WARNING says to use an isolated host. Do not run your first attempt on your daily development machine.</li>
+<li><strong>Get the Docker backend working before anything else.</strong> <code>npm run build:executor-image</code> + <code>npm run build:network-image</code> are the foundation of the egress lockdown and the sandbox; skipping them turns off the most important safety mechanism.</li>
+<li><strong>Keep the scope minimal on the first run.</strong> Use a <code>/32</code> single IP instead of a <code>/24</code>, and confirm the Gateway actually blocks out-of-scope traffic (check the <code>.net.jsonl</code> telemetry under <code>traffic/</code>) before widening it.</li>
+<li><strong>Start with <code>--max-cycles 3 --max-parallel-tasks 1</code>.</strong> Watch how the Planner builds the graph, how the Executor uses tools, and how the Projector projects — before touching concurrency. In the interactive TUI, <code>Tab</code> &#x2F; <code>Shift+Tab</code> switch between the all-tasks and single-task views, and both are instructive.</li>
+<li><strong>Look at the Reasoning Graph, not the final report.</strong> This project’s value is in the process, not the artifact. Walk the Evidence → Hypothesis → Vulnerability → Exploit chain once in the web workbench and you will immediately see how it differs from everything else.</li>
+<li><strong>For automation, use <code>--jsonl</code></strong> — the last record of <code>type: &quot;result&quot;</code> is the terminal state. But do not expect it to work as a CI gate — its positioning and runtime are in the long-task class.</li>
+<li><strong>Before asking “can I use it”, decide whether you want v1 or v2.</strong> If you want an existing track record, look at the <code>v1</code> branch; if you want the new architecture, look at <code>main</code>. Do not mix the two.</li>
+</ol>
+<h2 id="9-The-One-Line-Verdict"><a href="#9-The-One-Line-Verdict" class="headerlink" title="9. The One-Line Verdict"></a>9. The One-Line Verdict</h2><p><strong>If what you care about is “can every AI pentest conclusion be reviewed”, LuaN1ao v2 is one of the few open-source works that does it at the schema level — worth reading its Runtime invariants carefully; but if you want “install today, report tomorrow”, it is still missing the v2 benchmark, the approval gates, and a less discouraging license.</strong></p>
+<p>First move for red teamers and researchers: <strong>get the Docker backend running in an isolated VM, do a <code>--max-cycles 3</code> short run with a <code>/32</code> single-IP scope, then walk the causal chain end to end in the web workbench.</strong> Once you have seen that, you will know exactly how much it is worth to you.</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/en/ai-tools/luan1ao-agent/">https://we5ter.github.io/en/ai-tools/luan1ao-agent/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/luan1ao-agent/&text=LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/luan1ao-agent/&title=LuaN1ao Breakdown: Pinning Every Pentest Conclusion Back to the Evidence Chain, Instead of Leaving It in the Model&#39;s Memory"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//en/ai-tools/luan1ao-agent/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//en/ai-tools/luan1ao-agent/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//en/ai-tools/luan1ao-agent/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "en",
+    other: "/ai-tools/luan1ao-agent/"
+  };
+</script>
+
+
+
+
+
+<nav class="post-nav post-nav--series">
+  
+  <a class="post-nav-prev" href="/en/ai-tools/agent-governance-toolkit/">
+    <span class="post-nav-label">&larr;
+      <span class="i18n-zh">上一期 · 第 008 期</span>
+      <span class="i18n-en">Previous · No. 8</span>
+    </span>
+    <span class="post-nav-title">Agent Governance Toolkit: from &#34;asking AI to behave&#34; to &#34;making it structurally incapable of misbehaving&#34;</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/en/ai-tools/dark-moon/">
+    <span class="post-nav-label">
+      <span class="i18n-zh">下一期 · 第 010 期</span>
+      <span class="i18n-en">Next · No. 10</span>
+    </span> &rarr;
+    <span class="post-nav-title">Dark-Moon Breakdown: Sanitize Real IPs and Credentials Locally First, Then Let the AI Attack</span>
+  </a>
+  
+</nav>
+
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+<!-- 阅读进度条 + 本页目录（只在文章页有对应节点，其他页面自然空跑退出） -->
+<script>
+(function () {
+  var bar = document.getElementById('read-progress');
+  var tocAside = document.getElementById('post-toc');
+  var article = document.querySelector('article.post-detail');
+  if (!bar && !tocAside) return;
+
+  // 进度按「文章本体」算，不含评论区和页脚 —— 否则滚到评论区就早早满格，
+  // 读者会以为文章看完了。
+  function progress() {
+    if (!bar || !article) return;
+    var r = article.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? (-r.top) / total : (r.top <= 0 ? 1 : 0);
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+
+  var links = [];      // { a, head }
+  var cur = -1;
+
+  function headingText(h) {
+    // Hexo 在每个标题里塞了 <a class="headerlink">，直接取 textContent 会带上锚点空白
+    var c = h.cloneNode(true);
+    var hl = c.querySelectorAll('.headerlink');
+    for (var i = 0; i < hl.length; i++) hl[i].parentNode.removeChild(hl[i]);
+    return (c.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(s) {
+    return String(s).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildToc() {
+    if (!tocAside || !article) return;
+    var nav = document.getElementById('post-toc-nav');
+    var det = document.getElementById('post-toc-inner');
+    var body = article.querySelector('.post-content');
+    if (!nav || !body) return;
+
+    var heads = body.querySelectorAll('h2, h3');
+    var h2n = 0, i;
+    for (i = 0; i < heads.length; i++) if (heads[i].tagName === 'H2') h2n++;
+    // 少于三个标题的短文不值得占一列，目录反而比正文长。
+    // 只看总数不单独看 h2：早期 CVE 长文整篇用 h3 分层（没有 h2），按 h2 计数会一律漏掉。
+    if (heads.length < 3) return;
+
+    var html = '<ul class="post-toc-list' + (h2n ? '' : ' is-flat') + '">';
+    for (i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + i;
+      // 标题带 sticky masthead，滚动定位要留出它的高度，否则跳过去被压在导航底下
+      h.style.scrollMarginTop = '76px';
+      html += '<li class="post-toc-item post-toc-' + h.tagName.toLowerCase() + '">' +
+              '<a href="#' + h.id + '">' + esc(headingText(h)) + '</a></li>';
+    }
+    html += '</ul>';
+    nav.innerHTML = html;
+
+    var as = nav.querySelectorAll('a');
+    for (i = 0; i < as.length; i++) links.push({ a: as[i], head: heads[i] });
+
+    tocAside.hidden = false;
+    document.body.classList.add('has-post-toc');
+
+    // 窄屏默认收起，别一进来就占满半屏；宽屏常驻展开。
+    // 1399 是 CSS 里目录宽屏断点（min-width: 1100px）的另一半：
+    // 两处必须互补，否则 1100–1399 会出现「目录已在右侧常驻、却被脚本收起」。
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 1099px)');
+    if (det && narrow && narrow.matches) det.removeAttribute('open');
+    nav.addEventListener('click', function (e) {
+      if (det && narrow && narrow.matches && e.target && e.target.tagName === 'A') {
+        det.removeAttribute('open');
+      }
+    });
+    highlight();
+  }
+
+  // 当前小节 = 最后一个顶部已越过 masthead 下沿的标题
+  function highlight() {
+    if (!links.length) return;
+    var idx = -1;
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].head.getBoundingClientRect().top <= 90) idx = i;
+      else break;
+    }
+    if (idx === cur) return;
+    if (cur >= 0 && links[cur]) links[cur].a.classList.remove('is-active');
+    cur = idx;
+    if (cur >= 0) links[cur].a.classList.add('is-active');
+  }
+
+  buildToc();
+  progress();
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      progress();
+      highlight();
+      ticking = false;
+    });
+  }, { passive: true });
+  window.addEventListener('resize', function () { progress(); highlight(); }, { passive: true });
+})();
+</script>
+
+<!-- 代码块：语言标签 + 一键复制 + 超长折叠 -->
+<script>
+(function () {
+  var figs = document.querySelectorAll('.post-content figure.highlight');
+  if (!figs.length) return;
+
+  function codeText(fig) {
+    // 行号在 td.gutter 里，只能取 td.code；每行之间是 <br>，
+    // 直接 textContent 会把所有行粘成一坨，必须按 .line 拼。
+    var td = fig.querySelector('td.code') || fig;
+    var lines = td.querySelectorAll('.line');
+    if (lines.length) {
+      var out = [];
+      for (var i = 0; i < lines.length; i++) out.push(lines[i].textContent.replace(/\n$/, ''));
+      return out.join('\n');
+    }
+    var pre = td.querySelector('pre');
+    return pre ? pre.textContent : td.textContent;
+  }
+
+  // file:// 预览和非 https 环境拿不到 navigator.clipboard，退回 execCommand
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function zh(s) { return '<span class="i18n-zh">' + s + '</span>'; }
+  function en(s) { return '<span class="i18n-en">' + s + '</span>'; }
+
+  // 复制失败要说出来：非安全上下文 / 页面失焦时 clipboard API 和 execCommand 都会静默失败，
+  // 按钮若原地不动，读者以为已经复制上了。
+  var timers = [];
+  function paint(btn, state) {
+    btn.classList.remove('is-copied', 'is-failed');
+    if (state === 'ok') {
+      btn.classList.add('is-copied');
+      btn.innerHTML = zh('已复制') + en('Copied');
+    } else if (state === 'fail') {
+      btn.classList.add('is-failed');
+      btn.innerHTML = zh('复制失败，请手动选中') + en('Copy failed — select manually');
+    } else {
+      btn.innerHTML = zh('复制') + en('Copy');
+    }
+  }
+  function flash(btn, state) {
+    paint(btn, state);
+    timers.push(setTimeout(function () { paint(btn, false); }, 2000));
+  }
+
+  Array.prototype.forEach.call(figs, function (fig) {
+    if (fig.parentNode && fig.parentNode.classList.contains('code-box')) return;
+
+    var m = fig.className.match(/(?:^|\s)highlight(?:\s+([a-z0-9+#._-]+))?/i);
+    var lang = m && m[1] ? m[1] : '';
+    // 未标语言的围栏 Hexo 给的是 plaintext（不是 plain），别漏 —— 每块都挂个「plaintext」比不挂更吵。
+    if (/^(plain|plaintext|text|txt)$/i.test(lang)) lang = '';
+
+    // figure 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码横向跑掉，
+    // 所以外面套一层 .code-box 承载工具条和折叠按钮。
+    var box = document.createElement('div');
+    box.className = 'code-box';
+    fig.parentNode.insertBefore(box, fig);
+    box.appendChild(fig);
+
+    var bar = document.createElement('div');
+    bar.className = 'code-bar';
+    var langEl = document.createElement('span');
+    langEl.className = 'code-lang';
+    if (lang) langEl.textContent = lang; else langEl.style.display = 'none';
+    bar.appendChild(langEl);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    paint(btn, false);
+    btn.addEventListener('click', function () {
+      var text = codeText(fig);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn, 'ok'); },
+          function () { flash(btn, legacyCopy(text) ? 'ok' : 'fail'); });
+      } else {
+        flash(btn, legacyCopy(text) ? 'ok' : 'fail');
+      }
+    });
+    bar.appendChild(btn);
+    box.insertBefore(bar, fig);
+
+    // 超长代码折叠：默认只露 20 行。不折叠的话一段两百行的日志能把整篇的滚动条吃光。
+    var lines = fig.querySelectorAll('td.code .line');
+    if (lines.length > 20) {
+      box.classList.add('is-foldable', 'is-folded');
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'code-more';
+      function paintMore(folded) {
+        more.innerHTML = folded
+          ? zh('展开全部 ' + lines.length + ' 行') + en('Expand all ' + lines.length + ' lines')
+          : zh('收起') + en('Collapse');
+      }
+      paintMore(true);
+      more.addEventListener('click', function () {
+        // toggle 返回「切换后是否还带着这个 class」，正好就是折叠状态
+        paintMore(box.classList.toggle('is-folded'));
+      });
+      box.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- 全站 ⌘K 搜索：正文级索引（search.json 按需拉取）。
+     专栏页 /ai-tools/ 自带一份「搜工具」的面板，这里让位，不抢同一个快捷键。 -->
+<script>
+(function () {
+  if (document.body.classList.contains('layout-ai-tools')) return;
+
+  var INDEX_URL = '/search.json';
+  var KEY = 'site-search-index';
+  var pal, scrim, input, list, idx = null, loading = false;
+  var rows = [], active = -1, lastFocus = null;
+
+  var L = {
+    ph:    function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Search articles, issues and body text…'
+             : '搜索文章、期号与正文…'; },
+    kind:  function (d) {
+      var en = document.documentElement.getAttribute('data-lang') === 'en';
+      if (d.k === 'issue' && d.i !== '') return en ? 'No. ' + d.i : '第 ' + d.i + ' 期';
+      if (d.k === 'page') return en ? 'Page' : '页面';
+      return en ? 'Post' : '文章';
+    },
+    empty: function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'No match.' : '没有匹配的结果。'; },
+    load:  function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Loading index…' : '索引加载中…'; }
+  };
+
+  function build() {
+    if (pal) return;
+    scrim = document.createElement('div');
+    scrim.className = 'aitools-palette-scrim';
+    scrim.id = 'site-palette-scrim';
+    scrim.hidden = true;
+
+    pal = document.createElement('div');
+    pal.className = 'aitools-palette';
+    pal.id = 'site-palette';
+    pal.setAttribute('role', 'dialog');
+    pal.setAttribute('aria-modal', 'true');
+    pal.setAttribute('aria-label', 'Site search');
+    pal.hidden = true;
+    pal.innerHTML =
+      '<div class="aitools-palette-search">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+          '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>' +
+          '<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>' +
+        '</svg>' +
+        '<input type="text" class="aitools-palette-input" id="site-palette-q" autocomplete="off" spellcheck="false">' +
+        '<kbd class="aitools-palette-esc">Esc</kbd>' +
+      '</div>' +
+      '<ul class="aitools-palette-list" id="site-palette-list" role="listbox"></ul>';
+
+    document.body.appendChild(scrim);
+    document.body.appendChild(pal);
+    input = document.getElementById('site-palette-q');
+    list = document.getElementById('site-palette-list');
+    input.placeholder = L.ph();
+
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', onNav);
+    scrim.addEventListener('click', close);
+  }
+
+  function loadIndex(cb) {
+    if (idx) return cb(idx);
+    try {
+      var cached = sessionStorage.getItem(KEY);
+      if (cached) { idx = JSON.parse(cached); return cb(idx); }
+    } catch (e) { /* 隐私模式 / 超配额：当成没缓存 */ }
+    if (loading) return;
+    loading = true;
+    msg(L.load());
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', INDEX_URL, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      loading = false;
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          idx = JSON.parse(xhr.responseText);
+          try { sessionStorage.setItem(KEY, xhr.responseText); } catch (e) {}
+          cb(idx);
+        } catch (e) { msg(L.empty()); }
+      } else {
+        msg(document.documentElement.getAttribute('data-lang') === 'en'
+            ? 'Index unavailable.' : '索引加载失败。');
+      }
+    };
+    xhr.send();
+  }
+
+  function msg(text) {
+    rows = []; active = -1;
+    list.innerHTML = '<li class="aitools-palette-empty"></li>';
+    list.firstChild.textContent = text;
+  }
+
+  // 命中位置：返回该词在文本里第一次出现的位置，找不到返回 -1
+  function firstHit(hay, w) { return hay.indexOf(w); }
+
+  function snippet(text, pos) {
+    var from = Math.max(0, pos - 42);
+    var to = Math.min(text.length, pos + 96);
+    return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+  }
+
+  function search(q) {
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var uiLang = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+    var out = [];
+    idx.docs.forEach(function (d) {
+      var t = (d.t || '').toLowerCase();
+      var de = (d.d || '').toLowerCase();
+      var x = (d.x || '').toLowerCase();
+      var score = 0, hitPos = -1, ok = true;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        var inT = t.indexOf(w), inD = de.indexOf(w), inX = x.indexOf(w);
+        if (inT < 0 && inD < 0 && inX < 0) { ok = false; break; }
+        score += (inT >= 0 ? 8 : 0) + (inD >= 0 ? 3 : 0) + (inX >= 0 ? 1 : 0);
+        if (hitPos < 0) hitPos = inX;
+      }
+      if (!ok) return;
+      if (d.l === uiLang) score += 2;
+      out.push({ d: d, score: score, pos: hitPos });
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out.slice(0, 12);
+  }
+
+  function draw() {
+    var q = input.value.trim();
+    list.innerHTML = '';
+    rows = []; active = -1;
+    if (!idx) { msg(L.load()); return; }
+    if (!q) { msg(document.documentElement.getAttribute('data-lang') === 'en'
+                   ? 'Type to search ' + idx.docs.length + ' pages.'
+                   : '输入关键词，共 ' + idx.docs.length + ' 篇可搜。'); return; }
+    var hits = search(q);
+    if (!hits.length) { msg(L.empty()); return; }
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    hits.forEach(function (h, n) {
+      var d = h.d;
+      var li = document.createElement('li');
+      li.className = 'aitools-palette-row';
+      li.setAttribute('role', 'option');
+
+      var kind = document.createElement('span');
+      kind.className = 'aitools-palette-kind';
+      kind.textContent = L.kind(d);
+
+      var box = document.createElement('span');
+      box.className = 'site-palette-main';
+      var name = document.createElement('span');
+      name.className = 'aitools-palette-name';
+      name.textContent = d.t;
+      box.appendChild(name);
+
+      // 摘要优先给正文命中那一段（标题命中时正文摘要意义不大，但仍给读者上下文）
+      var pos = h.pos;
+      if (pos < 0) {
+        for (var i = 0; i < words.length && pos < 0; i++) pos = firstHit((d.x || '').toLowerCase(), words[i]);
+      }
+      if (pos >= 0) {
+        var sn = document.createElement('span');
+        sn.className = 'site-palette-snippet';
+        markWords(sn, snippet(d.x, pos), words);
+        box.appendChild(sn);
+      }
+
+      li.appendChild(kind);
+      li.appendChild(box);
+      li.addEventListener('click', function () { go(n); });
+      list.appendChild(li);
+      rows.push({ li: li, url: d.u });
+    });
+    setActive(0);
+  }
+
+  // 用 DOM 拼接而不是 innerHTML：关键词来自用户输入，不能进 HTML 解析
+  function markWords(el, text, words) {
+    var low = text.toLowerCase();
+    var marks = [];
+    words.forEach(function (w) {
+      if (w.length < 1) return;
+      var from = 0, p;
+      while ((p = low.indexOf(w, from)) !== -1) { marks.push([p, p + w.length]); from = p + w.length; }
+    });
+    if (!marks.length) { el.textContent = text; return; }
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var cur = 0;
+    marks.forEach(function (m) {
+      if (m[0] < cur) return;
+      if (m[0] > cur) el.appendChild(document.createTextNode(text.slice(cur, m[0])));
+      var k = document.createElement('mark');
+      k.className = 'aitools-hl';
+      k.textContent = text.slice(m[0], m[1]);
+      el.appendChild(k);
+      cur = m[1];
+    });
+    if (cur < text.length) el.appendChild(document.createTextNode(text.slice(cur)));
+  }
+
+  function setActive(n) {
+    if (!rows.length) return;
+    if (active >= 0 && rows[active]) rows[active].li.classList.remove('is-active');
+    active = (n + rows.length) % rows.length;
+    rows[active].li.classList.add('is-active');
+    rows[active].li.scrollIntoView({ block: 'nearest' });
+  }
+
+  function go(n) {
+    var words = input.value.trim();
+    var url = '/' + rows[n].url;
+    if (words) url += (url.indexOf('?') === -1 ? '?' : '&') + 'hl=' + encodeURIComponent(words);
+    window.location.href = url;
+  }
+
+  function onNav(e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (rows.length) go(active < 0 ? 0 : active); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  }
+
+  function open() {
+    build();
+    lastFocus = document.activeElement;
+    scrim.hidden = false;
+    pal.hidden = false;
+    document.body.classList.add('aitools-palette-open');
+    window.requestAnimationFrame(function () { scrim.classList.add('is-open'); pal.classList.add('is-open'); });
+    input.placeholder = L.ph();
+    input.value = '';
+    draw();
+    loadIndex(function () { draw(); });
+    input.focus();
+  }
+
+  function close() {
+    if (!pal) return;
+    scrim.classList.remove('is-open');
+    pal.classList.remove('is-open');
+    document.body.classList.remove('aitools-palette-open');
+    scrim.hidden = true;
+    pal.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!pal || pal.hidden) open(); else close();
+      return;
+    }
+    // 文章页的「/」也留给搜索：正文页没有专栏页那套列表快捷键，不冲突
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && (!pal || pal.hidden)) {
+      var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      open();
+    }
+  });
+
+  var trigger = document.getElementById('nav-search');
+  if (trigger) trigger.addEventListener('click', open);
+})();
+</script>
+
+<!-- 从搜索结果跳进来时高亮正文命中：?hl=关键词，标出第一处并滚过去。
+     用完就把参数从地址栏抹掉，免得分享出去的链接自带一个高亮。 -->
+<script>
+(function () {
+  var q;
+  try { q = new URLSearchParams(location.search).get('hl'); } catch (e) { return; }
+  if (!q) return;
+  var body = document.querySelector('.post-content');
+  if (!body) return;
+
+  var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+  if (!words.length) return;
+
+  var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentNode;
+      // 代码块和高亮脚本里不插 mark：会破坏缩进，也可能被复制走
+      while (p && p !== body) {
+        var tag = p.nodeName ? p.nodeName.toLowerCase() : '';
+        if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'mark') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  var node, hit = null;
+  while ((node = walker.nextNode())) {
+    var low = node.nodeValue.toLowerCase();
+    for (var i = 0; i < words.length; i++) {
+      var at = low.indexOf(words[i]);
+      if (at !== -1) { hit = { node: node, at: at, len: words[i].length }; break; }
+    }
+    if (hit) break;
+  }
+
+  if (hit) {
+    var k = document.createElement('mark');
+    k.className = 'search-hl';
+    k.textContent = hit.node.nodeValue.substr(hit.at, hit.len);
+    hit.node.splitText(hit.at);
+    hit.node.nextSibling.parentNode.insertBefore(k, hit.node.nextSibling);
+    if (k.scrollIntoView) k.scrollIntoView({ block: 'center' });
+  }
+
+  try {
+    var p = new URLSearchParams(location.search);
+    p.delete('hl');
+    var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>

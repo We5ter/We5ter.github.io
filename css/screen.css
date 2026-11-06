@@ -1,0 +1,3294 @@
+/* ==========================================================================
+   YOYO Theme — Light Academic (inspired by Minimal Mistakes)
+   ========================================================================== */
+
+:root {
+  --bg:            #ffffff;
+  --bg-soft:       #f8f9fa;
+  --text:          #22252a;
+  --text-muted:    #6f777d;
+  --border:        #e2e4e6;
+  --accent:        #2f7d95;
+  --accent-soft:   #eaf3f6;
+  --radius:        6px;
+  --sidebar-w:     220px;
+  --content-max:   1100px;
+  --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono:     'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin: 1.6em 0 .6em; font-weight: 600; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+p { margin: 0 0 1.2em; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+code {
+  font-family: var(--font-mono);
+  font-size: .875em;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: .1em .35em;
+}
+pre {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: .875rem;
+}
+pre code { background: none; border: 0; padding: 0; }
+blockquote {
+  margin: 1.5em 0;
+  padding: .5em 1.2em;
+  border-left: 4px solid var(--accent);
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: .9375rem; }
+th, td { border: 1px solid var(--border); padding: .5rem .75rem; text-align: left; }
+th { background: var(--bg-soft); font-weight: 600; }
+
+/* ==========================================================================
+   Masthead
+   ========================================================================== */
+.masthead {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.masthead__inner-wrap {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 60px;
+  flex-wrap: wrap;
+}
+.site-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+.site-title:hover { color: var(--accent); text-decoration: none; }
+/* 站点标题里的 Wester logo：高度用 em 绑当前字号（.site-title 是 1.05rem），
+   改字号时 logo 自动跟着变，不用同步改宽度（宽由 SVG viewBox 比例算出）。
+   height 由 Wester 指定为 1em；如果看着比旁边的粗体字大/小，改这个值即可
+   （font-size 含 ascender/descender，一般 0.8~1em 之间找视觉体量最接近的）。 */
+.site-title-logo {
+  height: 1em;
+  width: auto;
+  vertical-align: -.06em;   /* 压一点让视觉基线和旁边的字对齐 */
+  margin-right: .18em;
+}
+.visible-links {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.masthead__menu-item > a {
+  display: block;
+  padding: .5rem .75rem;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: .9375rem;
+  font-weight: 500;
+}
+.masthead__menu-item > a:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+  text-decoration: none;
+}
+.masthead__menu-item.is-active > a {
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+/* ---- 中英文切换 ---- */
+/* t() helper 把中英文两份文案都写进 HTML，这里按 <html data-lang> 决定显示哪份。
+   切换只改一个属性，不遍历 DOM，也不会首屏闪现另一种语言。 */
+.i18n-en { display: none; }
+html[data-lang="en"] .i18n-zh { display: none; }
+html[data-lang="en"] .i18n-en { display: inline; }
+
+.lang-toggle-item { display: flex; align-items: center; margin-left: .25rem; }
+.lang-toggle {
+  padding: .3rem .55rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: .02em;
+  cursor: pointer;
+}
+.lang-toggle:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.nav-toggle {
+  display: none;
+  margin-left: auto;
+  width: 38px; height: 34px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  padding: 8px 9px;
+}
+.nav-toggle span {
+  display: block; width: 18px; height: 2px;
+  background: var(--text); border-radius: 2px; margin: 3px 0;
+}
+
+/* ==========================================================================
+   Main layout: sidebar + content
+   ========================================================================== */
+#main {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  gap: 2.25rem;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+  align-items: start;
+}
+.sidebar { position: sticky; top: 85px; }
+.author-card { text-align: center; }
+.author-avatar {
+  width: 118px; height: 118px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+  margin: 0 auto 1rem;
+}
+.author-name {
+  margin: 0 0 .25rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+/* 侧栏里的 Wester logo：按 SVG viewBox 610×166 (3.67:1) 真实比例缩到 75×20，
+   宽度远小于 220px 的栏宽，刻意克制；height:auto 交给比例算，不写死避免变形。 */
+.author-logo {
+  display: block;
+  margin: 0 auto;          /* block 元素不响应父级 text-align，必须自居中 */
+  width: 100%;
+  max-width: 75px;
+  height: auto;
+  /* 用 aspect-ratio 锁 SVG 真实比例（别用 min-height 兜底，窄栏里会把字压扁）；
+     描边动画播完前这块是空白，比例锁住就不会有布局跳动。 */
+  aspect-ratio: 610 / 166;
+}
+.author-bio {
+  margin: 0 0 1.25rem;
+  font-size: .875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.author-links {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .35rem;
+}
+.author-links li { margin-bottom: .35rem; }
+.author-links a,
+.author-links .wechat-trigger {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .3rem .4rem;
+  margin: 0 -.4rem;
+  width: calc(100% + .8rem);
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: .875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.author-links a:hover,
+.author-links .wechat-trigger:hover {
+  background: var(--bg-soft);
+  color: var(--accent);
+  text-decoration: none;
+}
+.author-links svg { width: 16px; height: 16px; fill: currentColor; flex: none; }
+
+/* 悬停弹出的小卡片（公众号二维码等）；触屏靠 after_all.ejs 里的点击切换 .is-open */
+.author-link-pop { position: relative; }
+/* 侧边栏链接文字：过长时省略号，不撑破 220px 的侧栏 */
+.link-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-pop {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  z-index: 20;
+  display: none;
+  width: auto;
+  min-width: 128px;
+  max-width: 200px;
+  margin-left: .5rem;
+  padding: .5rem .7rem;
+  transform: translateY(-50%);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(34, 37, 42, .1);
+  text-align: center;
+  white-space: nowrap;
+  cursor: default;
+}
+.author-link-pop:hover .link-pop,
+.author-link-pop.is-open .link-pop { display: block; }
+.link-pop-qr { width: 156px; }
+.link-pop-name {
+  display: block;
+  overflow: hidden;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  text-overflow: ellipsis;
+}
+.link-pop img { display: block; width: 100%; height: auto; margin-top: .45rem; border-radius: 3px; }
+.link-pop-hint {
+  display: block;
+  margin-top: .2rem;
+  font-size: .6875rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.page-content { min-width: 0; }
+.page-content > :first-child { margin-top: 0; }
+
+/* page heading (section title) */
+
+/* ==========================================================================
+   Post list (blog index)
+   ========================================================================== */
+.post {
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.post:first-child { padding-top: 0; }
+.post:last-of-type { border-bottom: 0; }
+.post-header-row { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+.post-date-badge {
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.post-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.post-title a { color: var(--text); }
+.post-title a:hover { color: var(--accent); text-decoration: none; }
+/* 列表页标题固定一行，超长省略 —— 否则会把右侧标签挤到第二排
+   （只作用于列表行内，文章详情页的 h1 标题不受影响） */
+.post-header-row .post-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.post-excerpt {
+  margin: .25rem 0 0;
+  color: var(--text-muted);
+  font-size: .875rem;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-excerpt p { margin: 0; }
+.post-tags { display: flex; flex-wrap: wrap; gap: .3rem; }
+.post-header-row .post-tags { margin-left: auto; flex-shrink: 0; }
+.post-tag {
+  font-size: .6875rem;
+  line-height: 1.7;
+  padding: 0 .4rem;
+  border-radius: 3px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.post-tag:hover { text-decoration: none; border-color: var(--accent); }
+.post-pinned { background: var(--bg-soft); border-radius: var(--radius); padding: .85rem 1rem; margin: .85rem 0; }
+
+@media (max-width: 640px) {
+  .post-header-row { gap: .5rem; }
+  .post-header-row .post-tags { margin-left: 0; flex-basis: 100%; }
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: .875rem;
+}
+.page-number { color: var(--text-muted); }
+
+/* ==========================================================================
+   Article (post detail)
+   ========================================================================== */
+.article-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.post-detail .post-title {
+  font-size: 1.9rem;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  margin: 0 0 .7rem;
+  font-weight: 700;
+}
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+  font-size: .875rem;
+  color: var(--text-muted);
+}
+.meta-sep { color: var(--border); }
+.article-date, .article-readtime {
+  font-family: var(--font-mono);
+  font-size: .8125rem;
+}
+.article-tags { display: inline-flex; flex-wrap: wrap; gap: .35rem; }
+
+/* --- content typography: optimized for long-form reading --- */
+.post-content {
+  max-width: 720px;          /* ~70 chars per line */
+  font-size: 1.0625rem;      /* 17px */
+  line-height: 1.8;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Hexo 代码高亮输出的是 <figure class="highlight"><table>…，
+   表格会无视外层宽度把整页撑破，所以让 figure 自己横向滚动 */
+.post-content .highlight {
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 0 0 1.4em;
+  padding: .85rem 0;
+}
+.post-content .highlight table {
+  width: auto;
+  min-width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+}
+.post-content .highlight td { border: 0; padding: 0; vertical-align: top; }
+.post-content .highlight .gutter {
+  width: 1%;
+  white-space: nowrap;
+  padding-right: .5rem;
+  text-align: right;
+  color: var(--text-muted);
+  user-select: none;
+}
+.post-content .highlight pre {
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0 .85rem;
+  margin: 0;
+}
+
+/* 正文里的普通表格同样允许独立横向滚动 */
+.post-content > table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.post-content > p,
+.post-content > ul,
+.post-content > ol,
+.post-content > blockquote,
+.post-content > pre,
+.post-content > table { margin-bottom: 1.4em; }
+.post-content p { margin-top: 0; }
+
+.post-content h2 {
+  margin: 2.2em 0 .8em;
+  padding-bottom: .35em;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.45rem;
+}
+.post-content h3 { margin: 1.9em 0 .7em; font-size: 1.2rem; }
+.post-content h4 { margin: 1.6em 0 .6em; font-size: 1.05rem; }
+.post-content h2:first-child, .post-content h3:first-child { margin-top: 0; }
+
+.post-content ul, .post-content ol { padding-left: 1.5em; }
+.post-content li { margin-bottom: .45em; }
+.post-content li > ul, .post-content li > ol { margin: .45em 0 0; }
+
+.post-content a { text-decoration: underline; text-underline-offset: 2px; }
+.post-content a:hover { color: #235f72; }
+
+.post-content img {
+  display: block;
+  margin: 1.75rem auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 100%;
+}
+.post-content img + em {
+  display: block;
+  text-align: center;
+  font-size: .8125rem;
+  color: var(--text-muted);
+  margin-top: -.9rem;
+  margin-bottom: 1.4em;
+}
+.post-content blockquote {
+  border-left: 4px solid var(--accent);
+  background: var(--bg-soft);
+  padding: .8em 1.2em;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.post-content blockquote p:last-child { margin-bottom: 0; }
+.post-content hr { margin: 2.5em 0; }
+.post-content table { font-size: .9375rem; }
+
+/* --- 排版套件 v2：front-matter `typeset: v2` 开启；组件是包住普通 markdown 的 div，
+       导出知乎 md 时外壳会被剥掉，公众号导出在 export-wechat.js 里另有内联样式映射 --- */
+.post-content--v2 { counter-reset: v2sec; }
+.post-content--v2 h2 {
+  counter-increment: v2sec;
+  display: flex;
+  align-items: baseline;
+  gap: .6em;
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.post-content--v2 h2::before {
+  content: counter(v2sec, decimal-leading-zero);
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: .8em;
+  font-weight: 700;
+  color: var(--accent);
+  padding: .05em .45em;
+  border-radius: 4px;
+  background: var(--accent-soft);
+}
+.post-content--v2 h3 { padding-left: .7em; border-left: 3px solid var(--accent); line-height: 1.35; }
+
+.x-lede {
+  margin: 0 0 2em;
+  padding: 1.25em 1.4em;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-soft) 70%);
+  border: 1px solid var(--border);
+  font-size: 1.08em;
+}
+.x-lede > :last-child { margin-bottom: 0; }
+.x-label {
+  display: inline-block;
+  margin-bottom: .6em;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.x-facts ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: .6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.8em;
+}
+.x-facts li {
+  margin: 0;
+  padding: .7em .85em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+.x-facts li strong {
+  display: block;
+  margin-bottom: .25em;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+}
+
+.x-callout {
+  margin: 0 0 1.6em;
+  padding: .95em 1.15em;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  background: var(--bg-soft);
+  font-size: .97em;
+}
+.x-callout > :last-child { margin-bottom: 0; }
+.x-callout.x-warn { border-left-color: #d08a1c; background: #fdf7ec; }
+[data-theme="dark"] .x-callout.x-warn { background: #2a2217; border-left-color: #e0a443; }
+
+.x-vs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+  margin: 0 0 1.8em;
+}
+.x-vs > div {
+  padding: 1em 1.1em;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-soft);
+  font-size: .94em;
+}
+.x-vs > div:last-child { border-color: var(--accent); background: var(--accent-soft); }
+.x-vs > div > :last-child { margin-bottom: 0; }
+.x-vs h4 { margin: 0 0 .5em; }
+.x-vs ul { padding-left: 1.2em; }
+@media (max-width: 640px) { .x-vs { grid-template-columns: 1fr; } }
+
+.x-steps ol { list-style: none; counter-reset: xstep; padding: 0; margin: 0 0 1.8em; }
+.x-steps li {
+  counter-increment: xstep;
+  position: relative;
+  margin: 0;
+  padding: 0 0 1.05em 2.6em;
+  border-left: 2px solid var(--border);
+  margin-left: .9em;
+}
+.x-steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.x-steps li::before {
+  content: counter(xstep);
+  position: absolute;
+  left: -.95em;
+  top: -.1em;
+  width: 1.8em;
+  height: 1.8em;
+  line-height: 1.8em;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: .85em;
+  font-weight: 700;
+}
+
+.x-verdict {
+  margin: 2em 0 0;
+  padding: 1.3em 1.4em;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+}
+.x-verdict > :last-child { margin-bottom: 0; }
+
+.post-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  max-width: 720px;
+}
+.author-byline {
+  margin: 0 0 1.5rem;
+  font-size: .875rem;
+  color: var(--text-muted);
+}
+.author-byline strong { color: var(--text); }
+
+.post-nav {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.post-nav-prev, .post-nav-next { flex: 1 1 0; min-width: 0; }
+.post-nav-next { text-align: right; }
+.post-nav-label {
+  display: block;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-muted);
+  margin-bottom: .25rem;
+}
+.post-nav-title { font-size: .9375rem; font-weight: 500; }
+.post-nav-placeholder { flex: 1 1 0; }
+
+/* share buttons */
+.share { margin-top: 2rem; }
+.share-buttons { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.share-buttons a, .share-buttons button {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .35rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: .8125rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.share-buttons a:hover, .share-buttons button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+.share-buttons svg, .share-buttons img { width: 15px; height: 15px; fill: currentColor; }
+
+/* comments */
+.comments-section { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.comments-header { font-size: 1.05rem; font-weight: 600; margin-bottom: 1rem; }
+.giscus-wrapper { margin-top: 1rem; }
+
+/* ==========================================================================
+   Tag page
+   ========================================================================== */
+.site-head-tag { margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.tag-hero-icon { margin-bottom: .75rem; }
+.tag-description { color: var(--text-muted); font-size: .9375rem; margin: .5rem 0 0; }
+.tag-back-home { display: inline-block; margin-top: 1rem; font-size: .875rem; }
+.tag-post-count { font-size: .8125rem; color: var(--text-muted); white-space: nowrap; }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.page__footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-soft);
+  margin-top: 2rem;
+}
+.footer__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  font-size: .875rem;
+  color: var(--text-muted);
+}
+.footer__inner p { margin: .25rem 0; }
+/* 版权行里的 Wester logo：同样用 em 绑字号（.footer__inner 是 .875rem），
+   footer 本身居中（text-align: center），inline 的 img 自然跟着居中。 */
+.footer-logo {
+  height: .95em;
+  width: auto;
+  vertical-align: -.12em;
+  margin-left: .18em;
+}
+
+#back-to-top-btn {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+#back-to-top-btn.is-visible { opacity: 1; pointer-events: auto; }
+#back-to-top-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 860px) {
+  #main {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.75rem 1.25rem 3rem;
+  }
+  .sidebar { position: static; }
+  .author-avatar { width: 110px; height: 110px; }
+  .author-links li { margin-bottom: 0; }
+  .author-links a,
+  .author-links .wechat-trigger {
+    width: auto;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: .3rem .7rem;
+  }
+  /* 窄屏空间不够往右弹，改成在图标正上方居中弹出 */
+  .link-pop {
+    left: 50%;
+    top: auto;
+    bottom: 100%;
+    margin-left: 0;
+    margin-bottom: .45rem;
+    transform: translateX(-50%);
+  }
+
+  .nav-toggle { display: block; order: 3; }
+  .visible-links {
+    display: none;
+    order: 4;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .15rem;
+    padding: .5rem 0 .75rem;
+    border-top: 1px solid var(--border);
+    margin-top: .25rem;
+  }
+  .visible-links.is-open { display: flex; }
+  .masthead__menu-item > a { padding: .55rem .25rem; }
+  .lang-toggle-item { margin-left: 0; padding: .3rem .25rem; }
+  .site-title { order: 1; }
+}
+
+/* ==========================================================================
+   Talks & Repositories sections (JSON 数据 + 客户端渲染)
+   ========================================================================== */
+
+/* ---- Talks — compact list ---- */
+.talk-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.talk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .85rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.talk-item:last-child { border-bottom: none; }
+
+/* 会议 logo：本地托管，浅色容器保证任何配色的 logo 都能看清（黑底白字需 invert） */
+.talk-logo {
+  flex-shrink: 0;
+  width: 52px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-top: 1px;
+}
+.talk-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.talk-main { flex: 1 1 auto; min-width: 0; }
+
+/* 会议名称徽标：accent 色 + 左侧竖条，比标题更先被看到 */
+.talk-event {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: .2rem;
+  padding: .05rem .5rem .05rem .45rem;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 3px 3px 0;
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: .02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.talk-event:hover {
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+}
+
+.talk-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.talk-title a { color: var(--text); }
+.talk-title a:hover { color: var(--accent); text-decoration: none; }
+.talk-author {
+  display: block;
+  margin-top: 2px;
+  font-size: .8125rem;
+  color: var(--text-muted);
+}
+
+.talk-links {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: .8rem;
+}
+.talk-links a { color: var(--accent); white-space: nowrap; }
+
+@media (max-width: 640px) {
+  .talk-item { flex-wrap: wrap; gap: .4rem .75rem; }
+  .talk-links { flex-basis: 100%; margin-left: 0; padding-left: calc(52px + .75rem); }
+}
+
+@media (max-width: 480px) {
+  .talk-title { font-size: .9375rem; }
+  .talk-links { padding-left: 0; }
+  /* Fix post-detail huge padding on mobile */
+  .post.post-detail { padding: 20px 10px !important; width: auto !important; max-width: none !important; }
+  /* Fix footer stick to bottom */
+  main.content { min-height: calc(100vh - 120px) !important; padding-bottom: 10px; }
+}
+
+@media (max-width: 640px) and (min-width: 481px) {
+  .post.post-detail { padding: 30px 20px !important; }
+}
+
+/* ===== Open source projects — compact list ===== */
+.repo-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.repo-item {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.repo-item:last-child { border-bottom: none; }
+
+.repo-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.repo-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.repo-name a { color: var(--accent); }
+.repo-name a:hover { text-decoration: underline; }
+
+.repo-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  font-size: .8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.repo-stars { color: var(--text); }
+.repo-stats svg { vertical-align: -2px; }
+.repo-stats .repo-gh { font-size: .8rem; color: var(--accent); }
+
+.repo-desc {
+  margin: 3px 0 0;
+  font-size: .875rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .repo-head { flex-direction: column; align-items: flex-start; gap: 3px; }
+}
+
+@media (max-width: 480px) {
+  .repo-name { font-size: .9375rem; }
+  .repo-desc { font-size: .8125rem; -webkit-line-clamp: 3; }
+  /* Fix post-detail huge padding on mobile */
+  .post.post-detail { padding: 20px 10px !important; width: auto !important; max-width: none !important; }
+  /* Fix footer stick to bottom */
+  main.content { min-height: calc(100vh - 120px) !important; padding-bottom: 10px; }
+}
+
+/* ---- home page sections (merged single-page layout) ---- */
+.home-section { margin-bottom: 2.25rem; }
+.home-section:last-child { margin-bottom: 0; }
+
+/* ---- Recent news：站点公告，做成提示条的样式 ---- */
+.news-list {
+  list-style: none;
+  margin: 0;
+  padding: .6rem .9rem;
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.news-item {
+  display: flex;
+  gap: .6rem;
+  padding: .2rem 0;
+  font-size: .9375rem;
+  line-height: 1.6;
+}
+.news-date {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.news-text { flex: 1 1 auto; min-width: 0; }
+.section-heading {
+  margin: 0 0 .35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-sub {
+  margin: .4rem 0 1rem;
+  color: var(--text-muted);
+  font-size: .875rem;
+}
+
+/* ---- 404：GitHub Pages 会自动使用站点根目录的 404.html ---- */
+.notfound { max-width: 720px; padding: 1.5rem 0 1rem; }
+.notfound-code {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: var(--accent);
+}
+.notfound-title { margin: .6rem 0 .6rem; font-size: 1.6rem; }
+.notfound-desc { margin-bottom: .6rem; }
+.notfound-status { color: var(--text-muted); font-size: .875rem; }
+.notfound-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0 2rem; }
+.notfound-btn {
+  display: inline-block;
+  padding: .45rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: .875rem;
+  font-weight: 500;
+}
+.notfound-btn:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.notfound-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.notfound-btn-primary:hover {
+  background: #266a80;
+  border-color: #266a80;
+  color: #fff;
+}
+.notfound-suggest-title {
+  margin: 0 0 .5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--border);
+}
+.notfound-list { list-style: none; margin: 0; padding: 0; }
+.notfound-list li {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  padding: .45rem 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: .9375rem;
+}
+.notfound-list li:last-child { border-bottom: 0; }
+.notfound-list a { flex: 1 1 auto; min-width: 0; }
+.notfound-list time {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: .8125rem;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .notfound-code { font-size: 3.25rem; }
+  .notfound-title { font-size: 1.35rem; }
+  .notfound-actions { gap: .4rem; }
+  .notfound-list li { flex-direction: column; gap: .1rem; }
+}
+
+/* ---- AI 工具专栏页（/ai-tools/） ---- */
+
+/* 这一页隐藏侧边栏：正文是宽卡片列表，220px 的侧栏会把卡片挤窄，
+   而且侧栏里那个「最新 AI 工具推荐」小组件在本页是冗余的（下面就在列）。
+   用 body.layout-ai-tools 限定作用域，其他页面不受影响。
+   单列后把 --content-max 收窄回原来正文的宽度，避免一行过长难读。 */
+body.layout-ai-tools .sidebar { display: none; }
+/* 侧栏让出来的 220px 还给正文，回到站点统一的 --content-max（1100px）。
+   卡片是列表型内容、note 也只有一两句，宽一点不伤阅读，反而少滚动。 */
+body.layout-ai-tools #main {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1100px;
+}
+
+/* ---- 文章页（/blogs/<slug>/ · /ai-tools/<slug>/）：隐藏左侧边栏 ----
+   这两个 URL 都是文章（post layout）：前者走 _config 的 permalink: blogs/:title/，
+   后者在 front-matter 里写了 permalink: ai-tools/<slug>/。body 上统一带
+   layout-post，按它限定作用域就行，不用逐个 URL 判断。
+   侧栏装的是作者名片 + 访问统计，跟正文无关，在长文页上白占 220px；窄屏（≤860px）
+   #main 塌成单列后它还会整块堆在正文上方，更该藏。
+   和专栏页不同：那边正文是宽卡片列表，藏完直接吃满 1100；文章正文是
+   .post-content 的 720px 长文本，吃满会贴着左边缘、右边空出一大条，
+   所以这里外壳（导航 / 页脚）宽度不动，只把正文列居中。 */
+body.layout-post .sidebar { display: none; }
+body.layout-post #main { grid-template-columns: minmax(0, 1fr); }
+/* 720px 与 .post-content 的 max-width 一致 —— 正文正好填满这一列，
+   标题、正文、脚注共用一条中轴，不用再给 .post-content 加 margin auto。 */
+body.layout-post .page-content {
+  max-width: 720px;
+  margin-inline: auto;
+}
+/* ≥1100px 时目录要靠 .page-content 的两列网格挂到正文右侧（见文末
+   「本页目录：宽屏形态」），上面那条 max-width 会把目录列一起挤扁。
+   这里按「正文 720 + 目录 208」重新定列，并用 justify-content 把两列
+   整体居中，左右留白对称。选择器多带一个 .layout-post，特异性高于
+   body.has-post-toc .page-content，不依赖本段在文件里的位置。
+   断点跟着目录的宽屏形态走（1100px），两处必须一致，否则
+   1100–1399 这段会出现「正文已收窄、目录还在正文上方」的错位。 */
+@media (min-width: 1100px) {
+  body.layout-post.has-post-toc .page-content {
+    max-width: none;
+    grid-template-columns: 720px 208px;
+    justify-content: center;
+  }
+}
+
+/* 双语标语：作为 <h1> 里标题下面的一行小字，和标题同属一个视觉块。
+   挂在 banner 上时是白字 —— banner 自带压暗层（rgba(8,20,28,.52→.78)），白字托得住。
+   这里绝不能用主题色或渐变文字：深色图上会糊掉，也压不住背景纹理。
+   选择器一律带 body.layout-ai-tools 前缀（0,3,1），用来压过文件更后面的
+   「.section-heading--banner .i18n-* { color:#fff }」—— 同特异性时后者会反过来盖掉我们。 */
+body.layout-ai-tools .section-heading .aitools-slogan {
+  display: none;          /* 由下面两条按语言放开，避免中英两条同时出现 */
+  margin-top: .45rem;
+  font-size: .9375rem;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: .02em;
+  color: rgba(255, 255, 255, .9);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+}
+/* 只放开「当前语言」那一条，并提升成 block 让它独占一行。
+   特异性 (0,4,1) 高于上面 (0,3,1)，也高于 i18n 的 display 规则 (0,2,1)。 */
+html[data-lang="zh"] body.layout-ai-tools .section-heading .aitools-slogan.i18n-zh,
+html[data-lang="en"] body.layout-ai-tools .section-heading .aitools-slogan.i18n-en {
+  display: block;
+}
+/* 没配 banner 时标题是浅色背景，白字会隐形 —— 退回弱化正文色。
+   与上面那条选择器互斥（:not），不存在互相覆盖的问题。 */
+body.layout-ai-tools .section-heading:not(.section-heading--banner) .aitools-slogan {
+  color: var(--text-muted);
+  text-shadow: none;
+}
+
+/* banner 右上角「GitHub 仓库」按钮。
+   ① 外观刻意复刻文章页 banner 上的 .post-tag 玻璃样式（白 16% 底 + 白 38% 描边），
+     不引入第三种强调色 —— 压暗层是深蓝灰，任何彩色按钮都会变成视觉噪音。
+   ② font-size / line-height 必须显式写：父级是 <h1>，不写会继承 banner 的大字号。
+      color 同理：全局 a { color: var(--accent) } 会抢过来，必须压回去 #fff。
+   ③ 选择器带 body.layout-ai-tools 前缀 (0,3,2)，压过文件后面
+     「.section-heading--banner .i18n-* { color:#fff }」(0,2,1)。
+   ④ 不占文档流（absolute），标题在 banner 里保持完美居中，不需要为它留空。 */
+body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
+  position: absolute;
+  /* 垂直居中：不能用固定 top 偏移——banner 高度随标语折行动态变化，
+     写死偏移在标语折两行/一行时按钮就贴顶或沉底。top:50% + translateY(-50%)
+     才是真正的居中。 */
+  top: 50%;
+  transform: translateY(-50%);
+  right: 1.75rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: .55rem 1.05rem;
+  color: #fff;
+  text-decoration: none;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+  background: rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 255, 255, .38);
+  border-radius: var(--radius);
+  transition: background .15s, border-color .15s;
+}
+body.layout-ai-tools .section-heading--banner .aitools-banner-cta:hover {
+  background: rgba(255, 255, 255, .3);
+  border-color: #fff;
+}
+.aitools-banner-cta-icon { flex-shrink: 0; opacity: .92; }
+/* 状态提示：告诉读者是新标签打开，别让人以为会离开当前页面 */
+.aitools-banner-cta::after {
+  content: "↗";
+  font-size: .875rem;
+  opacity: .75;
+  margin-left: .05rem;
+}
+
+@media (max-width: 640px) {
+  /* 手机上 200px 面板 + right:12px 会吃掉大半个屏幕宽度，
+     收紧到「屏宽 - 24px」以内，保证左边还看得见正文。 */
+  /* 时间线缩进同步收窄，别在小屏上白占 1.1rem */
+  .aitools-day { padding-left: .85rem; }
+  /* 标语在窄屏会折成三四行，字号收一档，别抢标题的注意力 */
+  body.layout-ai-tools .section-heading .aitools-slogan { font-size: .8125rem; }
+}
+
+/* 尊重系统的「减少动态效果」：抬升、脉冲、闪烁定位全部关掉，
+   只保留颜色变化 —— 这些动画对前庭敏感的人是负担。 */
+@media (prefers-reduced-motion: reduce) {
+  .aitools-item,
+  .aitools-chip,
+  .aitools-search-input,
+  .aitools-search-icon,
+  .aitools-item:hover { transform: none; }
+  .aitools-chip.is-pulse,
+  .aitools-item.is-hot-target { animation: none; }
+}
+
+
+/* 非「按日期」排序时的平铺容器。卡片本身有 margin-bottom，这里不用再加间距。 */
+.aitools-flat { margin-bottom: 1rem; }
+
+/* 每一期做成一条时间线：左侧小圆点 + 向下渐隐的竖线。
+   纯文字的日期标题在长列表里很容易被扫过去，加了轴之后「一天 = 一段」的层次才立得住。
+   渐变收尾（而不是实线到底）避免相邻两期之间出现断头线。 */
+.aitools-day {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-left: 1.1rem;
+}
+.aitools-day::before {
+  content: '';
+  position: absolute;
+  left: .18rem;
+  top: .6rem;
+  bottom: .25rem;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--border) 45%, transparent 100%);
+}
+.aitools-day::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .42rem;
+  width: .44rem;
+  height: .44rem;
+  border-radius: 50%;
+  background: var(--accent);
+  /* 描一圈底色，让圆点在竖线上「挖空」，视觉上更像节点而不是贴片 */
+  box-shadow: 0 0 0 3px var(--bg);
+}
+.aitools-date {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+  margin: 0 0 .6rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.aitools-issue {
+  flex-shrink: 0;
+  padding: .05rem .45rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+  font-size: .75rem;
+}
+.aitools-week { font-weight: 400; }
+.aitools-item {
+  padding: .9rem 1rem;
+  margin-bottom: .75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  /* 左边框按分类着色（--cat 由 EJS 给 article 行内注入），
+     兜底走主题 accent —— 没配到色或未分类时仍能用。 */
+  border-left: 3px solid var(--cat, var(--accent));
+  border-radius: var(--radius);
+  position: relative;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+/* hover：轻微抬起 + 投影，边框跟分类色亮起来。
+   位移只给 2px —— 这是列表不是卡片画廊，抬多了会晃。 */
+.aitools-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .09);
+  border-color: var(--cat, var(--accent));
+}
+.aitools-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .35rem;
+}
+.aitools-name { font-size: 1.0625rem; font-weight: 600; }
+.aitools-tags { display: flex; gap: .35rem; flex-wrap: wrap; }
+.aitools-tag {
+  font-size: .75rem;
+  padding: .05rem .45rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+}
+.aitools-tagline { margin: 0 0 .5rem; }
+.aitools-note { margin: 0 0 .5rem; font-size: .9375rem; color: var(--text-muted); }
+.aitools-link { font-size: .8125rem; color: var(--text-muted); word-break: break-all; }
+.aitools-link:hover { color: var(--accent); }
+/* star / 机构徽章，贴在卡片标题后面。
+   ⚠️ .aitools-head 是 flex + align-items:baseline，flex item 上写 vertical-align 没用，
+   必须用 align-self: center 才能和标题垂直居中。
+   高度 16px：shields.io 出图是 20px，比 17px 的标题字还高、压得住整行；缩到 16px
+   才退回到「标注」的位置（SVG 是矢量，缩放不糊）。
+   只锁 height、width 交给 auto：机构徽章宽度随名字长短变，写死会拉变形。 */
+.aitools-badge {
+  align-self: center;
+  height: 16px;
+  width: auto;
+}
+.aitools-foot { margin-top: 1.5rem; font-size: .8125rem; color: var(--text-muted); }
+.aitools-empty { color: var(--text-muted); }
+
+/* ---- 首屏数字带 ----
+   期数 / star 总量 / 分类数 / 更新节奏，一眼交代这个专栏的积累。
+   刻意不用渐变大字：全站是浅色学术风，数字带只做「密度」不做「炫技」，
+   否则会跟下面的正文卡片割裂。左边框沿用 accent，和卡片语言一致。 */
+.aitools-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 1.25rem;
+  padding: .7rem .4rem .7rem 1rem;
+  background: linear-gradient(180deg, #fcfdfe 0%, var(--bg-soft) 100%);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.aitools-stat {
+  display: flex;
+  flex-direction: column;
+  gap: .05rem;
+  padding: 0 1.15rem;
+  border-left: 1px solid var(--border);
+}
+.aitools-stat:first-child { padding-left: 0; border-left: 0; }
+.aitools-stat-v {
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.aitools-stat-k { font-size: .75rem; line-height: 1.4; color: var(--text-muted); }
+/* 「今日已更新 / 今晚 21:30 更新」指示灯。靠右，跟数字之间留 auto 间距。 */
+.aitools-live {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-left: auto;
+  padding: .25rem .7rem;
+  background: var(--accent-soft);
+  border: 1px solid #d6e9ef;
+  border-radius: 999px;
+  font-size: .75rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.aitools-live-dot {
+  width: .4rem;
+  height: .4rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+/* 今天已经发过了才亮绿 + 呼吸；还没到点就是静态蓝，不制造「在动」的错觉 */
+.aitools-live.is-on {
+  background: #e8f8f2;
+  border-color: #c3ecdf;
+  color: #0a7d61;
+}
+.aitools-live.is-on .aitools-live-dot {
+  background: #06d6a0;
+  animation: aitools-live-pulse 2.4s ease-out infinite;
+}
+@keyframes aitools-live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(6, 214, 160, .55); }
+  70%  { box-shadow: 0 0 0 .45rem rgba(6, 214, 160, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0); }
+}
+
+/* ---- 赞助商带 ----
+   位置：数字带和工具栏之间。设计上刻意「轻」——
+   左边框用 accent（和卡片左边框、统计带同一语言），不加渐变、
+   不加阴影、不放品牌色大底：赞助信息要看得见，但不能比工具列表更像正文。
+   Logo 是赞助商自己的视觉资产，放 56px 大小做品牌位，
+   它自带颜色，所以整块其余部分一律中性色，避免两套品牌色打架。
+   移动端 CTA 换行到第二行、占满宽度（见文件末尾媒体查询）。 */
+.aitools-sponsor {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+  padding: .75rem 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.aitools-sponsor-logo {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  /* 赞助商 PNG 自带阴影/渐变，圆角容器统一遮一下，边框不必需 */
+  border-radius: var(--radius);
+}
+.aitools-sponsor-body { flex: 1 1 auto; min-width: 0; }
+.aitools-sponsor-kicker {
+  margin: 0 0 .1rem;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.aitools-sponsor-name {
+  margin: 0 0 .15rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.aitools-sponsor-desc {
+  margin: 0;
+  font-size: .8125rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+/* CTA：幽灵按钮，和订阅带的按钮同一规格，但更小一号 */
+.aitools-sponsor-cta {
+  flex-shrink: 0;
+  padding: .45rem .9rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-size: .8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.aitools-sponsor-cta:hover {
+  background: var(--accent);
+  /* 亮色 accent 上用白字；暗色 accent (#58b6d4) 上的白字对比度不达标，
+     所以这里不用 #fff，改用深色字 —— 两个主题都靠 var() 自动切。 */
+  color: #ffffff;
+}
+[data-theme="dark"] .aitools-sponsor-cta:hover { color: #12181b; }
+
+/* ---- 成为赞助商 ----
+   位置：赞助商带正下方。设计上比赞助商带「轻一档」——
+   没有左侧 accent 粗边、没有底色块、没有 Logo，只用虚线边框 + 中性文字，
+   因为它不是当期要推广的内容，而是一个常驻的「入口」。
+   ⚠️ 不放 PayPal 官方蓝按钮图：上面赞助商带的品牌色和本站 accent
+   已经是两套色，再塞一个 #009CDE 蓝按钮会让首屏出现三种主色。
+   统一走文字链，靠 hover 下划线反馈，保持视觉只有一种强调色。 */
+.aitools-sponsor-join {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem 1.25rem;
+  margin: -0.35rem 0 1.25rem;   /* 上负值：视觉上贴着赞助商带，两组是一件事 */
+  padding: .7rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+.aitools-sponsor-join-text { flex: 1 1 320px; min-width: 0; }
+.aitools-sponsor-join-k {
+  margin: 0;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.aitools-sponsor-join-h {
+  margin: .05rem 0 .1rem;
+  font-size: .9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.aitools-sponsor-join-d {
+  margin: 0;
+  font-size: .8125rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.aitools-sponsor-join-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .5rem;
+  flex-shrink: 0;
+}
+/* 文字链做成小药丸，hover 才起底色 —— 常驻时和正文文字同权重，
+   不会跟上面那个实心 CTA 抢注意力 */
+.aitools-join-link {
+  padding: .3rem .7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.aitools-join-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+/* PayPal 是四个入口里唯一「直接给钱」的，稍微强调一档：
+   描边用 accent（不是 PayPal 蓝），保持全站单一强调色 */
+.aitools-join-link--paypal { color: var(--accent); border-color: var(--accent); }
+
+/* ---- 卡片：整张可点开抽屉 ----
+   点击态（手型 + 右箭头）只给主专栏页的 .aitools-item--link：
+   分类归档页的卡片没有抽屉，挂上指针会骗人。 */
+.aitools-item {
+  position: relative;
+}
+.aitools-item--link {
+  /* 右侧留出箭头位，避免 chevron 压到徽章/分类标签上；常驻留白，hover 不产生位移抖动 */
+  padding-right: 2.1rem;
+  cursor: pointer;
+}
+.aitools-item--link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* hover / 键盘聚焦时才露出右向箭头：卡片能点开这件事要有暗示，
+   但常驻会跟「详细分析 →」打架，所以只在交互态出现。 */
+.aitools-item--link::after {
+  content: '';
+  position: absolute;
+  top: 1.1rem;
+  right: .85rem;
+  width: .42rem;
+  height: .42rem;
+  border-top: 1.5px solid var(--text-muted);
+  border-right: 1.5px solid var(--text-muted);
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.aitools-item--link:hover::after,
+.aitools-item--link:focus-visible::after { opacity: .6; }
+/* 卡片上的 note 收到 3 行，长列表才扫得动；全文在抽屉里（那里放开截断） */
+.aitools-item .aitools-note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* ---- 详情抽屉 ----
+   右侧滑出，内容从卡片克隆（见 ai-tools.ejs）。
+   z-index 要盖过 masthead（100），所以从 200 起。
+   顶边按分类色描一条，跟卡片左边框同源。 */
+.aitools-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(8, 20, 28, .42);
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+.aitools-scrim.is-open { opacity: 1; }
+.aitools-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100vw);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  border-top: 3px solid var(--cat, var(--accent));
+  box-shadow: -18px 0 48px rgba(0, 0, 0, .16);
+  transform: translateX(102%);
+  transition: transform .24s cubic-bezier(.22, .61, .36, 1);
+}
+.aitools-drawer.is-open { transform: none; }
+/* display 是作者样式，会盖掉 [hidden] 的 UA 规则，必须显式补回来 */
+.aitools-drawer[hidden],
+.aitools-scrim[hidden],
+.aitools-toast[hidden],
+.aitools-qr[hidden],
+.aitools-drawer-btn[hidden] { display: none; }
+
+.aitools-drawer-head {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: 1rem 1.1rem .85rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.aitools-drawer-headtxt { min-width: 0; flex: 1 1 auto; }
+.aitools-drawer-meta {
+  display: block;
+  margin-bottom: .25rem;
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+/* 克隆过来的分类徽章在 meta 行里是 inline，转成 inline-block 底色才铺得满 */
+.aitools-drawer-meta .aitools-cat { display: inline-block; vertical-align: baseline; }
+.aitools-drawer-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  word-break: break-word;
+}
+.aitools-drawer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-top: .5rem;
+}
+.aitools-drawer-badges:empty { display: none; }
+.aitools-drawer-badges .aitools-badge { align-self: center; }
+.aitools-drawer-close {
+  flex-shrink: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-drawer-close:hover { background: var(--border); color: var(--text); }
+.aitools-drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1rem 1.1rem 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+.aitools-drawer-body .aitools-tagline {
+  margin: 0 0 .9rem;
+  font-size: 1rem;
+}
+/* 抽屉里放开卡片上的 3 行截断，这里才是看全文的地方 */
+.aitools-drawer-body .aitools-note {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+  margin: 0;
+  font-size: .9375rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+.aitools-drawer-sub {
+  margin: 0 0 .4rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cat, var(--accent));
+}
+.aitools-drawer-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  padding: .8rem 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.aitools-drawer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .4rem .8rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.aitools-drawer-btn:hover {
+  background: #d6e6ea;
+  border-color: var(--cat, var(--accent));
+  color: var(--accent);
+  text-decoration: none;
+}
+.aitools-drawer-btn-main {
+  background: var(--cat, var(--accent));
+  border-color: var(--cat, var(--accent));
+  color: #fff;
+  font-weight: 600;
+}
+.aitools-drawer-btn-main:hover { background: var(--cat, var(--accent)); color: #fff; filter: brightness(1.08); }
+.aitools-drawer-nav {
+  display: flex;
+  gap: .45rem;
+  padding: 0 1.1rem .9rem;
+  flex-shrink: 0;
+}
+.aitools-drawer-step {
+  flex: 1 1 0;
+  padding: .4rem .5rem;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease;
+}
+.aitools-drawer-step:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); border-style: solid; }
+.aitools-drawer-step:disabled { opacity: .35; cursor: default; }
+body.aitools-drawer-open { overflow: hidden; }
+
+/* 复制反馈。role=status + aria-live 让读屏也念得出来。 */
+.aitools-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 210;
+  margin: 0;
+  padding: .45rem .95rem;
+  background: #22252a;
+  border-radius: 999px;
+  font-size: .8125rem;
+  color: #fff;
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+}
+.aitools-toast.is-on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---- 搜索框的「/」快捷键提示 ----
+   右浮在输入框里；聚焦或已有词时让位（CSS 管聚焦、JS 管有词）。 */
+.aitools-kbd {
+  position: absolute;
+  right: .55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 1.25rem;
+  padding: 0 .3rem;
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: opacity .15s ease;
+}
+.aitools-search:focus-within .aitools-kbd { opacity: 0; }
+
+/* ---- 视图切换（时间线 / 网格 / 星榜）----
+   分段控件贴在排序下拉右边；窄屏自然换行到下一排。 */
+.aitools-views {
+  display: inline-flex;
+  vertical-align: middle;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+}
+.aitools-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .4rem .65rem;
+  border: 0;
+  background: none;
+  font-size: .8125rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-view-btn + .aitools-view-btn { border-left: 1px solid var(--border); }
+.aitools-view-btn:hover { color: var(--accent); }
+.aitools-view-btn.is-active { background: var(--accent); color: #fff; }
+
+/* 网格：卡片搬进 flat 容器后改 CSS grid。卡片内部排版不动，只去行距。 */
+.aitools-view-grid #aitools-flat {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: .75rem;
+}
+.aitools-view-grid #aitools-flat .aitools-item { margin-bottom: 0; }
+
+/* 星榜：一行一个，名次用 CSS counter 画 —— 不用 JS 重排编号，
+   筛选隐藏（display:none）的卡片天然不占号。 */
+.aitools-view-board #aitools-flat {
+  counter-reset: aitools-rank;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.aitools-view-board #aitools-flat .aitools-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 0;
+  padding: .55rem .9rem;
+}
+.aitools-view-board #aitools-flat .aitools-item:not([hidden])::before {
+  counter-increment: aitools-rank;
+  content: counter(aitools-rank);
+  flex: 0 0 2rem;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* 前三名换金色：榜单的视觉锚点，一眼看到头部 */
+.aitools-view-board #aitools-flat .aitools-item.is-rank-top::before { color: #d9910b; }
+.aitools-view-board .aitools-head {
+  flex: 1 1 auto;
+  align-items: center;
+  margin-bottom: 0;
+}
+/* 星榜只留「名次 + 名字 + 徽章」，其余信息行全收起来 */
+.aitools-view-board .aitools-tagline,
+.aitools-view-board .aitools-note,
+.aitools-view-board .aitools-link,
+.aitools-view-board .aitools-more { display: none; }
+.aitools-view-board .aitools-item--link::after {
+  top: 50%;
+  margin-top: -.21rem;
+}
+
+/* ---- 订阅带 ----
+   和侧边栏小组件同一种底色语言（accent-soft + 浅蓝描边），全站认得出是「同一家人」。 */
+.aitools-subscribe {
+  margin: 1.75rem 0 0;
+  padding: 1rem 1.1rem;
+  background: var(--accent-soft);
+  border: 1px solid #d6e9ef;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  /* 锚点跳过来时别被吸顶导航盖住上沿 */
+  scroll-margin-top: 4.5rem;
+}
+/* 工具条订阅按钮跳转过来的落位提示：一圈扩散光，1.6s 后自己消失 */
+.aitools-subscribe.is-flash { animation: aitools-sub-flash 1.5s ease; }
+@keyframes aitools-sub-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(47, 125, 149, .45); }
+  100% { box-shadow: 0 0 0 16px rgba(47, 125, 149, 0); }
+}
+.aitools-subscribe-title { margin: 0 0 .25rem; font-size: 1.0625rem; font-weight: 700; }
+.aitools-subscribe-sub { margin: 0 0 .7rem; font-size: .875rem; color: var(--text-muted); }
+.aitools-subscribe-actions { display: flex; flex-wrap: wrap; gap: .45rem; }
+.aitools-subscribe-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .4rem .85rem;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-subscribe-btn:hover { background: var(--accent); color: #fff; text-decoration: none; }
+.aitools-qr {
+  display: inline-flex;
+  flex-direction: column;
+  gap: .3rem;
+  align-items: center;
+  margin-top: .8rem;
+  padding: .6rem;
+  background: var(--bg);
+  border: 1px solid #d6e9ef;
+  border-radius: var(--radius);
+}
+.aitools-qr img { width: 132px; height: 132px; display: block; }
+.aitools-qr-name { font-size: .75rem; color: var(--text-muted); }
+
+/* ---- 分类归档页（/ai-tools/cat/<slug>/）----
+   版式跟专栏页一致：单列、藏侧栏，卡片复用同一套 .aitools-* 类。 */
+body.layout-ai-tools-cat .sidebar { display: none; }
+body.layout-ai-tools-cat #main {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1100px;
+}
+.aitools-catpage-crumb { margin: 0 0 .5rem; font-size: .8125rem; }
+.aitools-catpage-crumb a { color: var(--text-muted); }
+.aitools-catpage-crumb a:hover { color: var(--accent); text-decoration: none; }
+.aitools-catpage-title {
+  margin: 0 0 .35rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--cat, var(--accent));
+}
+/* 分类色圆点：和卡片左边框、chip 同源，落地页一眼确认「没走错分类」 */
+.aitools-catpage-title::before {
+  content: '';
+  display: inline-block;
+  width: .6rem;
+  height: .6rem;
+  margin-right: .5rem;
+  border-radius: 50%;
+  background: var(--cat, var(--accent));
+  vertical-align: .12rem;
+}
+.aitools-catpage-issue {
+  font-size: .75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── 分类页：简介 + 本分类期号索引 ──────────────────────────────────────── */
+.aitools-catpage-desc {
+  max-width: 62ch;
+  margin: .9rem 0 0;
+  padding-left: .8rem;
+  border-left: 2px solid var(--cat, var(--accent));
+  font-size: .9375rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.aitools-catpage-issues { margin: 1.15rem 0 1.5rem; }
+.aitools-catpage-issues-title {
+  margin: 0 0 .4rem;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--text-muted);
+}
+.aitools-catpage-issues-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.aitools-catpage-issue-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .35rem;
+  padding: .18rem .5rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .75rem;
+  color: var(--text-muted);
+  transition: border-color .15s, color .15s, background .15s;
+}
+.aitools-catpage-issue-chip:hover {
+  color: var(--text);
+  border-color: var(--cat, var(--accent));
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+/* 期号是这枚 chip 的主信息，用等宽 + 分类色；名字只是提示，弱化成常规文本 */
+.aitools-catpage-issue-n {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  color: var(--cat, var(--accent));
+}
+.aitools-catpage-issue-name { color: var(--text); }
+/* chip 跳的是本页卡片：锚点滚动要躲开 sticky masthead，否则落点永远被压住一行 */
+#ai-tools-cat .aitools-item[id] { scroll-margin-top: 96px; }
+/* 归档页没有抽屉，note 不截断 —— 截了就没地方看全文了 */
+#ai-tools-cat .aitools-note {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
+}
+.aitools-catpage-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+.aitools-catpage-cats-title {
+  width: 100%;
+  margin: 0 0 .1rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.aitools-catpage-back { margin-top: 1.25rem; font-size: .875rem; }
+/* 分类徽章现在是 <a>：去掉默认下划线，hover 只提亮 */
+a.aitools-cat { display: inline-block; text-decoration: none; }
+a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
+
+@media (max-width: 640px) {
+  /* 四格数字带在窄屏改成两列网格，指示灯独占一行靠右 */
+  .aitools-stats { padding: .7rem .9rem; }
+  .aitools-stat {
+    flex: 1 1 40%;
+    padding: .35rem 0 .35rem .9rem;
+    border-left: 1px solid var(--border);
+  }
+  .aitools-stat:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .aitools-stat-v { font-size: 1.125rem; }
+  /* 指示灯换行后靠右，不拉成整条 —— 整条绿底在手机上太抢眼 */
+  .aitools-live { margin: .55rem 0 0 auto; }
+  .aitools-item--link { padding-right: 1.7rem; }
+  .aitools-item--link::after { right: .7rem; }
+  .aitools-drawer { width: 100vw; border-left: 0; }
+  /* 网格在手机上退化成单列 */
+  .aitools-view-grid #aitools-flat { grid-template-columns: 1fr; }
+  .aitools-view-board #aitools-flat .aitools-item { padding: .55rem .7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aitools-live.is-on .aitools-live-dot { animation: none; }
+  .aitools-subscribe.is-flash { animation: none; }
+  .aitools-drawer,
+  .aitools-scrim,
+  .aitools-toast { transition: none; }
+  .aitools-item--link::after { transition: none; }
+}
+
+/* ---- 侧边栏小组件：最新 AI 工具推荐 ----
+   做成有底色有边框的卡片，跟下面素净的社交链接拉开层次，一眼能看到。
+   分隔线用 accent 的浅色版（#d6e9ef），不能用 --border（灰线压在浅蓝底上发脏）。 */
+.sidebar-widget {
+  margin-top: 1.25rem;
+  padding: .85rem .9rem;
+  background: var(--accent-soft);
+  border: 1px solid #d6e9ef;
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.sidebar-widget-title {
+  margin: 0 0 .5rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .04em;
+}
+.sw-list { list-style: none; margin: 0 0 .5rem; padding: 0; }
+.sw-item { border-bottom: 1px dashed #d6e9ef; }
+.sw-item:last-child { border-bottom: 0; }
+.sw-item a {
+  display: flex;
+  gap: .5rem;
+  align-items: baseline;
+  padding: .35rem 0;
+  color: var(--text);
+  font-size: .875rem;
+}
+.sw-item a:hover { color: var(--accent); text-decoration: none; }
+.sw-date {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: .75rem;
+  font-variant-numeric: tabular-nums;
+}
+.sw-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sw-more { font-size: .8125rem; }
+@media (max-width: 640px) {
+  /* 这条 shorthand 在文件里更靠后，会把 .aitools-item--link 的 padding-right
+     一起盖掉，所以可点卡片的右侧箭头位要在它后面再补一次 */
+  .aitools-item { padding: .75rem .8rem; }
+  .aitools-item--link { padding-right: 1.7rem; }
+  .aitools-head { gap: .35rem; }
+}
+
+/* ---- 文章免责声明（带 column 的长文自动带上）---- */
+.post-disclaimer {
+  margin: 0 0 1.5rem;
+  padding: .9rem 1.1rem;
+  background: #fdf6e8;
+  border: 1px solid #f0e2c0;
+  border-left: 3px solid #d9910b;
+  border-radius: var(--radius);
+  font-size: .875rem;
+  color: #6b4e0a;
+}
+.post-disclaimer-title { margin: 0 0 .4rem; font-weight: 700; }
+.post-disclaimer-list { margin: 0; padding-left: 1.15rem; }
+.post-disclaimer-list li { margin-bottom: .3rem; line-height: 1.6; }
+.post-disclaimer-list li:last-child { margin-bottom: 0; }
+
+/* 卡片上「详细分析 →」：跳到独立长文（架构原理 / 代码分析） */
+.aitools-more {
+  display: inline-block;
+  margin-top: .5rem;
+  padding: .3rem .7rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: .8125rem;
+  font-weight: 600;
+}
+.aitools-more:hover { background: #d6e6ea; color: var(--accent); text-decoration: none; }
+
+/* ---- 导航里的 AI 工具入口：做成一个胶囊，比纯文字更抓眼 ---- */
+/* 选择器带上 .masthead__menu-item > ：单写 .nav-ai 的权重(0,1,0)低于
+   `.masthead__menu-item > a`(0,2,1)，border-radius 会被那条的 6px 吃掉，
+   胶囊一直是扁的。 */
+.masthead__menu-item > .nav-ai {
+  display: inline-flex !important;
+  align-items: center;
+  gap: .3rem;
+  padding: .3rem .7rem !important;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  color: var(--accent) !important;
+  font-weight: 600;
+  white-space: nowrap;
+  /* 浅色学术风主题：hover 反馈靠「底色加深 + 描边」，
+     不反色变白字（白字在这个主题上对比度低且显脏）。 */
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.masthead__menu-item > .nav-ai:hover {
+  background: #d6e6ea;
+  border-color: var(--accent);
+  color: var(--accent) !important;
+  text-decoration: none;
+}
+.nav-ai-logo {
+  width: 22px;
+  height: 22px;
+  /* 透明 PNG 在浅底导航上会透出底色，浅色描边能让轮廓更稳 */
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, .55));
+  flex: none;
+  /* 文字基线和 logo 中心对齐，避免 logo 把行高撑高 */
+  align-self: center;
+}
+
+/* ---- 导航里的姊妹站入口：实心蓝底白字 ---- */
+/* 导航里唯一的站外入口，所以做成实心块，跟浅底的 .nav-ai 明显分开。
+   底色 #2b7de0：白字 4.11:1，比 AA 要求的 4.5 略低一档（字重 600 所以还看得清）。
+   这是按「再浅两度」的要求取的；要回到 AA 就改 #2172cc（4.83:1），再浅就只剩 4.1 以下。
+   hover 只亮边框、底色不动，避免点下去反而变淡。 */
+.masthead__menu-item > .nav-aisec {
+  display: inline-flex !important;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .7rem !important;
+  border-radius: 999px;
+  background: #2b7de0;
+  border: 1px solid transparent;
+  color: #fff !important;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: border-color .15s ease;
+}
+.masthead__menu-item > .nav-aisec:hover {
+  background: #2b7de0;
+  border-color: #e3effd;
+  color: #fff !important;
+  text-decoration: none;
+}
+.nav-aisec-logo {
+  width: 18px;
+  height: 18px;
+  /* 原图是 447x447 的 JPEG，圆标外还有一圈白边且没有透明通道：
+     方着贴会露出四个白角，裁成内切圆后白边变成一圈细环。 */
+  border-radius: 50%;
+  flex: none;
+  align-self: center;
+}
+/* 暗色下比亮色档收一档（#2673d6，白字 4.66:1 过 AA）：同一亮度放在近黑背景上会发荧。
+   不再退回原来那种接近藏青的 #1e6cbe / #14487f —— 那两版都被嫌太深。 */
+[data-theme="dark"] .masthead__menu-item > .nav-aisec {
+  background: #2673d6;
+}
+[data-theme="dark"] .masthead__menu-item > .nav-aisec:hover {
+  background: #2673d6;
+  border-color: #b3d5fa;
+}
+
+/* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
+.post-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-decoration: none;
+  line-height: 1.4;
+  /* 跟外层 .article-meta 里的正文基线对齐 */
+  vertical-align: baseline;
+}
+.post-lang-toggle:hover {
+  background: #d6e6ea;
+  color: var(--accent);
+  text-decoration: none;
+}
+/* 导航项变多以后一行放不下，允许换行而不是横向溢出 */
+.visible-links { flex-wrap: wrap; }
+@media (max-width: 860px) {
+  /* 同样得带 .masthead__menu-item > 前缀，否则权重不够，这几条窄屏收紧根本不生效 */
+  .masthead__menu-item > .nav-ai { padding: .3rem .5rem !important; gap: .25rem; }
+  .nav-ai-logo { width: 20px; height: 20px; }
+  .masthead__menu-item > .nav-aisec { padding: .3rem .55rem !important; gap: .25rem; }
+  .nav-aisec-logo { width: 15px; height: 15px; }
+}
+
+/* ---- CVE 档案（/cve/）----
+   这页是「秀肌肉」用的：一句话战绩 + 一整面编号，不分平台、不标类型，密度本身就是说服力。
+   编号用等宽字体紧密排布；厂商致谢放在编号面下面，描边胶囊素一点，不抢戏。
+   hover 沿用全站规矩 —— 底色加深 + 描边，文字不反色。 */
+.cve-brag {
+  margin: .55rem 0 1.35rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.7;
+  color: var(--text);
+}
+.cve-idwall {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+/* 编号不可点（不带链接）：不伪装成可交互元素，去掉 hover 反馈 */
+.cve-chip {
+  padding: .26rem .55rem;
+  background: var(--accent-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: .8125rem;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  color: var(--accent);
+  cursor: default;
+}
+/* 每次刷新随机隐藏掉的那部分（JS 加 class） */
+.cve-chip.is-hidden { display: none; }
+/* 末尾省略号：暗示「这只是其中一部分」 */
+.cve-ellipsis {
+  align-self: center;
+  padding: 0 .15rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  letter-spacing: .1em;
+}
+
+/* 厂商致谢：编号墙下面另起一块，描边素底，只留厂商名 */
+.cve-hofblock { margin-top: 1.75rem; }
+.cve-hof-title {
+  margin: 0 0 .5rem;
+  font-size: .8125rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cve-hofwall {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+.cve-hof {
+  padding: .24rem .65rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+a.cve-hof:hover {
+  background: #d6e6ea;
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+/* 没有可核验外链的致谢：不伪装成链接 */
+.cve-hof.is-static { cursor: default; color: var(--text-muted); }
+.cve-hof.is-static:hover { background: var(--bg); border-color: var(--border); color: var(--text-muted); }
+
+.cvewall-foot {
+  margin: 1.5rem 0 0;
+  font-size: .8125rem;
+  color: var(--text-muted);
+}
+.cvewall-empty { color: var(--text-muted); }
+
+/* ---- 标题 banner 背景图 ----
+   只在 front-matter 里显式写了 `banner: /images/xxx.jpg` 时才加 --banner 类，
+   没写就是原来的素标题，不会多出空框。
+   文章页：<header class="article-header article-header--banner">
+   专栏页：<h1 class="section-heading section-heading--banner">
+   背景图靠内联 style 给，CSS 只负责裁切、压暗和文字反白。 */
+.article-header--banner,
+.section-heading--banner {
+  position: relative;
+  background-color: #1f5a6b;          /* 图没加载出来时的兜底底色 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.article-header--banner {
+  margin-bottom: 2rem;
+  padding: 3rem 1.75rem 2.25rem;
+  border-bottom: 0;
+  border-radius: var(--radius);
+}
+.section-heading--banner {
+  margin: 0 0 1rem;
+  padding: 2.5rem 1.75rem 2rem;
+  border-bottom: 0;
+  border-radius: var(--radius);
+}
+/* 压暗层：保证浅色学术风下白字依然可读。深色 / 浅色 banner 都要扛得住，
+   所以顶部 ≥ .52（白底 banner 顶部要够暗才能托住白字），底部 .78 压出层次感 */
+.article-header--banner::before,
+.section-heading--banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 20, 28, .52) 0%, rgba(8, 20, 28, .78) 100%);
+}
+.article-header--banner > *,
+.section-heading--banner > * { position: relative; z-index: 1; }
+.article-header--banner .post-title,
+.section-heading--banner .i18n-zh,
+.section-heading--banner .i18n-en {
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .45);
+}
+.article-header--banner .article-meta { color: rgba(255, 255, 255, .88); }
+.article-header--banner .article-meta .article-date,
+.article-header--banner .article-meta .article-readtime { color: rgba(255, 255, 255, .82); }
+.article-header--banner .meta-sep { color: rgba(255, 255, 255, .45); }
+.article-header--banner .post-tag {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .38);
+  color: #fff;
+}
+.article-header--banner .post-tag:hover {
+  background: rgba(255, 255, 255, .28);
+  border-color: #fff;
+  color: #fff;
+}
+.article-header--banner .post-lang-toggle {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .38);
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .article-header--banner { padding: 2rem 1.1rem 1.5rem; }
+  .section-heading--banner { padding: 1.75rem 1.1rem 1.35rem; }
+  .article-header--banner .post-title,
+  .section-heading--banner { font-size: 1.45rem; }
+  /* 窄屏上右上角绝对定位会和居中的标题打架（375px 屏标题几乎满宽）。
+     改成 static 落回文档流，排在中英文标语下方，用
+     「display:block + width:fit-content + margin-left:auto」靠右 ——
+     光写 margin-left:auto 不够，inline-flex 元素不吃 auto 外边距，
+     必须先变成 block 才能靠这个技巧右对齐。靠右而不是居中，
+     是为了跟下方订阅带、卡片列表的左对齐节奏错开，不显得飘。 */
+  body.layout-ai-tools .section-heading--banner .aitools-banner-cta {
+    position: static;
+    /* transform 对 static 元素照样生效，不复位 translateY(-50%)
+       会把按钮往上顶半个身高、压到标语上，必须显式清掉。 */
+    transform: none;
+    display: block;
+    width: fit-content;
+    margin: .7rem 0 0 auto;
+  }
+}
+
+/* ===== 专栏长文文末来源块：本文地址 + 项目仓库 =====
+   与导出 md 的文末保持一致（溯源 + 给 Scanners-Box 导流）。
+   用主题变量而非硬编码色，深色模式下自适应。 */
+.post-source {
+  margin: 1.75rem 0 0;
+  padding: .8rem 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: .8125rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+.post-source-line { margin: 0; }
+.post-source-line + .post-source-line { margin-top: .1rem; }
+.post-source-link { color: var(--accent); word-break: break-all; }
+.post-source-link:hover { text-decoration: underline; }
+
+/* ===== 访问统计（Vercount）=====
+   侧边栏：站点总访问 / 访客数；文章页 meta：本篇阅读量。
+   侧栏那一版刻意「素」：不上底色、不加边框、不放图标，
+   沿用 .author-links 那条 1px 分隔线的语言，数字走等宽字体 + 深墨色，
+   靠字重和字距做层次 —— 220px 的窄栏里再上主色和图标会显得吵。 */
+.site-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  min-width: 0;
+}
+.stat-item + .stat-item {
+  padding-left: 1rem;
+  border-left: 1px solid var(--border);
+}
+.stat-num {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  /* 这里不设 color：文章页 meta 下的数字要继承 .article-meta 的字色，
+     banner 页是反白白字，写死深色会糊在深色背景上。颜色只在侧栏作用域里给。 */
+}
+.site-stats .stat-num { color: var(--text); }
+.stat-label {
+  font-size: .6875rem;
+  color: var(--text-muted);
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+/* 文章页 meta：阅读量跟日期、时长同一行，沿用 · 分隔，靠字重区分而不是靠颜色。
+   数字**不能**写死深色 —— meta 在带 banner 的文章里是反白白字（底下压了 .52~.78 的暗层），
+   写死 var(--text) 会把白字覆盖成黑字，在深色 banner 上直接糊掉。
+   所以这里只继承 .article-meta 的字色，banner 页再单独跟 .article-date 对齐。 */
+.article-views { font-variant-numeric: tabular-nums; }
+.article-views .stat-num {
+  font-size: inherit;
+  font-weight: 600;
+}
+.article-header--banner .article-meta .article-views .stat-num,
+.article-header--banner .article-meta .views-label,
+.section-heading--banner .article-meta .article-views .stat-num,
+.section-heading--banner .article-meta .views-label {
+  color: rgba(255, 255, 255, .82);
+}
+
+@media (max-width: 640px) {
+  /* 窄屏下侧边栏掉到正文下方并占满宽度，两列统计照样成立，只需略微收紧间距 */
+  .site-stats { margin-top: .9rem; padding-top: .9rem; }
+}
+
+/* ===== 文章页右侧悬浮公众号二维码 =====
+   硬约束：默认状态绝不能压住正文。
+   内容区 max-width 1100px 居中 → 右侧富余 = (视口宽 - 1100) / 2：
+     ≥1400px → 富余 ≥150px，卡片（130px + right 12px = 142px）完整落在正文外 → 直接常驻，按钮收起
+     <1400px → 没有富余空间 → 只留 44px 图标按钮，**点击**才展开二维码
+               （再点 / 点别处 / Esc 收起；展开是用户主动触发的，可接受临时压住一点正文）
+   fixed 定位 + 垂直居中，不随页面滚动跑到正文上面。 */
+.float-qr {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .5rem;
+}
+.float-qr-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+  transition: color .15s ease, box-shadow .15s ease;
+}
+.float-qr-btn:hover { color: var(--accent); box-shadow: 0 3px 14px rgba(0, 0, 0, .12); }
+.float-qr-btn svg { width: 21px; height: 21px; fill: currentColor; }
+.float-qr-panel {
+  width: 130px;
+  padding: .5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .10);
+  text-align: center;
+  display: none;                     /* 默认收起 */
+}
+/* 展开按设备能力分流，两种都要留：
+   1) 有鼠标的设备（hover: hover）→ 悬停即展开，最顺手；:focus-within 给键盘兜底
+   2) 触摸设备（没有 hover 这个概念）→ 靠 JS 点击 toggle .is-open
+   不能只写 :hover：移动端没有真 hover，iOS 会把它变成「点一下才生效」的 sticky hover，
+   行为不确定，还会连累同一元素上的链接要点两次才跳转。 */
+@media (hover: hover) {
+  .float-qr:hover .float-qr-panel,
+  .float-qr:focus-within .float-qr-panel { display: block; }
+}
+.float-qr.is-open .float-qr-panel { display: block; }
+/* 大屏：面板已在正文外，常驻显示，不需要按钮了 */
+@media (min-width: 1400px) {
+  .float-qr-btn { display: none; }
+  .float-qr-panel { display: block; }
+}
+/* 手机：按钮再收一点，贴边更紧 */
+@media (max-width: 640px) {
+  .float-qr { right: 8px; }
+  .float-qr-btn { width: 40px; height: 40px; }
+  .float-qr-btn svg { width: 19px; height: 19px; }
+}
+.float-qr-panel img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.float-qr-name {
+  display: block;
+  margin-top: .4rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+.float-qr-hint {
+  display: block;
+  margin-top: .1rem;
+  font-size: .68rem;
+  color: var(--text-muted);
+}
+
+/* ========== Contact page ========== */
+.contact-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 560px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .9rem;
+}
+.contact-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .7rem;
+  padding: 1.2rem 1rem;
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--border-radius-md);
+  background: var(--accent-soft);
+}
+.contact-label {
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: .04em;
+}
+.contact-mail {
+  font-size: .95rem;
+  color: var(--accent);
+  word-break: break-all;
+  text-align: center;
+}
+.contact-mail:hover { text-decoration: underline; }
+.contact-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+}
+.contact-qr img {
+  display: block;
+  width: 116px;
+  height: 116px;
+  border-radius: 6px;
+  background: #fff;
+}
+.contact-qr-name {
+  font-size: .78rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+.contact-qr-hint {
+  font-size: .72rem;
+  color: var(--text-muted);
+  opacity: .85;
+  text-align: center;
+  line-height: 1.3;
+}
+@media (max-width: 560px) {
+  .contact-list { grid-template-columns: 1fr; }
+}
+
+/* ===== ai-tools 搜索 + 分类筛选 ===== */
+.aitools-toolbar {
+  margin: 0 0 1.25rem;
+  padding: .9rem 1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.aitools-search {
+  position: relative; display: flex; align-items: center; margin-bottom: .75rem;
+}
+.aitools-search-icon {
+  position: absolute; left: .7rem; color: var(--text-muted); pointer-events: none;
+  transition: color .15s ease;
+}
+/* 聚焦时放大镜也跟着变品牌色 —— 输入框本身已经有 ring，
+   图标不变色的话聚焦态看着是「半个」。 */
+.aitools-search:focus-within .aitools-search-icon { color: var(--accent); }
+.aitools-search-input {
+  width: 100%; padding: .55rem 2.2rem .55rem 2.2rem;
+  font: inherit; font-size: .9375rem; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.aitools-search-input::placeholder { color: var(--text-muted); }
+.aitools-search-input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47,125,149,.12);
+}
+.aitools-search-clear {
+  position: absolute; right: .5rem;
+  width: 1.4rem; height: 1.4rem; line-height: 1.3;
+  font-size: 1.1rem; color: var(--text-muted);
+  background: none; border: 0; border-radius: 50%; cursor: pointer;
+}
+.aitools-search-clear:hover { background: var(--border); color: var(--text); }
+
+/* 视图行：分段控件在左、订阅锚点被 margin-left:auto 顶到行尾 */
+.aitools-viewrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .7rem;
+}
+
+/* 视图行右端的订阅入口：列表太长，底部订阅带多数人滚不到，
+   这里给一颗随时能点的锚点。 */
+.aitools-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-left: auto;
+  padding: .3rem .7rem;
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--accent);
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.aitools-jump:hover { background: var(--accent); color: #fff; text-decoration: none; }
+
+.aitools-filters { display: flex; flex-wrap: wrap; gap: .45rem; }
+.aitools-chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .35rem .7rem;
+  font: inherit; font-size: .8125rem; line-height: 1.3;
+  color: var(--text); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 999px;
+  cursor: pointer; transition: all .15s;
+}
+.aitools-chip:hover:not(:disabled) {
+  /* 跟着 --cat 染色（每个分类的「多巴胺色」）。color-mix 拿 12% 透明度
+     作为 hover 浅背景 —— 不用预先给每个分类算浅色版。 */
+  border-color: var(--cat, var(--accent)); color: var(--cat, var(--accent));
+  background: color-mix(in srgb, var(--cat, var(--accent)) 12%, transparent);
+}
+.aitools-chip.is-active {
+  background: var(--cat, var(--accent)); border-color: var(--cat, var(--accent)); color: #fff;
+}
+/* 点中分类时弹一下 + 扩散一圈分类色的光晕。
+   筛选是「点一下整页就变了」的操作，没有这个反馈容易以为没点中
+   （尤其是当前类本来就只有一两条、页面几乎没变化的时候）。
+   .is-pulse 由 JS 在点击时加、动画结束摘掉，重复点同一类也能重播。 */
+@keyframes aitools-chip-pop {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cat, var(--accent)) 65%, transparent); }
+  45%  { transform: scale(1.07); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 12px transparent; }
+}
+.aitools-chip.is-pulse { animation: aitools-chip-pop .45s ease-out; }
+.aitools-chip.is-active .aitools-chip-n {
+  background: rgba(255,255,255,.22); color: #fff;
+}
+.aitools-chip:disabled {
+  opacity: .42; cursor: not-allowed;
+}
+.aitools-chip-n {
+  min-width: 1.25rem; padding: 0 .3rem;
+  font-size: .6875rem; text-align: center;
+  color: var(--text-muted); background: var(--bg-soft);
+  border-radius: 999px;
+}
+.aitools-status { margin: .6rem 0 0; font-size: .75rem; color: var(--text-muted); }
+
+.aitools-cat {
+  padding: .12rem .45rem;
+  font-size: .6875rem;
+  color: var(--cat, var(--accent));
+  background: color-mix(in srgb, var(--cat, var(--accent)) 14%, transparent);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.aitools-noresult {
+  margin: 1.5rem 0; padding: 2rem 1rem; text-align: center;
+  background: var(--bg-soft); border: 1px dashed var(--border); border-radius: 12px;
+}
+.aitools-noresult-title { margin: 0 0 .35rem; font-size: 1rem; font-weight: 600; }
+.aitools-noresult-hint { margin: 0 0 .9rem; font-size: .8125rem; color: var(--text-muted); }
+.aitools-reset {
+  padding: .4rem .9rem; font: inherit; font-size: .8125rem;
+  color: var(--accent); background: var(--bg);
+  border: 1px solid var(--accent); border-radius: 999px; cursor: pointer;
+}
+.aitools-reset:hover { background: var(--accent); color: #fff; }
+
+/* 确保 hidden 能覆盖掉可能已有的 display 样式 */
+.aitools-item[hidden],
+.aitools-day[hidden],
+.aitools-noresult[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 560px) {
+  .aitools-toolbar { padding: .75rem; }
+  .aitools-chip { font-size: .75rem; padding: .3rem .55rem; }
+  .aitools-search-input { font-size: .875rem; padding: .5rem 2rem .5rem 2rem; }
+}
+
+/* ---- 赞助商带：窄屏换行 ----
+   560px 以下 logo + 文字挤在一行会很憋，CTA 也不再塞得下。
+   改成「logo 和文字一行、CTA 独占第二行占满宽度」，
+   手机上拇指点 CTA 的面积也更大。 */
+@media (max-width: 560px) {
+  .aitools-sponsor { flex-wrap: wrap; }
+  .aitools-sponsor-cta { flex-basis: 100%; text-align: center; margin-top: .35rem; }
+}
+/* 420px 以下的极窄屏：logo 缩到 44px，给文字多留一行 */
+@media (max-width: 420px) {
+  .aitools-sponsor-logo { width: 44px; height: 44px; }
+  .aitools-sponsor-desc { font-size: .75rem; }
+}
+
+/* ---- 成为赞助商：窄屏 ----
+   flex-wrap 已经能让四个药丸自然换行，这里只处理两件事：
+   ① 负外边距在窄屏取消（否则文字块和上方赞助商带贴死）；
+   ② 药丸字号降到 .75rem，让四个入口在 375px 宽的手机上排成两行而不溢出。 */
+@media (max-width: 560px) {
+  .aitools-sponsor-join { margin-top: 0; }
+  .aitools-sponsor-join-actions { gap: .3rem .4rem; }
+  .aitools-join-link { font-size: .75rem; padding: .3rem .6rem; }
+}
+
+/* ==========================================================================
+   Dark theme — 只覆盖变量 + 少量硬编码浅色。
+   放在文件末尾：[data-theme="dark"] 与 :root 同特异性(0,1,0)，后者靠顺序胜出。
+   绝大多数组件用 var(--bg)/--bg-soft/--text/--border，改这几个就整体翻黑。
+   ========================================================================== */
+[data-theme="dark"] {
+  --bg:            #12181b;
+  --bg-soft:       #1a2226;
+  --text:          #e4e8ea;
+  --text-muted:    #96a0a6;
+  --border:        #2b353a;
+  --accent:        #58b6d4;
+  --accent-soft:   #16313b;
+  /* 暗色下反复出现的「浅色调」集中在这里改，避免逐个选择器重复写 */
+  --shadow:        0 4px 16px rgba(0, 0, 0, .4);
+}
+
+/* 卡片/浮层的白底 → 抬升一档的表面色（比 --bg 略亮，做出层次） */
+[data-theme="dark"] .link-pop,
+[data-theme="dark"] .talk-logo { background: #1e272b; }
+[data-theme="dark"] .link-pop { box-shadow: var(--shadow); }
+/* 二维码必须留白底，否则扫码识别率下降 —— 不改 .contact-qr img / .aitools-qr img */
+
+/* 正文链接 hover 的深青色在暗底上太暗，换成亮一档的 accent */
+[data-theme="dark"] .post-content a:hover { color: #7fd0e8; }
+
+/* 「今日已更新」绿灯带：浅色成功底 → 暗色成功底 */
+[data-theme="dark"] .aitools-live { border-color: #2b353a; }
+[data-theme="dark"] .aitools-live.is-on {
+  background: #12312a; border-color: #1d4a3d; color: #5fd6b0;
+}
+
+/* 各种 hover 浅蓝底 (#d6e6ea) → 暗色 hover 底 */
+[data-theme="dark"] .aitools-drawer-btn:hover,
+[data-theme="dark"] .nav-ai:hover,
+[data-theme="dark"] .post-lang-toggle:hover,
+[data-theme="dark"] a.cve-hof:hover { background: #24343a; }
+
+/* 淡青描边 (#d6e9ef)：订阅带 / 二维码框 / 侧栏小组件 / 分隔虚线 → 暗色描边 */
+[data-theme="dark"] .aitools-subscribe,
+[data-theme="dark"] .aitools-qr,
+[data-theme="dark"] .sidebar-widget { border-color: #2b353a; }
+[data-theme="dark"] .sw-item { border-bottom-color: #2b353a; }
+
+/* toast：亮底深字 → 暗色下反过来（浅底深字），否则深底上看不见 */
+[data-theme="dark"] .aitools-toast { background: #e4e8ea; color: #12181b; }
+
+/* 星榜 top3 的金色名次在暗底上稍微提亮 */
+[data-theme="dark"] .aitools-view-board #aitools-flat .aitools-item.is-rank-top::before { color: #f0b429; }
+
+/* 免责声明的暖色警告块 → 暗色警告底（保留琥珀语义，压暗背景） */
+[data-theme="dark"] .post-disclaimer {
+  background: #2a2415; border-color: #4a3f22; border-left-color: #d9910b; color: #e8cf9a;
+}
+
+/* banner 图没加载出来时的兜底底色，暗色下再压深一点，不刺眼 */
+[data-theme="dark"] .section-heading--banner { background-color: #14343d; }
+
+/* 首屏数字带的浅色渐变起点 (#fcfdfe) 在暗色下发灰，换成深色渐变 */
+[data-theme="dark"] .aitools-stats {
+  background: linear-gradient(180deg, #1e272b 0%, var(--bg-soft) 100%);
+}
+
+/* 404 主按钮 hover 的深青底在暗色下改用 accent，保持可辨识 */
+[data-theme="dark"] .notfound-btn-primary:hover { background: #266a80; border-color: #266a80; }
+
+/* 主题切换按钮：与语言切换按钮同一套外观，日/月图标按当前主题互斥显示 */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; margin-right: .35rem; padding: 0;
+  color: var(--text-muted); background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; vertical-align: middle; transition: color .15s, border-color .15s, background .15s;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.theme-toggle .theme-icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .theme-icon-sun { display: none; }
+[data-theme="dark"] .theme-toggle .theme-icon-moon { display: block; }
+.lang-toggle-item { display: flex; align-items: center; }
+
+/* ==========================================================================
+   ai-tools 追加组件：archived 徽章 / NEW 点 / 搜索高亮 /
+   加载更多 / 抽屉同类工具 / ⌘K 命令面板。全部用 var() 取色，暗色自动跟随。
+   ========================================================================== */
+
+/* ── archived / 史料 徽章 ─────────────────────────────── */
+.aitools-archived {
+  display: inline-flex; align-items: center;
+  padding: .1rem .5rem; font-size: .6875rem; font-weight: 600; letter-spacing: .02em;
+  color: var(--text-muted); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 999px; white-space: nowrap;
+}
+
+/* ── 自上次访问后的新期：左上角一颗 NEW 点 ─────────────── */
+.aitools-item.is-new::after {
+  content: "NEW";
+  position: absolute; top: -.4rem; left: .65rem;
+  padding: .05rem .35rem; font-size: .625rem; font-weight: 700; letter-spacing: .04em;
+  color: #fff; background: #ef476f; border-radius: 4px; line-height: 1.4;
+}
+
+/* ── 搜索命中高亮 ─────────────────────────────────────── */
+mark.aitools-hl {
+  background: #fff3b0; color: inherit;
+  padding: 0 .1em; border-radius: 2px;
+}
+[data-theme="dark"] mark.aitools-hl { background: #6b5900; color: #ffe9a3; }
+
+/* ── 时间线「加载更多」────────────────────────────────── */
+.aitools-loadmore-wrap { text-align: center; margin: .5rem 0 1.25rem; }
+.aitools-loadmore {
+  padding: .5rem 1.2rem; font: inherit; font-size: .875rem; font-weight: 600;
+  color: var(--accent); background: var(--bg);
+  border: 1px solid var(--accent); border-radius: 999px; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.aitools-loadmore:hover { background: var(--accent); color: #fff; }
+.aitools-loadmore-n { margin-left: .35rem; opacity: .7; font-weight: 500; }
+
+/* ── 抽屉「同类工具」交叉链 ───────────────────────────── */
+.aitools-drawer-related { padding: 0 1.25rem; margin-top: .25rem; }
+.aitools-related-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35rem; }
+.aitools-related {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  width: 100%; padding: .45rem .6rem; font: inherit; font-size: .8125rem; text-align: left;
+  color: var(--text); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.aitools-related:hover { border-color: var(--cat, var(--accent)); color: var(--accent); }
+.aitools-related-issue { flex: none; font-size: .6875rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* ── ⌘K 命令面板 ──────────────────────────────────────── */
+.aitools-palette-scrim {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(15, 20, 23, .45); opacity: 0;
+  transition: opacity .18s ease; backdrop-filter: blur(1px);
+}
+.aitools-palette-scrim.is-open { opacity: 1; }
+.aitools-palette {
+  position: fixed; z-index: 91; top: 14vh; left: 50%;
+  width: min(560px, calc(100vw - 2rem));
+  transform: translate(-50%, -8px); opacity: 0;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+  overflow: hidden; transition: opacity .18s ease, transform .18s ease;
+}
+.aitools-palette.is-open { opacity: 1; transform: translate(-50%, 0); }
+.aitools-palette-search {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .75rem .9rem; border-bottom: 1px solid var(--border); color: var(--text-muted);
+}
+.aitools-palette-input {
+  flex: 1; min-width: 0; font: inherit; font-size: .9375rem;
+  color: var(--text); background: transparent; border: 0; outline: none;
+}
+.aitools-palette-esc {
+  flex: none; padding: .1rem .4rem; font-family: var(--font-mono); font-size: .6875rem;
+  color: var(--text-muted); background: var(--bg-soft);
+  border: 1px solid var(--border); border-radius: 4px;
+}
+.aitools-palette-list {
+  list-style: none; margin: 0; padding: .35rem;
+  max-height: min(52vh, 420px); overflow-y: auto;
+}
+.aitools-palette-row {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .6rem; border-radius: var(--radius); cursor: pointer;
+}
+.aitools-palette-row.is-active { background: var(--accent-soft); }
+.aitools-palette-kind {
+  flex: none; min-width: 3.6rem; text-align: center;
+  font-size: .6875rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: 4px; padding: .1rem .3rem; font-variant-numeric: tabular-nums;
+}
+.aitools-palette-row.is-active .aitools-palette-kind { color: var(--accent); border-color: var(--accent); }
+.aitools-palette-name {
+  flex: 1; min-width: 0; font-size: .9375rem; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.aitools-palette-empty { margin: 0; padding: 1.5rem 1rem; text-align: center; color: var(--text-muted); font-size: .875rem; }
+body.aitools-palette-open { overflow: hidden; }
+@media (max-width: 560px) {
+  .aitools-palette { top: 8vh; }
+  .aitools-palette-kind { min-width: 3rem; }
+}
+
+/* ==========================================================================
+   阅读体验追加组件：阅读进度条 / 本页目录 / 代码块工具条。
+   全部走 var()，暗色自动跟随；硬编码的浅色单独在末尾补 dark 覆盖。
+   ========================================================================== */
+
+/* ── 阅读进度条 ──────────────────────────────────────────
+   压在 sticky masthead 的上沿（masthead z-index 100），高一级才不被盖住。
+   宽度用 scaleX 而不是 width：滚动每帧改 width 会触发 layout，scaleX 只走合成层。 */
+.read-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 101;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+/* ── 本页目录：窄屏形态（正文上方的折叠块）────────────── */
+.post-toc { margin: 0 0 1.5rem; }
+.post-toc[hidden] { display: none; }   /* 作者样式会盖掉 UA 的 [hidden]，必须补 */
+.post-toc-inner {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.post-toc-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem .8rem;
+  margin: 0;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  list-style: none;
+}
+.post-toc-title::-webkit-details-marker { display: none; }
+.post-toc-title::after {
+  content: "▾";
+  font-size: .75rem;
+  transition: transform .18s ease;
+}
+.post-toc-inner:not([open]) .post-toc-title::after { transform: rotate(-90deg); }
+.post-toc-nav { padding: 0 .8rem .7rem; }
+.post-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--border);
+}
+.post-toc-item a {
+  display: block;
+  margin-left: -2px;
+  padding: .2rem 0 .2rem .7rem;
+  border-left: 2px solid transparent;
+  font-size: .8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.post-toc-item a:hover { color: var(--accent); text-decoration: none; }
+.post-toc-item a.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.post-toc-h3 a { padding-left: 1.45rem; font-size: .78125rem; }
+/* 早期长文整篇只有 h3：没有 h2 时它们就是顶层，不该缩进 */
+.post-toc-list.is-flat .post-toc-h3 a { padding-left: 0; font-size: .8125rem; }
+
+/* 目录底部的公众号二维码：只在宽屏出现（那里 .float-qr 已经把右边让给目录了） */
+.post-toc-qr { display: none; }
+
+/* ── 本页目录：宽屏形态（正文右侧 sticky 一列）──────────
+   外壳（导航 / 主体 / 页脚）一起加宽 260px，正文列宽几乎不变，
+   只加宽 #main 会让侧栏和顶部导航的左边缘错开。
+   .page-content 变成两列网格：除目录外所有子元素显式占第一列，
+   否则自动放置会把 post-nav、评论区依次塞进第二列。
+
+   断点 1100px：原来定 1400px 是因为当时文章页还有 220px 的左侧栏，
+   侧栏 + 正文 + 目录要 1360 才放得下。侧栏藏掉之后目录只需要
+   「正文 720 + 间距 44 + 目录 208 = 972」加外壳 padding，1100 就够；
+   继续卡 1400 会把 1100–1399 这一大片（主流笔记本窗口）判成窄屏，
+   目录退化成压在文章标题上方的折叠条。 */
+@media (min-width: 1100px) {
+  body.has-post-toc .masthead__inner-wrap,
+  body.has-post-toc #main,
+  body.has-post-toc .footer__inner { max-width: calc(var(--content-max) + 260px); }
+
+  body.has-post-toc .page-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 208px;
+    gap: 0 2.75rem;
+    align-items: start;
+  }
+  body.has-post-toc .page-content > * { grid-column: 1; min-width: 0; }
+  body.has-post-toc .post-toc {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+    position: sticky;
+    top: 85px;
+    margin: 0;
+  }
+
+  .post-toc-inner {
+    background: none;
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-radius: 0;
+    padding-left: .85rem;
+  }
+  .post-toc-title { padding: 0 0 .45rem; cursor: default; }
+  .post-toc-title::after { display: none; }
+  .post-toc-nav {
+    padding: 0;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
+  }
+  .post-toc-list { border-left: 0; }
+  .post-toc-item a { margin-left: 0; border-left: 0; padding: .18rem 0; }
+  .post-toc-h3 a { padding-left: .8rem; }
+
+  .post-toc-qr {
+    display: block;
+    margin-top: 1.1rem;
+    padding-top: .9rem;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .post-toc-qr img {
+    display: block;
+    width: 112px; height: 112px;
+    margin: 0 auto;
+    padding: 4px;
+    background: #fff;               /* 二维码必须留白底，否则扫码识别率下降 */
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  .post-toc-qr-name { display: block; margin-top: .4rem; font-size: .75rem; font-weight: 600; color: var(--text); }
+  .post-toc-qr-hint { display: block; font-size: .6875rem; color: var(--text-muted); }
+
+  /* 目录占了右侧，悬浮二维码就没地方了 —— 二选一，避免两块浮层叠在一起 */
+  body.has-post-toc .float-qr { display: none; }
+}
+
+/* ── 代码块工具条 ──────────────────────────────────────
+   figure.highlight 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码
+   横向跑掉，所以外面套 .code-box 承载工具条和折叠按钮。 */
+.code-box { margin: 0 0 1.4em; }
+.post-content .code-box .highlight {
+  margin: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.post-content .code-box.is-foldable .highlight { border-radius: 0; }
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .25rem .55rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: .6875rem;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  padding: .12rem .5rem;
+  font: inherit;
+  font-size: .75rem;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.code-copy:hover { color: var(--accent); border-color: var(--accent); }
+.code-copy.is-copied { color: #0f8a5f; border-color: #0f8a5f; background: #eaf7f1; }
+.code-copy.is-failed { color: #b4443a; border-color: #e0b4ae; background: #fdf1ef; }
+/* 折叠：默认只露 400px，剩下的按需展开 */
+.code-box.is-folded .highlight { max-height: 400px; overflow: hidden; }
+.code-more {
+  display: block;
+  width: 100%;
+  padding: .4rem;
+  font: inherit;
+  font-size: .75rem;
+  color: var(--accent);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  cursor: pointer;
+  transition: background .15s;
+}
+.code-more:hover { background: var(--accent-soft); }
+
+/* 目录锚点跳转要平滑滚动，但前庭敏感的人要关掉 */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .read-progress { transition: none; }
+  .post-toc-title::after { transition: none; }
+}
+
+/* 暗色覆盖：只有 .code-copy.is-copied 用了硬编码浅色 */
+[data-theme="dark"] .code-copy.is-copied { color: #6fd6a8; border-color: #2f6b52; background: #16302a; }
+
+/* ── 全站 ⌘K 搜索：结果行带正文摘要，比专栏页那版多一行 ── */
+.aitools-palette[hidden],
+.aitools-palette-scrim[hidden] { display: none; }
+#site-palette .aitools-palette-row { align-items: flex-start; }
+#site-palette .aitools-palette-kind { margin-top: .15rem; }
+.site-palette-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: .12rem;
+}
+.site-palette-main .aitools-palette-name { flex: none; white-space: normal; }
+.site-palette-snippet {
+  font-size: .75rem; line-height: 1.45; color: var(--text-muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* 从搜索结果跳进来时正文里的命中 */
+mark.search-hl { background: #fff3b0; color: inherit; padding: .05em .18em; border-radius: 2px; }
+[data-theme="dark"] mark.search-hl { background: #6b5900; color: #ffe9a3; }
+
+/* 顶部导航的搜索入口：和主题切换按钮同一套外观，免得导航里出现第三种按钮形状 */
+.nav-search {
+  display: inline-flex; align-items: center; justify-content: center; gap: .3rem;
+  height: 30px; margin-right: .35rem; padding: 0 .45rem;
+  font-family: inherit; font-size: .8125rem;
+  color: var(--text-muted); background: transparent;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; vertical-align: middle;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.nav-search:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.nav-search-kbd { font-family: var(--font-mono); font-size: .6875rem; opacity: .85; }
+@media (max-width: 640px) {
+  .nav-search { width: 30px; padding: 0; }
+  .nav-search-kbd { display: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   专栏页：年份分隔 + 月度更新热力
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* 年份分隔：时间线的 ::before/::after 已经被竖线和小圆点占用，所以年份是真实子元素。
+   它跟着 .aitools-day 一起显隐 —— 网格/星榜视图把条目搬进 #aitools-flat 后整组隐藏，
+   年份条自然一起消失，不会在平铺视图里留下孤零零的年份。 */
+.aitools-year-marker {
+  /* 高度锁死（不是靠字号算出来的），下面 .42rem 那组偏移就是按这个值推的，改这里要同步改那边 */
+  height: 1.4rem;
+  margin: 0 0 .85rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-family: var(--font-mono);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.4rem;
+  letter-spacing: .04em;
+  color: var(--text);
+}
+/* 尾部渐隐的横线：年份和「本期」是同一种「分组」语气，用线连到行尾才像分隔而不是多了一行标题 */
+.aitools-year-marker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+}
+/* 年份条占了 2.25rem（1.4rem 高 + .85rem 下边距），小圆点和竖线一起下移，
+   保证节点仍然贴的是日期标题而不是年份条。:has() 不支持时退化成「圆点贴在年份上」，
+   两种都读得通，所以不必为此写 JS。 */
+.aitools-day:has(.aitools-year-marker)::after { top: 2.67rem; }
+.aitools-day:has(.aitools-year-marker)::before { top: 2.85rem; }

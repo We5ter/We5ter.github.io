@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
+      var pageTitle = "Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。" />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085456" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085456" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/ai-tools/dark-moon/" />
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/dark-moon/" />
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/dark-moon/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/ai-tools/dark-moon/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。" />
+  <meta property="og:url" content="https://we5ter.github.io/ai-tools/dark-moon/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/dark-moon-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。" />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/dark-moon-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-09-30T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-09-30T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085456" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/dark-moon/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/dark-moon/"},"headline":"Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打","name":"Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打","description":"975 star 的自主渗透平台：50 个专家 agent、140+ 真实工具，靠 Privacy Gateway 把真实 IP / 主机 / URL / 凭证换成确定性占位符、只在工具真正执行的那一刻本地还原。GPL-3.0，Python，可全本地模型跑。","image":"https://we5ter.github.io/images/banners/dark-moon-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-09-30T06:00:00.000Z","dateModified":"2026-09-30T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-aisec-item">
+            
+            <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="“全网最全”AI安全知识图谱">
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
+              <span class="i18n-zh">AI安全知识图谱</span>
+              <span class="i18n-en">AI Security KG</span>
+            </a>
+          </li>
+          <li class="masthead__menu-item nav-ai-item">
+            
+            <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">每日 AI 工具</span>
+              <span class="i18n-en">Daily AI Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            
+            
+            <button class="nav-search" id="nav-search" type="button"
+                    title="Search / 搜索 (⌘K)" aria-label="Search / 搜索">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+              <kbd class="nav-search-kbd">⌘K</kbd>
+            </button>
+            
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="公众号二维码">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="公众号二维码">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="公众号二维码" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+
+<aside class="post-toc" id="post-toc" hidden>
+  <details class="post-toc-inner" id="post-toc-inner" open>
+    <summary class="post-toc-title">
+      <span class="i18n-zh">本页目录</span><span class="i18n-en">On this page</span>
+    </summary>
+    <nav class="post-toc-nav" id="post-toc-nav" aria-label="Table of contents"></nav>
+    
+    <div class="post-toc-qr">
+      <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="112" height="112" loading="lazy" decoding="async">
+      <span class="post-toc-qr-name">Wester的AI安全札记</span>
+      <span class="post-toc-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+    </div>
+    
+  </details>
+</aside>
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/dark-moon-banner.jpg)">
+    <h1 class="post-title">Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-09-30">
+        <span class="i18n-zh">2026年9月30日</span>
+        <span class="i18n-en">Sep 30, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 21 分钟</span><span class="i18n-en">21 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/dark-moon/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="一、速览：值不值得你花时间"><a href="#一、速览：值不值得你花时间" class="headerlink" title="一、速览：值不值得你花时间"></a>一、速览：值不值得你花时间</h2><p><strong>推荐指数：★★★★☆（4 &#x2F; 5）</strong></p>
+<p>给到这个分数的理由：它解决的是自主渗透这个领域<strong>最卡企业落地的一个真问题</strong> —— 你不能把含有真实 IP、内网域名、凭证片段的流量发给云端大模型，但本地小模型又撑不起复杂推理。Dark-Moon 的答案是 <strong>Privacy Gateway：可逆的本地 tokenization</strong>。真实值在离开你的边界之前就变成了确定性占位符（比如把 <code>10.0.0.1</code> 换成 <code>__HOST_A__</code>），<strong>只在工具真正要执行的那一刻在本地还原</strong>。占位符是确定性的，所以模型依然能做「同一个主机出现了三次」这类关联推理，但送出去的文本里没有真实资产。</p>
+<p>第二个加分点是<strong>工具是真家伙而且数量管够</strong>：一个多阶段构建的 Docker 镜像里塞了 140+ 安全工具（Nuclei、sqlmap、WPScan、NetExec、BloodHound、Impacket 30+ 脚本、kubectl、aws&#x2F;az&#x2F;gcloud、hashcat、john……），不是一个「AI 假装自己在扫描」的壳子。</p>
+<p>扣掉的一颗星在四个地方：<strong>GPL-3.0</strong>（比 AGPL 温和，但仍是强 copyleft）；<strong>README 里 Pro 版的存在感过强</strong>（大段截图和「自动修复出 PR」都是付费的，开源版只有 CLI）；<strong>那条 57 个漏洞的 benchmark 是用云端 frontier 模型（Anthropic Claude）跑出来的</strong>，本地模型的覆盖率 README 自己写了「取决于你跑的模型」——所以 headline 数字不代表本地跑的效果；以及 <strong>Open Issues 只有 2 个</strong>，社区样本还很小。</p>
+<h3 id="关键数据（截至-2026-09-30）"><a href="#关键数据（截至-2026-09-30）" class="headerlink" title="关键数据（截至 2026-09-30）"></a>关键数据（截至 2026-09-30）</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>语言</td>
+<td><strong>Python</strong></td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td><strong>975</strong> &#x2F; 159</td>
+</tr>
+<tr>
+<td>提交 &#x2F; Open Issues</td>
+<td>220 &#x2F; <strong>2</strong></td>
+</tr>
+<tr>
+<td>许可证</td>
+<td><strong>GPL-3.0</strong></td>
+</tr>
+<tr>
+<td>首次提交</td>
+<td>2024-11-26（约 22 个月）</td>
+</tr>
+<tr>
+<td>最近提交</td>
+<td><strong>2026-09-27</strong>（2 天前，非常活跃）</td>
+</tr>
+<tr>
+<td>仓库体积</td>
+<td>约 <strong>92 MB</strong>（含文档与镜像构建资源）</td>
+</tr>
+<tr>
+<td>运行时要求</td>
+<td>Docker &amp; Docker Compose + LLM API key 或本地模型</td>
+</tr>
+<tr>
+<td>模型支持</td>
+<td>云端：Anthropic &#x2F; OpenAI &#x2F; OpenRouter；本地：Ollama &#x2F; llama.cpp</td>
+</tr>
+<tr>
+<td>官方站点</td>
+<td><a target="_blank" rel="noopener" href="https://dark-moon.org/">https://dark-moon.org/</a></td>
+</tr>
+</tbody></table>
+<h3 id="适合谁"><a href="#适合谁" class="headerlink" title="适合谁"></a>适合谁</h3><table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>企业安全运营</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>Privacy Gateway + 本地模型是对合规最友好的组合；CI&#x2F;CD 原生集成也齐</td>
+</tr>
+<tr>
+<td>红队 &#x2F; 渗透测试工程师</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>140+ 真工具 + AD&#x2F;K8s&#x2F;云全覆盖，覆盖面在开源里少见</td>
+</tr>
+<tr>
+<td>DevSecOps 工程师</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>GitHub Actions &#x2F; GitLab CI &#x2F; Jenkins &#x2F; VS Code &#x2F; JetBrains 全都有官方集成</td>
+</tr>
+<tr>
+<td>安全研究员</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td>架构上没有 LuaN1ao 那种证据链硬约束，偏工程而非方法论</td>
+</tr>
+<tr>
+<td>个人 &#x2F; 学习者</td>
+<td><strong>2 &#x2F; 5</strong></td>
+<td>Docker Compose 全栈 + 92MB 仓库，起步成本偏高</td>
+</tr>
+</tbody></table>
+<h3 id="二次开发"><a href="#二次开发" class="headerlink" title="二次开发"></a>二次开发</h3><table>
+<thead>
+<tr>
+<th>难度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改配置</td>
+<td><strong>低</strong> —— <code>./install.sh</code> 交互式配 LLM provider，不用手改 <code>docker-compose.yml</code>；<code>FOCUS</code> &#x2F; <code>EXCLUDE</code> &#x2F; <code>NOISE</code> 等 flag 直接写进 prompt</td>
+</tr>
+<tr>
+<td>改集成</td>
+<td><strong>低</strong> —— 有 npm 包 <code>@darkmoon_ai/client</code>，8 个官方集成，且<strong>所有集成只输出安全元数据</strong>（severity &#x2F; status &#x2F; MITRE &#x2F; ids），不含证据与凭证</td>
+</tr>
+<tr>
+<td>改内核</td>
+<td><strong>中</strong> —— MCP workflow、agent 定义都在 <code>docs/full.md</code> 里有章节，可以加自定义 agent，但要懂 OpenCode + MCP 两层</td>
+</tr>
+</tbody></table>
+<h2 id="二、它是什么，不是什么"><a href="#二、它是什么，不是什么" class="headerlink" title="二、它是什么，不是什么"></a>二、它是什么，不是什么</h2><ul>
+<li><strong>不是</strong>一个漏洞扫描器的包装。它不产出「分数」，README 的用词是 <strong>Evidence, not scores</strong> —— 每条发现都附带<strong>确切的命令和原始输出</strong>。</li>
+<li><strong>不是</strong>让 AI 直接碰系统的工具。架构里有一句很硬的话：<strong>The AI never runs a command directly</strong>，所有动作都经 MCP 这个 controlled + logged 的接口。</li>
+<li><strong>不是</strong>纯云端 SaaS。它能全本地跑（Ollama &#x2F; llama.cpp），这是它和 strix、shannon 最核心的差异。</li>
+<li><strong>不是</strong>一个「50 个 agent 各干各的」的 swarm。它是一个 agentic system 在推理和规划，<strong>按需派发</strong>专家 agent。</li>
+</ul>
+<p>提炼三个关键词：<strong>Privacy Gateway</strong>（本地可逆脱敏）、<strong>MCP Gatekeeper</strong>（AI 与工具之间的受控层）、<strong>sub-agent dispatch</strong>（按检测到的技术栈派发专家）。</p>
+<h2 id="三、Privacy-Gateway：这条设计是它最值钱的地方"><a href="#三、Privacy-Gateway：这条设计是它最值钱的地方" class="headerlink" title="三、Privacy Gateway：这条设计是它最值钱的地方"></a>三、Privacy Gateway：这条设计是它最值钱的地方</h2><p>先把威胁模型说清楚。你让一个 AI agent 去打你的内网，它会看到：真实 IP、内网域名、URL 路径、响应体里可能带的内网标识、甚至你给的凭证。这些文本要送给 LLM 做推理。如果 LLM 在云端，你等于<strong>把资产测绘结果发给了第三方</strong>。</p>
+<p>Dark-Moon 的做法：</p>
+<blockquote>
+<p>Reversible local tokenization turns real IPs, hosts, URLs and credentials into deterministic placeholders, rehydrated only locally at the moment a tool runs.</p>
+</blockquote>
+<p>三个关键词值得拆：</p>
+<ol>
+<li><strong>Reversible（可逆）</strong> —— 不是哈希掉找不回来。工具真要打 <code>10.0.0.1</code> 的时候得能还原成真地址，否则扫不了。</li>
+<li><strong>Deterministic（确定性）</strong> —— 同一个真实值每次都映射到同一个占位符。这一条是<strong>能不能做推理的关键</strong>：模型必须能看出「第 3 步和第 7 步遇到的是同一个主机」，如果占位符是随机的，这条关联就断了，规划质量会崩。</li>
+<li><strong>Rehydrated only locally, at the moment a tool runs（只在工具执行那一刻本地还原）</strong> —— 还原发生的时间窗极短，且不出本地边界。送进模型上下文的始终是占位符。</li>
+</ol>
+<p>这套思路其实和业界做「LLM 数据防泄漏」的路子一致，但把它<strong>专门针对渗透场景的资产标识符</strong>做了适配，这是 Dark-Moon 的原创贡献。企业里真要上自主渗透，这一条几乎是必备项。</p>
+<p><strong>但要诚实地说</strong>：README 只描述了机制，<strong>没有给出脱敏覆盖率的量化数据</strong>（哪些字段会脱敏、有没有漏网的、占位符碰撞怎么处理）。想依赖它做合规，得自己先审一遍代码再下结论。</p>
+<h2 id="四、架构：AI-只能隔着-MCP-下令"><a href="#四、架构：AI-只能隔着-MCP-下令" class="headerlink" title="四、架构：AI 只能隔着 MCP 下令"></a>四、架构：AI 只能隔着 MCP 下令</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User ──&gt; DarkmoonCLI ──&gt; OpenCode (AI Brain) ──&gt; MCP (Security Gatekeeper) ──&gt; Docker Toolbox (Real Tools)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">  participant U as User</span><br><span class="line">  participant O as OpenCode</span><br><span class="line">  participant A as AI Agent</span><br><span class="line">  participant M as MCP Darkmoon</span><br><span class="line">  participant T as Docker Toolbox</span><br><span class="line"></span><br><span class="line">  U-&gt;&gt;O: User prompt</span><br><span class="line">  O-&gt;&gt;A: Delegate task</span><br><span class="line">  A-&gt;&gt;M: MCP function call</span><br><span class="line">  M-&gt;&gt;T: Execute real tool</span><br><span class="line">  T--&gt;&gt;M: Results</span><br><span class="line">  M--&gt;&gt;A: Structured output</span><br><span class="line">  A--&gt;&gt;O: Next decision</span><br><span class="line">  O--&gt;&gt;U: Summary / result</span><br></pre></td></tr></table></figure>
+
+<p>三层职责很清楚：<strong>AI 推理和规划，MCP 决定什么能被执行，Toolbox 在 Docker 里跑隔离的工具。</strong></p>
+<p>这里有个细节值得单独拎出来 —— <strong>需要凭证才有意义的平面永远不在推理时派发</strong>：</p>
+<blockquote>
+<p>Planes that require credentials to be meaningful (cloud accounts, CI&#x2F;CD, secret stores, databases, Active Directory, Kubernetes) are <strong>never dispatched on inference</strong>. They fire only when a concrete artifact is found (a key, a token, a reachable metadata endpoint) or when you authorize them explicitly, and are otherwise flagged in the report.</p>
+</blockquote>
+<p>也就是说，AD &#x2F; K8s &#x2F; 云 &#x2F; 数据库这几类 agent，不是「模型觉得该打就打」，而是<strong>必须先找到具体凭证或可达的 metadata 端点，或者你显式授权</strong>。没触发就在报告里标出来让你自己看。这是个很务实的收敛 —— 既避免了模型凭空幻想云环境，也避免了一上手就对着云 API 猛打。</p>
+<h3 id="子-agent-派发表（部分）"><a href="#子-agent-派发表（部分）" class="headerlink" title="子 agent 派发表（部分）"></a>子 agent 派发表（部分）</h3><table>
+<thead>
+<tr>
+<th>检测到的技术</th>
+<th>触发的 agent</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>WordPress &#x2F; Drupal &#x2F; Joomla &#x2F; Magento &#x2F; PrestaShop &#x2F; Moodle</td>
+<td>CMS 专用</td>
+</tr>
+<tr>
+<td>PHP &#x2F; Node.js &#x2F; Flask &#x2F; ASP.NET &#x2F; Spring Boot &#x2F; Ruby on Rails &#x2F; Go</td>
+<td>技术栈专用</td>
+</tr>
+<tr>
+<td>GraphQL</td>
+<td>GraphQL agent</td>
+</tr>
+<tr>
+<td><strong>LLM &#x2F; AI 推理端点</strong>（OpenAI-compatible、Ollama、vLLM、TGI）</td>
+<td><strong>LLM agent</strong></td>
+</tr>
+<tr>
+<td>Active Directory</td>
+<td>AD agent</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>Kubernetes agent</td>
+</tr>
+<tr>
+<td>AWS &#x2F; Azure &#x2F; GCP</td>
+<td>云厂商 agent</td>
+</tr>
+<tr>
+<td>Entra ID</td>
+<td>Identity agent</td>
+</tr>
+<tr>
+<td>GitHub &#x2F; GitLab &#x2F; Jenkins</td>
+<td>SCM &amp; CI&#x2F;CD agent</td>
+</tr>
+<tr>
+<td>Terraform &#x2F; Ansible</td>
+<td>IaC agent</td>
+</tr>
+<tr>
+<td>Docker &#x2F; 容器仓库</td>
+<td>Container agent</td>
+</tr>
+<tr>
+<td>HashiCorp Vault</td>
+<td>Secrets agent</td>
+</tr>
+<tr>
+<td>PostgreSQL &#x2F; MySQL &#x2F; MSSQL &#x2F; Oracle</td>
+<td>Database agent</td>
+</tr>
+<tr>
+<td>Redis &#x2F; RabbitMQ &#x2F; Kafka &#x2F; MQTT</td>
+<td>Messaging &amp; cache agent</td>
+</tr>
+<tr>
+<td>固件 &#x2F; IoT 镜像</td>
+<td>Firmware agent</td>
+</tr>
+</tbody></table>
+<p><strong>它连你自己的 AI 也打</strong> —— LLM agent 会用 <strong>garak 支撑的 probes</strong> 去测 AI&#x2F;LLM 推理端点的 OWASP LLM Top 10。这一条在同类工具里不常见。</p>
+<h2 id="五、Benchmark：57-个漏洞，但要看清跑法"><a href="#五、Benchmark：57-个漏洞，但要看清跑法" class="headerlink" title="五、Benchmark：57 个漏洞，但要看清跑法"></a>五、Benchmark：57 个漏洞，但要看清跑法</h2><p>README 给的是一次<strong>真实、可复现的黑盒</strong>运行，靶场是 OWASP Juice Shop：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>发现漏洞数</td>
+<td><strong>57</strong>（8 critical &#x2F; 24 high &#x2F; 21 medium &#x2F; 4 low）</td>
+</tr>
+<tr>
+<td>墙钟耗时</td>
+<td><strong>28.5 分钟</strong></td>
+</tr>
+<tr>
+<td>利用证明</td>
+<td>每条发现附 command + raw output</td>
+</tr>
+<tr>
+<td>所用 LLM</td>
+<td><strong>Anthropic Claude（云端 frontier）</strong></td>
+</tr>
+</tbody></table>
+<p><strong>这里必须提醒一句</strong>：这张表的 57 是<strong>云端 frontier 模型</strong>的成绩。README 同一段紧接着写：</p>
+<blockquote>
+<p>DarkMoon also runs <strong>fully local</strong> (Ollama &#x2F; llama.cpp) behind the Privacy Gateway — so nothing leaves your infrastructure; <strong>local-model coverage depends on the model you run</strong>.</p>
+</blockquote>
+<p>也就是说，<strong>你如果为了合规跑本地模型，不能指望复现 57 这个数字</strong>。本地能到多少，README 没给数据。这是评估这个项目时最容易踩的坑 —— headline 和你的实际部署形态不是一回事。</p>
+<p>想自己复现对比，官方给了仓库：<a target="_blank" rel="noopener" href="https://github.com/ASCIT31/Darkmoon-Benchmarks">ASCIT31&#x2F;Darkmoon-Benchmarks</a>。这个态度是加分的。</p>
+<p>官方还给了横向对比表（标注「整理自公开 repo&#x2F;doc，2026-08，欢迎 PR 更正」）：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center"><strong>DarkMoon</strong></th>
+<th align="center">strix</th>
+<th align="center">shannon</th>
+<th align="center">PentAGI</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>跑在<strong>本地 LLM</strong> 上</td>
+<td align="center">✅</td>
+<td align="center">❌ 云端</td>
+<td align="center">❌ 云端</td>
+<td align="center">partial</td>
+</tr>
+<tr>
+<td>Privacy Gateway（本地 tokenization）</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td>Active Directory + Kubernetes</td>
+<td align="center">✅</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">partial</td>
+</tr>
+<tr>
+<td>利用证明</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
+<td>开源</td>
+<td align="center">✅ GPL-3.0</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+</tbody></table>
+<p><strong>这张表是项目方自己整理的，不是第三方评测</strong>，读的时候要带这个前提。</p>
+<h2 id="六、部署与集成"><a href="#六、部署与集成" class="headerlink" title="六、部署与集成"></a>六、部署与集成</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/ASCIT31/Dark-Moon.git</span><br><span class="line"><span class="built_in">cd</span> Dark-Moon</span><br><span class="line">./install.sh</span><br></pre></td></tr></table></figure>
+
+<p><code>install.sh</code> 会交互式配置 LLM provider（<strong>不用手改 <code>docker-compose.yml</code></strong>）并构建整个栈：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./install.sh           <span class="comment"># 若 .opencode.env 已配置则跳过表单</span></span><br><span class="line">./install.sh --init    <span class="comment"># 强制重新配置（云端或本地模型）</span></span><br><span class="line">./install.sh --<span class="built_in">help</span>    <span class="comment"># 查看用法</span></span><br></pre></td></tr></table></figure>
+
+<p>跑第一次评估并实时看日志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./darkmoon.sh <span class="string">&quot;TARGET: example.com&quot;</span></span><br><span class="line">./darkmoon.sh --<span class="built_in">log</span> &lt;session_id&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>前置条件</strong>：Docker &amp; Docker Compose，加一个 LLM API key（或本地模型）。</p>
+<h3 id="Scope-与-flag"><a href="#Scope-与-flag" class="headerlink" title="Scope 与 flag"></a>Scope 与 flag</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 快速渗透（零配置）</span></span><br><span class="line">./darkmoon.sh <span class="string">&quot;TARGET: http://172.19.0.3:3000&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 漏洞赏金模式（flag 自动激活）</span></span><br><span class="line">./darkmoon.sh <span class="string">&quot;TARGET: http://172.19.0.3:3000 PROGRAM=\&quot;Juice Shop\&quot; FOCUS=sqli,xss,idor NOISE=moderate FORMAT=h1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 指定技术栈聚焦 + 排除</span></span><br><span class="line">./darkmoon.sh <span class="string">&quot;TARGET: https://app.example.com PROGRAM=\&quot;Example BB\&quot; FOCUS=sqli,rce,ssrf EXCLUDE=H1 FORMAT=h1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Active Directory</span></span><br><span class="line">./darkmoon.sh <span class="string">&quot;TARGET: 192.168.1.10&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>主要 flag：<code>FOCUS</code>、<code>EXCLUDE</code>、<code>CREDS</code>、<code>TOKEN</code>、<code>NOISE</code>、<code>SEVERITY</code>、<code>FORMAT</code>，全部由 AI 自然语义解析。</p>
+<h3 id="工具箱（140-，Docker-多阶段构建）"><a href="#工具箱（140-，Docker-多阶段构建）" class="headerlink" title="工具箱（140+，Docker 多阶段构建）"></a>工具箱（140+，Docker 多阶段构建）</h3><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>工具举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>端口扫描</td>
+<td>Naabu（发现）、nmap（定向服务探测）</td>
+</tr>
+<tr>
+<td>Web 扫描</td>
+<td>Nuclei、ffuf、dirb、sqlmap、Arjun、wafw00f</td>
+</tr>
+<tr>
+<td>侦察 &amp; 爬取</td>
+<td>Subfinder、Katana、Waybackurls、httpx</td>
+</tr>
+<tr>
+<td>CMS</td>
+<td>WPScan、CMSeeK、WhatWeb</td>
+</tr>
+<tr>
+<td>Active Directory</td>
+<td>NetExec、BloodHound、Impacket（30+ 脚本）</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>kubectl、Kubescape、Kubeletctl、kube-bench、rbac-police</td>
+</tr>
+<tr>
+<td>云 CLI</td>
+<td>aws、az、gcloud、gsutil、bq</td>
+</tr>
+<tr>
+<td>数据库 &amp; 缓存</td>
+<td>psql、mysql、redis-cli、sqlite3</td>
+</tr>
+<tr>
+<td>固件 &#x2F; IoT</td>
+<td>binwalk、unsquashfs、sasquatch、firmwalker</td>
+</tr>
+<tr>
+<td>破解</td>
+<td>hashcat、john、7z2john</td>
+</tr>
+<tr>
+<td>网络</td>
+<td>Hydra、curl、dig、SNMP 工具</td>
+</tr>
+<tr>
+<td>浏览器</td>
+<td>Lightpanda（headless）</td>
+</tr>
+</tbody></table>
+<h3 id="集成矩阵"><a href="#集成矩阵" class="headerlink" title="集成矩阵"></a>集成矩阵</h3><table>
+<thead>
+<tr>
+<th>平台</th>
+<th>作用</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GitHub Actions</strong></td>
+<td>按严重程度 fail 流水线</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>GitLab CI&#x2F;CD</strong></td>
+<td>输出 Code Quality + SAST 报告</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>Jenkins</strong></td>
+<td>输出 Warnings-NG issues</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>VS Code</strong></td>
+<td>从编辑器浏览和发起评估</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>JetBrains</strong></td>
+<td>IDE tool window 显示发现</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>n8n</strong></td>
+<td>自动化 campaign &#x2F; retest &#x2F; 告警</td>
+<td><strong>Pro</strong></td>
+</tr>
+<tr>
+<td><strong>Grafana</strong></td>
+<td>安全态势仪表盘</td>
+<td><strong>Pro</strong></td>
+</tr>
+<tr>
+<td><strong>Splunk</strong></td>
+<td>SOC 接入（HEC）+ 告警动作</td>
+<td>OSS + Pro</td>
+</tr>
+<tr>
+<td><strong>SDK &#x2F; CLI</strong></td>
+<td><code>npm @darkmoon_ai/client</code> 自建集成</td>
+<td>OSS + Pro</td>
+</tr>
+</tbody></table>
+<p>一个很好的约束：<strong>所有集成只输出安全的元数据</strong>（severity、status、MITRE、id），<strong>不输出证据、密钥或 token</strong>。这避免了「CI 日志里泄露了内网证据」这类二次事故。</p>
+<h2 id="七、边界与风险（必须诚实说的部分）"><a href="#七、边界与风险（必须诚实说的部分）" class="headerlink" title="七、边界与风险（必须诚实说的部分）"></a>七、边界与风险（必须诚实说的部分）</h2><p><strong>1）GPL-3.0，不是 Apache&#x2F;MIT。</strong> 比 AGPL-3.0 温和（没有网络服务化条款），但仍是强 copyleft。企业把它嵌进自有产品要谨慎；作为独立工具使用没问题。</p>
+<p><strong>2）README 的 Pro 版篇幅过重，容易误读。</strong> 大段 dashboard 截图、orbital attack-surface map、scheduler、以及「finding → sandbox-validated fix → human-reviewed PR」这条自动修复链路，<strong>全都是 Darkmoon Pro 付费功能，不在你 clone 的开源仓库里</strong>。开源版是 CLI。README 虽然用 🔒 标了，但视觉上 Pro 的篇幅远超 OSS，第一次读很容易以为那些是开源能力。</p>
+<p><strong>3）57 漏洞的成绩与本地部署无关。</strong> 见第五章 —— 用云端 Claude 跑出来的。想评估本地方案的实际效果，目前<strong>没有公开数据</strong>，只能自己跑 benchmark 仓库。</p>
+<p><strong>4）本地模型的实际能力是个未知数。</strong> 文档只说「coverage depends on the model you run」。而本地小模型在长链条工具调用上的退化是行业共性问题 —— 50 个 agent 的派发决策、MCP 工具参数构造，对小模型都不友好。<strong>别默认「开了 Ollama 就等于等价替代」。</strong></p>
+<p><strong>5）Open Issues 只有 2 个，未必等于稳定。</strong> 975 star、220 commit、22 个月历史，issue 数这么低更可能反映<strong>社区参与度还很小</strong>。你踩到坑时，能指望的外部帮助有限。</p>
+<p><strong>6）对比表是自评。</strong> 「整理自公开 repo&#x2F;doc（2026-08），欢迎 PR 更正」—— 这个免责声明很诚实，但也说明它不是独立评测。用它做选型时请自己验证。</p>
+<p><strong>7）依赖链偏重。</strong> OpenCode（AI Brain）+ MCP + Docker Compose 全栈 + 92MB 仓库 + 140+ 工具的镜像。构建时间和排障成本都不低，而且这三层里任何一层出问题都会让整条链停下来。</p>
+<h2 id="八、上手建议（按这个顺序来）"><a href="#八、上手建议（按这个顺序来）" class="headerlink" title="八、上手建议（按这个顺序来）"></a>八、上手建议（按这个顺序来）</h2><ol>
+<li><strong>用 <code>./install.sh</code> 而不是手改 <code>docker-compose.yml</code>。</strong> 它会交互式配好 provider 并构建全栈。想换云端&#x2F;本地模型用 <code>./install.sh --init</code>。</li>
+<li><strong>第一次跑选最窄的 scope。</strong> 官方示例是 <code>TARGET: http://172.19.0.3:3000</code> 这种单点，别一上来就给网段。</li>
+<li><strong>优先试 Privacy Gateway 的脱敏效果。</strong> 这是它的核心卖点。跑的时候盯着 <code>--log &lt;session_id&gt;</code> 的实时日志，确认送出去的文本里确实没有真实 IP 和凭证。<strong>这一步不建议跳过</strong> —— 它是你决定是否敢用云端模型的前提。</li>
+<li><strong>想聚焦就用 <code>FOCUS</code>。</strong> 比如 <code>FOCUS=sqli,xss,idor</code> 能显著缩短跑完的时间，也减少无关噪声。第一次评估建议聚焦单一类别，看清楚它怎么推理。</li>
+<li><strong>云端模型先跑通，再切本地做对比。</strong> 先用 Claude 复现一遍 Juice Shop（对照 <code>Darkmoon-Benchmarks</code>），建立基线；再切 Ollama 跑同一个靶场，自己量化本地退化多少。这个差值才是你做部署决策的真实依据。</li>
+<li><strong>CI&#x2F;CD 集成从 GitHub Actions 或 GitLab CI 开始</strong>，这两个是 OSS 版就有的，且只输出元数据不输出证据，风险最低。<strong>别一上来就用 n8n &#x2F; Grafana</strong>，那是 Pro。</li>
+<li><strong>如果需要 AD &#x2F; K8s &#x2F; 云的覆盖，准备好显式授权。</strong> 那几个平面不会在推理时自动派发，你要么找到具体凭证&#x2F;可达 metadata 端点，要么显式授权，否则它们只会在报告里被标出来。</li>
+</ol>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>如果你的约束是「渗透可以自动化，但资产信息一步都不能出门」，Dark-Moon 是目前开源里唯一把本地可逆脱敏做进主流程的选择；但请记住它的 57 漏洞战绩属于云端 Claude，而那些漂亮的 dashboard 和自动修 PR 属于付费的 Pro。</strong></p>
+<p>给企业安全团队的第一动作：<strong>用 <code>./install.sh</code> 起一套，先跑 Juice Shop 单点，全程开着 <code>--log</code> 验证脱敏是否真的生效。</strong> 确认了这一点，再谈要不要把它接进 CI。</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/dark-moon/">https://we5ter.github.io/ai-tools/dark-moon/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/dark-moon/&text=Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/dark-moon/&title=Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/dark-moon/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/dark-moon/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/dark-moon/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/dark-moon/"
+  };
+</script>
+
+
+
+
+
+<nav class="post-nav post-nav--series">
+  
+  <a class="post-nav-prev" href="/ai-tools/luan1ao-agent/">
+    <span class="post-nav-label">&larr;
+      <span class="i18n-zh">上一期 · 第 009 期</span>
+      <span class="i18n-en">Previous · No. 9</span>
+    </span>
+    <span class="post-nav-title">LuaN1ao 拆解：把每条渗透结论钉回证据链，而不是留在模型的记忆里</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/deepsec/">
+    <span class="post-nav-label">
+      <span class="i18n-zh">下一期 · 第 011 期</span>
+      <span class="i18n-en">Next · No. 11</span>
+    </span> &rarr;
+    <span class="post-nav-title">deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀</span>
+  </a>
+  
+</nav>
+
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+<!-- 阅读进度条 + 本页目录（只在文章页有对应节点，其他页面自然空跑退出） -->
+<script>
+(function () {
+  var bar = document.getElementById('read-progress');
+  var tocAside = document.getElementById('post-toc');
+  var article = document.querySelector('article.post-detail');
+  if (!bar && !tocAside) return;
+
+  // 进度按「文章本体」算，不含评论区和页脚 —— 否则滚到评论区就早早满格，
+  // 读者会以为文章看完了。
+  function progress() {
+    if (!bar || !article) return;
+    var r = article.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? (-r.top) / total : (r.top <= 0 ? 1 : 0);
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+
+  var links = [];      // { a, head }
+  var cur = -1;
+
+  function headingText(h) {
+    // Hexo 在每个标题里塞了 <a class="headerlink">，直接取 textContent 会带上锚点空白
+    var c = h.cloneNode(true);
+    var hl = c.querySelectorAll('.headerlink');
+    for (var i = 0; i < hl.length; i++) hl[i].parentNode.removeChild(hl[i]);
+    return (c.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(s) {
+    return String(s).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildToc() {
+    if (!tocAside || !article) return;
+    var nav = document.getElementById('post-toc-nav');
+    var det = document.getElementById('post-toc-inner');
+    var body = article.querySelector('.post-content');
+    if (!nav || !body) return;
+
+    var heads = body.querySelectorAll('h2, h3');
+    var h2n = 0, i;
+    for (i = 0; i < heads.length; i++) if (heads[i].tagName === 'H2') h2n++;
+    // 少于三个标题的短文不值得占一列，目录反而比正文长。
+    // 只看总数不单独看 h2：早期 CVE 长文整篇用 h3 分层（没有 h2），按 h2 计数会一律漏掉。
+    if (heads.length < 3) return;
+
+    var html = '<ul class="post-toc-list' + (h2n ? '' : ' is-flat') + '">';
+    for (i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + i;
+      // 标题带 sticky masthead，滚动定位要留出它的高度，否则跳过去被压在导航底下
+      h.style.scrollMarginTop = '76px';
+      html += '<li class="post-toc-item post-toc-' + h.tagName.toLowerCase() + '">' +
+              '<a href="#' + h.id + '">' + esc(headingText(h)) + '</a></li>';
+    }
+    html += '</ul>';
+    nav.innerHTML = html;
+
+    var as = nav.querySelectorAll('a');
+    for (i = 0; i < as.length; i++) links.push({ a: as[i], head: heads[i] });
+
+    tocAside.hidden = false;
+    document.body.classList.add('has-post-toc');
+
+    // 窄屏默认收起，别一进来就占满半屏；宽屏常驻展开。
+    // 1399 是 CSS 里目录宽屏断点（min-width: 1100px）的另一半：
+    // 两处必须互补，否则 1100–1399 会出现「目录已在右侧常驻、却被脚本收起」。
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 1099px)');
+    if (det && narrow && narrow.matches) det.removeAttribute('open');
+    nav.addEventListener('click', function (e) {
+      if (det && narrow && narrow.matches && e.target && e.target.tagName === 'A') {
+        det.removeAttribute('open');
+      }
+    });
+    highlight();
+  }
+
+  // 当前小节 = 最后一个顶部已越过 masthead 下沿的标题
+  function highlight() {
+    if (!links.length) return;
+    var idx = -1;
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].head.getBoundingClientRect().top <= 90) idx = i;
+      else break;
+    }
+    if (idx === cur) return;
+    if (cur >= 0 && links[cur]) links[cur].a.classList.remove('is-active');
+    cur = idx;
+    if (cur >= 0) links[cur].a.classList.add('is-active');
+  }
+
+  buildToc();
+  progress();
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      progress();
+      highlight();
+      ticking = false;
+    });
+  }, { passive: true });
+  window.addEventListener('resize', function () { progress(); highlight(); }, { passive: true });
+})();
+</script>
+
+<!-- 代码块：语言标签 + 一键复制 + 超长折叠 -->
+<script>
+(function () {
+  var figs = document.querySelectorAll('.post-content figure.highlight');
+  if (!figs.length) return;
+
+  function codeText(fig) {
+    // 行号在 td.gutter 里，只能取 td.code；每行之间是 <br>，
+    // 直接 textContent 会把所有行粘成一坨，必须按 .line 拼。
+    var td = fig.querySelector('td.code') || fig;
+    var lines = td.querySelectorAll('.line');
+    if (lines.length) {
+      var out = [];
+      for (var i = 0; i < lines.length; i++) out.push(lines[i].textContent.replace(/\n$/, ''));
+      return out.join('\n');
+    }
+    var pre = td.querySelector('pre');
+    return pre ? pre.textContent : td.textContent;
+  }
+
+  // file:// 预览和非 https 环境拿不到 navigator.clipboard，退回 execCommand
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function zh(s) { return '<span class="i18n-zh">' + s + '</span>'; }
+  function en(s) { return '<span class="i18n-en">' + s + '</span>'; }
+
+  // 复制失败要说出来：非安全上下文 / 页面失焦时 clipboard API 和 execCommand 都会静默失败，
+  // 按钮若原地不动，读者以为已经复制上了。
+  var timers = [];
+  function paint(btn, state) {
+    btn.classList.remove('is-copied', 'is-failed');
+    if (state === 'ok') {
+      btn.classList.add('is-copied');
+      btn.innerHTML = zh('已复制') + en('Copied');
+    } else if (state === 'fail') {
+      btn.classList.add('is-failed');
+      btn.innerHTML = zh('复制失败，请手动选中') + en('Copy failed — select manually');
+    } else {
+      btn.innerHTML = zh('复制') + en('Copy');
+    }
+  }
+  function flash(btn, state) {
+    paint(btn, state);
+    timers.push(setTimeout(function () { paint(btn, false); }, 2000));
+  }
+
+  Array.prototype.forEach.call(figs, function (fig) {
+    if (fig.parentNode && fig.parentNode.classList.contains('code-box')) return;
+
+    var m = fig.className.match(/(?:^|\s)highlight(?:\s+([a-z0-9+#._-]+))?/i);
+    var lang = m && m[1] ? m[1] : '';
+    // 未标语言的围栏 Hexo 给的是 plaintext（不是 plain），别漏 —— 每块都挂个「plaintext」比不挂更吵。
+    if (/^(plain|plaintext|text|txt)$/i.test(lang)) lang = '';
+
+    // figure 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码横向跑掉，
+    // 所以外面套一层 .code-box 承载工具条和折叠按钮。
+    var box = document.createElement('div');
+    box.className = 'code-box';
+    fig.parentNode.insertBefore(box, fig);
+    box.appendChild(fig);
+
+    var bar = document.createElement('div');
+    bar.className = 'code-bar';
+    var langEl = document.createElement('span');
+    langEl.className = 'code-lang';
+    if (lang) langEl.textContent = lang; else langEl.style.display = 'none';
+    bar.appendChild(langEl);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    paint(btn, false);
+    btn.addEventListener('click', function () {
+      var text = codeText(fig);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn, 'ok'); },
+          function () { flash(btn, legacyCopy(text) ? 'ok' : 'fail'); });
+      } else {
+        flash(btn, legacyCopy(text) ? 'ok' : 'fail');
+      }
+    });
+    bar.appendChild(btn);
+    box.insertBefore(bar, fig);
+
+    // 超长代码折叠：默认只露 20 行。不折叠的话一段两百行的日志能把整篇的滚动条吃光。
+    var lines = fig.querySelectorAll('td.code .line');
+    if (lines.length > 20) {
+      box.classList.add('is-foldable', 'is-folded');
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'code-more';
+      function paintMore(folded) {
+        more.innerHTML = folded
+          ? zh('展开全部 ' + lines.length + ' 行') + en('Expand all ' + lines.length + ' lines')
+          : zh('收起') + en('Collapse');
+      }
+      paintMore(true);
+      more.addEventListener('click', function () {
+        // toggle 返回「切换后是否还带着这个 class」，正好就是折叠状态
+        paintMore(box.classList.toggle('is-folded'));
+      });
+      box.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- 全站 ⌘K 搜索：正文级索引（search.json 按需拉取）。
+     专栏页 /ai-tools/ 自带一份「搜工具」的面板，这里让位，不抢同一个快捷键。 -->
+<script>
+(function () {
+  if (document.body.classList.contains('layout-ai-tools')) return;
+
+  var INDEX_URL = '/search.json';
+  var KEY = 'site-search-index';
+  var pal, scrim, input, list, idx = null, loading = false;
+  var rows = [], active = -1, lastFocus = null;
+
+  var L = {
+    ph:    function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Search articles, issues and body text…'
+             : '搜索文章、期号与正文…'; },
+    kind:  function (d) {
+      var en = document.documentElement.getAttribute('data-lang') === 'en';
+      if (d.k === 'issue' && d.i !== '') return en ? 'No. ' + d.i : '第 ' + d.i + ' 期';
+      if (d.k === 'page') return en ? 'Page' : '页面';
+      return en ? 'Post' : '文章';
+    },
+    empty: function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'No match.' : '没有匹配的结果。'; },
+    load:  function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Loading index…' : '索引加载中…'; }
+  };
+
+  function build() {
+    if (pal) return;
+    scrim = document.createElement('div');
+    scrim.className = 'aitools-palette-scrim';
+    scrim.id = 'site-palette-scrim';
+    scrim.hidden = true;
+
+    pal = document.createElement('div');
+    pal.className = 'aitools-palette';
+    pal.id = 'site-palette';
+    pal.setAttribute('role', 'dialog');
+    pal.setAttribute('aria-modal', 'true');
+    pal.setAttribute('aria-label', 'Site search');
+    pal.hidden = true;
+    pal.innerHTML =
+      '<div class="aitools-palette-search">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+          '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>' +
+          '<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>' +
+        '</svg>' +
+        '<input type="text" class="aitools-palette-input" id="site-palette-q" autocomplete="off" spellcheck="false">' +
+        '<kbd class="aitools-palette-esc">Esc</kbd>' +
+      '</div>' +
+      '<ul class="aitools-palette-list" id="site-palette-list" role="listbox"></ul>';
+
+    document.body.appendChild(scrim);
+    document.body.appendChild(pal);
+    input = document.getElementById('site-palette-q');
+    list = document.getElementById('site-palette-list');
+    input.placeholder = L.ph();
+
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', onNav);
+    scrim.addEventListener('click', close);
+  }
+
+  function loadIndex(cb) {
+    if (idx) return cb(idx);
+    try {
+      var cached = sessionStorage.getItem(KEY);
+      if (cached) { idx = JSON.parse(cached); return cb(idx); }
+    } catch (e) { /* 隐私模式 / 超配额：当成没缓存 */ }
+    if (loading) return;
+    loading = true;
+    msg(L.load());
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', INDEX_URL, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      loading = false;
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          idx = JSON.parse(xhr.responseText);
+          try { sessionStorage.setItem(KEY, xhr.responseText); } catch (e) {}
+          cb(idx);
+        } catch (e) { msg(L.empty()); }
+      } else {
+        msg(document.documentElement.getAttribute('data-lang') === 'en'
+            ? 'Index unavailable.' : '索引加载失败。');
+      }
+    };
+    xhr.send();
+  }
+
+  function msg(text) {
+    rows = []; active = -1;
+    list.innerHTML = '<li class="aitools-palette-empty"></li>';
+    list.firstChild.textContent = text;
+  }
+
+  // 命中位置：返回该词在文本里第一次出现的位置，找不到返回 -1
+  function firstHit(hay, w) { return hay.indexOf(w); }
+
+  function snippet(text, pos) {
+    var from = Math.max(0, pos - 42);
+    var to = Math.min(text.length, pos + 96);
+    return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+  }
+
+  function search(q) {
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var uiLang = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+    var out = [];
+    idx.docs.forEach(function (d) {
+      var t = (d.t || '').toLowerCase();
+      var de = (d.d || '').toLowerCase();
+      var x = (d.x || '').toLowerCase();
+      var score = 0, hitPos = -1, ok = true;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        var inT = t.indexOf(w), inD = de.indexOf(w), inX = x.indexOf(w);
+        if (inT < 0 && inD < 0 && inX < 0) { ok = false; break; }
+        score += (inT >= 0 ? 8 : 0) + (inD >= 0 ? 3 : 0) + (inX >= 0 ? 1 : 0);
+        if (hitPos < 0) hitPos = inX;
+      }
+      if (!ok) return;
+      if (d.l === uiLang) score += 2;
+      out.push({ d: d, score: score, pos: hitPos });
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out.slice(0, 12);
+  }
+
+  function draw() {
+    var q = input.value.trim();
+    list.innerHTML = '';
+    rows = []; active = -1;
+    if (!idx) { msg(L.load()); return; }
+    if (!q) { msg(document.documentElement.getAttribute('data-lang') === 'en'
+                   ? 'Type to search ' + idx.docs.length + ' pages.'
+                   : '输入关键词，共 ' + idx.docs.length + ' 篇可搜。'); return; }
+    var hits = search(q);
+    if (!hits.length) { msg(L.empty()); return; }
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    hits.forEach(function (h, n) {
+      var d = h.d;
+      var li = document.createElement('li');
+      li.className = 'aitools-palette-row';
+      li.setAttribute('role', 'option');
+
+      var kind = document.createElement('span');
+      kind.className = 'aitools-palette-kind';
+      kind.textContent = L.kind(d);
+
+      var box = document.createElement('span');
+      box.className = 'site-palette-main';
+      var name = document.createElement('span');
+      name.className = 'aitools-palette-name';
+      name.textContent = d.t;
+      box.appendChild(name);
+
+      // 摘要优先给正文命中那一段（标题命中时正文摘要意义不大，但仍给读者上下文）
+      var pos = h.pos;
+      if (pos < 0) {
+        for (var i = 0; i < words.length && pos < 0; i++) pos = firstHit((d.x || '').toLowerCase(), words[i]);
+      }
+      if (pos >= 0) {
+        var sn = document.createElement('span');
+        sn.className = 'site-palette-snippet';
+        markWords(sn, snippet(d.x, pos), words);
+        box.appendChild(sn);
+      }
+
+      li.appendChild(kind);
+      li.appendChild(box);
+      li.addEventListener('click', function () { go(n); });
+      list.appendChild(li);
+      rows.push({ li: li, url: d.u });
+    });
+    setActive(0);
+  }
+
+  // 用 DOM 拼接而不是 innerHTML：关键词来自用户输入，不能进 HTML 解析
+  function markWords(el, text, words) {
+    var low = text.toLowerCase();
+    var marks = [];
+    words.forEach(function (w) {
+      if (w.length < 1) return;
+      var from = 0, p;
+      while ((p = low.indexOf(w, from)) !== -1) { marks.push([p, p + w.length]); from = p + w.length; }
+    });
+    if (!marks.length) { el.textContent = text; return; }
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var cur = 0;
+    marks.forEach(function (m) {
+      if (m[0] < cur) return;
+      if (m[0] > cur) el.appendChild(document.createTextNode(text.slice(cur, m[0])));
+      var k = document.createElement('mark');
+      k.className = 'aitools-hl';
+      k.textContent = text.slice(m[0], m[1]);
+      el.appendChild(k);
+      cur = m[1];
+    });
+    if (cur < text.length) el.appendChild(document.createTextNode(text.slice(cur)));
+  }
+
+  function setActive(n) {
+    if (!rows.length) return;
+    if (active >= 0 && rows[active]) rows[active].li.classList.remove('is-active');
+    active = (n + rows.length) % rows.length;
+    rows[active].li.classList.add('is-active');
+    rows[active].li.scrollIntoView({ block: 'nearest' });
+  }
+
+  function go(n) {
+    var words = input.value.trim();
+    var url = '/' + rows[n].url;
+    if (words) url += (url.indexOf('?') === -1 ? '?' : '&') + 'hl=' + encodeURIComponent(words);
+    window.location.href = url;
+  }
+
+  function onNav(e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (rows.length) go(active < 0 ? 0 : active); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  }
+
+  function open() {
+    build();
+    lastFocus = document.activeElement;
+    scrim.hidden = false;
+    pal.hidden = false;
+    document.body.classList.add('aitools-palette-open');
+    window.requestAnimationFrame(function () { scrim.classList.add('is-open'); pal.classList.add('is-open'); });
+    input.placeholder = L.ph();
+    input.value = '';
+    draw();
+    loadIndex(function () { draw(); });
+    input.focus();
+  }
+
+  function close() {
+    if (!pal) return;
+    scrim.classList.remove('is-open');
+    pal.classList.remove('is-open');
+    document.body.classList.remove('aitools-palette-open');
+    scrim.hidden = true;
+    pal.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!pal || pal.hidden) open(); else close();
+      return;
+    }
+    // 文章页的「/」也留给搜索：正文页没有专栏页那套列表快捷键，不冲突
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && (!pal || pal.hidden)) {
+      var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      open();
+    }
+  });
+
+  var trigger = document.getElementById('nav-search');
+  if (trigger) trigger.addEventListener('click', open);
+})();
+</script>
+
+<!-- 从搜索结果跳进来时高亮正文命中：?hl=关键词，标出第一处并滚过去。
+     用完就把参数从地址栏抹掉，免得分享出去的链接自带一个高亮。 -->
+<script>
+(function () {
+  var q;
+  try { q = new URLSearchParams(location.search).get('hl'); } catch (e) { return; }
+  if (!q) return;
+  var body = document.querySelector('.post-content');
+  if (!body) return;
+
+  var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+  if (!words.length) return;
+
+  var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentNode;
+      // 代码块和高亮脚本里不插 mark：会破坏缩进，也可能被复制走
+      while (p && p !== body) {
+        var tag = p.nodeName ? p.nodeName.toLowerCase() : '';
+        if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'mark') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  var node, hit = null;
+  while ((node = walker.nextNode())) {
+    var low = node.nodeValue.toLowerCase();
+    for (var i = 0; i < words.length; i++) {
+      var at = low.indexOf(words[i]);
+      if (at !== -1) { hit = { node: node, at: at, len: words[i].length }; break; }
+    }
+    if (hit) break;
+  }
+
+  if (hit) {
+    var k = document.createElement('mark');
+    k.className = 'search-hl';
+    k.textContent = hit.node.nodeValue.substr(hit.at, hit.len);
+    hit.node.splitText(hit.at);
+    hit.node.nextSibling.parentNode.insertBefore(k, hit.node.nextSibling);
+    if (k.scrollIntoView) k.scrollIntoView({ block: 'center' });
+  }
+
+  try {
+    var p = new URLSearchParams(location.search);
+    p.delete('hl');
+    var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>

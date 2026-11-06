@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+  <script>
+    /* 语言：必须在样式表之前同步执行，否则首屏会先闪一下中文再切英文。
+       t() helper 输出的中英文两份文案由 CSS 按 [data-lang] 显隐，这里只负责打标记。
+       同时把 <title> / meta description / keywords 切到对应语言的版本。 */
+    (function () {
+      var lang = 'en';
+      /* 文章页以「文章自身的语言」为准：正文是单语言的（中/英各一篇），
+         若照 localStorage 走，会出现「UI 中文 + 正文英文」的错配。
+         首页/专栏页是双语渲染的，没有 page.lang，照用户偏好走。 */
+      /* 只有「有兄弟翻译的文章」才强制 —— 用 en_path/zh_path 判定，不能用 page.lang：
+         _config.yml 的 language 改成 en 后，Hexo 会让所有页面（含首页、专栏页）
+         的 page.lang 默认继承成 'en'，那些双语页必须照用户偏好走，不能强锁。 */
+      var forced = "zh";
+      /* URL 参数强制切语言：/cve/?lang=en、/blogs/xxx/?lang=zh
+         用于调试和「分享时指定语言」—— 覆盖 localStorage 里记住的偏好，并顺手把偏好改过来
+         （相当于一键重置）。文章页仍以正文语言为准，避免 UI 和正文错配。 */
+      try {
+        var q = new URLSearchParams(location.search).get('lang');
+        if (q === 'en' || q === 'zh') {
+          try { localStorage.setItem('lang', q); } catch (e) {}
+          if (!forced) lang = q;
+        }
+      } catch (e) {}
+
+      if (forced) {
+        lang = forced;
+      } else {
+        try {
+          var saved = localStorage.getItem('lang');
+          if (saved === 'en' || saved === 'zh') lang = saved;
+        } catch (e) {}
+      }
+      var root = document.documentElement;
+      root.setAttribute('data-lang', lang);
+      root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+
+      var SEO = {
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+      };
+      /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
+         EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
+         一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
+         语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
+      var pageTitle = "deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀";
+      /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
+         专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
+         清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
+         拼接逻辑就都不用改。 */
+      
+      var cur = SEO[lang];
+      document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+      var metaKw = document.querySelector('meta[name="keywords"]');
+      if (metaKw) metaKw.setAttribute('content', cur.kw);
+      // 暴露给 lang-toggle 复用
+      window.__BLOG_SEO = { pageTitle: pageTitle, byLang: SEO };
+    })();
+  </script>
+  <script>
+    /* 主题（明/暗）：同样必须在样式表之前同步执行，否则暗色用户首屏会先闪一下白。
+       优先级：localStorage 显式选择 > 系统 prefers-color-scheme > 默认 light。
+       只打 data-theme 标记，具体配色交给 CSS 里的 [data-theme="dark"] 变量覆盖。
+       color-scheme 一并设上，让滚动条 / 表单控件 / UA 默认底色也跟着走。 */
+    (function () {
+      var theme = 'light';
+      try {
+        var saved = localStorage.getItem('theme');
+        if (saved === 'dark' || saved === 'light') theme = saved;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'dark';
+      } catch (e) {}
+      var root = document.documentElement;
+      root.setAttribute('data-theme', theme);
+      root.style.colorScheme = theme;
+    })();
+  </script>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <meta name="description" content="8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。" />
+  <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="hexo">
+  
+  <meta name="theme-color" content="#ffffff" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085453" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085453" />
+
+  <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
+  <link rel="canonical" href="https://we5ter.github.io/ai-tools/deepsec/" />
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://we5ter.github.io/ai-tools/deepsec/" />
+  <link rel="alternate" hreflang="en" href="https://we5ter.github.io/en/ai-tools/deepsec/" />
+  <link rel="alternate" hreflang="x-default" href="https://we5ter.github.io/ai-tools/deepsec/" />
+  
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:description" content="8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。" />
+  <meta property="og:url" content="https://we5ter.github.io/ai-tools/deepsec/" />
+  <meta property="og:image" content="https://we5ter.github.io/images/banners/deepsec-banner.jpg" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:description" content="8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。" />
+  <meta name="twitter:image" content="https://we5ter.github.io/images/banners/deepsec-banner.jpg" />
+  
+  <meta property="article:published_time" content="2026-10-01T06:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-10-01T06:00:00.000Z" />
+  <meta property="article:author" content="Wester" />
+  
+  <meta property="article:tag" content="Browser security" />
+  
+  <meta property="article:tag" content="Android Security" />
+  
+  <meta property="article:tag" content="Pentest" />
+  
+  <meta property="article:tag" content="Offensive Security Research" />
+  
+  <meta property="article:tag" content="Security for AI" />
+  
+  <meta property="article:tag" content="AI safety" />
+  
+  
+
+  
+  
+  
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- YOYO Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085453" />
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+  
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-372913719"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-372913719');
+    gtag('config', 'G-FJF1S6XH6E');
+    
+  </script>
+  
+
+  <!-- Structured data (schema.org) -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/deepsec/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/deepsec/"},"headline":"deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀","name":"deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀","description":"8k star 的 agent 驱动漏洞扫描器，来自 Vercel Labs。不扫增量、不扫 diff，定位是**对存量大型仓库做一次全量深挖**，用最高 thinking level 的模型去翻那些埋了很久的洞。Apache-2.0。README 直接写明：大型代码库一次扫描可能花掉数千甚至数万美元。","image":"https://we5ter.github.io/images/banners/deepsec-banner.jpg","inLanguage":"zh-CN","datePublished":"2026-10-01T06:00:00.000Z","dateModified":"2026-10-01T06:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+<link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
+</head>
+
+
+<body class="post-template layout-post">
+
+  <!-- ============ Masthead (top nav) ============ -->
+  <div class="masthead">
+    <div class="masthead__inner-wrap">
+      <nav class="site-nav" id="site-nav">
+        
+        
+        <a class="site-title" href="/">
+          <img class="site-title-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+          <span class="i18n-zh">的自留地</span>
+          <span class="i18n-en">&#39;s Space</span>
+        </a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="visible-links" id="nav-links">
+          <li class="masthead__menu-item"><a href="/#blog"><span class="i18n-zh">博客</span><span class="i18n-en">Blog</span></a></li>
+          <li class="masthead__menu-item"><a href="/#talks"><span class="i18n-zh">学术演讲</span><span class="i18n-en">Talks</span></a></li>
+          <li class="masthead__menu-item"><a href="/#repositories"><span class="i18n-zh">开源项目</span><span class="i18n-en">Open Source</span></a></li>
+          <li class="masthead__menu-item"><a href="/cve/"><span class="i18n-zh">CVE 档案</span><span class="i18n-en">CVE Files</span></a></li>
+          <li class="masthead__menu-item"><a href="/contact/"><span class="i18n-zh">联系我</span><span class="i18n-en">Contact</span></a></li>
+          <li class="masthead__menu-item nav-aisec-item">
+            
+            <a class="nav-aisec" href="https://aisec123.github.io/" target="_blank" rel="noopener" title="“全网最全”AI安全知识图谱">
+              <img class="nav-aisec-logo" src="/images/static/aisec123-logo.jpg" alt="AISec123" width="18" height="18" loading="lazy" decoding="async" />
+              <span class="i18n-zh">AI安全知识图谱</span>
+              <span class="i18n-en">AI Security KG</span>
+            </a>
+          </li>
+          <li class="masthead__menu-item nav-ai-item">
+            
+            <a class="nav-ai" href="/ai-tools/" title="Scanners-Box 每日 AI 工具推荐">
+              <img class="nav-ai-logo" src="/images/static/scanners-box-logo.png" alt="Scanners-Box" width="22" height="22" loading="lazy" decoding="async" />
+              <span class="i18n-zh">每日 AI 工具</span>
+              <span class="i18n-en">Daily AI Picks</span>
+            </a>
+          </li>
+          
+          
+          <li class="masthead__menu-item lang-toggle-item">
+            
+            
+            <button class="nav-search" id="nav-search" type="button"
+                    title="Search / 搜索 (⌘K)" aria-label="Search / 搜索">
+              <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+              </svg>
+              <kbd class="nav-search-kbd">⌘K</kbd>
+            </button>
+            
+            <button class="theme-toggle" id="theme-toggle" type="button"
+                    title="Toggle dark mode / 切换暗色模式"
+                    aria-label="Toggle dark mode / 切换暗色模式">
+              <svg class="theme-icon-sun" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+                <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+              <svg class="theme-icon-moon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a7 7 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+            <button class="lang-toggle" id="lang-toggle" type="button" title="Switch language / 切换语言">
+              <span class="i18n-zh">EN</span><span class="i18n-en">中文</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============ Main ============ -->
+  <div id="main" role="main">
+    <aside class="sidebar">
+      <div class="author-card">
+        <img class="author-avatar" src="/images/static/avatar.png" alt="Wester">
+        
+        <h3 class="author-name">
+          <img class="author-logo" src="/images/static/wester-logo.svg" alt="Wester" width="75" height="20">
+        </h3>
+        <p class="author-bio"><span class="i18n-zh">安全研究员，研究方向：AI 红队 · 移动安全 · agent安全治理</span><span class="i18n-en">Security Researcher. Research focus: AI Red Teaming · Mobile Security · Agent Security Governance</span></p>
+
+        <ul class="author-links">
+          
+          <li>
+            <a href="https://github.com/We5ter" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              <span class="link-label">Github</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://x.com/wester0x01" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span class="link-label">X</span>
+            </a>
+          </li>
+          
+          
+          <li>
+            <a href="https://www.zhihu.com/column/DataDefSecurity" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="#0084ff"/>
+                <text x="12" y="17.2" text-anchor="middle" font-size="13" font-weight="700"
+                      fill="#ffffff" font-family="'PingFang SC','Microsoft YaHei',sans-serif">知</text>
+              </svg>
+              <span class="link-label">Wester的AI安全札记</span>
+            </a>
+          </li>
+          
+          
+          <li class="author-link-pop author-link-wechat">
+            <button type="button" class="wechat-trigger" aria-haspopup="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+                <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+                <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+                <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+              </svg>
+              <span class="link-label"><span class="i18n-zh">公众号</span><span class="i18n-en">WeChat</span></span>
+              <span class="link-pop link-pop-qr" role="tooltip">
+                <span class="link-pop-name">Wester的AI安全札记</span>
+                <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记 二维码">
+                <span class="link-pop-hint">
+                  <span class="i18n-zh">扫码关注</span>
+                  <span class="i18n-en">Scan to follow</span>
+                </span>
+              </span>
+            </button>
+          </li>
+          
+          
+          
+          <li>
+            <a href="/atom.xml" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg>
+              <span class="link-label"><span class="i18n-zh">订阅</span><span class="i18n-en">RSS</span></span>
+            </a>
+          </li>
+          
+        </ul>
+
+        
+        <div class="site-stats">
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_pv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">次访问</span><span class="i18n-en">views</span></span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num" id="vercount_value_site_uv">&mdash;</span>
+            <span class="stat-label"><span class="i18n-zh">位访客</span><span class="i18n-en">visitors</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-content">
+      
+
+
+
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+
+
+
+
+<aside class="float-qr" id="float-qr" aria-label="公众号二维码">
+  <button class="float-qr-btn" type="button" aria-expanded="false" aria-controls="float-qr-panel" aria-label="公众号二维码">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path opacity=".5" d="M8.7 3C5.4 3 2.7 5.1 2.7 7.7c0 1.4.8 2.7 2 3.6l-.5 1.9 2-1c.6.2 1.3.2 2 .2.3 0 .6 0 .9-.1-.3-.7-.5-1.4-.5-2.2 0-2.8 2.8-5.1 6.2-5.1h.4C14.7 3.8 11.9 3 8.7 3z"/>
+      <path d="M20.5 13.5c0-2.4-2.4-4.3-5.3-4.3s-5.3 1.9-5.3 4.3c0 2.4 2.4 4.3 5.3 4.3.6 0 1.2-.1 1.8-.2l1.8.9-.4-1.6c1.3-.8 2.1-2 2.1-3.4z"/>
+      <circle cx="13.9" cy="13.3" r=".95" fill="#fff"/>
+      <circle cx="17.1" cy="13.3" r=".95" fill="#fff"/>
+    </svg>
+  </button>
+  <div class="float-qr-panel" id="float-qr-panel">
+    <img src="/images/static/wechat-qr.jpg" alt="公众号二维码" width="258" height="258" loading="lazy" decoding="async">
+    <span class="float-qr-name">Wester的AI安全札记</span>
+    <span class="float-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+  </div>
+</aside>
+<script>
+  // 只在**触摸设备**接管点击展开 / 收起。
+  // 有鼠标的设备（hover: hover）CSS 的 :hover 已经够顺手，再绑 click 会和 hover 打架
+  // （点了没反应 / 状态不一致）。大屏按钮被 CSS 隐藏，这段逻辑自然也不生效。
+  (function () {
+    var wrap = document.getElementById('float-qr');
+    var btn = wrap && wrap.querySelector('.float-qr-btn');
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia('(hover: hover)').matches) return;
+    function setOpen(open) {
+      wrap.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(!wrap.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+
+
+
+<aside class="post-toc" id="post-toc" hidden>
+  <details class="post-toc-inner" id="post-toc-inner" open>
+    <summary class="post-toc-title">
+      <span class="i18n-zh">本页目录</span><span class="i18n-en">On this page</span>
+    </summary>
+    <nav class="post-toc-nav" id="post-toc-nav" aria-label="Table of contents"></nav>
+    
+    <div class="post-toc-qr">
+      <img src="/images/static/wechat-qr.jpg" alt="Wester的AI安全札记" width="112" height="112" loading="lazy" decoding="async">
+      <span class="post-toc-qr-name">Wester的AI安全札记</span>
+      <span class="post-toc-qr-hint"><span class="i18n-zh">扫码关注</span><span class="i18n-en">Scan to follow</span></span>
+    </div>
+    
+  </details>
+</aside>
+
+<article class="post post-detail">
+  
+  <header class="article-header article-header--banner" style="background-image:url(/images/banners/deepsec-banner.jpg)">
+    <h1 class="post-title">deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀</h1>
+    <div class="article-meta">
+      <time class="article-date" datetime="2026-10-01">
+        <span class="i18n-zh">2026年10月1日</span>
+        <span class="i18n-en">Oct 1, 2026</span>
+      </time>
+      <span class="meta-sep">&middot;</span>
+      <span class="article-readtime"><span class="i18n-zh">约 15 分钟</span><span class="i18n-en">15 min read</span></span>
+      
+      <span class="meta-sep">&middot;</span>
+      <span class="article-views">
+        <span class="stat-num" id="vercount_value_page_pv">&mdash;</span>
+        <span class="views-label"><span class="i18n-zh">次阅读</span><span class="i18n-en">views</span></span>
+      </span>
+      
+      
+      
+      <span class="meta-sep">&middot;</span>
+      <a class="post-lang-toggle"
+         href="/en/ai-tools/deepsec/"
+         title="Switch to English">EN</a>
+      
+    </div>
+  </header>
+  
+
+  
+  <aside class="post-disclaimer" role="note">
+    <p class="post-disclaimer-title">
+      <span aria-hidden="true">⚠️</span>
+      <span class="i18n-zh">免责声明</span>
+      <span class="i18n-en">Disclaimer</span>
+    </p>
+    <ul class="post-disclaimer-list">
+      <li>
+        <span class="i18n-zh">本文由 AI 生成，内容可能存在错误或已过时，请以官方来源为准。</span>
+        <span class="i18n-en">This article is AI-generated and may contain inaccuracies. Always verify against official sources.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">文中涉及的工具与技术仅可用于自有系统或已获得明确授权的安全测试，请勿用于非授权或非法测试。</span>
+        <span class="i18n-en">Use only on systems you own or have explicit authorization to test. Never for unauthorized or illegal testing.</span>
+      </li>
+      <li>
+        <span class="i18n-zh">本文仅从技术角度做分析与推荐，不构成任何操作建议。</span>
+        <span class="i18n-en">Technical analysis and recommendation only — this is not operational advice.</span>
+      </li>
+    </ul>
+  </aside>
+  
+
+  <section class="post-content">
+    <h2 id="一、速览：值不值得你花时间"><a href="#一、速览：值不值得你花时间" class="headerlink" title="一、速览：值不值得你花时间"></a>一、速览：值不值得你花时间</h2><p><strong>推荐指数：★★★★☆（4 &#x2F; 5）</strong></p>
+<p>给到这个分数的理由：它把「AI 代码审计」这件事的<strong>定位想清楚了，而且敢把代价写在脸上</strong>。绝大多数 AI 安全工具都在卷「快」和「便宜」—— 接 CI、扫 diff、几分钟出结果。deepsec 走的是反方向：它明确说自己是 <strong>on-demand review of all code in existing large-scale repos</strong>，目标是那些「在应用里潜伏了很久的、难找的问题」，并且<strong>默认用最好的模型、最高的 thinking level</strong>。</p>
+<p>最让我欣赏的是 README 第一段就把成本讲明白了：</p>
+<blockquote>
+<p>…meaning scans can cost thousands or even tens-of-thousands of dollars for large codebases. Our customers have found the cost worth it for how quickly they were able to patch vulnerabilities that would have otherwise gone unfixed.</p>
+</blockquote>
+<p>在一个普遍对 token 成本含糊其辞的领域，这种直白是稀缺品。配套的 <code>--max-cost-usd 100 --max-duration 2h</code> 也让成本变得可控 —— 你能在开跑前就把上限钉死。</p>
+<p>扣掉的一颗星，主要在这几处：<strong>成本是真门槛</strong>，个人和小团队基本用不起全量模式；<strong>项目只有 5 个月</strong>（2026-04-30 才创建），Vercel Labs 的项目本身也带实验性质；<strong>默认走 Vercel AI Gateway</strong>，虽有 <code>--model-auth direct</code> 自带 key 的旁路，但主路径是绑 Vercel 生态的；以及 <strong>69 个 open issues</strong> 对于 8k star 来说不算少。</p>
+<h3 id="关键数据（截至-2026-10-01）"><a href="#关键数据（截至-2026-10-01）" class="headerlink" title="关键数据（截至 2026-10-01）"></a>关键数据（截至 2026-10-01）</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>出品方</td>
+<td><strong>Vercel Labs</strong></td>
+</tr>
+<tr>
+<td>语言</td>
+<td><strong>TypeScript</strong>（npm 包 <code>deepsec</code>）</td>
+</tr>
+<tr>
+<td>Star &#x2F; Fork</td>
+<td><strong>8,044</strong> &#x2F; 488</td>
+</tr>
+<tr>
+<td>提交 &#x2F; Open Issues</td>
+<td>104 &#x2F; <strong>69</strong></td>
+</tr>
+<tr>
+<td>许可证</td>
+<td><strong>Apache-2.0</strong></td>
+</tr>
+<tr>
+<td>首次提交</td>
+<td>2026-04-30（约 <strong>5 个月</strong>）</td>
+</tr>
+<tr>
+<td>最近提交</td>
+<td>2026-09-23（8 天前）</td>
+</tr>
+<tr>
+<td>成本量级</td>
+<td>大型代码库 <strong>数千～数万美元</strong>（官方明示，可设上限）</td>
+</tr>
+<tr>
+<td>模型接入</td>
+<td>默认 Vercel AI Gateway；支持自带 OpenAI &#x2F; Anthropic &#x2F; 自定义 HTTPS provider</td>
+</tr>
+<tr>
+<td>官方站点</td>
+<td><a target="_blank" rel="noopener" href="https://deepsec.sh/">https://deepsec.sh/</a></td>
+</tr>
+</tbody></table>
+<h3 id="适合谁"><a href="#适合谁" class="headerlink" title="适合谁"></a>适合谁</h3><table>
+<thead>
+<tr>
+<th>人群</th>
+<th>分</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>有存量大型仓库的中大型团队</td>
+<td><strong>5 &#x2F; 5</strong></td>
+<td>定位完全对口：一次全量深挖，找埋了很久的洞</td>
+</tr>
+<tr>
+<td>企业安全运营</td>
+<td><strong>4 &#x2F; 5</strong></td>
+<td>有成本上限和沙箱方案，可控；但要先说服预算</td>
+</tr>
+<tr>
+<td>DevSecOps 工程师</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td><code>process --diff</code> 能做 PR 门禁，但那不是它的主场景</td>
+</tr>
+<tr>
+<td>安全研究员</td>
+<td><strong>3 &#x2F; 5</strong></td>
+<td>工程完整度高，但方法论没有特别新的东西</td>
+</tr>
+<tr>
+<td>个人开发者 &#x2F; 小团队</td>
+<td><strong>1 &#x2F; 5</strong></td>
+<td><strong>成本直接劝退</strong>，全量模式不是给这个体量设计的</td>
+</tr>
+</tbody></table>
+<h3 id="二次开发"><a href="#二次开发" class="headerlink" title="二次开发"></a>二次开发</h3><table>
+<thead>
+<tr>
+<th>难度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改配置</td>
+<td><strong>低</strong> —— <code>npx deepsec init</code> 交互式引导，选模型（带 benchmark 分数和价格对比）和付费方式；<code>--max-cost-usd</code> &#x2F; <code>--max-duration</code> 直接限</td>
+</tr>
+<tr>
+<td>改集成</td>
+<td><strong>低</strong> —— 有 <code>report</code> &#x2F; <code>export --format md-dir</code> &#x2F; <code>metrics</code> &#x2F; <code>triage</code>，文档覆盖 CI 与 coding agent 两种跑法</td>
+</tr>
+<tr>
+<td>改内核</td>
+<td><strong>中</strong> —— 有 <code>docs/writing-matchers.md</code> 可写 matcher、有 plugins 机制；Apache-2.0 也友好</td>
+</tr>
+</tbody></table>
+<h2 id="二、它是什么，不是什么"><a href="#二、它是什么，不是什么" class="headerlink" title="二、它是什么，不是什么"></a>二、它是什么，不是什么</h2><ul>
+<li><strong>不是</strong> CI 里每次提交都跑的快速门禁。它的定位是<strong>按需全量</strong>，不是增量。想跑 diff 也有 <code>process --diff</code>，但那是附带模式。</li>
+<li><strong>不是</strong>一个规则扫描器。<code>scan</code> 那一步确实用 regex matcher 且<strong>免费、不用 AI</strong>，但真正的价值在 <code>process</code>（AI 调查）这一步。</li>
+<li><strong>不是</strong>传统 SAST 的替代品。SAST 靠已知规则模式匹配；它靠模型在代码上下文里推理「这里是不是有问题」。</li>
+<li><strong>不是</strong>只看你写的代码。<code>enrich</code> 能补 git committer 信息，配合 plugin 还能补 ownership 数据 —— 也就是说它关心「这个洞该谁修」。</li>
+</ul>
+<p>提炼三个关键词：<strong>all-code, on-demand</strong>（全量、按需）、<strong>maximum thinking level</strong>（最高推理档位）、<strong>resumable</strong>（可中断续跑）。</p>
+<h2 id="三、工作流：scan-→-process-→-revalidate-三段式"><a href="#三、工作流：scan-→-process-→-revalidate-三段式" class="headerlink" title="三、工作流：scan → process → revalidate 三段式"></a>三、工作流：scan → process → revalidate 三段式</h2><p>这是理解 deepsec 的核心。它把一次审计拆成几步，每步的成本和价值都不一样：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th>是否用 AI</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>scan</code></td>
+<td>用 regex matcher 找候选点</td>
+<td><strong>否（快，免费）</strong></td>
+</tr>
+<tr>
+<td><code>process</code></td>
+<td>AI 调查候选点，产出 finding + 修复建议</td>
+<td><strong>是（主要成本）</strong></td>
+</tr>
+<tr>
+<td><code>process --diff</code></td>
+<td>PR 模式：只扫 diff 里改动的文件</td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>triage</code></td>
+<td>P0&#x2F;P1&#x2F;P2 轻量分级</td>
+<td>是（<strong>用便宜模型</strong>）</td>
+</tr>
+<tr>
+<td><code>revalidate</code></td>
+<td>复查已有 finding，<strong>并查 git history 看是否已修</strong></td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>enrich</code></td>
+<td>补 git committer 信息 +（plugin）ownership 数据</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>report</code></td>
+<td>单项目的 Markdown + JSON 摘要</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>export</code></td>
+<td>每条 finding 的 JSON，或 markdown 文件目录</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>metrics</code></td>
+<td>跨项目统计：severity 分布、按类型的漏洞数、TP 数</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>项目镜像快照</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>sandbox &lt;cmd&gt;</code></td>
+<td>在 Vercel Sandbox microVM 上跑以上任意命令</td>
+<td>是</td>
+</tr>
+</tbody></table>
+<p>几个我认为设计得好的点：</p>
+<p><strong>1）<code>scan</code> 和 <code>process</code> 分开。</strong> 先用免费的正则 matcher 把候选点收窄，再让贵的模型只看这些候选。这是对 token 成本最基本的尊重 —— 直接把整个仓库丢给模型是不可行的。</p>
+<p><strong>2）<code>triage</code> 用便宜模型做分级。</strong> P0&#x2F;P1&#x2F;P2 这种粗分类不需要最强模型，省下来的钱用在 <code>process</code> 上。</p>
+<p><strong>3）<code>revalidate</code> 会查 git history。</strong> 它会检查已有 finding 是不是已经被修掉了。这一条很实用 —— 存量审计报告最大的问题就是跑一次之后 finding 慢慢过期，没人维护。</p>
+<p><strong>4）可中断续跑。</strong> Ctrl-C、断网、额度花光，重新跑同一条命令就行，它会<strong>跳过已分析的文件只查剩下的</strong>。对动辄跑几小时的全量审计来说，这个特性是必需品而不是加分项。</p>
+<h2 id="四、成本：这是选型时第一个要问的问题"><a href="#四、成本：这是选型时第一个要问的问题" class="headerlink" title="四、成本：这是选型时第一个要问的问题"></a>四、成本：这是选型时第一个要问的问题</h2><p>官方原文说得很直白：用最好的模型 + 最高 thinking level（<code>--thinking-level</code> 可调），大型代码库<strong>数千到数万美元</strong>。</p>
+<p>这个数字要怎么看？我的理解：</p>
+<ul>
+<li><strong>它的定价逻辑不是「每次提交几块钱」，而是「一年做几次深度体检」。</strong> 按这个心智模型，一次几千刀换一批「本来会一直没人修」的漏洞，对中大型团队是划算的。</li>
+<li><strong>成本是可以钉死的。</strong> <code>--max-cost-usd 100 --max-duration 2h</code> 能同时限金额和时长。开跑前先设这两个，是唯一负责任的做法。</li>
+<li><strong><code>scan</code> 免费。</strong> 你可以先跑 <code>scan</code> 看候选点有多少，据此估算 <code>process</code> 的量级，再决定要不要放开预算。这是个很好的成本控制路径。</li>
+<li><strong><code>triage</code> 用便宜模型</strong>，也能压成本。</li>
+</ul>
+<p><strong>给决策者的建议</strong>：别问「deepsec 多少钱」，先问「我们仓库有多少候选点、我们愿意为一次全量审计付多少」。用 <code>--max-cost-usd</code> 试一次小规模，拿到实际单价再外推。</p>
+<h2 id="五、分布式执行：把活撒到-microVM-上"><a href="#五、分布式执行：把活撒到-microVM-上" class="headerlink" title="五、分布式执行：把活撒到 microVM 上"></a>五、分布式执行：把活撒到 microVM 上</h2><p>大仓库靠单机跑太慢，deepsec 支持 fan out 到 <a target="_blank" rel="noopener" href="https://vercel.com/docs/vercel-sandbox">Vercel Sandbox</a> microVM：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pnpm deepsec sandbox process --project-id my-app --sandboxes 10 --concurrency 4</span><br></pre></td></tr></table></figure>
+
+<p>安全上的两个细节值得单独说：</p>
+<ul>
+<li><strong>本地工作目录被打包上传，但 <code>.git</code> 被排除。</strong></li>
+<li><strong>模型凭证留在 host 侧，只在选定的 egress host 注入。</strong></li>
+</ul>
+<p>这两条组合起来，意味着 worker 沙箱里既拿不到完整 git 历史，也拿不到 API key。</p>
+<h3 id="deepsec-自身的安全模型（官方原话，必须照抄）"><a href="#deepsec-自身的安全模型（官方原话，必须照抄）" class="headerlink" title="deepsec 自身的安全模型（官方原话，必须照抄）"></a>deepsec 自身的安全模型（官方原话，必须照抄）</h3><blockquote>
+<p>Treat <code>deepsec</code> like a coding agent with full shell access on the environment that it is running on.</p>
+</blockquote>
+<p>也就是说，<strong>默认把它当成一个有完整 shell 权限的 coding agent</strong>。它设计上跑在可信输入（你的源码）上，但官方承认：<strong>外部依赖或 vendored 代码可能带来 prompt injection</strong>。</p>
+<p>跑在沙箱里能显著降低暴露面：</p>
+<ul>
+<li>coding agent 的 API key <strong>在沙箱外注入</strong>，因此无法被外带</li>
+<li>worker 沙箱的<strong>网络出口被限制在 coding agent 的主机</strong>（bootstrap 阶段允许出网，但那一步不跑 coding agent）</li>
+</ul>
+<p><strong>实践结论：不要在承载敏感凭证的生产机上裸跑 deepsec。</strong> 要么用 sandbox 模式，要么给它一个干净的一次性环境。</p>
+<h2 id="六、上手"><a href="#六、上手" class="headerlink" title="六、上手"></a>六、上手</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>在要扫描的仓库根目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx deepsec init</span><br></pre></td></tr></table></figure>
+
+<p>这条命令会引导你走完全部流程：选 AI 模型（<strong>带 benchmark 分数和价格对比</strong>）、选付费方式（你自己的 OpenAI&#x2F;Anthropic key，或 Vercel AI Gateway），然后无人值守地跑完 —— 学习代码库、扫描、AI review。</p>
+<p><strong>它往你的仓库里只加一个 <code>.deepsec/</code> 目录</strong>，所有状态和 finding 都在里面。</p>
+<h3 id="限成本"><a href="#限成本" class="headerlink" title="限成本"></a>限成本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx deepsec init --max-cost-usd 100 --max-duration 2h</span><br></pre></td></tr></table></figure>
+
+<h3 id="出报告"><a href="#出报告" class="headerlink" title="出报告"></a>出报告</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> .deepsec</span><br><span class="line">pnpm deepsec <span class="built_in">export</span> --format md-dir --out ./findings</span><br></pre></td></tr></table></figure>
+
+<h3 id="后续扫描（在-deepsec-里操作）"><a href="#后续扫描（在-deepsec-里操作）" class="headerlink" title="后续扫描（在 .deepsec/ 里操作）"></a>后续扫描（在 <code>.deepsec/</code> 里操作）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pnpm deepsec scan        <span class="comment"># 快速 pattern 扫描，免费</span></span><br><span class="line">pnpm deepsec process     <span class="comment"># 对新候选点做 AI review</span></span><br><span class="line">pnpm deepsec revalidate  <span class="comment"># 可选，降低误报率</span></span><br><span class="line">pnpm deepsec <span class="built_in">export</span> --format md-dir --out ./findings</span><br></pre></td></tr></table></figure>
+
+<h3 id="自带-key（不依赖-Vercel-账号）"><a href="#自带-key（不依赖-Vercel-账号）" class="headerlink" title="自带 key（不依赖 Vercel 账号）"></a>自带 key（不依赖 Vercel 账号）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npx deepsec init --model-auth direct --ai-provider anthropic --ai-api-key-env ANTHROPIC_API_KEY</span><br></pre></td></tr></table></figure>
+
+<p>官方明确：<strong>deepsec 只存储持有 key 的环境变量的名字，绝不存储 key 本身。</strong></p>
+<p>如果 <code>process</code> 或 <code>revalidate</code> 因为上游额度&#x2F;信用用完而中断，它会<strong>优雅停止并告诉你在哪充值</strong>，重跑同一条命令即可续上。</p>
+<h3 id="给-agent-读的文档"><a href="#给-agent-读的文档" class="headerlink" title="给 agent 读的文档"></a>给 agent 读的文档</h3><p>初始化之后，agent 可以直接读与已安装 CLI <strong>版本精确匹配</strong>的文档：</p>
+<ul>
+<li><code>.deepsec/node_modules/deepsec/SKILL.md</code></li>
+<li><code>.deepsec/node_modules/deepsec/dist/docs/</code></li>
+</ul>
+<p>setup 报错时会把这些路径以<strong>绝对、机器可读</strong>的形式暴露出来。这个设计很贴心 —— 让 coding agent 自己读文档，而不是靠模型记忆里的旧版 API。</p>
+<h2 id="七、边界与风险（必须诚实说的部分）"><a href="#七、边界与风险（必须诚实说的部分）" class="headerlink" title="七、边界与风险（必须诚实说的部分）"></a>七、边界与风险（必须诚实说的部分）</h2><p><strong>1）成本是最硬的门槛，没有之一。</strong> 数千到数万美元不是营销话术，是官方文档。个人、小团队、开源项目基本与全量模式无缘。<strong>务必先设 <code>--max-cost-usd</code>。</strong></p>
+<p><strong>2）项目只有 5 个月。</strong> 2026-04-30 创建，104 次提交。对一个要跑数小时、花数千美元的工具来说，<strong>成熟度是真实风险</strong>。而且 Vercel Labs 的项目定位本身就带实验性质，路线可能变。</p>
+<p><strong>3）默认路径绑 Vercel 生态。</strong> 默认走 Vercel AI Gateway，分布式执行依赖 Vercel Sandbox。虽然有 <code>--model-auth direct</code> 可以完全绕开，但<strong>主路径和最佳实践文档都是围绕 Vercel 写的</strong>。不想进这个生态的话，可用性会打折扣。</p>
+<p><strong>4）要当成有完整 shell 权限的 agent 对待。</strong> 官方自己说的。外部依赖和 vendored 代码存在 prompt injection 面。<strong>别在带生产凭证的机器上裸跑。</strong></p>
+<p><strong>5）69 个 open issues。</strong> 对 8k star、5 个月的项目来说，这个数量说明迭代压力不小。考虑到单次运行成本高，<strong>踩到坑的代价也高</strong>。</p>
+<p><strong>6）全量模式的耗时和 CI 不相容。</strong> 这是定位使然，不是缺陷，但意味着你需要<strong>两套工具</strong>：CI 里用快的，定期用 deepsec 做深度体检。别指望它一个顶两个。</p>
+<p><strong>7）<code>revalidate</code> 是「可选」的。</strong> README 里标着 optional，说它能降低误报率。考虑到 AI 审计的误报本来就不低，<strong>如果预算允许，这一步不该省</strong>；但这也意味着成本要再往上加。</p>
+<h2 id="八、上手建议（按这个顺序来）"><a href="#八、上手建议（按这个顺序来）" class="headerlink" title="八、上手建议（按这个顺序来）"></a>八、上手建议（按这个顺序来）</h2><ol>
+<li><strong>先只跑 <code>scan</code>。</strong> 它免费、不用 AI，能告诉你候选点有多少。<strong>用这个数字估算 <code>process</code> 的量级</strong>，再决定预算。这一步别跳过。</li>
+<li><strong>第一次 <code>init</code> 一定带上 <code>--max-cost-usd</code>。</strong> 建议从一个你能承受全损的数字开始（比如 50~100 刀），看清楚单价和产出质量再放量。</li>
+<li><strong>先在一个中等规模、你自己熟悉的仓库上跑。</strong> 熟悉意味着你能判断它的 finding 有多少是真阳性 —— <strong>AI 审计的误报率只有你能就地验证</strong>，别一上来就在陌生大仓上花大钱。</li>
+<li><strong>用 <code>triage</code> 做分级，<code>revalidate</code> 降误报。</strong> 前者省后面的钱，后者提高结论可信度。预算有限时优先保 <code>revalidate</code>。</li>
+<li><strong>敏感仓库务必用 sandbox 模式。</strong> <code>pnpm deepsec sandbox process --sandboxes 10 --concurrency 4</code>，凭证留 host 侧、<code>.git</code> 不上传。别在有生产凭证的机器上裸跑。</li>
+<li><strong>接 CI 的话用 <code>process --diff</code>。</strong> 那是 PR 门禁模式，只看改动文件，成本可控。全量模式不要放进每次提交。</li>
+<li><strong>把它当「一年几次的体检」，不是「每天的门禁」。</strong> 这个心智模型对了，预算谈判和排期都会顺很多。</li>
+</ol>
+<h2 id="九、一句话结论"><a href="#九、一句话结论" class="headerlink" title="九、一句话结论"></a>九、一句话结论</h2><p><strong>如果你手上有一个跑了很多年、从没被 AI 认真翻过的存量大仓库，deepsec 是目前把「全量深度审计」工程化得最完整的开源选择 —— 但请先设好 <code>--max-cost-usd</code>，并且接受它是一次体检而非门禁的事实。</strong></p>
+<p>给团队的第一动作：<strong><code>npx deepsec scan</code>（免费）跑一遍看候选点规模 → 据此定预算 → <code>npx deepsec init --max-cost-usd 100</code> 试一次 → 用 <code>export --format md-dir</code> 出报告，自己核一遍真阳性率。</strong> 真阳性率合格，再谈放量。</p>
+
+  </section>
+
+  
+  
+  <aside class="post-source" role="note">
+    <p class="post-source-line">
+      <span class="i18n-zh">原文地址：</span>
+      <span class="i18n-en">Original:</span>
+      <a class="post-source-link" href="https://we5ter.github.io/ai-tools/deepsec/">https://we5ter.github.io/ai-tools/deepsec/</a>
+    </p>
+    <p class="post-source-line">
+      <span class="i18n-zh">项目仓库：</span>
+      <span class="i18n-en">Repository:</span>
+      <a class="post-source-link" href="https://github.com/We5ter/Scanners-Box" target="_blank" rel="noopener">https://github.com/We5ter/Scanners-Box</a>
+    </p>
+  </aside>
+  
+
+  <footer class="post-footer">
+    <p class="author-byline">
+      <span class="i18n-zh">作者：<strong>Wester</strong></span>
+      <span class="i18n-en">By <strong>Wester</strong></span>
+    </p>
+    <section class="share">
+    <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
+    <div class="share-buttons">
+        <!-- X (Twitter) -->
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//ai-tools/deepsec/&text=deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀"
+           onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
+           title="Share on X">
+            <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
+        </a>
+        <!-- Weibo -->
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//ai-tools/deepsec/&title=deepsec 拆解：Vercel 把全量代码深度审计压成一行 npm 命令，账单可能上万刀"
+           onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on Weibo">
+            <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
+        </a>
+        <!-- Xiaohongshu -->
+        <a class="icon-xiaohongshu" href="https://www.xiaohongshu.com/"
+           onclick="window.open(this.href, 'xhs-share', 'width=800,height=700');return false;" target="_blank" rel="noopener"
+           title="Share on Xiaohongshu">
+            <img src="/images/static/xiaohongshu.ico" alt="Xiaohongshu" width="22" height="22">
+        </a>
+        <!-- WeChat (copy link) -->
+        <a class="icon-wechat" href="javascript:void(0);"
+           onclick="var zh=document.documentElement.getAttribute('data-lang')!=='en';navigator.clipboard.writeText('https://we5ter.github.io//ai-tools/deepsec/').then(function(){alert(zh?'链接已复制，快去微信分享吧！':'Link copied. Paste it in WeChat to share!');}).catch(function(){prompt(zh?'请手动复制链接：':'Copy this link manually:','https://we5ter.github.io//ai-tools/deepsec/');});"
+           title="Copy link for WeChat">
+            <img src="/images/static/wechat.svg" alt="WeChat" width="24" height="24">
+        </a>
+        <!-- LinkedIn -->
+        <a class="icon-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https://we5ter.github.io//ai-tools/deepsec/"
+           onclick="window.open(this.href, 'linkedin-share', 'width=550,height=500');return false;" target="_blank" rel="noopener"
+           title="Share on LinkedIn">
+            <img src="/images/static/linkedin-icon.png" alt="LinkedIn" width="22" height="22">
+        </a>
+    </div>
+</section>
+
+  </footer>
+</article>
+
+
+
+<script>
+  window.__POST_LANG = {
+    lang:  "zh",
+    other: "/en/ai-tools/deepsec/"
+  };
+</script>
+
+
+
+
+
+<nav class="post-nav post-nav--series">
+  
+  <a class="post-nav-prev" href="/ai-tools/dark-moon/">
+    <span class="post-nav-label">&larr;
+      <span class="i18n-zh">上一期 · 第 010 期</span>
+      <span class="i18n-en">Previous · No. 10</span>
+    </span>
+    <span class="post-nav-title">Dark-Moon 拆解：先把真实 IP 和凭证本地脱敏，再放 AI 去打</span>
+  </a>
+  
+  
+  <a class="post-nav-next" href="/ai-tools/vigolium/">
+    <span class="post-nav-label">
+      <span class="i18n-zh">下一期 · 第 012 期</span>
+      <span class="i18n-en">Next · No. 12</span>
+    </span> &rarr;
+    <span class="post-nav-title">Vigolium 拆解：Go 原生 324 个扫描模块，外挂一个会自己写攻击插件的 AI swarm</span>
+  </a>
+  
+</nav>
+
+
+<!-- Giscus Comments -->
+
+<section class="comments-section" id="comments">
+  <div class="comments-header"><span class="i18n-zh">评论</span><span class="i18n-en">Comments</span></div>
+  <div class="giscus-wrapper">
+    <script src="https://giscus.app/client.js"
+      data-repo="We5ter/We5ter.github.io"
+      data-repo-id="MDEwOlJlcG9zaXRvcnkyNTk4MDIyMTY="
+      data-category="Announcements"
+      data-category-id="DIC_kwDOD3xEaM4C7WSs"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="zh-CN"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</section>
+
+
+
+    </div>
+  </div>
+
+  <!-- ============ Footer ============ -->
+  <footer class="page__footer">
+    <div class="footer__inner">
+      
+      <p>&copy; 2026
+        
+        <img class="footer-logo" src="/images/static/wester-logo.svg" alt="Wester" width="610" height="166">
+        
+      </p>
+      <p class="footer__powered">
+        <span class="i18n-zh">由 <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 驱动</span>
+        <span class="i18n-en">Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a></span>
+      </p>
+    </div>
+  </footer>
+
+  <button id="back-to-top-btn" title="Back to top" aria-label="Back to top">&#8593;</button>
+
+  <!-- 访问统计：Vercount（不蒜子的现代替代，Go+Redis，POST+Cookie 去重）。
+       defer 保证不阻塞渲染；填数前页面上是「—」占位，不会抖布局。 -->
+  <script defer src="https://events.vercount.one/js"></script>
+  <script>
+  (function () {
+    var IDS = ['vercount_value_site_pv', 'vercount_value_site_uv', 'vercount_value_page_pv'];
+
+    // Vercount 写进来的是纯数字，上万后没有千分位。用 MutationObserver 等它
+    // 写入再格式化，别跟它抢 DOM（直接定时轮询容易覆盖它自己的更新）。
+    function fmt(el) {
+      var t = (el.textContent || '').trim();
+      if (!/^\d+$/.test(t)) return;
+      var n = Number(t);
+      if (n < 10000) return;
+      el.textContent = n.toLocaleString('en-US');
+    }
+
+    IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      fmt(el);
+      if (typeof MutationObserver === 'function') {
+        new MutationObserver(function () { fmt(el); })
+          .observe(el, { childList: true, characterData: true, subtree: true });
+      }
+    });
+
+    // 兜底：Vercount 是第三方公益服务，真挂了就别在首页留一条永远「—」的横条
+    setTimeout(function () {
+      var sp = document.getElementById('vercount_value_site_pv');
+      if (sp && !/^\d+$/.test((sp.textContent || '').trim())) {
+        var bar = document.querySelector('.site-stats');
+        if (bar) bar.style.display = 'none';
+      }
+    }, 8000);
+  })();
+  </script>
+
+  
+<!-- 注：GA4 已移到 head.ejs（官方推荐位置，也让 Search Console 的 GA 验证法可用） -->
+
+<!-- Giscus: keep comment widget in sync with the site theme (light/dark) -->
+<script>
+(function() {
+  var siteTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+
+  function syncGiscusTheme(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return false;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      'https://giscus.app'
+    );
+    return true;
+  }
+
+  function syncWithRetry(theme, attempts) {
+    if (attempts === undefined) attempts = 0;
+    if (syncGiscusTheme(theme)) return;
+    if (attempts < 20) {
+      setTimeout(function() { syncWithRetry(theme, attempts + 1); }, 300);
+    }
+  }
+  syncWithRetry(siteTheme);
+})();
+</script>
+
+<!-- Back to Top -->
+<script>
+(function() {
+  var btn = document.getElementById('back-to-top-btn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  window.addEventListener('scroll', function() {
+    var st = window.pageYOffset || document.documentElement.scrollTop;
+    if (st > 300) { btn.classList.add('is-visible'); }
+    else { btn.classList.remove('is-visible'); }
+  }, { passive: true });
+})();
+</script>
+
+<!-- Language switch: 只改 <html data-lang>，文案显隐交给 CSS -->
+<script>
+(function () {
+  var KEY = 'lang';
+  var btn = document.getElementById('lang-toggle');
+
+  function apply(lang) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', lang);
+    root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem(KEY, lang); } catch (e) {}
+
+    // 同步 SEO meta：head.ejs 已经把页面级 title 拆好存到 window.__BLOG_SEO
+    try {
+      var seo = window.__BLOG_SEO;
+      if (seo && seo.byLang && seo.byLang[lang]) {
+        var cur = seo.byLang[lang];
+        var pageTitle = seo.pageTitle;
+        document.title = (pageTitle ? (pageTitle + ' | ') : '') + cur.title;
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', cur.desc);
+        var metaKw = document.querySelector('meta[name="keywords"]');
+        if (metaKw) metaKw.setAttribute('content', cur.kw);
+      }
+    } catch (e) {}
+
+    // 评论框语言跟随（已加载就立即同步，否则下次加载生效）
+    try {
+      var frame = document.querySelector('.giscus iframe');
+      if (frame) {
+        frame.contentWindow.postMessage(
+          { giscus: { setConfig: { lang: lang === 'en' ? 'en' : 'zh-CN' } } },
+          'https://giscus.app'
+        );
+      }
+    } catch (e) {}
+  }
+
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-lang');
+      var next = cur === 'en' ? 'zh' : 'en';
+
+      // 文章页：正文是单语言的（中/英各一篇），只翻 UI 文案会变成
+      // 「免责声明中文了、正文还是英文」的半切换状态。
+      // 所以这里直接跳到对应语言的那篇文章（post.ejs 暴露的 __POST_LANG）。
+      // 跳转时不做 UI 切换，否则会先闪一下再跳走。
+      var pl = window.__POST_LANG;
+      if (pl && pl.other && pl.lang && pl.lang !== next) {
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        window.location.href = pl.other;
+        return;
+      }
+
+      apply(next);
+    });
+  }
+})();
+</script>
+
+<!-- 主题切换（明/暗）：改 <html data-theme> + color-scheme，配色交给 CSS 变量覆盖。
+     记忆到 localStorage；系统偏好只在用户没手动选过时作为初始值（初始化在 head.ejs）。
+     顺带把 giscus 评论框的主题一起切，否则暗色页面里嵌一块亮白评论框很刺眼。 -->
+<script>
+(function () {
+  var KEY = 'theme';
+  var btn = document.getElementById('theme-toggle');
+  var root = document.documentElement;
+
+  function syncGiscus(theme) {
+    var frame = document.querySelector('.giscus iframe');
+    if (!frame) return;
+    frame.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+      'https://giscus.app'
+    );
+  }
+
+  function apply(theme) {
+    root.setAttribute('data-theme', theme);
+    root.style.colorScheme = theme;
+    try { localStorage.setItem(KEY, theme); } catch (e) {}
+    if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    syncGiscus(theme);
+  }
+
+  if (btn) {
+    // 初始 aria-pressed 跟当前生效主题对齐（head.ejs 已经打好 data-theme）
+    btn.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+  }
+
+  // 系统偏好变化时，只在用户「没手动选过」的情况下跟随，别覆盖显式选择。
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var onSystemChange = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem(KEY); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') apply(e.matches ? 'dark' : 'light');
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
+})();
+</script>
+
+<!-- 微信公众号二维码：触屏没有 hover，改成点击切换，点外面或 Esc 关闭 -->
+<script>
+(function () {
+  var wrap = document.querySelector('.author-link-wechat');
+  var btn = document.querySelector('.wechat-trigger');
+  if (!wrap || !btn) return;
+
+  function close() { wrap.classList.remove('is-open'); }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    wrap.classList.toggle('is-open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!wrap.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<!-- Mobile nav toggle + active link highlight -->
+<script>
+(function() {
+  var toggle = document.getElementById('nav-toggle');
+  var links  = document.getElementById('nav-links');
+  if (toggle && links) {
+    toggle.addEventListener('click', function() {
+      links.classList.toggle('is-open');
+    });
+  }
+
+  // Highlight the nav item matching the current path
+  var path = window.location.pathname.replace(/index\.html$/, '');
+  var items = document.querySelectorAll('.masthead__menu-item > a');
+  for (var i = 0; i < items.length; i++) {
+    var href = items[i].getAttribute('href');
+    if (href === path || (href !== '/' && href !== '/' && path.indexOf(href) === 0)) {
+      items[i].parentNode.classList.add('is-active');
+    } else if (href === '/' && (path === '/' || path === '')) {
+      items[i].parentNode.classList.add('is-active');
+    }
+  }
+})();
+</script>
+
+<!-- 阅读进度条 + 本页目录（只在文章页有对应节点，其他页面自然空跑退出） -->
+<script>
+(function () {
+  var bar = document.getElementById('read-progress');
+  var tocAside = document.getElementById('post-toc');
+  var article = document.querySelector('article.post-detail');
+  if (!bar && !tocAside) return;
+
+  // 进度按「文章本体」算，不含评论区和页脚 —— 否则滚到评论区就早早满格，
+  // 读者会以为文章看完了。
+  function progress() {
+    if (!bar || !article) return;
+    var r = article.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? (-r.top) / total : (r.top <= 0 ? 1 : 0);
+    if (p < 0) p = 0; else if (p > 1) p = 1;
+    bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+  }
+
+  var links = [];      // { a, head }
+  var cur = -1;
+
+  function headingText(h) {
+    // Hexo 在每个标题里塞了 <a class="headerlink">，直接取 textContent 会带上锚点空白
+    var c = h.cloneNode(true);
+    var hl = c.querySelectorAll('.headerlink');
+    for (var i = 0; i < hl.length; i++) hl[i].parentNode.removeChild(hl[i]);
+    return (c.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(s) {
+    return String(s).replace(/[<>&"]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+    });
+  }
+
+  function buildToc() {
+    if (!tocAside || !article) return;
+    var nav = document.getElementById('post-toc-nav');
+    var det = document.getElementById('post-toc-inner');
+    var body = article.querySelector('.post-content');
+    if (!nav || !body) return;
+
+    var heads = body.querySelectorAll('h2, h3');
+    var h2n = 0, i;
+    for (i = 0; i < heads.length; i++) if (heads[i].tagName === 'H2') h2n++;
+    // 少于三个标题的短文不值得占一列，目录反而比正文长。
+    // 只看总数不单独看 h2：早期 CVE 长文整篇用 h3 分层（没有 h2），按 h2 计数会一律漏掉。
+    if (heads.length < 3) return;
+
+    var html = '<ul class="post-toc-list' + (h2n ? '' : ' is-flat') + '">';
+    for (i = 0; i < heads.length; i++) {
+      var h = heads[i];
+      if (!h.id) h.id = 'sec-' + i;
+      // 标题带 sticky masthead，滚动定位要留出它的高度，否则跳过去被压在导航底下
+      h.style.scrollMarginTop = '76px';
+      html += '<li class="post-toc-item post-toc-' + h.tagName.toLowerCase() + '">' +
+              '<a href="#' + h.id + '">' + esc(headingText(h)) + '</a></li>';
+    }
+    html += '</ul>';
+    nav.innerHTML = html;
+
+    var as = nav.querySelectorAll('a');
+    for (i = 0; i < as.length; i++) links.push({ a: as[i], head: heads[i] });
+
+    tocAside.hidden = false;
+    document.body.classList.add('has-post-toc');
+
+    // 窄屏默认收起，别一进来就占满半屏；宽屏常驻展开。
+    // 1399 是 CSS 里目录宽屏断点（min-width: 1100px）的另一半：
+    // 两处必须互补，否则 1100–1399 会出现「目录已在右侧常驻、却被脚本收起」。
+    var narrow = window.matchMedia && window.matchMedia('(max-width: 1099px)');
+    if (det && narrow && narrow.matches) det.removeAttribute('open');
+    nav.addEventListener('click', function (e) {
+      if (det && narrow && narrow.matches && e.target && e.target.tagName === 'A') {
+        det.removeAttribute('open');
+      }
+    });
+    highlight();
+  }
+
+  // 当前小节 = 最后一个顶部已越过 masthead 下沿的标题
+  function highlight() {
+    if (!links.length) return;
+    var idx = -1;
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].head.getBoundingClientRect().top <= 90) idx = i;
+      else break;
+    }
+    if (idx === cur) return;
+    if (cur >= 0 && links[cur]) links[cur].a.classList.remove('is-active');
+    cur = idx;
+    if (cur >= 0) links[cur].a.classList.add('is-active');
+  }
+
+  buildToc();
+  progress();
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () {
+      progress();
+      highlight();
+      ticking = false;
+    });
+  }, { passive: true });
+  window.addEventListener('resize', function () { progress(); highlight(); }, { passive: true });
+})();
+</script>
+
+<!-- 代码块：语言标签 + 一键复制 + 超长折叠 -->
+<script>
+(function () {
+  var figs = document.querySelectorAll('.post-content figure.highlight');
+  if (!figs.length) return;
+
+  function codeText(fig) {
+    // 行号在 td.gutter 里，只能取 td.code；每行之间是 <br>，
+    // 直接 textContent 会把所有行粘成一坨，必须按 .line 拼。
+    var td = fig.querySelector('td.code') || fig;
+    var lines = td.querySelectorAll('.line');
+    if (lines.length) {
+      var out = [];
+      for (var i = 0; i < lines.length; i++) out.push(lines[i].textContent.replace(/\n$/, ''));
+      return out.join('\n');
+    }
+    var pre = td.querySelector('pre');
+    return pre ? pre.textContent : td.textContent;
+  }
+
+  // file:// 预览和非 https 环境拿不到 navigator.clipboard，退回 execCommand
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function zh(s) { return '<span class="i18n-zh">' + s + '</span>'; }
+  function en(s) { return '<span class="i18n-en">' + s + '</span>'; }
+
+  // 复制失败要说出来：非安全上下文 / 页面失焦时 clipboard API 和 execCommand 都会静默失败，
+  // 按钮若原地不动，读者以为已经复制上了。
+  var timers = [];
+  function paint(btn, state) {
+    btn.classList.remove('is-copied', 'is-failed');
+    if (state === 'ok') {
+      btn.classList.add('is-copied');
+      btn.innerHTML = zh('已复制') + en('Copied');
+    } else if (state === 'fail') {
+      btn.classList.add('is-failed');
+      btn.innerHTML = zh('复制失败，请手动选中') + en('Copy failed — select manually');
+    } else {
+      btn.innerHTML = zh('复制') + en('Copy');
+    }
+  }
+  function flash(btn, state) {
+    paint(btn, state);
+    timers.push(setTimeout(function () { paint(btn, false); }, 2000));
+  }
+
+  Array.prototype.forEach.call(figs, function (fig) {
+    if (fig.parentNode && fig.parentNode.classList.contains('code-box')) return;
+
+    var m = fig.className.match(/(?:^|\s)highlight(?:\s+([a-z0-9+#._-]+))?/i);
+    var lang = m && m[1] ? m[1] : '';
+    // 未标语言的围栏 Hexo 给的是 plaintext（不是 plain），别漏 —— 每块都挂个「plaintext」比不挂更吵。
+    if (/^(plain|plaintext|text|txt)$/i.test(lang)) lang = '';
+
+    // figure 自己是 overflow-x:auto 的滚动容器，工具条塞进去会跟着代码横向跑掉，
+    // 所以外面套一层 .code-box 承载工具条和折叠按钮。
+    var box = document.createElement('div');
+    box.className = 'code-box';
+    fig.parentNode.insertBefore(box, fig);
+    box.appendChild(fig);
+
+    var bar = document.createElement('div');
+    bar.className = 'code-bar';
+    var langEl = document.createElement('span');
+    langEl.className = 'code-lang';
+    if (lang) langEl.textContent = lang; else langEl.style.display = 'none';
+    bar.appendChild(langEl);
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy';
+    paint(btn, false);
+    btn.addEventListener('click', function () {
+      var text = codeText(fig);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { flash(btn, 'ok'); },
+          function () { flash(btn, legacyCopy(text) ? 'ok' : 'fail'); });
+      } else {
+        flash(btn, legacyCopy(text) ? 'ok' : 'fail');
+      }
+    });
+    bar.appendChild(btn);
+    box.insertBefore(bar, fig);
+
+    // 超长代码折叠：默认只露 20 行。不折叠的话一段两百行的日志能把整篇的滚动条吃光。
+    var lines = fig.querySelectorAll('td.code .line');
+    if (lines.length > 20) {
+      box.classList.add('is-foldable', 'is-folded');
+      var more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'code-more';
+      function paintMore(folded) {
+        more.innerHTML = folded
+          ? zh('展开全部 ' + lines.length + ' 行') + en('Expand all ' + lines.length + ' lines')
+          : zh('收起') + en('Collapse');
+      }
+      paintMore(true);
+      more.addEventListener('click', function () {
+        // toggle 返回「切换后是否还带着这个 class」，正好就是折叠状态
+        paintMore(box.classList.toggle('is-folded'));
+      });
+      box.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- 全站 ⌘K 搜索：正文级索引（search.json 按需拉取）。
+     专栏页 /ai-tools/ 自带一份「搜工具」的面板，这里让位，不抢同一个快捷键。 -->
+<script>
+(function () {
+  if (document.body.classList.contains('layout-ai-tools')) return;
+
+  var INDEX_URL = '/search.json';
+  var KEY = 'site-search-index';
+  var pal, scrim, input, list, idx = null, loading = false;
+  var rows = [], active = -1, lastFocus = null;
+
+  var L = {
+    ph:    function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Search articles, issues and body text…'
+             : '搜索文章、期号与正文…'; },
+    kind:  function (d) {
+      var en = document.documentElement.getAttribute('data-lang') === 'en';
+      if (d.k === 'issue' && d.i !== '') return en ? 'No. ' + d.i : '第 ' + d.i + ' 期';
+      if (d.k === 'page') return en ? 'Page' : '页面';
+      return en ? 'Post' : '文章';
+    },
+    empty: function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'No match.' : '没有匹配的结果。'; },
+    load:  function () { return document.documentElement.getAttribute('data-lang') === 'en'
+             ? 'Loading index…' : '索引加载中…'; }
+  };
+
+  function build() {
+    if (pal) return;
+    scrim = document.createElement('div');
+    scrim.className = 'aitools-palette-scrim';
+    scrim.id = 'site-palette-scrim';
+    scrim.hidden = true;
+
+    pal = document.createElement('div');
+    pal.className = 'aitools-palette';
+    pal.id = 'site-palette';
+    pal.setAttribute('role', 'dialog');
+    pal.setAttribute('aria-modal', 'true');
+    pal.setAttribute('aria-label', 'Site search');
+    pal.hidden = true;
+    pal.innerHTML =
+      '<div class="aitools-palette-search">' +
+        '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">' +
+          '<circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>' +
+          '<line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>' +
+        '</svg>' +
+        '<input type="text" class="aitools-palette-input" id="site-palette-q" autocomplete="off" spellcheck="false">' +
+        '<kbd class="aitools-palette-esc">Esc</kbd>' +
+      '</div>' +
+      '<ul class="aitools-palette-list" id="site-palette-list" role="listbox"></ul>';
+
+    document.body.appendChild(scrim);
+    document.body.appendChild(pal);
+    input = document.getElementById('site-palette-q');
+    list = document.getElementById('site-palette-list');
+    input.placeholder = L.ph();
+
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', onNav);
+    scrim.addEventListener('click', close);
+  }
+
+  function loadIndex(cb) {
+    if (idx) return cb(idx);
+    try {
+      var cached = sessionStorage.getItem(KEY);
+      if (cached) { idx = JSON.parse(cached); return cb(idx); }
+    } catch (e) { /* 隐私模式 / 超配额：当成没缓存 */ }
+    if (loading) return;
+    loading = true;
+    msg(L.load());
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', INDEX_URL, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) return;
+      loading = false;
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          idx = JSON.parse(xhr.responseText);
+          try { sessionStorage.setItem(KEY, xhr.responseText); } catch (e) {}
+          cb(idx);
+        } catch (e) { msg(L.empty()); }
+      } else {
+        msg(document.documentElement.getAttribute('data-lang') === 'en'
+            ? 'Index unavailable.' : '索引加载失败。');
+      }
+    };
+    xhr.send();
+  }
+
+  function msg(text) {
+    rows = []; active = -1;
+    list.innerHTML = '<li class="aitools-palette-empty"></li>';
+    list.firstChild.textContent = text;
+  }
+
+  // 命中位置：返回该词在文本里第一次出现的位置，找不到返回 -1
+  function firstHit(hay, w) { return hay.indexOf(w); }
+
+  function snippet(text, pos) {
+    var from = Math.max(0, pos - 42);
+    var to = Math.min(text.length, pos + 96);
+    return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+  }
+
+  function search(q) {
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!words.length) return [];
+    var uiLang = document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh';
+    var out = [];
+    idx.docs.forEach(function (d) {
+      var t = (d.t || '').toLowerCase();
+      var de = (d.d || '').toLowerCase();
+      var x = (d.x || '').toLowerCase();
+      var score = 0, hitPos = -1, ok = true;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        var inT = t.indexOf(w), inD = de.indexOf(w), inX = x.indexOf(w);
+        if (inT < 0 && inD < 0 && inX < 0) { ok = false; break; }
+        score += (inT >= 0 ? 8 : 0) + (inD >= 0 ? 3 : 0) + (inX >= 0 ? 1 : 0);
+        if (hitPos < 0) hitPos = inX;
+      }
+      if (!ok) return;
+      if (d.l === uiLang) score += 2;
+      out.push({ d: d, score: score, pos: hitPos });
+    });
+    out.sort(function (a, b) { return b.score - a.score; });
+    return out.slice(0, 12);
+  }
+
+  function draw() {
+    var q = input.value.trim();
+    list.innerHTML = '';
+    rows = []; active = -1;
+    if (!idx) { msg(L.load()); return; }
+    if (!q) { msg(document.documentElement.getAttribute('data-lang') === 'en'
+                   ? 'Type to search ' + idx.docs.length + ' pages.'
+                   : '输入关键词，共 ' + idx.docs.length + ' 篇可搜。'); return; }
+    var hits = search(q);
+    if (!hits.length) { msg(L.empty()); return; }
+    var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    hits.forEach(function (h, n) {
+      var d = h.d;
+      var li = document.createElement('li');
+      li.className = 'aitools-palette-row';
+      li.setAttribute('role', 'option');
+
+      var kind = document.createElement('span');
+      kind.className = 'aitools-palette-kind';
+      kind.textContent = L.kind(d);
+
+      var box = document.createElement('span');
+      box.className = 'site-palette-main';
+      var name = document.createElement('span');
+      name.className = 'aitools-palette-name';
+      name.textContent = d.t;
+      box.appendChild(name);
+
+      // 摘要优先给正文命中那一段（标题命中时正文摘要意义不大，但仍给读者上下文）
+      var pos = h.pos;
+      if (pos < 0) {
+        for (var i = 0; i < words.length && pos < 0; i++) pos = firstHit((d.x || '').toLowerCase(), words[i]);
+      }
+      if (pos >= 0) {
+        var sn = document.createElement('span');
+        sn.className = 'site-palette-snippet';
+        markWords(sn, snippet(d.x, pos), words);
+        box.appendChild(sn);
+      }
+
+      li.appendChild(kind);
+      li.appendChild(box);
+      li.addEventListener('click', function () { go(n); });
+      list.appendChild(li);
+      rows.push({ li: li, url: d.u });
+    });
+    setActive(0);
+  }
+
+  // 用 DOM 拼接而不是 innerHTML：关键词来自用户输入，不能进 HTML 解析
+  function markWords(el, text, words) {
+    var low = text.toLowerCase();
+    var marks = [];
+    words.forEach(function (w) {
+      if (w.length < 1) return;
+      var from = 0, p;
+      while ((p = low.indexOf(w, from)) !== -1) { marks.push([p, p + w.length]); from = p + w.length; }
+    });
+    if (!marks.length) { el.textContent = text; return; }
+    marks.sort(function (a, b) { return a[0] - b[0]; });
+    var cur = 0;
+    marks.forEach(function (m) {
+      if (m[0] < cur) return;
+      if (m[0] > cur) el.appendChild(document.createTextNode(text.slice(cur, m[0])));
+      var k = document.createElement('mark');
+      k.className = 'aitools-hl';
+      k.textContent = text.slice(m[0], m[1]);
+      el.appendChild(k);
+      cur = m[1];
+    });
+    if (cur < text.length) el.appendChild(document.createTextNode(text.slice(cur)));
+  }
+
+  function setActive(n) {
+    if (!rows.length) return;
+    if (active >= 0 && rows[active]) rows[active].li.classList.remove('is-active');
+    active = (n + rows.length) % rows.length;
+    rows[active].li.classList.add('is-active');
+    rows[active].li.scrollIntoView({ block: 'nearest' });
+  }
+
+  function go(n) {
+    var words = input.value.trim();
+    var url = '/' + rows[n].url;
+    if (words) url += (url.indexOf('?') === -1 ? '?' : '&') + 'hl=' + encodeURIComponent(words);
+    window.location.href = url;
+  }
+
+  function onNav(e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (rows.length) go(active < 0 ? 0 : active); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  }
+
+  function open() {
+    build();
+    lastFocus = document.activeElement;
+    scrim.hidden = false;
+    pal.hidden = false;
+    document.body.classList.add('aitools-palette-open');
+    window.requestAnimationFrame(function () { scrim.classList.add('is-open'); pal.classList.add('is-open'); });
+    input.placeholder = L.ph();
+    input.value = '';
+    draw();
+    loadIndex(function () { draw(); });
+    input.focus();
+  }
+
+  function close() {
+    if (!pal) return;
+    scrim.classList.remove('is-open');
+    pal.classList.remove('is-open');
+    document.body.classList.remove('aitools-palette-open');
+    scrim.hidden = true;
+    pal.hidden = true;
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      if (!pal || pal.hidden) open(); else close();
+      return;
+    }
+    // 文章页的「/」也留给搜索：正文页没有专栏页那套列表快捷键，不冲突
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && (!pal || pal.hidden)) {
+      var t = e.target, tag = t && t.tagName ? t.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || (t && t.isContentEditable)) return;
+      e.preventDefault();
+      open();
+    }
+  });
+
+  var trigger = document.getElementById('nav-search');
+  if (trigger) trigger.addEventListener('click', open);
+})();
+</script>
+
+<!-- 从搜索结果跳进来时高亮正文命中：?hl=关键词，标出第一处并滚过去。
+     用完就把参数从地址栏抹掉，免得分享出去的链接自带一个高亮。 -->
+<script>
+(function () {
+  var q;
+  try { q = new URLSearchParams(location.search).get('hl'); } catch (e) { return; }
+  if (!q) return;
+  var body = document.querySelector('.post-content');
+  if (!body) return;
+
+  var words = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 2; });
+  if (!words.length) return;
+
+  var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      var p = n.parentNode;
+      // 代码块和高亮脚本里不插 mark：会破坏缩进，也可能被复制走
+      while (p && p !== body) {
+        var tag = p.nodeName ? p.nodeName.toLowerCase() : '';
+        if (tag === 'code' || tag === 'pre' || tag === 'script' || tag === 'mark') return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  var node, hit = null;
+  while ((node = walker.nextNode())) {
+    var low = node.nodeValue.toLowerCase();
+    for (var i = 0; i < words.length; i++) {
+      var at = low.indexOf(words[i]);
+      if (at !== -1) { hit = { node: node, at: at, len: words[i].length }; break; }
+    }
+    if (hit) break;
+  }
+
+  if (hit) {
+    var k = document.createElement('mark');
+    k.className = 'search-hl';
+    k.textContent = hit.node.nodeValue.substr(hit.at, hit.len);
+    hit.node.splitText(hit.at);
+    hit.node.nextSibling.parentNode.insertBefore(k, hit.node.nextSibling);
+    if (k.scrollIntoView) k.scrollIntoView({ block: 'center' });
+  }
+
+  try {
+    var p = new URLSearchParams(location.search);
+    p.delete('hl');
+    var s = p.toString();
+    history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+  } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
