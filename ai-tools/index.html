@@ -95,8 +95,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085435" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085435" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1794282331663" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1794282331663" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/" />
@@ -126,7 +126,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085435" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1794282331663" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -346,7 +346,7 @@
       </span>
     </div>
     <div class="aitools-stat">
-      <span class="aitools-stat-v">2026-11-06</span>
+      <span class="aitools-stat-v">2026-11-10</span>
       <span class="aitools-stat-k">
         <span class="i18n-zh">最近更新</span><span class="i18n-en">Last update</span>
       </span>
@@ -568,20 +568,20 @@
           <span class="i18n-zh">第 026 期</span>
           <span class="i18n-en">No. 26</span>
         </span>
-        <time datetime="2026-11-06">
-          <span class="i18n-zh">2026.11.6 <span class="aitools-week">周五</span></span>
-          <span class="i18n-en">Nov 6, 2026</span>
+        <time datetime="2026-11-10">
+          <span class="i18n-zh">2026.11.10 <span class="aitools-week">周二</span></span>
+          <span class="i18n-en">Nov 10, 2026</span>
         </time>
       </h2>
 
       
       
       
-      <article class="aitools-item aitools-item--link" id="tool-20261106-promptmap"
-               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="promptmap 双 llm 对赌的 prompt 注入扫描器：一个 llm 发攻击、另一个 llm 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ yaml 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面 dual-llm prompt injection scanner: one llm attacks, another judges, plus an n-gram programmatic layer catches verbatim system prompt leaks; 50+ yaml rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) utku sen 维护，2023 年初版、2025 年重写为 promptmap2。核心架构：target llm（接收攻击）+ controller llm（判 pass/fail），两者可同模型或异模型（推荐 gpt-5 / gemini 2.5 pro / claude 4 sonnet 做裁判）。判定走两条路径：llm 裁判对照 yaml 规则的自然语言 pass/fail 条件；程序化检测用 4-gram + 句子重叠度（阈值 0.85）抓系统提示词原样泄露。三种测试模式：白盒（直连 openai/anthropic/google/xai/ollama api，需提供 system-prompts.txt）、黑盒（http yaml 配置，{payload_position} 占位符，支持代理/鉴权/cookie/url+form 编码，answer_focus_hint 告诉裁判响应里哪段是模型答案）、防火墙（检查响应是否含指定字符串，测拦截率）。读码发现：controller_system_prompt 约 400 字，要求只回 &#34;pass&#34;/&#34;fail&#34; 一个词；evaluate_test_result() 同时跑 llm 裁判 + 程序化检测；check_ngram_leaks 从系统提示提取 4-gram 片段在输出里搜索；check_sentence_overlap 计算 jaccard 相似度。短板：50 规则 × 3 轮 = 150 次 controller 调用成本不低；规则只覆盖六类攻击，对抗性 suffix / 多语言 / 多轮注入缺席；llm 裁判可能被长输出绕过（judge jailbreak）；程序化检测对同义词改写无效。 maintained by utku sen; original 2023, rewritten as promptmap2 in 2025. core architecture: target llm (receives attack) + controller llm (judges pass/fail), same or different models (gpt-5 / gemini 2.5 pro / claude 4 sonnet recommended as controller). verdict runs two paths: llm controller checks natural-language pass/fail conditions in yaml rules; programmatic detection uses 4-gram + sentence overlap (threshold 0.85) to catch verbatim system prompt leaks. three testing modes: white-box (direct openai/anthropic/google/xai/ollama api, requires system-prompts.txt), black-box (http yaml config, {payload_position} placeholder, supports proxy/auth/cookie/url+form encoding, answer_focus_hint tells the controller which slice of the response is the model answer), firewall (checks whether response contains a specific string, measures interception rate). from the source: controller_system_prompt is ~400 words requiring exactly &#34;pass&#34;/&#34;fail&#34; as output; evaluate_test_result() runs both llm judge and programmatic detection; check_ngram_leaks extracts 4-grams from the system prompt and searches the output; check_sentence_overlap computes jaccard similarity. gaps: 50 rules × 3 rounds = 150 controller calls is not cheap; rules cover only six attack families (no adversarial suffix / multilingual / multi-turn injection); llm judge can be bypassed by long outputs (judge jailbreak); programmatic detection misses synonym rewrites."
+      <article class="aitools-item aitools-item--link" id="tool-20261110-promptmap"
+               data-cat="AI Red Teaming Frameworks &amp; Agents" data-search="promptmap 攻判分离的 prompt 注入扫描器：一个 llm 发攻击、另一个 llm 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ yaml 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面 dual-llm prompt injection scanner: one llm attacks, another judges, plus an n-gram programmatic layer catches verbatim system prompt leaks; 50+ yaml rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) utku sen 维护，2023 年初版、2025 年重写为 promptmap2。核心架构：target llm（接收攻击）+ controller llm（判 pass/fail），两者可同模型或异模型（推荐 gpt-5 / gemini 2.5 pro / claude 4 sonnet 做裁判）。判定走两条路径：llm 裁判对照 yaml 规则的自然语言 pass/fail 条件；程序化检测用 4-gram + 句子重叠度（阈值 0.85）抓系统提示词原样泄露。三种测试模式：白盒（直连 openai/anthropic/google/xai/ollama api，需提供 system-prompts.txt）、黑盒（http yaml 配置，{payload_position} 占位符，支持代理/鉴权/cookie/url+form 编码，answer_focus_hint 告诉裁判响应里哪段是模型答案）、防火墙（检查响应是否含指定字符串，测拦截率）。读码发现：controller_system_prompt 约 400 字，要求只回 &#34;pass&#34;/&#34;fail&#34; 一个词；evaluate_test_result() 同时跑 llm 裁判 + 程序化检测；check_ngram_leaks 从系统提示提取 4-gram 片段在输出里搜索；check_sentence_overlap 计算 jaccard 相似度。短板：50 规则 × 3 轮 = 150 次 controller 调用成本不低；规则只覆盖六类攻击，对抗性 suffix / 多语言 / 多轮注入缺席；llm 裁判可能被长输出绕过（judge jailbreak）；程序化检测对同义词改写无效。 maintained by utku sen; original 2023, rewritten as promptmap2 in 2025. core architecture: target llm (receives attack) + controller llm (judges pass/fail), same or different models (gpt-5 / gemini 2.5 pro / claude 4 sonnet recommended as controller). verdict runs two paths: llm controller checks natural-language pass/fail conditions in yaml rules; programmatic detection uses 4-gram + sentence overlap (threshold 0.85) to catch verbatim system prompt leaks. three testing modes: white-box (direct openai/anthropic/google/xai/ollama api, requires system-prompts.txt), black-box (http yaml config, {payload_position} placeholder, supports proxy/auth/cookie/url+form encoding, answer_focus_hint tells the controller which slice of the response is the model answer), firewall (checks whether response contains a specific string, measures interception rate). from the source: controller_system_prompt is ~400 words requiring exactly &#34;pass&#34;/&#34;fail&#34; as output; evaluate_test_result() runs both llm judge and programmatic detection; check_ngram_leaks extracts 4-grams from the system prompt and searches the output; check_sentence_overlap computes jaccard similarity. gaps: 50 rules × 3 rounds = 150 controller calls is not cheap; rules cover only six attack families (no adversarial suffix / multilingual / multi-turn injection); llm judge can be bypassed by long outputs (judge jailbreak); programmatic detection misses synonym rewrites."
                data-name="promptmap" data-status=""
                data-srank="17"
-               data-issue="26" data-date="2026-11-06"
+               data-issue="26" data-date="2026-11-10"
                data-url="https://github.com/utkusen/promptmap"
                data-post-zh="/ai-tools/promptmap/" data-post-en="/en/ai-tools/promptmap/" style="--cat: #F72585">
         <div class="aitools-head">
@@ -608,7 +608,7 @@
         </div>
 
         <p class="aitools-tagline">
-          <span class="i18n-zh">双 LLM 对赌的 Prompt 注入扫描器：一个 LLM 发攻击、另一个 LLM 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ YAML 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面</span>
+          <span class="i18n-zh">攻判分离的 Prompt 注入扫描器：一个 LLM 发攻击、另一个 LLM 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ YAML 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面</span>
           <span class="i18n-en">Dual-LLM prompt injection scanner: one LLM attacks, another judges, plus an n-gram programmatic layer catches verbatim system prompt leaks; 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias)</span>
         </p>
 
@@ -2722,9 +2722,9 @@
       "item": {
         "@type": "SoftwareApplication",
         "name": "promptmap",
-        "description": "双 LLM 对赌的 Prompt 注入扫描器：一个 LLM 发攻击、另一个 LLM 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ YAML 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面",
+        "description": "攻判分离的 Prompt 注入扫描器：一个 LLM 发攻击、另一个 LLM 判过失败，再叠一层 n-gram 程序化检测兜底系统提示词泄露；50+ YAML 规则覆盖提示词窃取 / 越狱 / 分心 / 有害 / 仇恨 / 偏见六类攻击面",
         "url": "https://github.com/utkusen/promptmap",
-        "datePublished": "2026-11-06",
+        "datePublished": "2026-11-10",
         "applicationCategory": "SecurityApplication",
         "author": { "@type": "Person", "name": "Wester" }
       }

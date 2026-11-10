@@ -47,7 +47,7 @@
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
          一条赋值号右边空着的语句 —— 整段 <script> 直接 SyntaxError，
          语言切换和 title 回填全挂。（别在这里写出「赋值号紧跟分号」的字面串，grep 会误报。） */
-      var pageTitle = "promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback";
+      var pageTitle = "promptmap: A Prompt Injection Scanner with Separated Attack and Judgment";
       /* 页面级全量 title 覆盖（front-matter seo_title_zh / seo_title_en）：
          专栏页这类不希望标题后面挂站名、而要挂页面自己定位句的页面用。
          清空 pageTitle、把全量 title 塞进 byLang，本处和 lang-toggle 的
@@ -81,7 +81,7 @@
     })();
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-  <title>promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
+  <title>promptmap: A Prompt Injection Scanner with Separated Attack and Judgment | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
   <meta name="description" content="utkusen/promptmap is an open-source prompt injection scanner by Utku Sen. Core design: one LLM attacks, another LLM judges, plus a programmatic n-gram layer to catch verbatim system prompt leaks. 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) across three testing modes (white-box API, black-box HTTP endpoint, firewall interception rate)." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1793954085438" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1793954085438" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1794282331665" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1794282331665" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/promptmap/" />
@@ -105,19 +105,19 @@
   <!-- Open Graph / Twitter Card -->
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta property="og:title" content="promptmap: A Prompt Injection Scanner with Separated Attack and Judgment | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
   <meta property="og:description" content="utkusen/promptmap is an open-source prompt injection scanner by Utku Sen. Core design: one LLM attacks, another LLM judges, plus a programmatic n-gram layer to catch verbatim system prompt leaks. 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) across three testing modes (white-box API, black-box HTTP endpoint, firewall interception rate)." />
   <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/promptmap/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/promptmap-banner.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
+  <meta name="twitter:title" content="promptmap: A Prompt Injection Scanner with Separated Attack and Judgment | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
   <meta name="twitter:description" content="utkusen/promptmap is an open-source prompt injection scanner by Utku Sen. Core design: one LLM attacks, another LLM judges, plus a programmatic n-gram layer to catch verbatim system prompt leaks. 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) across three testing modes (white-box API, black-box HTTP endpoint, firewall interception rate)." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/promptmap-banner.png" />
   
-  <meta property="article:published_time" content="2026-11-06T04:00:00.000Z" />
-  <meta property="article:modified_time" content="2026-11-06T04:00:00.000Z" />
+  <meta property="article:published_time" content="2026-11-10T00:00:00.000Z" />
+  <meta property="article:modified_time" content="2026-11-10T00:00:00.000Z" />
   <meta property="article:author" content="Wester" />
   
   <meta property="article:tag" content="Browser security" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1793954085438" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1794282331665" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/promptmap/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/promptmap/"},"headline":"promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback","name":"promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback","description":"utkusen/promptmap is an open-source prompt injection scanner by Utku Sen. Core design: one LLM attacks, another LLM judges, plus a programmatic n-gram layer to catch verbatim system prompt leaks. 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) across three testing modes (white-box API, black-box HTTP endpoint, firewall interception rate).","image":"https://we5ter.github.io/images/banners/promptmap-banner.png","inLanguage":"en","datePublished":"2026-11-06T04:00:00.000Z","dateModified":"2026-11-06T04:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/promptmap/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/promptmap/"},"headline":"promptmap: A Prompt Injection Scanner with Separated Attack and Judgment","name":"promptmap: A Prompt Injection Scanner with Separated Attack and Judgment","description":"utkusen/promptmap is an open-source prompt injection scanner by Utku Sen. Core design: one LLM attacks, another LLM judges, plus a programmatic n-gram layer to catch verbatim system prompt leaks. 50+ YAML rules cover six attack surfaces (prompt stealing / jailbreak / distraction / harmful / hate / social bias) across three testing modes (white-box API, black-box HTTP endpoint, firewall interception rate).","image":"https://we5ter.github.io/images/banners/promptmap-banner.png","inLanguage":"en","datePublished":"2026-11-10T00:00:00.000Z","dateModified":"2026-11-10T00:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -394,11 +394,11 @@
 <article class="post post-detail">
   
   <header class="article-header article-header--banner" style="background-image:url(/images/banners/promptmap-banner.png)">
-    <h1 class="post-title">promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback</h1>
+    <h1 class="post-title">promptmap: A Prompt Injection Scanner with Separated Attack and Judgment</h1>
     <div class="article-meta">
-      <time class="article-date" datetime="2026-11-06">
-        <span class="i18n-zh">2026年11月6日</span>
-        <span class="i18n-en">Nov 6, 2026</span>
+      <time class="article-date" datetime="2026-11-10">
+        <span class="i18n-zh">2026年11月10日</span>
+        <span class="i18n-en">Nov 10, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
       <span class="article-readtime"><span class="i18n-zh">约 16 分钟</span><span class="i18n-en">16 min read</span></span>
@@ -646,13 +646,13 @@
     <h4><span class="i18n-zh">分享这篇文章</span><span class="i18n-en">Share this post</span></h4>
     <div class="share-buttons">
         <!-- X (Twitter) -->
-        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/promptmap/&text=promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback"
+        <a class="icon-x" href="https://x.com/share?url=https://we5ter.github.io//en/ai-tools/promptmap/&text=promptmap: A Prompt Injection Scanner with Separated Attack and Judgment"
            onclick="window.open(this.href, 'x-share', 'width=550,height=235');return false;" target="_blank" rel="noopener"
            title="Share on X">
             <img src="/images/static/x-logo.jpg" alt="X" width="22" height="22">
         </a>
         <!-- Weibo -->
-        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/promptmap/&title=promptmap: A Dual-LLM Prompt Injection Scanner with Programmatic Fallback"
+        <a class="icon-weibo" href="https://service.weibo.com/share/share.php?url=https://we5ter.github.io//en/ai-tools/promptmap/&title=promptmap: A Prompt Injection Scanner with Separated Attack and Judgment"
            onclick="window.open(this.href, 'weibo-share', 'width=600,height=500');return false;" target="_blank" rel="noopener"
            title="Share on Weibo">
             <img src="/images/static/weibo.png" alt="Weibo" width="22" height="22">
