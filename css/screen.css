@@ -2206,9 +2206,6 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 .nav-aisec-logo {
   width: 18px;
   height: 18px;
-  /* 原图是 447x447 的 JPEG，圆标外还有一圈白边且没有透明通道：
-     方着贴会露出四个白角，裁成内切圆后白边变成一圈细环。 */
-  border-radius: 50%;
   flex: none;
   align-self: center;
 }
