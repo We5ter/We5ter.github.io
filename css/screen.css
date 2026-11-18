@@ -2166,6 +2166,16 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
   font-size: .75em;
   opacity: .65;
 }
+/* 这两个入口在 /ai-tools/ 下会被高亮脚本标成 is-active，通用规则会给它们刷上
+   accent-soft 淡蓝底，看着又变回胶囊。只去掉底色，当前页仍靠强调色 + 加粗表示。 */
+.masthead__menu-item.is-active > .nav-ai,
+.masthead__menu-item.is-active > .nav-aisec {
+  background: none;
+}
+.masthead__menu-item.is-active > .nav-ai:hover,
+.masthead__menu-item.is-active > .nav-aisec:hover {
+  background: var(--bg-soft);
+}
 
 /* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
 .post-lang-toggle {
