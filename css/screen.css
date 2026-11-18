@@ -2144,79 +2144,27 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 }
 .aitools-more:hover { background: #d6e6ea; color: var(--accent); text-decoration: none; }
 
-/* ---- 导航里的 AI 工具入口：做成一个胶囊，比纯文字更抓眼 ---- */
+/* ---- 导航里的两个产品入口：与其它导航项同规格，只靠 logo 区分 ---- */
 /* 选择器带上 .masthead__menu-item > ：单写 .nav-ai 的权重(0,1,0)低于
-   `.masthead__menu-item > a`(0,2,1)，border-radius 会被那条的 6px 吃掉，
-   胶囊一直是扁的。 */
-.masthead__menu-item > .nav-ai {
-  display: inline-flex !important;
-  align-items: center;
-  gap: .3rem;
-  padding: .3rem .7rem !important;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  border: 1px solid transparent;
-  color: var(--accent) !important;
-  font-weight: 600;
-  white-space: nowrap;
-  /* 浅色学术风主题：hover 反馈靠「底色加深 + 描边」，
-     不反色变白字（白字在这个主题上对比度低且显脏）。 */
-  transition: background-color .15s ease, border-color .15s ease;
-}
-.masthead__menu-item > .nav-ai:hover {
-  background: #d6e6ea;
-  border-color: var(--accent);
-  color: var(--accent) !important;
-  text-decoration: none;
-}
-.nav-ai-logo {
-  width: 22px;
-  height: 22px;
-  /* 透明 PNG 在浅底导航上会透出底色，浅色描边能让轮廓更稳 */
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, .55));
-  flex: none;
-  /* 文字基线和 logo 中心对齐，避免 logo 把行高撑高 */
-  align-self: center;
-}
-
-/* ---- 导航里的姊妹站入口：实心蓝底白字 ---- */
-/* 导航里唯一的站外入口，所以做成实心块，跟浅底的 .nav-ai 明显分开。
-   底色 #2b7de0：白字 4.11:1，比 AA 要求的 4.5 略低一档（字重 600 所以还看得清）。
-   这是按「再浅两度」的要求取的；要回到 AA 就改 #2172cc（4.83:1），再浅就只剩 4.1 以下。
-   hover 只亮边框、底色不动，避免点下去反而变淡。 */
+   `.masthead__menu-item > a`(0,2,1)，display 会被那条的 block 吃掉，
+   logo 和文字就排不到一行。padding / 字号 / 颜色 / hover 全部继承那条。 */
+.masthead__menu-item > .nav-ai,
 .masthead__menu-item > .nav-aisec {
   display: inline-flex !important;
   align-items: center;
   gap: .35rem;
-  padding: .3rem .7rem !important;
-  border-radius: 999px;
-  background: #2b7de0;
-  border: 1px solid transparent;
-  color: #fff !important;
-  font-weight: 600;
   white-space: nowrap;
-  transition: border-color .15s ease;
 }
-.masthead__menu-item > .nav-aisec:hover {
-  background: #2b7de0;
-  border-color: #e3effd;
-  color: #fff !important;
-  text-decoration: none;
-}
+.nav-ai-logo,
 .nav-aisec-logo {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex: none;
   align-self: center;
 }
-/* 暗色下比亮色档收一档（#2673d6，白字 4.66:1 过 AA）：同一亮度放在近黑背景上会发荧。
-   不再退回原来那种接近藏青的 #1e6cbe / #14487f —— 那两版都被嫌太深。 */
-[data-theme="dark"] .masthead__menu-item > .nav-aisec {
-  background: #2673d6;
-}
-[data-theme="dark"] .masthead__menu-item > .nav-aisec:hover {
-  background: #2673d6;
-  border-color: #b3d5fa;
+.nav-ext {
+  font-size: .75em;
+  opacity: .65;
 }
 
 /* ---- 文章头部的语言切换胶囊（翻译兄弟文章用） ---- */
@@ -2244,10 +2192,8 @@ a.aitools-cat:hover { text-decoration: none; filter: brightness(.92); }
 .visible-links { flex-wrap: wrap; }
 @media (max-width: 860px) {
   /* 同样得带 .masthead__menu-item > 前缀，否则权重不够，这几条窄屏收紧根本不生效 */
-  .masthead__menu-item > .nav-ai { padding: .3rem .5rem !important; gap: .25rem; }
-  .nav-ai-logo { width: 20px; height: 20px; }
-  .masthead__menu-item > .nav-aisec { padding: .3rem .55rem !important; gap: .25rem; }
-  .nav-aisec-logo { width: 15px; height: 15px; }
+  .masthead__menu-item > .nav-ai,
+  .masthead__menu-item > .nav-aisec { gap: .3rem; }
 }
 
 /* ---- CVE 档案（/cve/）----
@@ -2848,7 +2794,6 @@ a.cve-hof:hover {
 
 /* 各种 hover 浅蓝底 (#d6e6ea) → 暗色 hover 底 */
 [data-theme="dark"] .aitools-drawer-btn:hover,
-[data-theme="dark"] .nav-ai:hover,
 [data-theme="dark"] .post-lang-toggle:hover,
 [data-theme="dark"] a.cve-hof:hover { background: #24343a; }
 
