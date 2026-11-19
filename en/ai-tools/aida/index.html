@@ -40,8 +40,8 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
@@ -82,7 +82,7 @@
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <title>AIDA: Turn any LLM into a red team AI agent | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
+  <meta name="description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1795088597410" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1795088597410" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1795089077634" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1795089077634" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/en/ai-tools/aida/" />
@@ -106,14 +106,14 @@
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="AIDA: Turn any LLM into a red team AI agent | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
+  <meta property="og:description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
   <meta property="og:url" content="https://we5ter.github.io/en/ai-tools/aida/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/aida-banner.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AIDA: Turn any LLM into a red team AI agent | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
+  <meta name="twitter:description" content="AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars." />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/aida-banner.png" />
   
   <meta property="article:published_time" content="2026-11-18T00:00:00.000Z" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1795088597410" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1795089077634" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/aida/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/aida/"},"headline":"AIDA: Turn any LLM into a red team AI agent","name":"AIDA: Turn any LLM into a red team AI agent","description":"AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and a card-based findings notebook. This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.","image":"https://we5ter.github.io/images/banners/aida-banner.png","inLanguage":"en","datePublished":"2026-11-18T00:00:00.000Z","dateModified":"2026-11-18T00:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/en/ai-tools/aida/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/en/ai-tools/aida/"},"headline":"AIDA: Turn any LLM into a red team AI agent","name":"AIDA: Turn any LLM into a red team AI agent","description":"AIDA (AI-Driven Security Assessment) does not implement an agent loop. Reasoning and execution belong to the Claude Code / Codex / Kimi / Qwen CLI you already have; AIDA supplies 21 MCP tools, a workspace bind-mounted between host and container, a 203-line operating playbook, and persistent note cards of three types (finding / observation / info). This teardown covers three things the README never mentions: the three command approval modes and one fail-open path, the shipped ASVS 5.0 grid of 345 requirements, and the fact that CVSS 4.0 scoring means the model picks the vector while a library does the arithmetic. The four claimed CVEs are verified against MITRE. AGPL-3.0, 515 stars.","image":"https://we5ter.github.io/images/banners/aida-banner.png","inLanguage":"en","datePublished":"2026-11-18T00:00:00.000Z","dateModified":"2026-11-18T00:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -402,7 +402,7 @@
         <span class="i18n-en">Nov 18, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 36 分钟</span><span class="i18n-en">36 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 35 分钟</span><span class="i18n-en">35 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -539,7 +539,7 @@
 <td><code>create_assessment</code> &#x2F; <code>load_assessment</code> &#x2F; <code>list_assessments</code></td>
 </tr>
 <tr>
-<td>Findings notebook</td>
+<td>Note cards (finding &#x2F; observation &#x2F; info)</td>
 <td><code>add_card</code> &#x2F; <code>list_cards</code> &#x2F; <code>update_card</code> &#x2F; <code>delete_card</code></td>
 </tr>
 <tr>
@@ -662,12 +662,10 @@
 
 <p><strong>The model supplies the vector; the library computes the score.</strong> The arithmetic is deterministic and trustworthy. But judgements like <code>AV:N/AC:L/PR:N</code> are model output with no validation, and an invalid vector only logs a warning — the score stays empty and the card is stored anyway. “Automatic scoring” is more accurately <strong>automatic conversion</strong>, not automatic assessment.</p>
 <h2 id="7-Boundaries-and-Risks"><a href="#7-Boundaries-and-Risks" class="headerlink" title="7. Boundaries and Risks"></a>7. Boundaries and Risks</h2><p><strong>1) AGPL-3.0.</strong> Stronger than GPL: turn it into a network-facing service and you must open-source your changes. Fine as a standalone internal tool; think twice before embedding it in a product.</p>
-<p><strong>2) A single-maintainer project.</strong> The contributor list is the author with 205 commits, dependabot with 5, and two outside contributors with 5 and 1. Two open issues and seven watchers more likely mean a small community sample than proven stability. External help when you hit a bug will be limited.</p>
-<p><strong>3) Cadence.</strong> The last commit on the default branch is 2026-09-15; the last release is v1.1.0 from 2026-04-15. The README’s “What’s New” stops at v1.1.0 while the code moved on for months. Docs drifting from code is the normal state here.</p>
-<p><strong>4) The real isolation boundary is the socket allowlist.</strong> In <code>docker-compose.yml</code> the backend does not mount the raw Docker socket; it goes through <code>tecnativa/docker-socket-proxy</code> with only <code>CONTAINERS: 1</code> (inspect &#x2F; list &#x2F; start &#x2F; stop) and <code>EXEC: 1</code> enabled, <code>POST: 1</code> to allow exec and start, and <code>IMAGES</code> &#x2F; <code>VOLUMES</code> &#x2F; <code>NETWORKS</code> &#x2F; <code>BUILD</code> &#x2F; <code>SECRETS</code> &#x2F; <code>PLUGINS</code> all at 0. The comment spells out the intent: a compromised backend cannot create or run a container with a host mount to escape. <strong>This is far more concrete than “it runs in Docker”, and it is the design most worth copying.</strong> Just remember section 3: the workspace itself is a bind mount, and localhost mode has no container at all.</p>
-<p><strong>5) One fail-open path in the approval gate.</strong> See section 4.</p>
-<p><strong>6) Results depend entirely on the model you plug in.</strong> The README’s record was set with Claude. “The smarter the model, the deeper the engagement” is honest, but it also means a smaller model degrades both long tool-call chains and vulnerability judgement — and the project publishes no local-model comparison data.</p>
-<p><strong>7) Do not expose the dashboard.</strong> The README warns with double exclamation marks. <code>--lan</code> enables self-signed HTTPS and <code>--domain</code> provisions Let’s Encrypt; both are double-edged. The JWT auth and roles added in v1.1.0 are necessary, not sufficient.</p>
+<p><strong>2) The real isolation boundary is the socket allowlist.</strong> In <code>docker-compose.yml</code> the backend does not mount the raw Docker socket; it goes through <code>tecnativa/docker-socket-proxy</code> with only <code>CONTAINERS: 1</code> (inspect &#x2F; list &#x2F; start &#x2F; stop) and <code>EXEC: 1</code> enabled, <code>POST: 1</code> to allow exec and start, and <code>IMAGES</code> &#x2F; <code>VOLUMES</code> &#x2F; <code>NETWORKS</code> &#x2F; <code>BUILD</code> &#x2F; <code>SECRETS</code> &#x2F; <code>PLUGINS</code> all at 0. The comment spells out the intent: a compromised backend cannot create or run a container with a host mount to escape. <strong>This is far more concrete than “it runs in Docker”, and it is the design most worth copying.</strong> Just remember section 3: the workspace itself is a bind mount, and localhost mode has no container at all.</p>
+<p><strong>3) One fail-open path in the approval gate.</strong> See section 4.</p>
+<p><strong>4) Results depend entirely on the model you plug in.</strong> The README’s record was set with Claude. “The smarter the model, the deeper the engagement” is honest, but it also means a smaller model degrades both long tool-call chains and vulnerability judgement — and the project publishes no local-model comparison data.</p>
+<p><strong>5) Do not expose the dashboard.</strong> The README warns with double exclamation marks. <code>--lan</code> enables self-signed HTTPS and <code>--domain</code> provisions Let’s Encrypt; both are double-edged. The JWT auth and roles added in v1.1.0 are necessary, not sufficient.</p>
 <h2 id="8-Where-It-Sits"><a href="#8-Where-It-Sits" class="headerlink" title="8. Where It Sits"></a>8. Where It Sits</h2><table>
 <thead>
 <tr>
@@ -721,7 +719,7 @@
 <td>—</td>
 </tr>
 </tbody></table>
-<p>AIDA’s position is clear: <strong>it is not competing on whose planner is smarter, it is competing on how completely a general CLI can be turned into a pentest tool.</strong> The tool surface, shared workspace, credential placeholders, card notebook, approval switch and ASVS grid are the actual deliverable. If you already run Claude Code or Codex, adoption costs almost nothing. If you want a pentest platform that runs independently of a specific CLI, this is not that.</p>
+<p>AIDA’s position is clear: <strong>it is not competing on whose planner is smarter, it is competing on how completely a general CLI can be turned into a pentest tool.</strong> The tool surface, shared workspace, credential placeholders, note cards, approval switch and ASVS grid are the actual deliverable. If you already run Claude Code or Codex, adoption costs almost nothing. If you want a pentest platform that runs independently of a specific CLI, this is not that.</p>
 <div class="x-verdict">
 <span class="x-label">Verdict</span>
 

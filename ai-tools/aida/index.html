@@ -40,8 +40,8 @@
       root.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
 
       var SEO = {
-        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
-        zh: { title: "西风微雨 - Wester's blog", desc: "AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
+        en: { title: "西风微雨 · Wester's blog — Security Research & AI Tooling", desc: "AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。", kw: "Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" },
+        zh: { title: "西风微雨 - Wester's blog", desc: "AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。", kw: "浏览器安全, Android安全, 渗透测试, 攻击性安全研究, AI安全, 人工智能安全" }
       };
       /* 必须带 `|| ''`：JSON.stringify(undefined) 返回的是 undefined 而不是字符串，
          EJS 的  又把它输出成空串，于是首页/归档页（page.title 为空）会渲染出
@@ -82,7 +82,7 @@
   </script>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
   <title>AIDA：把任意 LLM 变成红队 AI 智能体 | 西风微雨 · Wester's blog — Security Research & AI Tooling</title>
-  <meta name="description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
+  <meta name="description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
   <meta name="keywords" content="Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="MobileOptimized" content="320" />
@@ -91,8 +91,8 @@
   
   <meta name="theme-color" content="#ffffff" />
   
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1795088597410" />
-  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1795088597410" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/static/wester-favicon-32.png?v=1795089077635" />
+  <link rel="apple-touch-icon" href="/images/static/wester-apple-touch.png?v=1795089077635" />
 
   <!-- Canonical + hreflang（有中英兄弟页的文章才发 hreflang）-->
   <link rel="canonical" href="https://we5ter.github.io/ai-tools/aida/" />
@@ -106,14 +106,14 @@
   <meta property="og:site_name" content="西风微雨 - Wester&#39;s blog" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="AIDA：把任意 LLM 变成红队 AI 智能体 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta property="og:description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
+  <meta property="og:description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
   <meta property="og:url" content="https://we5ter.github.io/ai-tools/aida/" />
   <meta property="og:image" content="https://we5ter.github.io/images/banners/aida-banner.png" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:locale:alternate" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AIDA：把任意 LLM 变成红队 AI 智能体 | 西风微雨 · Wester&#39;s blog — Security Research &amp; AI Tooling" />
-  <meta name="twitter:description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
+  <meta name="twitter:description" content="AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。" />
   <meta name="twitter:image" content="https://we5ter.github.io/images/banners/aida-banner.png" />
   
   <meta property="article:published_time" content="2026-11-18T00:00:00.000Z" />
@@ -143,7 +143,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- YOYO Theme Styles -->
-  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1795088597410" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css?v=1795089077635" />
   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" />
 
   
@@ -161,7 +161,7 @@
   
 
   <!-- Structured data (schema.org) -->
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/aida/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/aida/"},"headline":"AIDA：把任意 LLM 变成红队 AI 智能体","name":"AIDA：把任意 LLM 变成红队 AI 智能体","description":"AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和卡片式发现笔记本。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。","image":"https://we5ter.github.io/images/banners/aida-banner.png","inLanguage":"zh-CN","datePublished":"2026-11-18T00:00:00.000Z","dateModified":"2026-11-18T00:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://we5ter.github.io/#website","url":"https://we5ter.github.io/","name":"西风微雨 · Wester's blog — Security Research & AI Tooling","alternateName":"西风微雨 - Wester's blog","description":"Security Researcher. Research focus: AI Red Teaming, Mobile Security, Agent Security Governance.","inLanguage":["en","zh-CN"],"publisher":{"@id":"https://we5ter.github.io/#publisher"}},{"@type":"Person","@id":"https://we5ter.github.io/#publisher","name":"Wester","url":"https://we5ter.github.io/","image":{"@type":"ImageObject","url":"https://we5ter.github.io/images/static/avatar.png"}},{"@type":"BlogPosting","@id":"https://we5ter.github.io/ai-tools/aida/#article","mainEntityOfPage":{"@type":"WebPage","@id":"https://we5ter.github.io/ai-tools/aida/"},"headline":"AIDA：把任意 LLM 变成红队 AI 智能体","name":"AIDA：把任意 LLM 变成红队 AI 智能体","description":"AIDA（AI-Driven Security Assessment）不自己写 agent 循环：推理和执行交给你装的 Claude Code / Codex / Kimi / Qwen CLI，它提供 21 个 MCP 工具、宿主机与容器共享的工作目录、一份 203 行操作手册和三类持久化笔记卡片（发现 / 观察 / 信息）。本文读码拆解三件 README 没写的事：命令审批闸门三档默认值与一处 fail-open、已落地的 ASVS 5.0 345 条验证网格、CVSS 4.0 打分其实是模型给向量库算分；并核实了它宣称的四个 CVE。AGPL-3.0，515 star。","image":"https://we5ter.github.io/images/banners/aida-banner.png","inLanguage":"zh-CN","datePublished":"2026-11-18T00:00:00.000Z","dateModified":"2026-11-18T00:00:00.000Z","author":{"@id":"https://we5ter.github.io/#publisher"},"publisher":{"@id":"https://we5ter.github.io/#publisher"},"keywords":"Browser security, Android Security, Pentest, Offensive Security Research, Security for AI, AI safety"}]}</script>
 <link rel="alternate" href="/atom.xml" title="西风微雨 - Wester's blog" type="application/rss+xml">
 </head>
 
@@ -402,7 +402,7 @@
         <span class="i18n-en">Nov 18, 2026</span>
       </time>
       <span class="meta-sep">&middot;</span>
-      <span class="article-readtime"><span class="i18n-zh">约 20 分钟</span><span class="i18n-en">20 min read</span></span>
+      <span class="article-readtime"><span class="i18n-zh">约 19 分钟</span><span class="i18n-en">19 min read</span></span>
       
       <span class="meta-sep">&middot;</span>
       <span class="article-views">
@@ -539,7 +539,7 @@
 <td><code>create_assessment</code> &#x2F; <code>load_assessment</code> &#x2F; <code>list_assessments</code></td>
 </tr>
 <tr>
-<td>发现笔记本</td>
+<td>笔记卡片（发现 &#x2F; 观察 &#x2F; 信息）</td>
 <td><code>add_card</code> &#x2F; <code>list_cards</code> &#x2F; <code>update_card</code> &#x2F; <code>delete_card</code></td>
 </tr>
 <tr>
@@ -662,12 +662,10 @@
 
 <p><strong>向量由模型给，分数由库算。</strong> 算分这一步是确定性的、可信的；但「AV:N&#x2F;AC:L&#x2F;PR:N」这些判断本身是模型的输出，没有任何校验。向量非法时只记一条 warning，分数留空，卡片照样入库。所以「自动打分」准确的说法是<strong>自动换算</strong>，不是自动评估。</p>
 <h2 id="七、边界与风险"><a href="#七、边界与风险" class="headerlink" title="七、边界与风险"></a>七、边界与风险</h2><p><strong>1）AGPL-3.0。</strong> 比 GPL 多了网络服务化条款：你把它改造成对外提供的服务，也要开源。企业内部当独立工具用没问题，嵌进自有产品要谨慎。</p>
-<p><strong>2）单人项目。</strong> 贡献者表是作者 205 次提交 + dependabot 5 次 + 两位外部贡献者各 5 次和 1 次。open issues 只有 2 个、watchers 7 个——这更可能说明社区样本还很小，而不是说明它稳定。你踩坑时能指望的外部帮助有限。</p>
-<p><strong>3）节奏。</strong> 主干最近一次提交是 2026-09-15，最后一个 release 是 2026-04-15 的 v1.1.0。README 的「What’s New」停在 v1.1.0，但代码在那之后又走了几个月，文档与代码不同步是常态。</p>
-<p><strong>4）真正的隔离边界在 socket 白名单。</strong> <code>docker-compose.yml</code> 里 backend 不挂原始 Docker socket，而是走 <code>tecnativa/docker-socket-proxy</code>：只开 <code>CONTAINERS: 1</code>（inspect &#x2F; list &#x2F; start &#x2F; stop）和 <code>EXEC: 1</code>，<code>POST: 1</code> 是为了 exec 与 start；<code>IMAGES</code> &#x2F; <code>VOLUMES</code> &#x2F; <code>NETWORKS</code> &#x2F; <code>BUILD</code> &#x2F; <code>SECRETS</code> &#x2F; <code>PLUGINS</code> 等全部为 0。注释写得明白：被攻陷的 backend 也没法 create&#x2F;run 一个挂宿主机目录的容器逃出去。<strong>这一条比「跑在 Docker 里」具体得多，也是它最值得抄的设计。</strong> 但别忘了第三章：工作目录本身是 bind mount，localhost 模式连容器都没有。</p>
-<p><strong>5）审批闸门有一处 fail-open。</strong> 见第四章。</p>
-<p><strong>6）效果完全取决于你接的模型。</strong> README 的战绩是 Claude 跑的，手册里那句「The smarter the model, the deeper the engagement」是诚实的，但也意味着换个小模型，长链条工具调用和漏洞判定都会退化，而项目没有给任何本地模型的对照数据。</p>
-<p><strong>7）dashboard 别暴露公网。</strong> README 自己用双感叹号警告了。<code>--lan</code> 会开自签名 HTTPS，<code>--domain</code> 会签 Let’s Encrypt 证书——这两个开关是把双刃剑，v1.1.0 加的 JWT 鉴权和角色是必要条件，不是充分条件。</p>
+<p><strong>2）真正的隔离边界在 socket 白名单。</strong> <code>docker-compose.yml</code> 里 backend 不挂原始 Docker socket，而是走 <code>tecnativa/docker-socket-proxy</code>：只开 <code>CONTAINERS: 1</code>（inspect &#x2F; list &#x2F; start &#x2F; stop）和 <code>EXEC: 1</code>，<code>POST: 1</code> 是为了 exec 与 start；<code>IMAGES</code> &#x2F; <code>VOLUMES</code> &#x2F; <code>NETWORKS</code> &#x2F; <code>BUILD</code> &#x2F; <code>SECRETS</code> &#x2F; <code>PLUGINS</code> 等全部为 0。注释写得明白：被攻陷的 backend 也没法 create&#x2F;run 一个挂宿主机目录的容器逃出去。<strong>这一条比「跑在 Docker 里」具体得多，也是它最值得抄的设计。</strong> 但别忘了第三章：工作目录本身是 bind mount，localhost 模式连容器都没有。</p>
+<p><strong>3）审批闸门有一处 fail-open。</strong> 见第四章。</p>
+<p><strong>4）效果完全取决于你接的模型。</strong> README 的战绩是 Claude 跑的，手册里那句「The smarter the model, the deeper the engagement」是诚实的，但也意味着换个小模型，长链条工具调用和漏洞判定都会退化，而项目没有给任何本地模型的对照数据。</p>
+<p><strong>5）dashboard 别暴露公网。</strong> README 自己用双感叹号警告了。<code>--lan</code> 会开自签名 HTTPS，<code>--domain</code> 会签 Let’s Encrypt 证书——这两个开关是把双刃剑，v1.1.0 加的 JWT 鉴权和角色是必要条件，不是充分条件。</p>
 <h2 id="八、生态定位"><a href="#八、生态定位" class="headerlink" title="八、生态定位"></a>八、生态定位</h2><table>
 <thead>
 <tr>
@@ -721,7 +719,7 @@
 <td>—</td>
 </tr>
 </tbody></table>
-<p>AIDA 的位置很清楚：<strong>它不跟自研编排引擎比谁的规划更聪明，它比的是「把通用 CLI 变成红队工具」这件事做得多完整</strong>——工具面、共享工作目录、凭证占位符、卡片笔记本、审批开关、ASVS 网格，这一整套是它真正的产出。如果你已经在用 Claude Code 或 Codex，它的接入成本几乎为零；如果你想要一个能脱离特定 CLI 独立运行的红队平台，它不是那个东西。</p>
+<p>AIDA 的位置很清楚：<strong>它不跟自研编排引擎比谁的规划更聪明，它比的是「把通用 CLI 变成红队工具」这件事做得多完整</strong>——工具面、共享工作目录、凭证占位符、笔记卡片、审批开关、ASVS 网格，这一整套是它真正的产出。如果你已经在用 Claude Code 或 Codex，它的接入成本几乎为零；如果你想要一个能脱离特定 CLI 独立运行的红队平台，它不是那个东西。</p>
 <div class="x-verdict">
 <span class="x-label">结论</span>
 
