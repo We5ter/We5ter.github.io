@@ -366,6 +366,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://we5ter.github.io/en/ai-tools/aida/</loc>
+    <lastmod>2026-11-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://we5ter.github.io/ai-tools/aida/</loc>
+    <lastmod>2026-11-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://we5ter.github.io/tags/Browser-Security/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.3</priority>
